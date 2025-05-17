@@ -1,0 +1,34 @@
+server:
+  port: 8080
+  address: 127.192.0.1
+
+spring:
+  application:
+    name: smartcampus            # 应用名称，供日志输出使用
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/memorystore_db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: 10280017
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+langchain4j:
+  community:
+    dashscope:
+      chat-model:
+        api-key: ${DASHSCOPE_API_KEY}
+        model-name: qwen-max-latest
+      embedding-model:
+        api-key: ${DASHSCOPE_API_KEY}
+        model-name: text-embedding-v3
+
+logging:
+  level:
+    com.hmall: DEBUG             # 设置包级别日志
+  pattern:
+    dateformat: HH:mm:ss:SSS     # 时间格式
+  file:
+    path: logs/${spring.application.name}   # 引用已定义的应用名
