@@ -34,5 +34,10 @@ public class JsonUtils {
         return newObject;
     }
 
+    public static String toJsonString(Object object) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(object);
+    }
+
 
 }

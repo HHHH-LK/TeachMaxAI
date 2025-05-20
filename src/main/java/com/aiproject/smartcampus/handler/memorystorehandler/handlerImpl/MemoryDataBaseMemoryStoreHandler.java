@@ -1,11 +1,11 @@
 package com.aiproject.smartcampus.handler.memorystorehandler.handlerImpl;
 
-import com.aiproject.smartcampus.handler.memorystorehandler.Handler;
+import com.aiproject.smartcampus.handler.memorystorehandler.MemoryStoreHandler;
 
 import com.aiproject.smartcampus.mapper.AIMapper;
-import com.aiproject.smartcampus.pojo.entity.HandlerResponse;
-import com.aiproject.smartcampus.pojo.entity.Handlerquery;
-import com.aiproject.smartcampus.pojo.entity.LocalMessage;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerResponse;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerquery;
+import com.aiproject.smartcampus.pojo.po.LocalMessage;
 import com.aiproject.smartcampus.commons.utils.ChatMemoryBuilder;
 import com.aiproject.smartcampus.commons.utils.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -33,21 +33,20 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class MemoryDataBaseHandler extends Handler {
+public class MemoryDataBaseMemoryStoreHandler extends MemoryStoreHandler {
 
     private static final int MAX_TTL_DAYS = 7;
     private final AIMapper aiMapper;
 
     @Override
-    public void getMessagesHandle(Handlerquery query, HandlerResponse response) {
+    public void getMessagesHandle(MemoryStoreHandlerquery query, MemoryStoreHandlerResponse response) {
         if (Boolean.FALSE.equals(response.getIsSuccess())) {
             log.error("跳过 DB 读取：前置校验失败");
             return;
         }
         String userId = query.getUserId();
         // 1. 读出该 userId 所有消息
-        List<LocalMessage> localMemories =
-                aiMapper.selectList(new LambdaQueryWrapper<LocalMessage>()
+        List<LocalMessage> localMemories = aiMapper.selectList(new LambdaQueryWrapper<LocalMessage>()
                         .eq(LocalMessage::getUserId, userId));
 
         // 2. 过滤掉超过 TTL 天的记录
@@ -71,7 +70,7 @@ public class MemoryDataBaseHandler extends Handler {
     }
 
     @Override
-    public void updateMessagesHandle(Handlerquery query, HandlerResponse response) {
+    public void updateMessagesHandle(MemoryStoreHandlerquery query, MemoryStoreHandlerResponse response) {
         if (Boolean.FALSE.equals(response.getIsSuccess())) {
             log.error("跳过 DB 更新：前置校验失败");
             return;
@@ -111,7 +110,7 @@ public class MemoryDataBaseHandler extends Handler {
     }
 
     @Override
-    public void deleteMessagesHandle(Handlerquery query, HandlerResponse response) {
+    public void deleteMessagesHandle(MemoryStoreHandlerquery query, MemoryStoreHandlerResponse response) {
         if (Boolean.FALSE.equals(response.getIsSuccess())) {
             log.error("跳过 DB 删除：前置校验失败");
             return;

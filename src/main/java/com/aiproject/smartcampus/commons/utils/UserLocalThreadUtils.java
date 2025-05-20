@@ -1,7 +1,7 @@
 package com.aiproject.smartcampus.commons.utils;
 
 
-import com.aiproject.smartcampus.pojo.entity.User;
+import com.aiproject.smartcampus.pojo.dto.UserRegisterDTO;
 import lombok.Data;
 
 /**
@@ -14,12 +14,12 @@ import lombok.Data;
 @Data
 public class UserLocalThreadUtils {
 
-    private static ThreadLocal<User> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<UserRegisterDTO> threadLocal = new ThreadLocal<>();
 
-    public static User getUserInfo(){
+    public static UserRegisterDTO getUserInfo(){
         return threadLocal.get();
     }
-    public static void setUserInfo(User user){threadLocal.set(user);}
+    public static void setUserInfo(UserRegisterDTO user){threadLocal.set(user);}
     public static void removeUserInfo(){threadLocal.remove();}
 
 }

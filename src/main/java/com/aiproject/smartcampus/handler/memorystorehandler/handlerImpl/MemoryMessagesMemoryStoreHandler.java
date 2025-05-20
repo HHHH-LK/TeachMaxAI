@@ -1,8 +1,8 @@
 package com.aiproject.smartcampus.handler.memorystorehandler.handlerImpl;
 
-import com.aiproject.smartcampus.handler.memorystorehandler.Handler;
-import com.aiproject.smartcampus.pojo.entity.HandlerResponse;
-import com.aiproject.smartcampus.pojo.entity.Handlerquery;
+import com.aiproject.smartcampus.handler.memorystorehandler.MemoryStoreHandler;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerResponse;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerquery;
 import com.aiproject.smartcampus.commons.utils.CollectionUtils;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
@@ -20,13 +20,13 @@ import java.util.Map;
  **/
 
 @Slf4j
-public class MemoryMessagesHandler extends Handler {
+public class MemoryMessagesMemoryStoreHandler extends MemoryStoreHandler {
     @Override
-    public void getMessagesHandle(Handlerquery handlerquery, HandlerResponse handlerResponse) {
+    public void getMessagesHandle(MemoryStoreHandlerquery handlerquery, MemoryStoreHandlerResponse handlerResponse) {
 
         try{
             if(handlerResponse.getIsSuccess()==false){
-                log.error("{}流程前错误",MemoryMessagesHandler.class.getName());
+                log.error("{}流程前错误", MemoryMessagesMemoryStoreHandler.class.getName());
                 return;
             }
             Map<String, ChatMemory> memoryMap = handlerResponse.getMemoryMap();
@@ -43,7 +43,7 @@ public class MemoryMessagesHandler extends Handler {
             }
 
         }catch (RuntimeException e){
-            log.error("{}流程错误",MemoryMessagesHandler.class.getName());
+            log.error("{}流程错误", MemoryMessagesMemoryStoreHandler.class.getName());
             handlerResponse.setIsSuccess(false);
         }
 
@@ -51,14 +51,14 @@ public class MemoryMessagesHandler extends Handler {
     }
 
     @Override
-    public void updateMessagesHandle(Handlerquery handlerquery,HandlerResponse handlerResponse) {
+    public void updateMessagesHandle(MemoryStoreHandlerquery handlerquery, MemoryStoreHandlerResponse handlerResponse) {
 
 
 
     }
 
     @Override
-    public void deleteMessagesHandle(Handlerquery handlerquery,HandlerResponse handlerResponse) {
+    public void deleteMessagesHandle(MemoryStoreHandlerquery handlerquery, MemoryStoreHandlerResponse handlerResponse) {
 
     }
 }

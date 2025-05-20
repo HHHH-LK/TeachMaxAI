@@ -1,10 +1,8 @@
-package com.aiproject.smartcampus.pojo.entity;
+package com.aiproject.smartcampus.pojo.bo.handlerentity;
 
-import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,15 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @program: SmartCampus
  * @description: 责任链请求体
  * @author: lk
- * @create: 2025-05-17 16:16
+ * @create: 2025-05-19 17:21
  **/
 
 @Data
 public class Handlerquery {
 
+    //查询内容
+    protected String queryContent;
     private Map<String, ChatMemory> queryMap=new ConcurrentHashMap<>();
-    private String userId;
-    private List<ChatMessage> chatMessageList;
-
-
 }

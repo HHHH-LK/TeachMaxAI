@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.pojo.entity;
+package com.aiproject.smartcampus.pojo.bo;
 
 import dev.langchain4j.agent.tool.ToolSpecification;
 import lombok.Data;

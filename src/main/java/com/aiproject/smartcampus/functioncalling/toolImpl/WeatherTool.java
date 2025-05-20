@@ -2,7 +2,7 @@ package com.aiproject.smartcampus.functioncalling.toolImpl;
 
 import com.aiproject.smartcampus.exception.WeatherExpection;
 import com.aiproject.smartcampus.functioncalling.Tool;
-import com.aiproject.smartcampus.pojo.entity.WeatherInfo;
+import com.aiproject.smartcampus.pojo.bo.WeatherInfo;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

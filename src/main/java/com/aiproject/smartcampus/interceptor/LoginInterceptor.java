@@ -16,6 +16,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @create: 2025-05-17 17:07
  **/
 
+//todo 在此基础上加上限流算法
+
 @Component
 @RequiredArgsConstructor
 public class LoginInterceptor implements HandlerInterceptor {

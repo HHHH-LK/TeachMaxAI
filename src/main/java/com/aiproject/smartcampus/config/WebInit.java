@@ -21,21 +21,29 @@ public class WebInit implements WebMvcConfigurer {
     private final LoginInterceptor loginInterceptor;
     private final RefreashInterceptor refreashInterceptor;
     //todo 设置允许公共操作的路径
-    private final String[]paths={};
+    private final String[] swaggerWhitelist = {
+            "/doc.html",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns(paths)
+                .excludePathPatterns(swaggerWhitelist)
                 .order(0);
         registry.addInterceptor(refreashInterceptor)
                 .addPathPatterns("/**")
                 .order(1);
 
 
-
-
     }
+
 }
 

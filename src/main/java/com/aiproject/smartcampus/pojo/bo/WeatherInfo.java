@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.pojo.entity;
+package com.aiproject.smartcampus.pojo.bo;
 
 
 import com.aiproject.smartcampus.tools.WeatherTool;

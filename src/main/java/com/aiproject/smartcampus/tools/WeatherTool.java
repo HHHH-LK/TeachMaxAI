@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.tools;
 
-import com.aiproject.smartcampus.pojo.entity.WeatherInfo;
+import com.aiproject.smartcampus.pojo.bo.WeatherInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.pojo.entity;
+package com.aiproject.smartcampus.pojo.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

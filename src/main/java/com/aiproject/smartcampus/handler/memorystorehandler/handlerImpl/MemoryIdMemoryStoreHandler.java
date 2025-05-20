@@ -1,8 +1,8 @@
 package com.aiproject.smartcampus.handler.memorystorehandler.handlerImpl;
 
-import com.aiproject.smartcampus.handler.memorystorehandler.Handler;
-import com.aiproject.smartcampus.pojo.entity.HandlerResponse;
-import com.aiproject.smartcampus.pojo.entity.Handlerquery;
+import com.aiproject.smartcampus.handler.memorystorehandler.MemoryStoreHandler;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerResponse;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerquery;
 import com.aiproject.smartcampus.commons.utils.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
  * @create: 2025-05-11 10:40
  **/
 @Slf4j
-public class MemoryIdHandler extends Handler {
+public class MemoryIdMemoryStoreHandler extends MemoryStoreHandler {
 
     @Override
-    public void getMessagesHandle(Handlerquery query, HandlerResponse response) {
+    public void getMessagesHandle(MemoryStoreHandlerquery query, MemoryStoreHandlerResponse response) {
         String userId = query.getUserId();
         if (StringUtils.isBlank(userId)) {
             response.setIsSuccess(false);
@@ -33,7 +33,7 @@ public class MemoryIdHandler extends Handler {
     }
 
     @Override
-    public void updateMessagesHandle(Handlerquery query, HandlerResponse response) {
+    public void updateMessagesHandle(MemoryStoreHandlerquery query, MemoryStoreHandlerResponse response) {
         String userId = query.getUserId();
         if (StringUtils.isBlank(userId) || CollectionUtils.isEmpty(query.getChatMessageList())) {
             response.setIsSuccess(false);
@@ -48,7 +48,7 @@ public class MemoryIdHandler extends Handler {
     }
 
     @Override
-    public void deleteMessagesHandle(Handlerquery query, HandlerResponse response) {
+    public void deleteMessagesHandle(MemoryStoreHandlerquery query, MemoryStoreHandlerResponse response) {
         String userId = query.getUserId();
         if (StringUtils.isBlank(userId)) {
             response.setIsSuccess(false);

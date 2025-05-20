@@ -1,713 +1,255 @@
-15:45:44:764  INFO 14856 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 14856 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-15:45:44:765  INFO 14856 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-15:45:45:047  INFO 14856 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-15:45:45:053  INFO 14856 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-15:45:45:065  INFO 14856 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 Redis repository interfaces.
-15:45:45:137  WARN 14856 --- [smartcampus] [main] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.aiproject.smartcampus]' package. Please check your configuration.
-15:45:45:780  INFO 14856 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 1.294 seconds (process running for 1.723)
-19:12:51:777  INFO 36204 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 36204 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-19:12:51:778  INFO 36204 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-19:12:52:664  INFO 36204 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:12:52:667  INFO 36204 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:12:52:692  INFO 36204 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
-19:12:53:071  INFO 36204 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-19:12:53:074  INFO 36204 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-19:12:53:076  INFO 36204 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-19:12:53:084  INFO 36204 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-19:12:53:084  INFO 36204 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-19:12:53:127  INFO 36204 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-19:12:53:127  INFO 36204 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1322 ms
-19:12:56:808  INFO 36204 --- [smartcampus] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
-19:12:57:677  INFO 36204 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-19:12:57:683  INFO 36204 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 6.202 seconds (process running for 6.739)
-19:17:26:621  INFO 36204 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-19:17:26:623  INFO 36204 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-19:17:31:657  INFO 35592 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 35592 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-19:17:31:658  INFO 35592 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-19:17:32:275  INFO 35592 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:17:32:277  INFO 35592 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:17:32:307  INFO 35592 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 15 ms. Found 0 Redis repository interfaces.
-19:17:32:666  INFO 35592 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-19:17:32:668  INFO 35592 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-19:17:32:671  INFO 35592 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-19:17:32:677  INFO 35592 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-19:17:32:678  INFO 35592 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-19:17:32:725  INFO 35592 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-19:17:32:727  INFO 35592 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1022 ms
-19:17:36:778  INFO 35592 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-19:17:36:783  INFO 35592 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 5.386 seconds (process running for 5.836)
-19:18:30:716  INFO 32688 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 32688 (started by lk139 in D:\SmartCampus)
-19:18:30:717  INFO 32688 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:18:31:610  INFO 32688 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:18:31:615  INFO 32688 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:18:31:679  INFO 32688 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 0 Redis repository interfaces.
-19:18:38:987  INFO 32688 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 8.553 seconds (process running for 9.897)
-19:18:39:596  INFO 32688 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:19:31:227  INFO 35752 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 35752 (started by lk139 in D:\SmartCampus)
-19:19:31:228  INFO 35752 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:19:31:819  INFO 35752 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:19:31:821  INFO 35752 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:19:31:853  INFO 35752 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 17 ms. Found 0 Redis repository interfaces.
-19:19:38:857  INFO 35752 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 7.899 seconds (process running for 8.621)
-19:19:39:401  INFO 35752 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:19:39:490  INFO 35752 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7c59f315
-19:19:39:491  INFO 35752 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:19:42:517  WARN 35752 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 未触发任何工具调用
-19:19:42:546  INFO 35752 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:19:42:551  INFO 35752 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-19:26:37:046  INFO 33740 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 33740 (started by lk139 in D:\SmartCampus)
-19:26:37:047  INFO 33740 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:26:37:636  INFO 33740 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:26:37:638  INFO 33740 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:26:37:665  INFO 33740 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
-19:26:42:273  INFO 33740 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 5.501 seconds (process running for 6.298)
-19:26:42:898  INFO 33740 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:26:43:002  INFO 33740 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@11b234aa
-19:26:43:004  INFO 33740 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:26:44:575  WARN 33740 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : Tool execution result should follow a tool execution request message. Drop duplicated message: UserMessage { name = null contents = [TextContent { text = "今天天气怎么样" }] }
-19:26:45:761  WARN 33740 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 未触发任何工具调用
-19:26:45:783  INFO 33740 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:26:45:787  INFO 33740 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-19:26:57:068  INFO 18336 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 18336 (started by lk139 in D:\SmartCampus)
-19:26:57:068  INFO 18336 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:26:57:807  INFO 18336 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:26:57:811  INFO 18336 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:26:57:847  INFO 18336 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 21 ms. Found 0 Redis repository interfaces.
-19:27:03:231  INFO 18336 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 6.555 seconds (process running for 7.628)
-19:27:25:411  INFO 18336 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:27:25:504  INFO 18336 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5016934
-19:27:25:507  INFO 18336 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:28:39:512  WARN 18336 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m104ms323µs).
-19:28:53:844  WARN 18336 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : The first message should be a system message or a user message, but found: AiMessage { text = "很抱歉，您提供的信息中并没有提到“行明”的相关故事或背景。如果您能提供更详细的上下文或者关于“行明”的具体信息，我会尽力为您整理出一个完整的故事或回答您的问题。
+01:29:12:901  INFO 48344 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+01:29:12:919  INFO 48344 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+15:13:53:967  INFO 19776 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 19776 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
+15:13:53:969  INFO 19776 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+15:13:55:480  INFO 19776 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+15:13:55:483  INFO 19776 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+15:13:55:516  INFO 19776 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 19 ms. Found 0 Redis repository interfaces.
+15:13:56:064  INFO 19776 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+15:13:56:067  INFO 19776 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+15:13:56:083  INFO 19776 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+15:13:56:092  INFO 19776 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+15:13:56:093  INFO 19776 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+15:13:56:135  INFO 19776 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+15:13:56:135  INFO 19776 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2132 ms
+15:13:56:995  INFO 19776 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+15:13:57:135  WARN 19776 --- [smartcampus] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'commonController' defined in file [D:\SmartCampus\target\classes\com\aiproject\smartcampus\controller\CommonController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'commonServiceImpl' defined in file [D:\SmartCampus\target\classes\com\aiproject\smartcampus\service\impl\CommonServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 3: Error creating bean with name 'redissionClient' defined in class path resource [com/aiproject/smartcampus/config/Lockinit.class]: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+15:13:57:143  INFO 19776 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+15:13:57:168  INFO 19776 --- [smartcampus] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
 
-如果“行明”是某个历史人物、小说角色或特定文化背景中的形象，请补充相关信息，我将根据您提供的内容进行解答！" toolExecutionRequests = null }
-19:28:53:844  WARN 18336 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : Tool execution result should follow a tool execution request message. Drop duplicated message: UserMessage { name = null contents = [TextContent { text = "今天天气怎么样" }] }
-19:28:53:844  WARN 18336 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : Tool execution result should follow a tool execution request message. Drop duplicated message: UserMessage { name = null contents = [TextContent { text = "今天天气怎么样" }] }
-19:29:29:077  WARN 18336 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49s565ms634µs400ns).
-19:30:49:691  WARN 18336 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m20s614ms76µs100ns).
-19:30:49:692  WARN 18336 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 未触发任何工具调用
-19:30:49:719  INFO 18336 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:30:49:724  INFO 18336 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-19:30:55:306  INFO 2064 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 2064 (started by lk139 in D:\SmartCampus)
-19:30:55:307  INFO 2064 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:30:55:908  INFO 2064 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:30:55:911  INFO 2064 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:30:55:938  INFO 2064 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 15 ms. Found 0 Redis repository interfaces.
-19:31:00:632  INFO 2064 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 5.582 seconds (process running for 6.435)
-19:31:01:231  INFO 2064 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:31:01:327  INFO 2064 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@581f1f40
-19:31:01:328  INFO 2064 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:31:04:019  WARN 2064 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 未触发任何工具调用
-19:31:04:044  INFO 2064 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:31:04:052  INFO 2064 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-19:31:13:201  INFO 33888 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 33888 (started by lk139 in D:\SmartCampus)
-19:31:13:202  INFO 33888 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:31:13:822  INFO 33888 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:31:13:824  INFO 33888 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:31:13:855  INFO 33888 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
-19:31:19:512  INFO 33888 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 6.635 seconds (process running for 7.826)
-19:31:23:572  INFO 33888 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:31:23:667  INFO 33888 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@23e0b938
-19:31:23:669  INFO 33888 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:32:14:259  WARN 33888 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49s997ms742µs700ns).
-19:34:22:430  WARN 33888 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m8s172ms151µs400ns).
-19:34:22:435  WARN 33888 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 未触发任何工具调用
-19:34:22:466  INFO 33888 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:34:22:472  INFO 33888 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-19:44:34:107  INFO 35592 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-19:44:34:109  INFO 35592 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-19:45:10:346  INFO 33684 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 33684 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-19:45:10:348  INFO 33684 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-19:45:10:879  INFO 33684 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:45:10:881  INFO 33684 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:45:10:904  INFO 33684 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 Redis repository interfaces.
-19:45:11:274  INFO 33684 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-19:45:11:275  INFO 33684 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-19:45:11:279  INFO 33684 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-19:45:11:286  INFO 33684 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-19:45:11:287  INFO 33684 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-19:45:11:332  INFO 33684 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-19:45:11:332  INFO 33684 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 949 ms
-19:45:14:963  INFO 33684 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-19:45:14:968  INFO 33684 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 4.915 seconds (process running for 5.449)
-19:45:40:317  INFO 14404 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 14404 (started by lk139 in D:\SmartCampus)
-19:45:40:317  INFO 14404 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:45:40:942  INFO 14404 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:45:40:944  INFO 14404 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:45:40:974  INFO 14404 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
-19:45:45:465  INFO 14404 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 5.448 seconds (process running for 6.341)
-19:45:46:076  INFO 14404 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:45:46:165  INFO 14404 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1455a374
-19:45:46:166  INFO 14404 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:45:47:795  WARN 14404 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : The system message should be the first message. Drop existed messages: [SystemMessage { text = "你是智能助手，可使用以下工具完成业务：" }, UserMessage { name = null contents = [TextContent { text = "今天天气怎么样" }] }]
-19:45:48:682  INFO 14404 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:45:48:688  INFO 14404 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-19:49:27:504  INFO 33684 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-19:49:27:507  INFO 33684 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-19:49:31:320  INFO 22592 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 22592 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-19:49:31:321  INFO 22592 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-19:49:31:804  INFO 22592 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:49:31:806  INFO 22592 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:49:31:833  INFO 22592 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
-19:49:32:178  INFO 22592 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-19:49:32:180  INFO 22592 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-19:49:32:183  INFO 22592 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-19:49:32:189  INFO 22592 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-19:49:32:190  INFO 22592 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-19:49:32:235  INFO 22592 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-19:49:32:236  INFO 22592 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 880 ms
-19:49:37:407  INFO 22592 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-19:49:37:413  INFO 22592 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 6.373 seconds (process running for 6.828)
-19:50:34:363  INFO 23968 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 23968 (started by lk139 in D:\SmartCampus)
-19:50:34:364  INFO 23968 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:50:34:980  INFO 23968 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:50:34:982  INFO 23968 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:50:35:011  INFO 23968 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 15 ms. Found 0 Redis repository interfaces.
-19:50:39:917  INFO 23968 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 5.826 seconds (process running for 6.565)
-19:50:40:498  INFO 23968 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:50:40:605  INFO 23968 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@32a541a8
-19:50:40:606  INFO 23968 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:50:42:080  WARN 23968 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : Tool execution result should follow a tool execution request message. Drop duplicated message: UserMessage { name = null contents = [TextContent { text = "今天天气怎么样" }] }
-19:50:42:102  INFO 23968 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:50:42:110  INFO 23968 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-19:51:37:844  INFO 32236 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 32236 (started by lk139 in D:\SmartCampus)
-19:51:37:845  INFO 32236 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-19:51:38:489  INFO 32236 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-19:51:38:493  INFO 32236 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-19:51:38:523  INFO 32236 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
-19:51:43:630  INFO 32236 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 6.097 seconds (process running for 7.122)
-19:51:44:236  INFO 32236 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-19:51:44:345  INFO 32236 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@273c4b3
-19:51:44:347  INFO 32236 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-19:52:46:831  WARN 32236 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49s717ms272µs800ns).
-19:53:36:207  WARN 32236 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49s375ms432µs).
-19:54:15:395  WARN 32236 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : Tool execution result should follow a tool execution request message. Drop duplicated message: UserMessage { name = null contents = [TextContent { text = "今天天气怎么样" }] }
-19:58:04:111  WARN 32236 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m57s8ms650µs400ns).
-19:58:04:124  INFO 32236 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-19:58:04:138  INFO 32236 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:01:23:484  INFO 6784 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 6784 (started by lk139 in D:\SmartCampus)
-20:01:23:486  INFO 6784 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:01:24:404  INFO 6784 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:01:24:406  INFO 6784 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:01:24:433  INFO 6784 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
-20:01:29:993  INFO 6784 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 6.81 seconds (process running for 8.029)
-20:01:30:452  INFO 6784 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:01:30:547  INFO 6784 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5c883b3f
-20:01:30:548  INFO 6784 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:01:33:388 ERROR 6784 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 调用工具:WeatherTool失败
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+15:13:57:179 ERROR 19776 --- [smartcampus] [main] o.s.boot.SpringApplication               : Application run failed
 
-java.lang.ClassNotFoundException: com.aiproject.smartcampus.functioncalling.toolImplWeatherTool
-	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
-	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
-	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526) ~[na:na]
-	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
-	at java.base/java.lang.Class.forName(Class.java:421) ~[na:na]
-	at java.base/java.lang.Class.forName(Class.java:412) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.lambda$doEasyRag$1(RagAPI.java:84) ~[classes/:na]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.doEasyRag(RagAPI.java:82) ~[classes/:na]
-	at com.aiproject.smartcampus.rag.RagAPITest.test(RagAPITest.java:18) ~[test-classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
-	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57) ~[junit5-rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38) ~[junit-rt.jar:na]
-	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11) ~[idea_rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55) ~[junit-rt.jar:na]
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'commonController' defined in file [D:\SmartCampus\target\classes\com\aiproject\smartcampus\controller\CommonController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'commonServiceImpl' defined in file [D:\SmartCampus\target\classes\com\aiproject\smartcampus\service\impl\CommonServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 3: Error creating bean with name 'redissionClient' defined in class path resource [com/aiproject/smartcampus/config/Lockinit.class]: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1387) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1224) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1221) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1122) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1362) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1351) ~[spring-boot-3.4.5.jar:3.4.5]
+	at com.aiproject.smartcampus.SmartCampusApplication.main(SmartCampusApplication.java:14) ~[classes/:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'commonServiceImpl' defined in file [D:\SmartCampus\target\classes\com\aiproject\smartcampus\service\impl\CommonServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 3: Error creating bean with name 'redissionClient' defined in class path resource [com/aiproject/smartcampus/config/Lockinit.class]: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1387) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1224) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1739) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1627) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.6.jar:6.2.6]
+	... 21 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'redissionClient' defined in class path resource [com/aiproject/smartcampus/config/Lockinit.class]: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:489) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1367) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1197) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1739) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1627) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.6.jar:6.2.6]
+	... 35 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:199) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:88) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:168) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653) ~[spring-beans-6.2.6.jar:6.2.6]
+	... 49 common frames omitted
+Caused by: org.redisson.client.RedisConnectionException: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.redisson.connection.pool.ConnectionPool$1.lambda$run$0(ConnectionPool.java:159) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.misc.RedissonPromise.lambda$onComplete$0(RedissonPromise.java:183) ~[redisson-3.13.6.jar:3.13.6]
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:557) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at org.redisson.misc.RedissonPromise.tryFailure(RedissonPromise.java:96) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.connection.pool.ConnectionPool.promiseFailure(ConnectionPool.java:329) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.connection.pool.ConnectionPool.lambda$createConnection$1(ConnectionPool.java:295) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.misc.RedissonPromise.lambda$onComplete$0(RedissonPromise.java:183) ~[redisson-3.13.6.jar:3.13.6]
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at org.redisson.misc.RedissonPromise.tryFailure(RedissonPromise.java:96) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.client.RedisClient$2$2.run(RedisClient.java:248) ~[redisson-3.13.6.jar:3.13.6]
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:472) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: getsockopt: /127.0.0.1:6379
+Caused by: java.net.ConnectException: Connection refused: getsockopt
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682) ~[na:na]
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:973) ~[na:na]
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:336) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:339) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:784) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
 
-20:01:33:418  INFO 6784 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:01:33:422  INFO 6784 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:02:33:682  INFO 15676 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 15676 (started by lk139 in D:\SmartCampus)
-20:02:33:683  INFO 15676 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:02:34:358  INFO 15676 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:02:34:360  INFO 15676 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:02:34:389  INFO 15676 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 15 ms. Found 0 Redis repository interfaces.
-20:02:40:667  INFO 15676 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 7.301 seconds (process running for 14.307)
-20:02:41:087  INFO 15676 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:02:41:185  INFO 15676 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7e729046
-20:02:41:186  INFO 15676 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:03:13:091 ERROR 15676 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 调用工具:WeatherTool失败
-
-java.lang.ClassNotFoundException: com.aiproject.smartcampus.functioncalling.toolImplWeatherTool
-	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
-	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
-	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526) ~[na:na]
-	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
-	at java.base/java.lang.Class.forName(Class.java:421) ~[na:na]
-	at java.base/java.lang.Class.forName(Class.java:412) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.lambda$doEasyRag$1(RagAPI.java:84) ~[classes/:na]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.doEasyRag(RagAPI.java:82) ~[classes/:na]
-	at com.aiproject.smartcampus.rag.RagAPITest.test(RagAPITest.java:18) ~[test-classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
-	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57) ~[junit5-rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38) ~[junit-rt.jar:na]
-	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11) ~[idea_rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55) ~[junit-rt.jar:na]
-
-20:03:13:117  INFO 15676 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:03:13:124  INFO 15676 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:05:31:277  INFO 22592 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-20:05:31:279  INFO 22592 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-20:05:35:437  INFO 26496 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 26496 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-20:05:35:439  INFO 26496 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-20:05:35:904  INFO 26496 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:05:35:906  INFO 26496 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:05:35:928  INFO 26496 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 Redis repository interfaces.
-20:05:36:311  INFO 26496 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-20:05:36:314  INFO 26496 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-20:05:36:319  INFO 26496 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-20:05:36:329  INFO 26496 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-20:05:36:329  INFO 26496 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-20:05:36:374  INFO 26496 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-20:05:36:374  INFO 26496 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 910 ms
-20:05:41:786  INFO 26496 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-20:05:41:791  INFO 26496 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 6.603 seconds (process running for 7.074)
-20:25:36:982  INFO 26000 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 26000 (started by lk139 in D:\SmartCampus)
-20:25:36:984  INFO 26000 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:25:37:727  INFO 26000 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:25:37:730  INFO 26000 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:25:37:761  INFO 26000 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 15 ms. Found 0 Redis repository interfaces.
-20:25:44:986  INFO 26000 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 8.334 seconds (process running for 9.1)
-20:25:45:457  INFO 26000 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:25:45:589  INFO 26000 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@172ca6a
-20:25:45:590  INFO 26000 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:25:47:367  WARN 26000 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : Tool execution result should follow a tool execution request message. Drop duplicated message: UserMessage { name = null contents = [TextContent { text = "湖南今天天气怎么样" }] }
-20:25:47:393  INFO 26000 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:25:47:398  INFO 26000 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:26:25:352  INFO 15392 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 15392 (started by lk139 in D:\SmartCampus)
-20:26:25:354  INFO 15392 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:26:26:094  INFO 15392 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:26:26:098  INFO 15392 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:26:26:133  INFO 15392 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
-20:26:34:568  INFO 15392 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 9.574 seconds (process running for 16.909)
-20:26:35:283  INFO 15392 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:26:35:391  INFO 15392 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@219bad15
-20:26:35:392  INFO 15392 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:31:19:798  WARN 15392 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m14s405ms441µs500ns).
-20:31:42:808 ERROR 15392 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 调用工具:WeatherTool失败
-
-java.lang.ClassNotFoundException: com.aiproject.smartcampus.functioncalling.toolImpl.WeatherTool
-	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
-	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
-	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526) ~[na:na]
-	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
-	at java.base/java.lang.Class.forName(Class.java:421) ~[na:na]
-	at java.base/java.lang.Class.forName(Class.java:412) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.lambda$doEasyRag$1(RagAPI.java:84) ~[classes/:na]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.doEasyRag(RagAPI.java:82) ~[classes/:na]
-	at com.aiproject.smartcampus.rag.RagAPITest.test(RagAPITest.java:18) ~[test-classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
-	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57) ~[junit5-rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38) ~[junit-rt.jar:na]
-	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11) ~[idea_rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55) ~[junit-rt.jar:na]
-
-20:31:42:841  INFO 15392 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:31:42:849  INFO 15392 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:34:16:837  INFO 26496 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-20:34:16:839  INFO 26496 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-20:34:21:719  INFO 35444 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 35444 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-20:34:21:720  INFO 35444 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-20:34:22:210  INFO 35444 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:34:22:211  INFO 35444 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:34:22:235  INFO 35444 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
-20:34:22:612  INFO 35444 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-20:34:22:614  INFO 35444 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-20:34:22:619  INFO 35444 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-20:34:22:627  INFO 35444 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-20:34:22:627  INFO 35444 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-20:34:22:674  INFO 35444 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-20:34:22:674  INFO 35444 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 927 ms
-20:34:26:889  INFO 35444 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-20:34:26:895  INFO 35444 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 5.438 seconds (process running for 5.864)
-20:34:47:367  INFO 29756 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 29756 (started by lk139 in D:\SmartCampus)
-20:34:47:370  INFO 29756 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:34:47:992  INFO 29756 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:34:47:994  INFO 29756 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:34:48:023  INFO 29756 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
-20:34:53:733  INFO 29756 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 6.688 seconds (process running for 13.473)
-20:34:54:159  INFO 29756 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:34:54:275  INFO 29756 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3638a852
-20:34:54:276  INFO 29756 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:35:01:398  WARN 29756 --- [smartcampus] [main] d.l.c.model.dashscope.QwenHelper         : Tool execution result should follow a tool execution request message. Drop duplicated message: UserMessage { name = null contents = [TextContent { text = "湖南今天天气怎么样" }] }
-20:35:01:452  INFO 29756 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:35:01:460  INFO 29756 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:49:26:186  INFO 35444 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-20:49:26:189  INFO 35444 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-20:49:30:975  INFO 8848 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 8848 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-20:49:30:976  INFO 8848 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-20:49:31:487  INFO 8848 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:49:31:489  INFO 8848 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:49:31:511  INFO 8848 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces.
-20:49:31:903  INFO 8848 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-20:49:31:905  INFO 8848 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-20:49:31:908  INFO 8848 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-20:49:31:915  INFO 8848 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-20:49:31:915  INFO 8848 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-20:49:31:964  INFO 8848 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-20:49:31:964  INFO 8848 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 964 ms
-20:49:36:587  INFO 8848 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-20:49:36:592  INFO 8848 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 5.943 seconds (process running for 6.766)
-20:50:03:057  INFO 12832 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 12832 (started by lk139 in D:\SmartCampus)
-20:50:03:058  INFO 12832 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:50:03:677  INFO 12832 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:50:03:679  INFO 12832 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:50:03:707  INFO 12832 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 15 ms. Found 0 Redis repository interfaces.
-20:50:09:101  INFO 12832 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 6.359 seconds (process running for 12.959)
-20:50:09:542  INFO 12832 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:50:09:638  INFO 12832 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4fe91eed
-20:50:09:639  INFO 12832 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:50:36:888  WARN 12832 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=57s248ms411µs300ns).
-20:52:05:115  INFO 8848 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-20:52:05:117  INFO 8848 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-20:52:09:442  INFO 21716 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 21716 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-20:52:09:444  INFO 21716 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-20:52:10:038  INFO 21716 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:52:10:042  INFO 21716 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:52:10:086  INFO 21716 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 23 ms. Found 0 Redis repository interfaces.
-20:52:10:496  INFO 21716 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-20:52:10:499  INFO 21716 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-20:52:10:500  INFO 21716 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-20:52:10:512  INFO 21716 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-20:52:10:513  INFO 21716 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-20:52:10:556  INFO 21716 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-20:52:10:556  INFO 21716 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1065 ms
-20:52:14:435  INFO 21716 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-20:52:14:440  INFO 21716 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 5.394 seconds (process running for 5.99)
-20:52:26:732  WARN 12832 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m49s844ms416µs200ns).
-20:52:26:781  INFO 12832 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:52:26:785  INFO 12832 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:52:47:460  INFO 25236 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 25236 (started by lk139 in D:\SmartCampus)
-20:52:47:463  INFO 25236 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:52:48:068  INFO 25236 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:52:48:073  INFO 25236 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:52:48:104  INFO 25236 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 18 ms. Found 0 Redis repository interfaces.
-20:52:53:218  INFO 25236 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 6.07 seconds (process running for 12.409)
-20:52:53:645  INFO 25236 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:52:53:740  INFO 25236 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2199e1a4
-20:52:53:741  INFO 25236 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:53:54:189  WARN 25236 --- [smartcampus] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=56s914ms999µs100ns).
-20:53:54:243  INFO 25236 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:53:54:247  INFO 25236 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:53:59:892  INFO 21716 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-20:53:59:894  INFO 21716 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-20:54:04:404  INFO 1652 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 1652 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-20:54:04:405  INFO 1652 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-20:54:04:859  INFO 1652 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:54:04:861  INFO 1652 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:54:04:891  INFO 1652 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 17 ms. Found 0 Redis repository interfaces.
-20:54:05:275  INFO 1652 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-20:54:05:278  INFO 1652 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-20:54:05:281  INFO 1652 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-20:54:05:288  INFO 1652 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-20:54:05:288  INFO 1652 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-20:54:05:336  INFO 1652 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-20:54:05:336  INFO 1652 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 908 ms
-20:54:09:324  INFO 1652 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-20:54:09:330  INFO 1652 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 5.171 seconds (process running for 5.766)
-20:54:28:811  INFO 28608 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 28608 (started by lk139 in D:\SmartCampus)
-20:54:28:812  INFO 28608 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-20:54:29:410  INFO 28608 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:54:29:412  INFO 28608 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:54:29:441  INFO 28608 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
-20:54:34:476  INFO 28608 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 5.956 seconds (process running for 12.462)
-20:54:34:888  INFO 28608 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-20:54:34:995  INFO 28608 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3638a852
-20:54:34:996  INFO 28608 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-20:55:27:148  INFO 28608 --- [smartcampus] [main] c.a.smartcampus.tools.WeatherTool        : 解析到城市 湖南 的坐标：lat=24.45469, lon=118.33599
-20:55:35:009 ERROR 28608 --- [smartcampus] [main] com.aiproject.smartcampus.rag.RagAPI     : 调用工具:WeatherTool失败
-
-java.lang.NoSuchMethodException: com.aiproject.smartcampus.functioncalling.toolImpl.WeatherTool.getResult()
-	at java.base/java.lang.Class.getMethod(Class.java:2395) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.lambda$doEasyRag$1(RagAPI.java:91) ~[classes/:na]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at com.aiproject.smartcampus.rag.RagAPI.doEasyRag(RagAPI.java:86) ~[classes/:na]
-	at com.aiproject.smartcampus.rag.RagAPITest.test(RagAPITest.java:18) ~[test-classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
-	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
-	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57) ~[junit5-rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38) ~[junit-rt.jar:na]
-	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11) ~[idea_rt.jar:na]
-	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232) ~[junit-rt.jar:na]
-	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55) ~[junit-rt.jar:na]
-
-20:55:35:035  INFO 28608 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-20:55:35:043  INFO 28608 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-20:56:39:320  INFO 1652 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-20:56:39:321  INFO 1652 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-20:56:42:717  INFO 13340 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 13340 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
-20:56:42:719  INFO 13340 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
-20:56:43:250  INFO 13340 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-20:56:43:251  INFO 13340 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-20:56:43:276  INFO 13340 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
-20:56:43:629  INFO 13340 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-20:56:43:631  INFO 13340 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
-20:56:43:634  INFO 13340 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-20:56:43:640  INFO 13340 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-20:56:43:641  INFO 13340 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
-20:56:43:684  INFO 13340 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-20:56:43:684  INFO 13340 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 883 ms
-20:56:47:108  INFO 13340 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-20:56:47:113  INFO 13340 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 4.714 seconds (process running for 5.133)
-21:00:48:878  INFO 1276 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Starting RagAPITest using Java 21.0.7 with PID 1276 (started by lk139 in D:\SmartCampus)
-21:00:48:879  INFO 1276 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : No active profile set, falling back to 1 default profile: "default"
-21:00:49:499  INFO 1276 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-21:00:49:501  INFO 1276 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-21:00:49:532  INFO 1276 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
-21:00:56:229  INFO 1276 --- [smartcampus] [main] c.aiproject.smartcampus.rag.RagAPITest   : Started RagAPITest in 7.663 seconds (process running for 14.354)
-21:00:56:647  INFO 1276 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-21:00:56:739  INFO 1276 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@27e42fe8
-21:00:56:740  INFO 1276 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-21:01:18:609  INFO 1276 --- [smartcampus] [main] c.a.smartcampus.tools.WeatherTool        : 解析到城市 湖南 的坐标：lat=24.45469, lon=118.33599
-21:01:27:403  INFO 1276 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-21:01:27:410  INFO 1276 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+15:16:19:626  INFO 25936 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 25936 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
+15:16:19:627  INFO 25936 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+15:16:20:115  INFO 25936 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+15:16:20:118  INFO 25936 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+15:16:20:148  INFO 25936 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 19 ms. Found 0 Redis repository interfaces.
+15:16:20:514  INFO 25936 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+15:16:20:517  INFO 25936 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+15:16:20:520  INFO 25936 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+15:16:20:527  INFO 25936 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+15:16:20:527  INFO 25936 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+15:16:20:568  INFO 25936 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+15:16:20:568  INFO 25936 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 914 ms
+15:16:21:271  INFO 25936 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+15:16:21:409  INFO 25936 --- [smartcampus] [redisson-netty-4-13] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+15:16:21:418  INFO 25936 --- [smartcampus] [redisson-netty-4-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+15:16:27:816  INFO 25936 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+15:16:27:822  INFO 25936 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 8.473 seconds (process running for 8.983)
+15:21:00:228  INFO 25936 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+15:21:00:231  INFO 25936 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+15:21:02:450  INFO 8992 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 8992 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
+15:21:02:451  INFO 8992 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+15:21:02:984  INFO 8992 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+15:21:02:986  INFO 8992 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+15:21:03:015  INFO 8992 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 18 ms. Found 0 Redis repository interfaces.
+15:21:03:405  INFO 8992 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+15:21:03:408  INFO 8992 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+15:21:03:411  INFO 8992 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+15:21:03:419  INFO 8992 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+15:21:03:419  INFO 8992 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+15:21:03:459  INFO 8992 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+15:21:03:460  INFO 8992 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 975 ms
+15:21:04:174  INFO 8992 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+15:21:04:313  INFO 8992 --- [smartcampus] [redisson-netty-4-13] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+15:21:04:319  INFO 8992 --- [smartcampus] [redisson-netty-4-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+15:21:11:184  INFO 8992 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+15:21:11:191  INFO 8992 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 9.023 seconds (process running for 9.561)
+15:23:22:483  INFO 8992 --- [smartcampus] [http-nio-127.192.0.1-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+15:23:22:483  INFO 8992 --- [smartcampus] [http-nio-127.192.0.1-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+15:23:22:485  INFO 8992 --- [smartcampus] [http-nio-127.192.0.1-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+15:23:42:625  INFO 8992 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+15:23:42:627  INFO 8992 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+15:23:44:737  INFO 25576 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 25576 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
+15:23:44:738  INFO 25576 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+15:23:45:221  INFO 25576 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+15:23:45:223  INFO 25576 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+15:23:45:254  INFO 25576 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 18 ms. Found 0 Redis repository interfaces.
+15:23:45:626  INFO 25576 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+15:23:45:628  INFO 25576 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+15:23:45:632  INFO 25576 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+15:23:45:639  INFO 25576 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+15:23:45:640  INFO 25576 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+15:23:45:681  INFO 25576 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+15:23:45:681  INFO 25576 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 917 ms
+15:23:46:379  INFO 25576 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+15:23:46:521  INFO 25576 --- [smartcampus] [redisson-netty-4-18] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+15:23:46:531  INFO 25576 --- [smartcampus] [redisson-netty-4-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+15:23:52:008  INFO 25576 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+15:23:52:014  INFO 25576 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 7.564 seconds (process running for 8.12)
+15:25:05:157  INFO 25576 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+15:25:05:159  INFO 25576 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+15:25:07:448  INFO 3092 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 3092 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
+15:25:07:449  INFO 3092 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+15:25:07:978  INFO 3092 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+15:25:07:980  INFO 3092 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+15:25:08:013  INFO 3092 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 18 ms. Found 0 Redis repository interfaces.
+15:25:08:405  INFO 3092 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+15:25:08:408  INFO 3092 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+15:25:08:410  INFO 3092 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+15:25:08:426  INFO 3092 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+15:25:08:427  INFO 3092 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+15:25:08:469  INFO 3092 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+15:25:08:470  INFO 3092 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 989 ms
+15:25:09:195  INFO 3092 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+15:25:09:335  INFO 3092 --- [smartcampus] [redisson-netty-4-17] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+15:25:09:344  INFO 3092 --- [smartcampus] [redisson-netty-4-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+15:25:13:533  INFO 3092 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+15:25:13:539  INFO 3092 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 6.376 seconds (process running for 6.903)
+15:25:45:442  INFO 3092 --- [smartcampus] [http-nio-127.0.0.1-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+15:25:45:442  INFO 3092 --- [smartcampus] [http-nio-127.0.0.1-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+15:25:45:443  INFO 3092 --- [smartcampus] [http-nio-127.0.0.1-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+15:27:22:793  INFO 3092 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+15:27:22:794  INFO 3092 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+15:27:25:920  INFO 18876 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 18876 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
+15:27:25:921  INFO 18876 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+15:27:26:433  INFO 18876 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+15:27:26:435  INFO 18876 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+15:27:26:463  INFO 18876 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
+15:27:26:824  INFO 18876 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+15:27:26:827  INFO 18876 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+15:27:26:830  INFO 18876 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+15:27:26:837  INFO 18876 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+15:27:26:838  INFO 18876 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+15:27:26:885  INFO 18876 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+15:27:26:885  INFO 18876 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 936 ms
+15:27:27:605  INFO 18876 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+15:27:27:733  INFO 18876 --- [smartcampus] [redisson-netty-4-19] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+15:27:27:741  INFO 18876 --- [smartcampus] [redisson-netty-4-15] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+15:27:31:408  INFO 18876 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+15:27:31:415  INFO 18876 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 5.78 seconds (process running for 6.25)
+15:27:38:660  INFO 18876 --- [smartcampus] [http-nio-127.0.0.1-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+15:27:38:661  INFO 18876 --- [smartcampus] [http-nio-127.0.0.1-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+15:27:38:661  INFO 18876 --- [smartcampus] [http-nio-127.0.0.1-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+15:27:39:148  INFO 18876 --- [smartcampus] [http-nio-127.0.0.1-8080-exec-4] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 160 ms
+15:32:14:705  INFO 18876 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+15:32:14:706  INFO 18876 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+15:32:20:964  INFO 25960 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 25960 (D:\SmartCampus\target\classes started by lk139 in D:\SmartCampus)
+15:32:20:966  INFO 25960 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+15:32:21:705  INFO 25960 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+15:32:21:707  INFO 25960 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+15:32:21:737  INFO 25960 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 18 ms. Found 0 Redis repository interfaces.
+15:32:22:104  INFO 25960 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+15:32:22:106  INFO 25960 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+15:32:22:109  INFO 25960 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+15:32:22:126  INFO 25960 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+15:32:22:127  INFO 25960 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+15:32:22:172  INFO 25960 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+15:32:22:172  INFO 25960 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1178 ms
+15:32:22:886  INFO 25960 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+15:32:23:028  INFO 25960 --- [smartcampus] [redisson-netty-4-19] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+15:32:23:037  INFO 25960 --- [smartcampus] [redisson-netty-4-20] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+15:32:28:416  INFO 25960 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+15:32:28:422  INFO 25960 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 7.738 seconds (process running for 8.212)
+22:16:20:507  INFO 25960 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+22:16:20:512  INFO 25960 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete

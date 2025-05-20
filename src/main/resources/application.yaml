@@ -1,6 +1,6 @@
 server:
   port: 8080
-  address: 127.192.0.1
+  address: localhost
 
 spring:
   application:
@@ -32,3 +32,15 @@ logging:
     dateformat: HH:mm:ss:SSS     # 时间格式
   file:
     path: logs/${spring.application.name}   # 引用已定义的应用名
+
+# 接口文档配置
+knife4j:
+  enable: true
+  openapi:
+    title: "智慧校园"
+    version: 1.0
+    group:
+      default:
+        api-rule: package
+        api-rule-resources:
+          - com.aiproject.smartcampus.controller

@@ -1,11 +1,11 @@
 package com.aiproject.smartcampus.store;
 
 import com.aiproject.smartcampus.exception.MemoryExpection;
-import com.aiproject.smartcampus.handler.memorystorehandler.handlerImpl.MemoryDataBaseHandler;
-import com.aiproject.smartcampus.handler.memorystorehandler.handlerImpl.MemoryIdHandler;
+import com.aiproject.smartcampus.handler.memorystorehandler.handlerImpl.MemoryDataBaseMemoryStoreHandler;
+import com.aiproject.smartcampus.handler.memorystorehandler.handlerImpl.MemoryIdMemoryStoreHandler;
 import com.aiproject.smartcampus.mapper.AIMapper;
-import com.aiproject.smartcampus.pojo.entity.HandlerResponse;
-import com.aiproject.smartcampus.pojo.entity.Handlerquery;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerResponse;
+import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerquery;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
@@ -34,14 +34,14 @@ public class LocalStore implements ChatMemoryStore {
     @Override
     public List<ChatMessage> getMessages(Object userIdObj) {
         String userId = userIdObj.toString();
-        Handlerquery query = new Handlerquery();
+        MemoryStoreHandlerquery query = new MemoryStoreHandlerquery();
         query.setUserId(userId);
-        HandlerResponse response = new HandlerResponse();
+        MemoryStoreHandlerResponse response = new MemoryStoreHandlerResponse();
         // 预先初始化内存映射，防止 null
         response.setMemoryMap(memoryMap);
         // 构建链并执行
-        new MemoryIdHandler()
-                .setNextHandler(new MemoryDataBaseHandler(aiMapper))
+        new MemoryIdMemoryStoreHandler()
+                .setNextHandler(new MemoryDataBaseMemoryStoreHandler(aiMapper))
                 .getMessagesHandle(query, response);
 
         if (!response.getIsSuccess()) {
@@ -53,14 +53,14 @@ public class LocalStore implements ChatMemoryStore {
     @Override
     public void updateMessages(Object userIdObj, List<ChatMessage> list) {
         String userId = userIdObj.toString();
-        Handlerquery query = new Handlerquery();
+        MemoryStoreHandlerquery query = new MemoryStoreHandlerquery();
         query.setUserId(userId);
         query.setChatMessageList(list);
-        HandlerResponse response = new HandlerResponse();
+        MemoryStoreHandlerResponse response = new MemoryStoreHandlerResponse();
         response.setMemoryMap(memoryMap);
 
-        new MemoryIdHandler()
-                .setNextHandler(new MemoryDataBaseHandler(aiMapper))
+        new MemoryIdMemoryStoreHandler()
+                .setNextHandler(new MemoryDataBaseMemoryStoreHandler(aiMapper))
                 .updateMessagesHandle(query, response);
 
         if (!response.getIsSuccess()) {
@@ -71,13 +71,13 @@ public class LocalStore implements ChatMemoryStore {
     @Override
     public void deleteMessages(Object userIdObj) {
         String userId = userIdObj.toString();
-        Handlerquery query = new Handlerquery();
+        MemoryStoreHandlerquery query = new MemoryStoreHandlerquery();
         query.setUserId(userId);
-        HandlerResponse response = new HandlerResponse();
+        MemoryStoreHandlerResponse response = new MemoryStoreHandlerResponse();
         response.setMemoryMap(memoryMap);
 
-        new MemoryIdHandler()
-                .setNextHandler(new MemoryDataBaseHandler(aiMapper))
+        new MemoryIdMemoryStoreHandler()
+                .setNextHandler(new MemoryDataBaseMemoryStoreHandler(aiMapper))
                 .deleteMessagesHandle(query, response);
 
         if (!response.getIsSuccess()) {

@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.config;
 
-import com.aiproject.smartcampus.pojo.entity.ToolList;
+import com.aiproject.smartcampus.pojo.bo.ToolList;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema;

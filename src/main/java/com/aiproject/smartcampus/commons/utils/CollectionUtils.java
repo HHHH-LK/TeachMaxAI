@@ -1,5 +1,8 @@
 package com.aiproject.smartcampus.commons.utils;
 
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.rag.content.Content;
+
 import java.util.List;
 
 /**
@@ -17,5 +20,30 @@ public class CollectionUtils {
         return false;
     }
 
+    public static String MessageSplicing(List<ChatMessage> collection) {
+        if (isEmpty(collection)) {
+            return "";
+        }
+        StringBuilder stringBuilder=new StringBuilder();
+        for (ChatMessage message : collection) {
+            stringBuilder.append(message.text()).append("\n");
+        }
+        String content = stringBuilder.toString();
+        return content;
 
-}
+    }
+
+    public static String ContentSplicing(List<Content> collection) {
+        if (isEmpty(collection)) {
+            return "";
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Content message : collection) {
+            stringBuilder.append(message.textSegment().text()).append("\n");
+        }
+        String content = stringBuilder.toString();
+        return content;
+    }
+
+
+    }
