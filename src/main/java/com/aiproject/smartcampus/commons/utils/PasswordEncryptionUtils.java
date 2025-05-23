@@ -2,55 +2,87 @@ package com.aiproject.smartcampus.commons.utils;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.util.Arrays;
 import java.util.Base64;
 
 /**
- * @program: MedicalAgent
- * @description: 密码加密和解密（AES）
+ * @program: SmartCampus
+ * @description: 密码加密和解密（AES），固定密钥因子，实现单参数加解密
  * @author: lk
  * @create: 2025-05-01 22:06
  **/
-
-//基于AES加密算法实现
 public class PasswordEncryptionUtils {
 
-    //加密
-    public static String encryption(String password) throws InvalidAlgorithmParameterException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException {
-        // 生成一个随机的初始化向量（IV）
-        byte[] iv = new byte[16]; // 128位的IV
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-        // 创建密钥
-        SecretKey secretKey = new javax.crypto.spec.SecretKeySpec("1".getBytes(), "AES");
-        // 初始化Cipher对象，指定加密模式为AES CBC
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-        // 执行加密
-        byte[] encryptedBytes = cipher.doFinal(password.getBytes());
-        // 将加密结果转为Base64字符串返回
-        return Base64.getEncoder().encodeToString(encryptedBytes);
+    // 固定密码因子（派生AES密钥使用）
+    private static final String SECRET_FACTOR = "lk2025FixedFactor!"; // 16+ 字节字符串
+
+    // 派生 AES-128 密钥
+    private static SecretKeySpec deriveKey() throws NoSuchAlgorithmException {
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+        byte[] hash = sha256.digest(SECRET_FACTOR.getBytes(StandardCharsets.UTF_8));
+        byte[] keyBytes = Arrays.copyOf(hash, 16); // 16字节 = 128bit
+        return new SecretKeySpec(keyBytes, "AES");
     }
 
-    //解密
-    public static String decryption(String password) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        // 生成一个随机的初始化向量（IV）
-        byte[] iv = new byte[16]; // 128位的IV
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-        // 创建密钥
-        SecretKey secretKey = new javax.crypto.spec.SecretKeySpec("1".getBytes(), "AES");
-        // 初始化Cipher对象，指定解密模式为AES CBC
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
-        // 进行Base64解码，并解密
-        byte[] decodedBytes = Base64.getDecoder().decode(password);
-        byte[] decryptedBytes = cipher.doFinal(decodedBytes);
-        // 将解密后的字节数组转换为字符串并返回
-        return new String(decryptedBytes);
+    /**
+     * 加密：随机 IV（16字节），密文前16字节存 IV，剩余为实际密文
+     * @param plainText 要加密的明文密码
+     * @return Base64编码的IV+密文
+     */
+    public static String encryption(String plainText) {
+        try {
+            SecretKeySpec keySpec = deriveKey();
 
+            byte[] iv = new byte[16];
+            SecureRandom random = new SecureRandom();
+            random.nextBytes(iv);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+
+            byte[] encrypted = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+
+            ByteBuffer buffer = ByteBuffer.allocate(iv.length + encrypted.length);
+            buffer.put(iv);
+            buffer.put(encrypted);
+            byte[] ivAndCipher = buffer.array();
+
+            return Base64.getEncoder().encodeToString(ivAndCipher);
+        } catch (Exception e) {
+            throw new RuntimeException("加密失败", e);
+        }
     }
 
+    /**
+     * 解密：Base64解码后，前16字节为IV，后续为实际密文
+     * @param base64IvAndCipher Base64编码的IV+密文
+     * @return 解密后的明文密码
+     */
+    public static String decryption(String base64IvAndCipher) {
+        try {
+            SecretKeySpec keySpec = deriveKey();
 
+            byte[] ivAndCipher = Base64.getDecoder().decode(base64IvAndCipher);
+            ByteBuffer buffer = ByteBuffer.wrap(ivAndCipher);
+            byte[] iv = new byte[16];
+            buffer.get(iv);
+            byte[] cipherBytes = new byte[buffer.remaining()];
+            buffer.get(cipherBytes);
+
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+
+            byte[] decrypted = cipher.doFinal(cipherBytes);
+            return new String(decrypted, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("解密失败", e);
+        }
+    }
 }

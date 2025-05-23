@@ -21,6 +21,9 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static com.aiproject.smartcampus.commons.utils.LockUtils.Redo;
+
+
 /**
  * @program: SmartCampus
  * @description: 教师注册
@@ -37,7 +40,7 @@ public class TeacherRegister implements RegsterStrategy {
     private final RedissonClient redissonClient;
     private final StringRedisTemplate stringRedisTemplate;
     public static PasswordEncryptionUtils passwordEncoder = new PasswordEncryptionUtils();
-    private static final String REDIS_KEY_PREFIX = "reg:teacher:";
+    private static final String REDIS_KEY_PREFIX = "smartcampus:reg:teacher:";
     private static final Duration PRE_REG_TTL = Duration.ofMinutes(10);
 
     @Override
@@ -49,7 +52,6 @@ public class TeacherRegister implements RegsterStrategy {
         RLock lock = redissonClient.getLock("teacher:preregister");
         boolean acquired = false;
         try {
-            acquired = lock.tryLock(5, 30, TimeUnit.SECONDS);
             if (!acquired) {
                 throw new UserExpection("系统繁忙，请稍后重试");
             }
@@ -71,7 +73,7 @@ public class TeacherRegister implements RegsterStrategy {
             return token;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new UserExpection("线程被中断，请重试");
+            throw new RuntimeException("线程被中断，请重试");
         } catch (Exception e) {
             log.error("教师预处理失败 error", e);
             throw new UserExpection("预注册失败，请稍后重试");
@@ -91,7 +93,6 @@ public class TeacherRegister implements RegsterStrategy {
         RLock lock = redissonClient.getLock("teacher:register");
         boolean acquired = false;
         try {
-            acquired = lock.tryLock(5, 30, TimeUnit.SECONDS);
             if (!acquired) {
                 throw new UserExpection("系统繁忙，请稍后重试");
             }
@@ -111,7 +112,7 @@ public class TeacherRegister implements RegsterStrategy {
             log.info("教师注册 success, teacherId={}", tea.getTeacherId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new UserExpection("线程被中断，请重试");
+            throw new RuntimeException("线程被中断，请重试");
         } catch (Exception e) {
             log.error("教师注册 error", e);
             throw new UserExpection("注册失败，请稍后重试");

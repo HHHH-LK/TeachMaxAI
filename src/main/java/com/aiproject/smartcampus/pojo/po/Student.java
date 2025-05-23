@@ -80,4 +80,6 @@ public class Student implements Serializable {
      */
     @TableField("department")
     private String department;
+
+
 }

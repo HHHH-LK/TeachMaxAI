@@ -4,6 +4,7 @@ import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,7 +23,8 @@ import static com.aiproject.smartcampus.contest.CommonContest.REFRESH_TIEM;
 @Component
 public class RefreashInterceptor implements HandlerInterceptor {
 
-    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private  StringRedisTemplate stringRedisTemplate;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

@@ -34,7 +34,6 @@ public class RagHandler extends ChatHandler {
 
     @Override
     public void chatHandle(ChatHandlerquery handlerquery, ChatHandlerResponse handlerResponse) {
-
         // 1. 确保上一步（Memory）成功
         if (!handlerResponse.getIsSuccess()) {
             log.error("RAG 前步骤失败");

@@ -21,6 +21,8 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+
+
 /**
  * 优化后的学生注册实现
  */
@@ -33,7 +35,7 @@ public class StudentRegister implements RegsterStrategy {
     private final RedissonClient redissonClient;
     private final StringRedisTemplate stringRedisTemplate;
     public static PasswordEncryptionUtils passwordEncoder = new PasswordEncryptionUtils();
-    private static final String REDIS_KEY_PREFIX = "reg:student:";
+    private static final String REDIS_KEY_PREFIX = "smartcampus:reg:student:";
     private static final Duration PRE_REG_TTL = Duration.ofMinutes(10);
 
     @Override
@@ -47,7 +49,7 @@ public class StudentRegister implements RegsterStrategy {
         try {
             acquired = lock.tryLock(5, 30, TimeUnit.SECONDS);
             if (!acquired) {
-                throw new UserExpection("系统繁忙，请稍后重试");
+                    throw new UserExpection("系统繁忙，请稍后重试");
             }
             log.info("预处理 start, phone={}, account={}", dto.getPhone(), dto.getUserAccount());
             LambdaQueryWrapper<Student> wrapper = new LambdaQueryWrapper<Student>()
@@ -68,7 +70,7 @@ public class StudentRegister implements RegsterStrategy {
             return token;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new UserExpection("线程被中断，请重试");
+            throw new RuntimeException("线程被中断，请重试");
         } catch (Exception e) {
             log.error("预处理失败 error", e);
             throw new UserExpection("预注册失败，请稍后重试");
@@ -109,7 +111,7 @@ public class StudentRegister implements RegsterStrategy {
             log.info("注册 success, studentId={}", stu.getStudentId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new UserExpection("线程被中断，请重试");
+            throw new RuntimeException("线程被中断，请重试");
         } catch (Exception e) {
             log.error("注册 error", e);
             throw new UserExpection("注册失败，请稍后重试");

@@ -51,13 +51,13 @@ public class Userutils {
         }
 
         switch (dto.getCharacter()) {
-            case "teacher":
+            case "Teacher":
                 validateTeacher(dto.getTeacher());
                 break;
-            case "student":
+            case "Student":
                 validateStudent(dto.getStudent());
                 break;
-            case "admin":
+            case "ManagerPerson":
                 validateAdmin(dto.getManagePerson());
                 break;
             default:
