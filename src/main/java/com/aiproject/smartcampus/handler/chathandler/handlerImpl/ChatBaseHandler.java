@@ -69,6 +69,7 @@ public class ChatBaseHandler extends ChatHandler {
         }catch (Exception e){
             handlerResponse.setIsSuccess(false);
             handlerResponse.setErrorMsg(e.getMessage());
+
             throw new MemoryExpection(e.getMessage());
         }
 

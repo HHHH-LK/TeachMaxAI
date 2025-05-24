@@ -42,9 +42,6 @@ public class AccountLogin implements LoginStrategy {
     private final StringRedisTemplate stringRedisTemplate;
     private final RedissonClient redissonClient;
     private final ApplicationContext applicationContext;
-    private final String LOGIN_KEY = "smartcampus:login:";
-    private final long   ttl = TOKEN_PRE_TTL * 60 * 60 * 24;
-
 
     @Override
     public String login(UserLoginDTO userLoginDTO) throws Exception {
@@ -121,7 +118,7 @@ public class AccountLogin implements LoginStrategy {
                 //生成token
                 token = userAccount + currentTimeMillis + ttl;
                 //将token存入redis
-                stringRedisTemplate.opsForValue().set(LOGIN_KEY + "teacher" + token, JsonUtils.toJsonString(teacher), REFRESH_TIEM, TimeUnit.DAYS);
+                stringRedisTemplate.opsForValue().set(LOGIN_KEY + "teacher:" + token, JsonUtils.toJsonString(teacher), REFRESH_TIEM, TimeUnit.DAYS);
             }
             if (mapper instanceof ManagePersonMapper) {
                 boolean acquired = studentlock.tryLock(5, 30, TimeUnit.SECONDS);
@@ -151,15 +148,15 @@ public class AccountLogin implements LoginStrategy {
                 //生成token
                 token = userAccount + currentTimeMillis + ttl;
                 //将token存入redis
-                stringRedisTemplate.opsForValue().set(LOGIN_KEY + "teacher" + token, JsonUtils.toJsonString(managePerson), REFRESH_TIEM, TimeUnit.DAYS);
+                stringRedisTemplate.opsForValue().set(LOGIN_KEY + "teacher:" + token, JsonUtils.toJsonString(managePerson), REFRESH_TIEM, TimeUnit.DAYS);
 
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("线程被中断，请重试");
         } catch (Exception e) {
-            log.error("管理员注册 error", e);
-            throw new UserExpection("注册失败，请稍后重试");
+            log.error("登录失败", e);
+            throw new UserExpection("登录失败，请稍后重试");
         } finally {
             //释放锁
             if(studentlock!=null && studentlock.isHeldByCurrentThread()){

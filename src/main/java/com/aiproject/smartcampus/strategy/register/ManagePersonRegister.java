@@ -34,7 +34,6 @@ import static com.aiproject.smartcampus.commons.utils.LockUtils.Redo;
 @RequiredArgsConstructor
 @Slf4j
 public class ManagePersonRegister implements RegsterStrategy {
-
     //预处理
     private final ManagePersonMapper managePersonMapper;
     private final RedissonClient redissonClient;

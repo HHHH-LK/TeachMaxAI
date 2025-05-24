@@ -14,5 +14,7 @@ public class CommonContest {
     public static final String MAPPER_SCAN_NAME="com.aiproject.smartcampus.mapper.";
     public static final long TOKEN_PRE_TTL=3l;
     public static final Integer REDO_SUM=5;
+    public static final long   ttl = TOKEN_PRE_TTL * 60 * 60 * 24;
+    public static final String LOGIN_KEY = "smartcampus:login:";
 
 }

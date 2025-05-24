@@ -22,26 +22,21 @@ public class UserStrategyContext {
     private RegsterStrategy regsterStrategy;
     private LoginStrategy loginStrategy;
 
-
+    //预注册策略
     public String Preliminaryregisterregister(UserPreliminaryRegisterDTO userPreliminaryRegisterDTO) throws Exception {
         String preliminaryregistertoken = regsterStrategy.Preliminaryregister(userPreliminaryRegisterDTO);
         return preliminaryregistertoken;
     }
 
+    //注册策略
     public void register(String token, UserRegisterDTO userRegisterDTO) throws Exception {
         regsterStrategy.register(token,userRegisterDTO);
 
     }
-
-    public String AccountLogin(UserLoginDTO userLoginDTO) throws Exception {
+    //登录策略
+    public String login(UserLoginDTO userLoginDTO) throws Exception {
         String token = loginStrategy.login(userLoginDTO);
         return token;
-    }
-
-    public String PhoneLogin(UserLoginDTO userLoginDTO) throws Exception {
-        String token = loginStrategy.login(userLoginDTO);
-        return token;
-
     }
 
 

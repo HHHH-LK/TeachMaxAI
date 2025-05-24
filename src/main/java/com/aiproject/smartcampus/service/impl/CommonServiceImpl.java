@@ -15,11 +15,13 @@ import com.aiproject.smartcampus.strategy.register.ManagePersonRegister;
 import com.aiproject.smartcampus.strategy.UserStrategyContext;
 import com.aiproject.smartcampus.strategy.register.StudentRegister;
 import com.aiproject.smartcampus.strategy.register.TeacherRegister;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
 
@@ -96,7 +98,7 @@ public class CommonServiceImpl implements CommonService {
      * 用户登录功能
      */
     @Override
-    public Result userLogin(UserLoginDTO userLoginDTO) {
+    public Result userLogin(UserLoginDTO userLoginDTO) throws Exception {
 
         UserStrategyContext userStrategyContext = new UserStrategyContext();
         switch (userLoginDTO.getType()) {
@@ -104,11 +106,30 @@ public class CommonServiceImpl implements CommonService {
                 userStrategyContext.setLoginStrategy(new AccountLogin(stringRedisTemplate,redissonClient,applicationContext));
                 break;
             case "Phone":
-                userStrategyContext.setLoginStrategy(new PhoneLogin());
+                userStrategyContext.setLoginStrategy(new PhoneLogin(stringRedisTemplate,redissonClient,applicationContext));
                 break;
-
+            default:
+                throw new UserExpection("无效的登录方式");
         }
 
+        String logintoken = userStrategyContext.login(userLoginDTO);
+        return Result.success(logintoken);
+    }
+
+    @Override
+    public Result userLogout(String token) {
+        //基于账号进行退出
+        String user = stringRedisTemplate.opsForValue().get(token);
+        if (StrUtil.isBlank(user)) {
+            throw new UserExpection("用户未登录");
+        }
+        stringRedisTemplate.delete(token);
+        return Result.success();
+
+    }
+
+    @Override
+    public Result upload(MultipartFile file) {
 
         return null;
     }

@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @program: SmartCampus
@@ -28,7 +29,7 @@ public class CommonController {
     @PostMapping("/preliminaryregister")
     @Operation(summary = "用户初步注册", description = "用户进入系统前的初步信息登记")
     public Result register(@RequestBody UserPreliminaryRegisterDTO userPreliminaryRegisterDTO) throws Exception {
-        //注册流程
+
         return commonService.userPreliminaryregister(userPreliminaryRegisterDTO);
 
     }
@@ -41,12 +42,25 @@ public class CommonController {
         return commonService.userRegister(registrationToken, userRegisterDTO);
     }
 
-
     //用户登录功能
     @GetMapping("/login")
     @Operation(summary = "用户登录", description = "用户登录功能")
     public Result login(UserLoginDTO userLoginDTO) throws Exception {
         return commonService.userLogin(userLoginDTO);
+    }
+
+    //用户退出功能
+    @GetMapping("/logout")
+    @Operation(summary = "用户退出", description = "用户退出功能")
+    public Result logout(@RequestParam(value = "token") String token)  {
+        return commonService.userLogout(token);
+    }
+
+    //文件上传功能
+    @PostMapping("/fileupload")
+    @Operation(summary = "文件上传", description = "文件上传功能")
+    public Result upload(@RequestParam(value = "file") MultipartFile file) throws Exception {
+        return commonService.upload(file);
     }
 
 

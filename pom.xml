@@ -112,6 +112,13 @@
             <version>${langchain4j-pinecone.version}</version>
         </dependency>
 
+        <!--爬取网页-->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.2</version>
+        </dependency>
+
         <!-- Redis (Spring Boot 管理版本，无需显式 version) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -124,7 +131,6 @@
             <artifactId>redisson</artifactId>
             <version>3.13.6</version>
         </dependency>
-
 
         <!-- 其它常用依赖 -->
         <dependency>

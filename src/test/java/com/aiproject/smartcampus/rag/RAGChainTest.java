@@ -14,7 +14,7 @@ class RAGChainTest {
 
     @Test
     void test() {
-        String answer = ragChain.chat("北京今天天气怎么样", "5");
+        String answer = ragChain.chat("帮我生成一份含高中数学所有知识点的试卷，题目数量为10道题，全部为简答题？", "5");
         System.out.println(answer);
 
     }

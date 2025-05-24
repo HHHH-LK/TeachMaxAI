@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.commons.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +39,9 @@ public class JsonUtils {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(object);
     }
+
+
+
 
 
 }

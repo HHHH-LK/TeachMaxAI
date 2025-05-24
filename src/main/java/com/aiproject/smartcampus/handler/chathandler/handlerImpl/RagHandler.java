@@ -49,19 +49,18 @@ public class RagHandler extends ChatHandler {
                 .stream().distinct().collect(Collectors.toList());
         String retrievedContent = CollectionUtils.ContentSplicing(retrieved);
 
-        // 3. STEP 1: 判定能否回答
+        //  判定能否回答
         String canPrompt = PromptUtils.buildRagCanPrompt(retrievedContent, memoryContent, userMessage);
         String canResult = chatLanguageModel.chat(canPrompt).trim();
         handlerResponse.setIsSuccess(true);
         if ("CAN".equalsIgnoreCase(canResult)) {
-            // STEP 2: 真正回答
+            // 真正回答
             String answerPrompt = PromptUtils.buildRagAnswerPrompt(retrievedContent, memoryContent, userMessage);
             String finalAnswer  = chatLanguageModel.chat(answerPrompt);
             handlerResponse.setChatAnswer(finalAnswer);
             log.info("rag增强检索结束");
 
         } else {
-            // fallback：交给下一个 handler
             handlerquery.setRagContent(retrievedContent + "\n" + memoryContent);
             if (nextHandler != null) {
                 log.info("rag增强检索结束");

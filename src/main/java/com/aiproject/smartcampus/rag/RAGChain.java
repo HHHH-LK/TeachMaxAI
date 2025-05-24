@@ -10,6 +10,7 @@ import com.aiproject.smartcampus.store.LocalStore;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.web.search.searchapi.SearchApiWebSearchEngine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class RAGChain {
     private final ContentRetriever contentRetriever;
     private final ToolList toolList;
     private final LocalStore store;
+    private final SearchApiWebSearchEngine searchEngine;
     private Map<String, ChatMemory> memoryMap = new ConcurrentHashMap<>();
 
 
@@ -40,7 +42,7 @@ public class RAGChain {
         //构建调用链
         ChatBaseHandler chatbaseChain = new ChatBaseHandler(chatLanguageModel, store);
         RagHandler ragChain = new RagHandler(contentRetriever,chatLanguageModel);
-        FunctionCallingHandler funcChain = new FunctionCallingHandler(toolList, chatLanguageModel);
+        FunctionCallingHandler funcChain = new FunctionCallingHandler(toolList, chatLanguageModel,searchEngine);
         //构建请求响应
         ChatHandlerquery chatHandlerquery = new ChatHandlerquery();
         chatHandlerquery.setQueryContent(userMessage);

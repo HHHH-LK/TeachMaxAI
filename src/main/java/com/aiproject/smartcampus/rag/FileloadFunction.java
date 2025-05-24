@@ -45,7 +45,7 @@ public class FileloadFunction {
             //转换成document
             Document document = Document.from(textSegment.text());
             ChatResponse chatResponse = chatLanguageModel
-                    .chat(SystemMessage.systemMessage("将该内容进行概括成只有100 token的文本"), UserMessage.userMessage(document.text()));
+                    .chat(SystemMessage.systemMessage("将该内容进行概括成只有 100 token的文本"), UserMessage.userMessage(document.text()));
             //存入总结
             String content = chatResponse.aiMessage().text();
             //对 document 进行二次拆分
