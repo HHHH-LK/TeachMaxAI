@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.tools;
+package com.aiproject.smartcampus.functioncalling.toolutils;
 
 import com.aiproject.smartcampus.pojo.bo.WeatherInfo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,12 +23,12 @@ import java.time.Duration;
  */
 @Getter
 @RequiredArgsConstructor
-public enum WeatherTool {
+public enum WeatherToolUtils {
     SUNNY("晴"), CLOUDY("多云"), RAINY("雨"), SNOWY("雪"), FOGGY("雾"), WINDY("风"), STORM("雷暴"), UNKNOWN("未知");
 
     private final String description;
 
-    private static final Logger log = LoggerFactory.getLogger(WeatherTool.class);
+    private static final Logger log = LoggerFactory.getLogger(WeatherToolUtils.class);
     private static final HttpClient CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String TIMEZONE = "Asia/Shanghai";
@@ -71,7 +71,7 @@ public enum WeatherTool {
         JsonNode daily = root.path("daily");
         // 3.解析并封装
         int code = current.path("weathercode").asInt();
-        WeatherTool cond = mapWeatherCode(code);
+        WeatherToolUtils cond = mapWeatherCode(code);
         int minT = daily.path("temperature_2m_min").get(0).asInt();
         int maxT = daily.path("temperature_2m_max").get(0).asInt();
         double windSpeed = current.path("windspeed").asDouble();
@@ -80,7 +80,7 @@ public enum WeatherTool {
         return new WeatherInfo(cond, minT, maxT, windDesc);
     }
     // WMO weathercode 映射
-    private static WeatherTool mapWeatherCode(int code) {
+    private static WeatherToolUtils mapWeatherCode(int code) {
         if (code == 0) return SUNNY;
         if (code <= 3) return CLOUDY;
         if (code == 45 || code == 48) return FOGGY;

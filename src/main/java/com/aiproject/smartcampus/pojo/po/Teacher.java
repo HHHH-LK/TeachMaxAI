@@ -18,7 +18,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("teacher")
-public class Teacher implements Serializable {
+public class        Teacher implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** 教师ID，自增主键 */

@@ -12,7 +12,7 @@ import lombok.Data;
  **/
 
 @Data
-public class UserLocalThreadUtils {
+public class   UserLocalThreadUtils {
 
     private static ThreadLocal<UserRegisterDTO> threadLocal = new ThreadLocal<>();
 

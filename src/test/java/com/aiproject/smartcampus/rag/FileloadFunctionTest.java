@@ -4,22 +4,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 @SpringBootTest
-class RAGChainTest {
+class FileloadFunctionTest {
 
     @Autowired
-    private RAGChain ragChain;
+    private FileloadFunction fileloadFunction;
 
 
     @Test
-    void chat() {
+    void test() {
 
-        String answer = ragChain.chat("帮我查看13周要上的所有课", "1");
-        System.out.println(answer);
+        fileloadFunction.documentsloade();
+
+
     }
 
-
+  
 }

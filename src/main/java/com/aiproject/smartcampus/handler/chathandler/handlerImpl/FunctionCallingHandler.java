@@ -25,12 +25,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,11 +54,16 @@ public class FunctionCallingHandler extends ChatHandler {
     private final ExecutorService webCrawlExecutor = Executors.newFixedThreadPool(5);
 
     // 优化配置参数
-    private static final int MAX_SEARCH_RESULTS = 8; // 增加搜索结果数量
-    private static final int MAX_CONTENT_LENGTH = 2000; // 增加内容长度
-    private static final int CRAWL_TIMEOUT_SECONDS = 15; // 增加抓取超时时间
+    private static final int MAX_SEARCH_RESULTS = 8;
+    private static final int MAX_CONTENT_LENGTH = 2000;
+    private static final int CRAWL_TIMEOUT_SECONDS = 15;
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]+>");
-    private static final double MIN_RELEVANCE_SCORE = 0.6; // 最小相关性分数
+    private static final double MIN_RELEVANCE_SCORE = 0.6;
+
+    // 时间相关的正则模式
+    private static final Pattern TIME_PATTERN = Pattern.compile(
+            "(?i)(今天|今日|今天的|今日的|当前|现在|最新|近期|昨天|昨日|明天|明日|本周|这周|本月|这个月|最近的|今年|今年的|2024年|2025年)"
+    );
 
     @Override
     public void chatHandle(ChatHandlerquery handlerquery, ChatHandlerResponse handlerResponse) {
@@ -66,15 +75,30 @@ public class FunctionCallingHandler extends ChatHandler {
         log.info("执行工具调用中...");
         String userMessage = handlerquery.getQueryContent();
 
-        List<ToolSpecification> tools = toolList.getTools();
-        ChatResponse chatResponse = chatLanguageModel.doChat(ChatRequest.builder()
-                .messages(SystemMessage.systemMessage(buildSystemPrompt()), UserMessage.from(userMessage))
-                .parameters(ChatRequestParameters.builder()
-                        .toolSpecifications(tools)
-                        .build())
-                .build()
-        );
+        // —— 1. 捕获模型调用中的安全审查异常 ——
+        AtomicReference<ChatResponse> chatResponseRef = new AtomicReference<>();
+        try {
+            ChatResponse chatResponse = chatLanguageModel.doChat(ChatRequest.builder()
+                    .messages(SystemMessage.systemMessage(buildSystemPrompt()), UserMessage.from(userMessage))
+                    .parameters(ChatRequestParameters.builder()
+                            .toolSpecifications(toolList.getTools())
+                            .build())
+                    .build()
+            );
+            chatResponseRef.set(chatResponse);
+        } catch (MemoryExpection me) {
+            // 如果是内容审核失败，则返回友好提示
+            if (me.getMessage().contains("DataInspectionFailed")) {
+                log.warn("模型输出被安全策略拦截，requestId={}", me.getMessage());
+                handlerResponse.setIsSuccess(true);
+                handlerResponse.setChatAnswer("抱歉，当前问题涉及敏感或不适内容，无法回答。");
+                return;
+            }
+            // 其他 MemoryExpection 继续抛出
+            throw me;
+        }
 
+        ChatResponse chatResponse = chatResponseRef.get();
         AtomicReference<String> toolResultRef = new AtomicReference<>("");
         List<ToolExecutionRequest> toolRequests = chatResponse.aiMessage().toolExecutionRequests();
 
@@ -82,12 +106,22 @@ public class FunctionCallingHandler extends ChatHandler {
             for (ToolExecutionRequest req : toolRequests) {
                 try {
                     if ("SearchEngine".equalsIgnoreCase(req.name())) {
-                        String searchResult = executeOptimizedSearchEngine(req, userMessage);
+                        String searchResult = executeTimeAwareSearchEngine(req, userMessage);
                         toolResultRef.set(searchResult);
                     } else {
                         String customToolResult = executeCustomTool(req);
                         toolResultRef.set(customToolResult);
                     }
+                } catch (MemoryExpection me) {
+                    // 捕获工具执行中被审核拦截的情况
+                    if (me.getMessage().contains("DataInspectionFailed")) {
+                        log.warn("工具 {} 执行结果被安全策略拦截，requestId={}", req.name(), me.getMessage());
+                        handlerResponse.setIsSuccess(true);
+                        handlerResponse.setChatAnswer("抱歉，工具调用结果包含敏感或不适内容，无法提供信息。");
+                        return;
+                    }
+                    log.error("调用工具 {} 失败", req.name(), me);
+                    throw new RagExpection("工具调用失败: " + me.getMessage());
                 } catch (Exception e) {
                     log.error("调用工具 {} 失败", req.name(), e);
                     throw new MemoryExpection("工具调用失败: " + e.getMessage());
@@ -102,19 +136,28 @@ public class FunctionCallingHandler extends ChatHandler {
     }
 
     /**
-     * 优化的搜索引擎执行方法
+     * 时间感知的搜索引擎执行方法
      */
-    private String executeOptimizedSearchEngine(ToolExecutionRequest req, String userMessage) {
-        log.info("执行优化联网搜索中...");
+    private String executeTimeAwareSearchEngine(ToolExecutionRequest req, String userMessage) {
+        log.info("执行时间感知联网搜索中...");
         try {
             JsonObject arguments = JsonParser.parseString(req.arguments()).getAsJsonObject();
             String rawQuery = arguments.get("query").getAsString();
-            // 1. 多层次查询优化
-            List<String> optimizedQueries = generateMultipleQueries(rawQuery, userMessage);
-            // 2. 执行多次搜索并合并结果
+
+            // 1. 检查是否包含时间相关查询
+            boolean isTimeRelated = isTimeRelatedQuery(userMessage, rawQuery);
+            String currentTimeInfo = getCurrentTimeInfo();
+
+            log.info("查询是否时间相关: {}, 当前时间: {}", isTimeRelated, currentTimeInfo);
+
+            // 2. 生成时间感知的查询
+            List<String> optimizedQueries = generateTimeAwareQueries(rawQuery, userMessage, isTimeRelated, currentTimeInfo);
+
+            // 3. 执行多次搜索并合并结果
             Set<WebSearchOrganicResult> allResults = new LinkedHashSet<>();
             for (String query : optimizedQueries) {
                 try {
+                    log.info("执行搜索查询: {}", query);
                     WebSearchResults searchResults = searchEngine.search(query);
                     allResults.addAll(searchResults.results());
                     // 避免请求过于频繁
@@ -123,14 +166,18 @@ public class FunctionCallingHandler extends ChatHandler {
                     log.warn("查询 {} 失败: {}", query, e.getMessage());
                 }
             }
+
             if (allResults.isEmpty()) {
                 return "搜索未找到相关结果，请尝试调整搜索关键词";
             }
-            // 3. 智能筛选和排序结果
+
+            // 4. 智能筛选和排序结果
             List<WebSearchOrganicResult> filteredResults = filterAndRankResults(
                     new ArrayList<>(allResults), userMessage, rawQuery);
-            // 4. 并发抓取并分析内容
-            return crawlAndAnalyzeContent(filteredResults, rawQuery, userMessage);
+
+            // 5. 并发抓取并分析内容
+            return crawlAndAnalyzeContent(filteredResults, rawQuery, userMessage, isTimeRelated, currentTimeInfo);
+
         } catch (Exception e) {
             log.error("联网搜索失败", e);
             return "搜索过程中发生错误：" + e.getMessage() + "，请稍后重试";
@@ -138,37 +185,157 @@ public class FunctionCallingHandler extends ChatHandler {
     }
 
     /**
-     * 生成多个优化查询
+     * 判断查询是否与时间相关
+     */
+    private boolean isTimeRelatedQuery(String userMessage, String rawQuery) {
+        String combinedText = (userMessage + " " + rawQuery).toLowerCase();
+        return TIME_PATTERN.matcher(combinedText).find();
+    }
+
+    /**
+     * 获取当前时间信息
+     */
+    private String getCurrentTimeInfo() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return String.format("当前时间: %s (日期: %s)",
+                now.format(formatter),
+                now.format(dateFormatter));
+    }
+
+
+    /**
+     * 生成时间感知的查询列表
+     */
+    private List<String> generateTimeAwareQueries(String rawQuery, String userMessage,
+                                                  boolean isTimeRelated, String currentTimeInfo) {
+        if (!isTimeRelated) {
+            // 如果不是时间相关查询，使用原有逻辑
+            return generateMultipleQueries(rawQuery, userMessage);
+        }
+
+        String timeAwarePrompt = String.format("""
+        根据用户问题和当前时间信息，生成3-5个时间感知的搜索查询：
+                        
+        用户问题：%s
+        原始查询：%s
+        %s
+                        
+        时间查询优化要求：
+        1. 第一个查询：包含具体日期的直接查询（如"2025年5月25日 事件"）
+        2. 第二个查询：使用"今日"、"今天"等时间词的查询
+        3. 第三个查询：加上"最新"、"近期"等时效性词汇
+        4. 第四个查询：包含年份月份的查询（如"2025年5月"）
+        5. 第五个查询：相关事件类型的通用查询    
+                        
+        特别注意：
+        - 如果用户问今日/今天的事件，务必在查询中包含具体日期
+        - 优先生成能找到最新信息的查询词
+        - 考虑新闻、事件、热点等相关词汇
+                        
+        请返回JSON格式：{"queries": ["查询1", "查询2", "查询3", "查询4", "查询5"]}
+        """, userMessage, rawQuery, currentTimeInfo);
+
+        List<String> queries = new ArrayList<>();
+
+        try {
+            UserMessage promptMessage = UserMessage.from(timeAwarePrompt);
+            ChatResponse response = chatLanguageModel.chat(promptMessage);
+            String responseText = response.aiMessage().text().trim();
+
+            Pattern pattern = Pattern.compile("```json\\s*(\\{.*?\\})\\s*```", Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(responseText);
+            if (matcher.find()) {
+                // 解析 JSON 并填充到同一个列表
+                String jsonString = matcher.group(1);
+                JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
+                json.getAsJsonArray("queries")
+                        .forEach(elem -> queries.add(elem.getAsString()));
+                log.info("生成的时间感知查询列表: {}", queries);
+            } else {
+                log.warn("时间感知查询JSON解析失败，使用备用方案");
+                // 将备用查询追加到同一个列表
+                queries.addAll(generateFallbackTimeQueries(rawQuery, userMessage));
+            }
+        } catch (Exception e) {
+            log.warn("生成时间感知查询失败，使用备用方案: {}", e.getMessage());
+            queries.addAll(generateFallbackTimeQueries(rawQuery, userMessage));
+        }
+
+        return queries;
+    }
+
+
+    /**
+     * 备用时间查询生成方案
+     */
+    private List<String> generateFallbackTimeQueries(String rawQuery, String userMessage) {
+        LocalDate today = LocalDate.now();
+        String todayStr = today.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
+        String todayStrEn = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String monthStr = today.format(DateTimeFormatter.ofPattern("yyyy年MM月"));
+
+        List<String> queries = new ArrayList<>();
+
+        // 添加具体日期查询
+        queries.add(todayStr + " " + rawQuery);
+        queries.add(todayStrEn + " " + rawQuery);
+        queries.add("今日 " + rawQuery);
+        queries.add("最新 " + rawQuery);
+        queries.add(monthStr + " " + rawQuery);
+
+        // 确保包含原始查询
+        if (!queries.contains(rawQuery)) {
+            queries.add(rawQuery);
+        }
+
+        log.info("备用时间查询列表: {}", queries);
+        return queries;
+    }
+
+    /**
+     * 生成多个优化查询（原有方法，用于非时间相关查询）
      */
     private List<String> generateMultipleQueries(String rawQuery, String userMessage) {
         String queryOptimizePrompt = String.format("""
-                根据用户问题和原始查询，生成3-5个不同角度的搜索查询，提高搜索精确度：
-              
-                用户问题：%s
-                原始查询：%s
-                
-                要求：
-                1. 第一个查询应该是最直接的关键词组合
-                2. 第二个查询应该包含更具体的术语
-                3. 第三个查询应该考虑相关概念和同义词
-                4. 如果是技术问题，包含专业术语
-                5. 如果是时效性问题，加上时间限定词
-                
-                请返回JSON格式：{"queries": ["查询1", "查询2", "查询3"]}
-                """, userMessage, rawQuery);
+            根据用户问题和原始查询，生成3-5个不同角度的搜索查询，提高搜索精确度：
+                            
+            用户问题：%s
+            原始查询：%s
+                            
+            要求：
+            1. 第一个查询应该是最直接的关键词组合
+            2. 第二个查询应该包含更具体的术语
+            3. 第三个查询应该考虑相关概念和同义词
+            4. 如果是技术问题，包含专业术语
+            5. 如果是时效性问题，加上时间限定词 
+                            
+            请返回JSON格式：{"queries": ["查询1", "查询2", "查询3"]}
+            """, userMessage, rawQuery);
         try {
-            String response = chatLanguageModel.chat(queryOptimizePrompt).trim();
-            JsonObject json = JsonParser.parseString(response).getAsJsonObject();
-            List<String> queries = new ArrayList<>();
-            json.getAsJsonArray("queries").forEach(element ->
-                    queries.add(element.getAsString()));
-            // 确保包含原始查询
-            if (!queries.contains(rawQuery)) {
-                queries.add(0, rawQuery);
-            }
-            log.info("生成的查询列表: {}", queries);
-            return queries;
+            UserMessage promptMessage = UserMessage.from(queryOptimizePrompt);
+            ChatResponse response = chatLanguageModel.chat(promptMessage);
+            String responseText = response.aiMessage().text().trim();
 
+            Pattern pattern = Pattern.compile("```json\\s*(\\{.*?\\})\\s*```", Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(responseText);
+            List<String> queries = new ArrayList<>();
+            if(matcher.find()){
+                String jsonString = matcher.group(1);
+                JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
+                json.getAsJsonArray("queries").forEach(element ->
+                        queries.add(element.getAsString()));
+                // 确保包含原始查询
+                if (!queries.contains(rawQuery)) {
+                    queries.add(0, rawQuery);
+                }
+                log.info("生成的查询列表: {}", queries);
+            }else{
+                log.warn("json解析失败");
+            }
+            return queries;
         } catch (Exception e) {
             log.warn("生成多查询失败，使用原始查询: {}", rawQuery);
             return Arrays.asList(rawQuery);
@@ -197,9 +364,11 @@ public class FunctionCallingHandler extends ChatHandler {
     }
 
     /**
-     * 计算搜索结果相关性分数
+     * 计算搜索结果相关性分数（增强时间相关性）
      */
     private double calculateRelevanceScore(WebSearchOrganicResult result, String userMessage, String query) {
+        //todo 后续需要对这个得分情况进行处理
+
         double score = 0.0;
 
         String title = result.title() != null ? result.title().toLowerCase() : "";
@@ -221,9 +390,35 @@ public class FunctionCallingHandler extends ChatHandler {
             if (content.contains(term)) score += 0.1;
         }
 
+        // 时间相关性加分
+        if (isTimeRelatedQuery(userMessage, query)) {
+            LocalDate today = LocalDate.now();
+            String todayStr = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String todayStrCn = today.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
+
+            if (title.contains(todayStr) || content.contains(todayStr) ||
+                    title.contains(todayStrCn) || content.contains(todayStrCn) ||
+                    title.contains("今日") || content.contains("今日") ||
+                    title.contains("今天") || content.contains("今天")) {
+                score += 0.3; // 时间匹配高分加成
+            }
+
+            if (title.contains("最新") || content.contains("最新") ||
+                    title.contains("近期") || content.contains("近期")) {
+                score += 0.2; // 时效性加分
+            }
+        }
+
         // URL权威性加分
         if (url.contains("gov") || url.contains("edu") || url.contains("org")) {
             score += 0.2;
+        }
+
+        // 新闻网站加分（时间相关查询）
+        if (isTimeRelatedQuery(userMessage, query) &&
+                (url.contains("news") || url.contains("新闻") || url.contains("sina") ||
+                        url.contains("sohu") || url.contains("163") || url.contains("qq"))) {
+            score += 0.15;
         }
 
         // 内容长度合理性
@@ -235,9 +430,10 @@ public class FunctionCallingHandler extends ChatHandler {
     }
 
     /**
-     * 优化的内容抓取和分析
+     * 优化的内容抓取和分析（增强时间感知）
      */
-    private String crawlAndAnalyzeContent(List<WebSearchOrganicResult> results, String query, String userMessage) {
+    private String crawlAndAnalyzeContent(List<WebSearchOrganicResult> results, String query,
+                                          String userMessage, boolean isTimeRelated, String currentTimeInfo) {
         List<CompletableFuture<EnhancedWebPageInfo>> futures = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
             final int index = i;
@@ -250,7 +446,8 @@ public class FunctionCallingHandler extends ChatHandler {
 
                     if (pageContent != null && !pageContent.trim().isEmpty()) {
                         String cleanContent = cleanHtmlContent(pageContent);
-                        String summary = generateEnhancedSummary(cleanContent, query, userMessage);
+                        String summary = generateTimeAwareSummary(cleanContent, query, userMessage,
+                                isTimeRelated, currentTimeInfo);
                         double contentRelevance = evaluateContentRelevance(cleanContent, userMessage);
                         return new EnhancedWebPageInfo(
                                 index + 1, result.title(), result.content(), url,
@@ -281,38 +478,68 @@ public class FunctionCallingHandler extends ChatHandler {
         // 按相关性重新排序
         webPageInfos.sort((a, b) -> Double.compare(b.relevanceScore, a.relevanceScore));
 
-        return formatSearchResults(webPageInfos, query, userMessage);
+        return formatSearchResults(webPageInfos, query, userMessage, isTimeRelated, currentTimeInfo);
     }
 
     /**
-     * 生成增强的内容摘要
+     * 生成时间感知的内容摘要
      */
-    private String generateEnhancedSummary(String content, String query, String userMessage) {
+    private String generateTimeAwareSummary(String content, String query, String userMessage,
+                                            boolean isTimeRelated, String currentTimeInfo) {
         if (content == null || content.trim().isEmpty()) {
             return "无法获取网页内容";
         }
 
         try {
-            String summaryPrompt = String.format("""
+            String summaryPrompt;
+            if (isTimeRelated) {
+                summaryPrompt = String.format("""
+                    作为专业的信息提取专家，请根据以下内容回答用户的时间相关问题：
+                                            
+                    用户问题：%s
+                    搜索查询：%s
+                    %s
+                    网页内容：%s
+                                            
+                    时间感知要求：
+                    1. 特别关注内容中的时间信息（日期、时间、"今日"、"最新"等）
+                    2. 如果内容包含今日或最新事件，优先提取
+                    3. 明确标注信息的时间属性
+                    4. 如果内容时间与用户询问时间不符，明确说明
+                    5. 突出时效性强的关键信息
+                    6.请严格避免输出任何不当、敏感、暴力或歧视性的内容。
+                          
+                                            
+                    一般要求：
+                    1. 直接回答用户问题的核心要点
+                    2. 提取最相关和最准确的信息
+                    3. 保持简洁但信息完整（300字内）
+                    4. 突出重要的数据、时间、地点等关键信息
+                                            
+                    摘要：
+                    """, userMessage, query, currentTimeInfo, content);
+            } else {
+                summaryPrompt = String.format("""
                     作为专业的信息提取专家，请根据以下内容回答用户问题：
-                    
+                                            
                     用户问题：%s
                     搜索查询：%s
                     网页内容：%s
-                    
+                                            
                     要求：
                     1. 直接回答用户问题的核心要点
                     2. 提取最相关和最准确的信息
                     3. 如果内容不能完全回答问题，明确说明
                     4. 保持简洁但信息完整（300字内）
                     5. 突出重要的数据、时间、地点等关键信息
-                    
+                                            
                     摘要：
                     """, userMessage, query, content);
+            }
 
             return chatLanguageModel.chat(summaryPrompt).trim();
         } catch (Exception e) {
-            log.warn("生成增强摘要失败: {}", e.getMessage());
+            log.warn("生成时间感知摘要失败: {}", e.getMessage());
             return content.length() > 300 ? content.substring(0, 300) + "..." : content;
         }
     }
@@ -324,10 +551,10 @@ public class FunctionCallingHandler extends ChatHandler {
         try {
             String relevancePrompt = String.format("""
                     请评估以下网页内容对用户问题的相关性，返回0-1之间的分数：
-                    
+                                            
                     用户问题：%s
                     网页内容：%s
-                    
+                                            
                     评估标准：
                     - 1.0: 完全相关，直接回答问题
                     - 0.8: 高度相关，包含大部分答案
@@ -335,7 +562,7 @@ public class FunctionCallingHandler extends ChatHandler {
                     - 0.4: 低度相关，仅有少量相关信息
                     - 0.2: 几乎无关
                     - 0.0: 完全无关
-                    
+                                            
                     请只返回数字分数：
                     """, userMessage, content.length() > 1000 ? content.substring(0, 1000) : content);
 
@@ -347,15 +574,19 @@ public class FunctionCallingHandler extends ChatHandler {
     }
 
     /**
-     * 格式化搜索结果
+     * 格式化搜索结果（增强时间信息显示）
      */
-    private String formatSearchResults(List<EnhancedWebPageInfo> webPageInfos, String query, String userMessage) {
+    private String formatSearchResults(List<EnhancedWebPageInfo> webPageInfos, String query,
+                                       String userMessage, boolean isTimeRelated, String currentTimeInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append("=== 搜索结果汇总 ===\n\n");
 
         // 添加搜索概况
         long validResults = webPageInfos.stream().filter(info -> info.hasContent).count();
         sb.append(String.format("搜索查询：%s\n", query));
+        if (isTimeRelated) {
+            sb.append(String.format("查询时间：%s\n", currentTimeInfo));
+        }
         sb.append(String.format("有效结果：%d/%d\n\n", validResults, webPageInfos.size()));
 
         // 按相关性分组显示

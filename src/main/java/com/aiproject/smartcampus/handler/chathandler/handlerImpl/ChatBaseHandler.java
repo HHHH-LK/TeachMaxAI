@@ -58,6 +58,8 @@ public class ChatBaseHandler extends ChatHandler {
                 String finalAnswer = chatLanguageModel.chat(answerPrompt);
                 handlerResponse.setChatAnswer(finalAnswer);
                 log.info("记忆搜索结束");
+                //实现记忆化
+                chatMemory.add(UserMessage.from(finalAnswer));
             }else {
                 chatHandlerquery.setMemoryContent(content);
                 if (nextHandler != null) {

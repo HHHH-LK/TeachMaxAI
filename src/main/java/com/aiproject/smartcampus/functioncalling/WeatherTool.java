@@ -1,8 +1,9 @@
-package com.aiproject.smartcampus.functioncalling.toolImpl;
+package com.aiproject.smartcampus.functioncalling;
 
 import com.aiproject.smartcampus.exception.WeatherExpection;
-import com.aiproject.smartcampus.functioncalling.Tool;
+import com.aiproject.smartcampus.functioncalling.toolutils.WeatherToolUtils;
 import com.aiproject.smartcampus.pojo.bo.WeatherInfo;
+import dev.langchain4j.agent.tool.ToolSpecification;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,13 +25,14 @@ public class WeatherTool implements Tool {
     @Override
     public void run() {
         try {
-            WeatherInfo info = com.aiproject.smartcampus.tools.WeatherTool.getWeatherInfo(city);
+            WeatherInfo info = WeatherToolUtils.getWeatherInfo(city);
             result = info.toString();
         } catch (Exception e) {
             log.error("获取天气失败");
             throw new WeatherExpection("获取天气失败");
         }
     }
+
 
 
 }

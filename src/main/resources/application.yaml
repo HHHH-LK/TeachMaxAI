@@ -33,6 +33,10 @@ logging:
   file:
     path: logs/${spring.application.name}   # 引用已定义的应用名
 
+#quarkus:
+#  langchain4j:
+#    huggingface:api-key: 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
+
 # 接口文档配置
 knife4j:
   enable: true

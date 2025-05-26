@@ -1,7 +1,7 @@
 package com.aiproject.smartcampus.pojo.bo;
 
 
-import com.aiproject.smartcampus.tools.WeatherTool;
+import com.aiproject.smartcampus.functioncalling.toolutils.WeatherToolUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WeatherInfo {
     /** 天气状况枚举 */
-    private WeatherTool condition;
+    private WeatherToolUtils condition;
     /** 最低温度，单位°C */
     private int minTemp;
     /** 最高温度，单位°C */
