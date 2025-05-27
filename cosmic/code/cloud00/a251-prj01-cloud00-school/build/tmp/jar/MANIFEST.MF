@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Jar-Id: 
+Project-Name: a251-prj01-cloud00-school
+Build-Tool: Gradle 7.6.3
+Build-Date: 2025-05-27 16:48:53
+Built-By: Kingdee Cosmic Developer Tools
+Build-Num: 20250527164853990
+App-Name: 
+Git-Branch: 
+Cloud-Name: 
+Group-Name: a251.cosmic
+Bundle-Version: 1.0.0
+Git-Commit-Hash: 
+Build-Image: 
+Build-Jdk: 1.8.0_275
+
