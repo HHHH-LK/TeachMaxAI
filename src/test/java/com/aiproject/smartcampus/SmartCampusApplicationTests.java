@@ -16,6 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static com.aiproject.smartcampus.model.prompts.SystemPrompts.INITENT_ANALYSIS_PROMPT;
+import static com.aiproject.smartcampus.model.prompts.SystemPrompts.INITENT_SPIDLER_PROMPT;
+
 
 @Slf4j
 @SpringBootTest
@@ -119,5 +122,21 @@ class SmartCampusApplicationTests {
           ChatResponse chatResponse = chatLanguageModel.chat(SystemMessage.systemMessage(extractionPrompt), UserMessage.userMessage(documents.get(0).text()));
           System.out.println(chatResponse.aiMessage().text());
     }
+
+
+    @Test
+    void test2(){
+        ChatResponse chatResponse = chatLanguageModel.chat(SystemMessage.from(INITENT_ANALYSIS_PROMPT), UserMessage.from("你好，我能够和你聊天吗？"));
+        String text = chatResponse.aiMessage().text();
+        System.out.println(text);
+        System.out.println("----------------------------");
+        ChatResponse chatResponse1 = chatLanguageModel.chat(SystemMessage.from(INITENT_SPIDLER_PROMPT), UserMessage.from(text));
+        System.out.println(chatResponse1.aiMessage().text());
+
+
+    }
+
+
+
 
 }

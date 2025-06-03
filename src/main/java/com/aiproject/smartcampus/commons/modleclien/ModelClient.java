@@ -1,12 +1,8 @@
-package com.aiproject.smartcampus.modleclien;
+package com.aiproject.smartcampus.commons.modleclien;
 
 import dev.langchain4j.community.model.dashscope.QwenChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @program: SmartCampus
@@ -18,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class ModelClient {
 
-    private static String api_key ;//=System.getenv("DASHSCOPE_API_KEY");
+    private static String api_key ;
     private static String modle_name;
 
 

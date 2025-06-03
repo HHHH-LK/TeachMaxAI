@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RAGChain {
+public class ChatChain {
 
     private final ChatLanguageModel chatLanguageModel;
     private final ContentRetriever contentRetriever;

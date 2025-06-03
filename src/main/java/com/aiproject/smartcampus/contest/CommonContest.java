@@ -16,5 +16,18 @@ public class CommonContest {
     public static final Integer REDO_SUM=5;
     public static final long   ttl = TOKEN_PRE_TTL * 60 * 60 * 24;
     public static final String LOGIN_KEY = "smartcampus:login:";
+    //todo 后续可以进行添加违法关键词
+    public static  String[] illegalContentList={
+            "赌博",      // 赌博相关
+            "暴力",      // 暴力相关
+            "涉政内容",  // 涉及政治敏感
+            "恐怖组织",  // 恐怖主义
+            "毒品",      // 毒品相关
+            "不良信息",  // 泛指不良内容
+            "黄色网站",  // 色情内容
+            "诈骗信息",  // 网络诈骗
+            "非法集资",  // 金融类违法
+            "枪支弹药"   // 管制物品
+    };
 
 }

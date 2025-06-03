@@ -4,20 +4,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 @SpringBootTest
 class RAGChainTest {
 
     @Autowired
-    private RAGChain ragChain;
+    private ChatChain chatChain;
 
 
     @Test
     void chat() {
 
-        String answer = ragChain.chat("帮我查看13周要上的所有课", "1");
+        String answer = chatChain.chat("学分最高的三门课是那三门", "1");
         System.out.println(answer);
     }
 

@@ -92,6 +92,7 @@ public class Userutils {
         if (StringUtils.isBlank(t.getDepartment())) {
             throw new UserExpection("教师所属院系不能为空");
         }
+
     }
 
     private static void validateStudent(Student s) {

@@ -1,10 +1,13 @@
 package com.aiproject.smartcampus.commons.utils;
 
+import com.aiproject.smartcampus.pojo.po.Side;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,6 +19,10 @@ import java.util.Map;
 
 @Slf4j
 public class JsonUtils {
+
+    private JsonUtils(){
+
+    }
 
     public static Object toJsonObject(String json, Class<?> clazz) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -38,6 +45,65 @@ public class JsonUtils {
     public static String toJsonString(Object object) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(object);
+    }
+
+    /**
+     * 从JSON字符串中解析任务列表
+     */
+    public static List<String> parseTasksFromJson(String jsonString) {
+        List<String> tasks = new ArrayList<>();
+        try {
+            // 清理可能的markdown标记
+            String cleanJson = jsonString.replaceAll("```json\\s*", "").replaceAll("```\\s*$", "").trim();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(cleanJson);
+            JsonNode tasksNode = rootNode.get("tasks");
+
+            if (tasksNode != null && tasksNode.isArray()) {
+                for (JsonNode taskNode : tasksNode) {
+                    String task = taskNode.asText().trim();
+                    if (!task.isEmpty()) {
+                        tasks.add(task);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("解析任务JSON失败: {}", jsonString, e);
+        }
+        return tasks;
+    }
+
+
+    /**
+     * 从JSON字符串中解析任务关系
+     */
+    public static List<Side> parseRelationsFromJson(String jsonString) {
+        List<Side> relations = new ArrayList<>();
+        try {
+            // 清理可能的markdown标记
+            String cleanJson = jsonString.replaceAll("```json\\s*", "").replaceAll("```\\s*$", "").trim();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(cleanJson);
+            JsonNode relationsNode = rootNode.get("relations");
+
+            if (relationsNode != null && relationsNode.isArray()) {
+                for (JsonNode relationNode : relationsNode) {
+                    String relationString = relationNode.asText();
+                    String[] parts = relationString.split(":");
+
+                    if (parts.length == 2) {
+                        String from = parts[0].trim();
+                        String to = parts[1].trim();
+                        if (!from.isEmpty() && !to.isEmpty()) {
+                            relations.add(new Side(from, to));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("解析关系JSON失败: {}", jsonString, e);
+        }
+        return relations;
     }
 
 

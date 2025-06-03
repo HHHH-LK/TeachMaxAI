@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.handler.exceptionhandler;
+package com.aiproject.smartcampus.commons.exceptionhandler;
 
 import com.aiproject.smartcampus.commons.Result;
 import com.aiproject.smartcampus.exception.MemoryExpection;
@@ -15,7 +15,6 @@ public class GobalExpectionHandler {
 
     @ExceptionHandler
     public Result handlerException(MemoryExpection e) {
-
         return Result.error(e.getMessage());
     }
 

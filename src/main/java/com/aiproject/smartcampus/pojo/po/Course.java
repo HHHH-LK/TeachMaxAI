@@ -33,7 +33,7 @@ public class Course {
     private String assessment;       // 考核方式
     @JsonProperty("weekly_hours")
     private int weeklyHours;         // 周学时
-    private double credits;          // 学分
+    private Double credits;          // 学分
 
     @Override
     public String toString() {

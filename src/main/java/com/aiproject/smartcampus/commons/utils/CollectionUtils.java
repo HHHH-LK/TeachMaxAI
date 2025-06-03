@@ -30,7 +30,6 @@ public class CollectionUtils {
         }
         String content = stringBuilder.toString();
         return content;
-
     }
 
     public static String ContentSplicing(List<Content> collection) {
