@@ -126,7 +126,7 @@ class SmartCampusApplicationTests {
 
     @Test
     void test2(){
-        ChatResponse chatResponse = chatLanguageModel.chat(SystemMessage.from(INITENT_ANALYSIS_PROMPT), UserMessage.from("你好，我能够和你聊天吗？"));
+        ChatResponse chatResponse = chatLanguageModel.chat(SystemMessage.from(INITENT_ANALYSIS_PROMPT), UserMessage.from("我课表中学分最高的三门课是那三门？"));
         String text = chatResponse.aiMessage().text();
         System.out.println(text);
         System.out.println("----------------------------");

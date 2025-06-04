@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @program: SmartCampus
@@ -37,7 +39,15 @@ public class IntentDispatcher {
     }
 
     public String dispatch(Handler handler, String intent, List<CompletableFuture<String>> futureList) {
-        return handler.run(intent,futureList);
+        try {
+            return handler.run(intent, futureList);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

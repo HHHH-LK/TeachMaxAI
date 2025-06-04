@@ -53,7 +53,6 @@ public class SlidingWindowRateLimiter implements RateLimiter {
 
         log.info("当前时间：{}，当前请求数：{}", currentTime, totalCount);
 
-
         return totalCount < maxRequest;
     }
 

@@ -8,6 +8,7 @@ import com.aiproject.smartcampus.commons.utils.CreateDiagram;
 import com.aiproject.smartcampus.commons.utils.TaskStatusChange;
 import com.aiproject.smartcampus.model.intent.handler.Handler;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,20 +57,18 @@ public class TaskExecutor {
                 throw new RuntimeException("任务执行失败", e);
             }
         }, executor);
-
         //将结果存入结果队列中
         List<CompletableFuture<String>> allFutures = new ArrayList<>();
-        if (futureList != null) {
-            allFutures.addAll(futureList);
+        if(submit!=null&& !StrUtil.isBlank(submit.toString())){
+            allFutures.add(submit);
         }
-        allFutures.add(submit);
         resultCilent.addResult(intent, allFutures);
         TaskAction action = TaskAction.statusUpdate(intent, "SUCCESS");
         statusCilent.push(action);
 
     }
 
-    public void enqueueDelayed(String intent, List<CompletableFuture<String>> futureList) throws Exception {
+    public void enqueueDelayed(String intent, List<CompletableFuture<String>> futureList) {
         //todo 对其进行依赖控制处理
         IntentBatchTask task = new IntentBatchTask();
         task.setIntents(intent);

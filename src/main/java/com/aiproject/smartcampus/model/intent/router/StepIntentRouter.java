@@ -53,7 +53,11 @@ public class StepIntentRouter implements StepRouter {
         //执行路由
         start();
         //获取总结
-        return modelSummer.summer(intents);
+        String summer = modelSummer.summer(intents);
+        //todo 清理数据
+
+        //返回结果
+        return summer;
     }
 
     //执行限流路由

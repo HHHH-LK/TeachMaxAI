@@ -17,7 +17,6 @@ public class ModelClient {
     private static String api_key ;
     private static String modle_name;
 
-
     public static ModelClient builder(String api_key,String modle_name){
 
         ModelClient modelClient = new ModelClient();

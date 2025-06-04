@@ -15,7 +15,7 @@ class AgentTest {
 
     @Test
     void start() {
-       agent.start("我们能一起聊天吗");
+       agent.start("我能和你聊天吗");
     }
 
 
