@@ -15,8 +15,8 @@ class AgentTest {
 
     @Test
     void start() {
-       agent.start("我能和你聊天吗");
+        String answer = agent.start("湖南明天天气怎么样？");
+        System.out.println(answer);
     }
-
 
 }

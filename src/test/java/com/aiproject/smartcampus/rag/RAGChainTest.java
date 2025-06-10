@@ -15,7 +15,7 @@ class RAGChainTest {
     @Test
     void chat() {
 
-        String answer = chatChain.chat("学分最高的三门课是那三门", "1");
+        String answer = chatChain.chat("我要上的课程中学分最高的三门课是那三门", "1");
         System.out.println(answer);
     }
 

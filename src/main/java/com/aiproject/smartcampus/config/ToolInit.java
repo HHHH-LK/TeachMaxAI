@@ -45,7 +45,7 @@ public class ToolInit {
         if (!exists) {
 
             log.info("天气搜索工具初始化成功");
-             tools.add(weathertool);
+            tools.add(weathertool);
         }
 
         return weathertool;
@@ -84,8 +84,8 @@ public class ToolInit {
         //判断是否已经存在
         boolean exists = tools.stream().anyMatch(tool -> "SearchEngine".equals(tool.name()));
         if (!exists) {
-   //         log.info("联网搜索工具初始化成功");
-  //          tools.add(searchToolSpec);
+            //         log.info("联网搜索工具初始化成功");
+            //          tools.add(searchToolSpec);
         }
         return searchEngine;
     }

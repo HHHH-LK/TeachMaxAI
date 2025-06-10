@@ -168,4 +168,23 @@ public class CreateDiagram {
         }
     }
 
+    //清除所有节点
+    public void clear() {
+        Lock lock = readWriteLock.writeLock();
+        try{
+            lock.lock();
+            readyList.clear();
+            intentMap.clear();
+            reIntentMap.clear();
+            adjList.clear();
+            reIntentMap.clear();
+            log.info("图节点清除成功");
+        }catch(Exception e){
+            log.error("图节点清除失败");
+        }finally {
+            lock.unlock();
+        }
+
+    }
+
 }

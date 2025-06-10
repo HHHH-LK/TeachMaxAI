@@ -227,6 +227,14 @@ public class IntentDelayedQueueClien {
         return processingTasks.size();
     }
 
+    /**
+     * 清除延时任务列表
+     * */
+    public void clearProcessingTasks() {
+        intentBatchTaskQueue.clear();
+    }
+
+
     @PreDestroy
     public void stop() {
         log.info("开始关闭延时队列客户端");
@@ -252,4 +260,5 @@ public class IntentDelayedQueueClien {
 
         log.info("延时队列客户端已关闭，剩余队列任务：{}", intentBatchTaskQueue.size());
     }
+
 }

@@ -4,10 +4,12 @@ import com.aiproject.smartcampus.commons.TaskClient;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -19,6 +21,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class TaskStatusChange {
 
@@ -86,6 +89,22 @@ public class TaskStatusChange {
             taskStatusMap.remove(intent);
         } finally {
             readWriteLock.writeLock().unlock();
+        }
+    }
+
+    /*
+    * 删除所有任务状态
+    * */
+    public void deleteAllStatus() {
+        Lock lock = readWriteLock.writeLock();
+        try {
+            lock.lock();
+            taskStatusMap.clear();
+            log.info("任务状态清除成功");
+        }catch (Exception e){
+            log.error("任务状态清除失败");
+        }finally {
+            lock.unlock();
         }
     }
 }

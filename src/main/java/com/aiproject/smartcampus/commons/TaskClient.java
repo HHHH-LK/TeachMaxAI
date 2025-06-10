@@ -105,4 +105,22 @@ public class TaskClient {
         }
 
     }
+
+    //清除所有任务
+    public void deleteAllTask() {
+        //删除任务
+        readWriteLock.writeLock().lock();
+        try {
+            TaskList.clear();
+            TaskStatusMap.clear();
+            TaskRelationMap.clear();
+        }catch (Exception e){
+            log.error("任务清除失败！");
+            throw new RuntimeException("任务清除失败！");
+
+        }
+
+    }
+
+
 }
