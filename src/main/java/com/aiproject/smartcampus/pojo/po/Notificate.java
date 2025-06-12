@@ -92,5 +92,8 @@ public class Notificate implements Serializable {
     @TableField(value = "type", typeHandler = NotificationTypeHandler.class)
     private NotificationType type;
 
+    @TableField("num")
+    private Long num;
+
 
 }

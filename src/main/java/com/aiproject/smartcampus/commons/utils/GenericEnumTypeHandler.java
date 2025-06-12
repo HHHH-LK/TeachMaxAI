@@ -11,7 +11,7 @@ public class GenericEnumTypeHandler<E extends Enum<E> & BaseEnum<T>, T> extends 
     private final Class<E> type;
 
     public GenericEnumTypeHandler(Class<E> type) {
-        if (type == null) throw new IllegalArgumentException("Type argument cannot be null");
+        if (type == null) {throw new IllegalArgumentException("Type argument cannot be null");}
         this.type = type;
     }
 
@@ -36,7 +36,7 @@ public class GenericEnumTypeHandler<E extends Enum<E> & BaseEnum<T>, T> extends 
     }
 
     private E codeOf(String code) {
-        if (code == null) return null;
+        if(code == null){ return null; }
         return Arrays.stream(type.getEnumConstants())
                 .filter(e -> e.getCode().toString().equalsIgnoreCase(code))
                 .findFirst()

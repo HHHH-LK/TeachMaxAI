@@ -44,13 +44,14 @@ public class WebInit implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        registry.addInterceptor(loginInterceptor)
+        //todo 取消拦截器做测试
+       /* registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(excludePathPatternList)
                 .order(0);
         registry.addInterceptor(refreashInterceptor)
                 .addPathPatterns("/**")
-                .order(1);
+                .order(1);*/
 
     }
 

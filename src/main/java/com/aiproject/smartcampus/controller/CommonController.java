@@ -33,10 +33,12 @@ public class CommonController {
 
     }
 
-    //用户信息填写
+    /**
+     * 用户信息填写
+     * */
     @PostMapping("/register")
     @Operation(summary = "用户注册信息填写", description = "用户进入系统前的完整信息登记")
-    public Result login(@RequestHeader("token") String registrationToken, @RequestBody UserRegisterDTO userRegisterDTO) throws Exception {
+    public Result login(@RequestParam("token") String registrationToken, @RequestBody UserRegisterDTO userRegisterDTO) throws Exception {
 
         return commonService.userRegister(registrationToken, userRegisterDTO);
     }
@@ -75,6 +77,17 @@ public class CommonController {
     public Result getAllUser(@RequestParam(value = "content")  String content) {
         return commonService.broadcastNotification(content);
     }
+
+    /**
+     * 消息确认
+     * */
+    @PostMapping("/notificationConfirm")
+    @Operation(summary = "消息确认", description = "消息确认")
+    public Result notificationConfirm(String charater,String userId , String notificatioonId,String content) throws Exception {
+
+        return commonService.notificationConfirm(charater,userId,notificatioonId,content);
+    }
+
 
 
 
