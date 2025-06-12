@@ -1,7 +1,7 @@
 package com.aiproject.smartcampus.model.intent.handler.impl;
 
-import com.aiproject.smartcampus.commons.ResultCilent;
-import com.aiproject.smartcampus.commons.StatusCilent;
+import com.aiproject.smartcampus.commons.client.ResultCilent;
+import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.commons.delayedtask.IntentBatchTask;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
@@ -12,7 +12,6 @@ import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import com.aiproject.smartcampus.pojo.bo.ToolList;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
-import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.request.ChatRequest;

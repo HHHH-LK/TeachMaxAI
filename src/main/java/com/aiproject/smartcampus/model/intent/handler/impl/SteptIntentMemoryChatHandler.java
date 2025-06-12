@@ -1,12 +1,11 @@
 package com.aiproject.smartcampus.model.intent.handler.impl;
 
-import com.aiproject.smartcampus.commons.ResultCilent;
-import com.aiproject.smartcampus.commons.StatusCilent;
+import com.aiproject.smartcampus.commons.client.ResultCilent;
+import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.commons.delayedtask.IntentBatchTask;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
 import com.aiproject.smartcampus.model.intent.handler.AutoRegisterHandler;
-import com.aiproject.smartcampus.model.prompts.UserPrompts;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import dev.langchain4j.data.message.ChatMessage;

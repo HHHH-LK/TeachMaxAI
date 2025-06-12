@@ -1,8 +1,7 @@
 package com.aiproject.smartcampus.commons.utils;
 
-import com.aiproject.smartcampus.commons.TaskClient;
+import com.aiproject.smartcampus.commons.client.TaskClient;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

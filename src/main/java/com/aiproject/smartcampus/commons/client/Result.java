@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.commons;
+package com.aiproject.smartcampus.commons.client;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

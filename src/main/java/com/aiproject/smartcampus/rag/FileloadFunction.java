@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.rag;
 
-import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.bo.classprase.Course;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.pojo.po;
+package com.aiproject.smartcampus.pojo.bo.classprase;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

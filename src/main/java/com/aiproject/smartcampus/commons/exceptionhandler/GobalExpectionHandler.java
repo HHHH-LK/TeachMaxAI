@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.commons.exceptionhandler;
 
-import com.aiproject.smartcampus.commons.Result;
+import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.exception.MemoryExpection;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 

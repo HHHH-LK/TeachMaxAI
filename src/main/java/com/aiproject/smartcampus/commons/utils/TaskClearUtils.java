@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.commons.utils;
 
-import com.aiproject.smartcampus.commons.TaskClient;
+import com.aiproject.smartcampus.commons.client.TaskClient;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

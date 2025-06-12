@@ -1,11 +1,10 @@
 package com.aiproject.smartcampus.controller;
 
-import com.aiproject.smartcampus.commons.Result;
+import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.dto.UserLoginDTO;
 import com.aiproject.smartcampus.pojo.dto.UserPreliminaryRegisterDTO;
 import com.aiproject.smartcampus.pojo.dto.UserRegisterDTO;
 import com.aiproject.smartcampus.service.CommonService;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -56,12 +55,29 @@ public class CommonController {
         return commonService.userLogout(token);
     }
 
-    //文件上传功能
+    //todo 文件上传功能待完成
     @PostMapping("/fileupload")
     @Operation(summary = "文件上传", description = "文件上传功能")
     public Result upload(@RequestParam(value = "file") MultipartFile file) throws Exception {
         return commonService.upload(file);
     }
+
+    //定时消息实时通知
+    @GetMapping("/notificate")
+    @Operation(summary = "定时消息实时通知",description = "定时消息实时通知")
+    public Result notificate(@RequestParam(value = "userId") Integer userId) throws Exception {
+        return commonService.notificateService(userId);
+    }
+
+    //发布系统通知
+    @GetMapping("/broadcastNotification")
+    @Operation(summary = "发布系统通知",description = "发布系统通知")
+    public Result getAllUser(@RequestParam(value = "content")  String content) {
+        return commonService.broadcastNotification(content);
+    }
+
+
+
 
 
 }

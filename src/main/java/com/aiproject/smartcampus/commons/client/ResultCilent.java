@@ -1,7 +1,6 @@
-package com.aiproject.smartcampus.commons;
+package com.aiproject.smartcampus.commons.client;
 
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
-import com.aiproject.smartcampus.commons.utils.TaskStatusChange;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

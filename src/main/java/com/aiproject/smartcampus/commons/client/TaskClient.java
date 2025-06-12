@@ -1,12 +1,11 @@
-package com.aiproject.smartcampus.commons;
+package com.aiproject.smartcampus.commons.client;
 
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
-import com.aiproject.smartcampus.pojo.po.Node;
-import com.aiproject.smartcampus.pojo.po.Side;
+import com.aiproject.smartcampus.pojo.bo.Node;
+import com.aiproject.smartcampus.pojo.bo.Side;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

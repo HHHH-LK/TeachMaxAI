@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.model.intent.summer;
 
-import com.aiproject.smartcampus.commons.ResultCilent;
+import com.aiproject.smartcampus.commons.client.ResultCilent;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;

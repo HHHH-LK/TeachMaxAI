@@ -1,8 +1,6 @@
 package com.aiproject.smartcampus.service.impl;
 
-import com.aiproject.smartcampus.commons.Result;
 import com.aiproject.smartcampus.mapper.StudentMapper;
-import com.aiproject.smartcampus.pojo.dto.UserPreliminaryRegisterDTO;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.aiproject.smartcampus.service.StudentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

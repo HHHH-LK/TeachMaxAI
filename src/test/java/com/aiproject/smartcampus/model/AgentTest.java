@@ -15,7 +15,7 @@ class AgentTest {
 
     @Test
     void start() {
-        String answer = agent.start("湖南明天天气怎么样？");
+        String answer = agent.start("高考试卷题型一般怎么分布");
         System.out.println(answer);
     }
 

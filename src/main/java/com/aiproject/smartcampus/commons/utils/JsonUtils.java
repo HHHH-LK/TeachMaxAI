@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.commons.utils;
 
-import com.aiproject.smartcampus.pojo.po.Side;
+import com.aiproject.smartcampus.pojo.bo.Side;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

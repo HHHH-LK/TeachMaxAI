@@ -30,4 +30,6 @@ public class CommonContest {
             "枪支弹药"   // 管制物品
     };
 
+    public static String NOTIFICATION_KEY="smartcampus:notification:";
+
 }

@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.pojo.po;
+package com.aiproject.smartcampus.pojo.bo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

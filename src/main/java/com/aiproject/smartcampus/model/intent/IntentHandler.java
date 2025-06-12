@@ -1,13 +1,8 @@
 package com.aiproject.smartcampus.model.intent;
 
-import com.aiproject.smartcampus.commons.TaskClient;
-import com.aiproject.smartcampus.commons.utils.CreateDiagram;
 import com.aiproject.smartcampus.commons.utils.TaskInitUtils;
-import com.aiproject.smartcampus.commons.utils.TaskStatusChange;
 import com.aiproject.smartcampus.model.intent.router.StepIntentRouter;
-import com.aiproject.smartcampus.model.prompts.SystemPrompts;
-import com.aiproject.smartcampus.pojo.po.Node;
-import com.aiproject.smartcampus.pojo.po.Side;
+import com.aiproject.smartcampus.pojo.bo.Side;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -57,7 +52,7 @@ public class IntentHandler implements Intent {
                     UserMessage.from(intent)
             );
 
-            String analysisResult = chatResponse.aiMessage().text().trim();
+           String analysisResult = chatResponse.aiMessage().text().trim();
             log.info("用户意图分析结果: {}", analysisResult);
 
             // 进行意图拆分

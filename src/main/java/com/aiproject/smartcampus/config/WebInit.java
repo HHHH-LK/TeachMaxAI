@@ -1,8 +1,14 @@
 package com.aiproject.smartcampus.config;
 
+import com.aiproject.smartcampus.commons.utils.NotificationTypeHandler;
+import com.aiproject.smartcampus.commons.utils.SenderTypeHandler;
 import com.aiproject.smartcampus.interceptor.LoginInterceptor;
 import com.aiproject.smartcampus.interceptor.RefreashInterceptor;
+import com.aiproject.smartcampus.pojo.enums.NotificationType;
+import com.aiproject.smartcampus.pojo.enums.SenderType;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -46,8 +52,16 @@ public class WebInit implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .order(1);
 
-
     }
+
+    @Bean
+    public ConfigurationCustomizer configurationCustomizer() {
+        return configuration -> {
+            configuration.getTypeHandlerRegistry().register(SenderType.class, SenderTypeHandler.class);
+            configuration.getTypeHandlerRegistry().register(NotificationType.class, NotificationTypeHandler.class);
+        };
+    }
+
 
 }
 

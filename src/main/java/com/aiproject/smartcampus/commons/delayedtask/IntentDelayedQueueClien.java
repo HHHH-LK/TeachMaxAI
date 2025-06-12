@@ -1,8 +1,8 @@
 package com.aiproject.smartcampus.commons.delayedtask;
 
-import com.aiproject.smartcampus.commons.HandlerRegiserCilent;
-import com.aiproject.smartcampus.commons.ResultCilent;
-import com.aiproject.smartcampus.commons.StatusCilent;
+import com.aiproject.smartcampus.commons.client.HandlerRegiserCilent;
+import com.aiproject.smartcampus.commons.client.ResultCilent;
+import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.model.intent.handler.Handler;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import jakarta.annotation.PostConstruct;

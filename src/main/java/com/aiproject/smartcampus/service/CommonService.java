@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.service;
 
-import com.aiproject.smartcampus.commons.Result;
+import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.dto.UserLoginDTO;
 import com.aiproject.smartcampus.pojo.dto.UserPreliminaryRegisterDTO;
 import com.aiproject.smartcampus.pojo.dto.UserRegisterDTO;
@@ -16,4 +16,8 @@ public interface CommonService {
     Result userLogout(String token);
 
     Result upload(MultipartFile file);
+
+    Result notificateService(Integer userId) ;
+
+    Result broadcastNotification(String content);
 }

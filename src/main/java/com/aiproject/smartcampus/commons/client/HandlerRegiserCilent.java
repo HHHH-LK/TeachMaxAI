@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.commons;
+package com.aiproject.smartcampus.commons.client;
 
 import com.aiproject.smartcampus.model.intent.handler.Handler;
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +57,9 @@ public class HandlerRegiserCilent {
         lock.writeLock().lock();
         try {
             exactMatchMap.put(usage, handler);
-
             if (usage.contains("处理器")) {
                 registerHandlerWithMetadata(usage, handler);
             }
-
             log.debug("服务[{}]（{}）添加成功", usage, handler.getClass().getSimpleName());
         } catch (Exception e) {
             log.error("添加服务失败", e);

@@ -1,16 +1,14 @@
 package com.aiproject.smartcampus.model.intent.handler.impl;
 
-import com.aiproject.smartcampus.commons.ResultCilent;
-import com.aiproject.smartcampus.commons.StatusCilent;
+import com.aiproject.smartcampus.commons.client.ResultCilent;
+import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.commons.delayedtask.IntentBatchTask;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
 import com.aiproject.smartcampus.commons.utils.CollectionUtils;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
 import com.aiproject.smartcampus.model.intent.handler.AutoRegisterHandler;
-import com.aiproject.smartcampus.model.prompts.SystemPrompts;
 import com.aiproject.smartcampus.model.prompts.UserPrompts;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
-import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
@@ -27,7 +25,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
+
+//todo 待修改（还存在些逻辑问题）
 
 /**
  * @program: SmartCampus
@@ -173,7 +172,6 @@ public class SeptIntentRagHandler extends AutoRegisterHandler {
     }
 
     private void executeWithDependenciesFaild(String intent, List<CompletableFuture<String>> result) {
-
             //缺失前置依赖
             log.info("任务[{}]缺失前置依赖，需要延迟执行", intent);
             TaskAction action = TaskAction.statusUpdate(intent, "WAITING_DEPENDENCY");

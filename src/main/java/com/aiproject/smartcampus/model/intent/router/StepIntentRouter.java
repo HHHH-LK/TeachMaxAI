@@ -1,25 +1,19 @@
 package com.aiproject.smartcampus.model.intent.router;
 
-import com.aiproject.smartcampus.commons.ResultCilent;
-import com.aiproject.smartcampus.commons.StatusCilent;
-import com.aiproject.smartcampus.commons.easyuse.IntentDispatcher;
+import com.aiproject.smartcampus.commons.client.ResultCilent;
+import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.commons.easyuse.RateLimiterWrapper;
 import com.aiproject.smartcampus.commons.easyuse.TaskExecutor;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
-import com.aiproject.smartcampus.commons.utils.TaskStatusChange;
 import com.aiproject.smartcampus.handler.contenthandler.ContentCheckClient;
-import com.aiproject.smartcampus.model.intent.handler.Handler;
 import com.aiproject.smartcampus.model.intent.summer.ModelSummer;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * @program: SmartCampus

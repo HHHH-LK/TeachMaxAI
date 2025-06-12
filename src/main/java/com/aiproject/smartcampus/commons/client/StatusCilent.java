@@ -1,4 +1,4 @@
-package com.aiproject.smartcampus.commons;
+package com.aiproject.smartcampus.commons.client;
 
 import com.aiproject.smartcampus.commons.delayedtask.IntentBatchTask;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
