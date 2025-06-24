@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -56,10 +58,10 @@ public class ResultCilent {
         readWriteLock.readLock().lock();
         try {
             List<CompletableFuture<String>> completableFutures = resultMap.get(key);
-            // 修复：使用正确的逻辑条件
+
             if (completableFutures == null || completableFutures.isEmpty()) {
                 log.warn("resultMap中不存在{}的依赖结果", key);
-                return null;
+                return new ArrayList<>(); // 返回空列表而不是null
             }
             log.info("从resultMap中获取任务{}的结果", key);
             return completableFutures;
@@ -67,7 +69,6 @@ public class ResultCilent {
             readWriteLock.readLock().unlock();
         }
     }
-
     /**
      * 移除结果
      */
@@ -94,23 +95,45 @@ public class ResultCilent {
 
     //获取依赖任务的结果
     public List<CompletableFuture<String>> getPreTask(String intent) {
-        //todo 获取依赖结果逻辑需要进行修改（获取其依赖）
-        //获取当前任务的依赖任务
-        List<String> preTask = createDiagram.getParetents(intent);
-        //过滤已经执行完成的任务(幂等性)
-        List<String> preTasks = preTask.stream().filter(Task -> !taskClient.getTaskStatus(Task).equals("SUCCESS")&&!taskClient.getTaskStatus(Task).equals("RUNNING")).toList();
-        //判断是否需要依赖
-        if (preTasks == null || preTasks.isEmpty()) {
-            log.info("任务{}不需要依赖其他任务", intent);
-            return null;
-        }
-        //获取依赖任务的结果
-        List<CompletableFuture<String>> futures = new CopyOnWriteArrayList<>();
-        for (String preTaskq : preTasks) {
-            futures.addAll(getResult(preTaskq));
-        }
+        try {
+            // 获取当前任务的依赖任务
+            List<String> preTask = createDiagram.getParetents(intent);
 
-        return futures;
+            // 判断是否需要依赖
+            if (preTask == null || preTask.isEmpty()) {
+                log.info("任务{}不需要依赖其他任务", intent);
+                return new ArrayList<>(); // 🔥 返回空列表而不是null
+            }
+            // 过滤已经执行完成的任务(幂等性)
+            List<String> preTasks = preTask.stream()
+                    .filter(task -> {
+                        String status = taskClient.getTaskStatus(task);
+                        return !"SUCCESS".equals(status) && !"RUNNING".equals(status);
+                    })
+                    .collect(Collectors.toList());
+
+            if (preTasks.isEmpty()) {
+                log.info("任务{}的所有前置任务都已完成", intent);
+                return new ArrayList<>();
+            }
+
+            // 获取依赖任务的结果
+            List<CompletableFuture<String>> futures = new ArrayList<>();
+            for (String preTaskName : preTasks) {
+                List<CompletableFuture<String>> taskResults = getResult(preTaskName);
+                // 🔥 由于getResult现在总是返回非null，这里更安全
+                if (!taskResults.isEmpty()) {
+                    futures.addAll(taskResults);
+                } else {
+                    log.warn("前置任务{}的结果为空", preTaskName);
+                }
+            }
+            return futures;
+
+        } catch (Exception e) {
+            log.error("获取任务{}的前置任务失败", intent, e);
+            return new ArrayList<>(); // 🔥 异常时也返回空列表
+        }
     }
 
 }

@@ -43,4 +43,6 @@ public interface CommonService {
      * 消息确认
      */
     Result notificationConfirm(String charater,String userId, String notificatioonId,String content);
+
+
 }

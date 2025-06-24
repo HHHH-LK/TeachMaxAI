@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.pojo.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -12,6 +13,7 @@ import lombok.Data;
 @Data
 public class UserPreliminaryRegisterDTO {
     //用来判断是否为学生（student/teacher/controller）
+    @JsonProperty("Character")
     private String Character;
     private String password;
     private String rePassword;

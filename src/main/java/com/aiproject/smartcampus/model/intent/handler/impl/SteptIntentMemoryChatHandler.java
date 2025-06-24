@@ -5,7 +5,7 @@ import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.commons.delayedtask.IntentBatchTask;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
-import com.aiproject.smartcampus.model.intent.handler.AutoRegisterHandler;
+import com.aiproject.smartcampus.model.intent.handler.EnhancedAutoRegisterHandler;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import dev.langchain4j.data.message.ChatMessage;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SteptIntentMemoryChatHandler extends AutoRegisterHandler {
+public class SteptIntentMemoryChatHandler extends EnhancedAutoRegisterHandler {
 
     private final CreateDiagram createDiagram;
     private final ChatLanguageModel chatLanguageModel;
@@ -44,7 +44,6 @@ public class SteptIntentMemoryChatHandler extends AutoRegisterHandler {
     private final ResultCilent resultCilent;
     private final StatusCilent statusCilent;
 
-    private final String functionDescription = "基于对话记忆回答用户问题，处理上下文相关的查询";
 
     // 默认记忆ID，可以根据用户会话或任务分组 todo 后续修改成为user指定id
     private static final String DEFAULT_MEMORY_ID = "smart_campus_memory";
@@ -103,10 +102,6 @@ public class SteptIntentMemoryChatHandler extends AutoRegisterHandler {
             updateMemory(intent, result);
 
             log.info("记忆对话执行[{}]成功,结果为[{}]", intent, result);
-
-            // 更新状态为成功
-            TaskAction successAction = TaskAction.statusUpdate(intent, "SUCCESS");
-            statusCilent.push(successAction);
 
             // 减少相关任务的入度
             TaskAction decreaseAction = TaskAction.indegreeDecrease(intent);

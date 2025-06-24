@@ -73,7 +73,7 @@ public class TaskInitUtils {
         try {
             for (String task : splitResult) {
                 if (task != null && !task.trim().isEmpty()) {
-                    taskClient.addTask(new Node(task.trim()));
+                    taskClient.addTask(new Node(task.trim(),null));
                     log.debug("添加任务节点: {}", task);
                 }
             }
@@ -153,7 +153,7 @@ public class TaskInitUtils {
             }
 
             // 添加单个任务节点
-            taskClient.addTask(new Node(originalIntent.trim()));
+            taskClient.addTask(new Node(originalIntent.trim(),null));
 
             // 设置入度为0（无依赖）
             createDiagram.addInDegree(originalIntent.trim(), new AtomicInteger(0));

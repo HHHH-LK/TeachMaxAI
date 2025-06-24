@@ -18,5 +18,6 @@ import lombok.NoArgsConstructor;
 public class Node {
 
     private String intent;
+    private String handler;
 
 }

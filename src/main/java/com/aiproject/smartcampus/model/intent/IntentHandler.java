@@ -137,15 +137,12 @@ public class IntentHandler implements Intent {
             // 构建包含任务列表的上下文
             String contextInput = String.format("原始意图: %s\n子任务列表: %s",
                     originalIntent, String.join(", ", tasks));
-
             ChatResponse relationResponse = chatLanguageModel.chat(
                     SystemMessage.from(INITENT_RELATION_PROMPT),
                     UserMessage.from(contextInput)
             );
-
             String relationResult = relationResponse.aiMessage().text().trim();
             log.info("任务关系分析结果: {}", relationResult);
-
             // 解析关系JSON
             relations = parseRelationsFromJson(relationResult);
             log.info("成功解析 {} 个任务依赖关系", relations.size());

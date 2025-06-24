@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -32,11 +33,20 @@ public class ModelSummer {
     private final ChatLanguageModel chatLanguageModel;
 
     public String summer(List<String> intents) {
-
         List<CompletableFuture<String>> result = new ArrayList<>();
         for (String intent : intents) {
-            result.addAll(resultCilent.getResult(intent));
+            List<CompletableFuture<String>> intentResults = resultCilent.getResult(intent);
+            if (intentResults != null && !intentResults.isEmpty()) {
+                result.addAll(intentResults);
+            } else {
+                log.warn("任务 {} 的结果为空，跳过添加", intent);
+            }
         }
+        if (result.isEmpty()) {
+            log.warn("所有任务结果都为空，返回默认响应");
+            return "系统正在处理您的请求，相关信息暂时无法获取，请稍后重试";
+        }
+
         //等待所有任务执行完
         CompletableFuture.allOf(result.toArray(new CompletableFuture[0])).join();
         try {
@@ -55,8 +65,6 @@ public class ModelSummer {
             log.error("模型处理异常", e);
             return "模型处理失败：" + e.getMessage();
         }
-
-
     }
 
 }

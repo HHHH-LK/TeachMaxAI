@@ -17,7 +17,6 @@ public class Agent {
 
     private final Intent intentHandler;
     //注入意图处理器
-
     public String start(String userMessage){
 
         String answer = intentHandler.handlerIntent(userMessage);

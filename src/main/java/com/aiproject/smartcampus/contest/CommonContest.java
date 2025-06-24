@@ -12,10 +12,12 @@ public class CommonContest {
     public static final int REFRESH_TIEM=3;
     public static final String TOOL_SCAN_NAME="com.aiproject.smartcampus.functioncalling.";
     public static final String MAPPER_SCAN_NAME="com.aiproject.smartcampus.mapper.";
-    public static final long TOKEN_PRE_TTL=3l;
+    public static final long TOKEN_PRE_TTL= 3L;
     public static final Integer REDO_SUM=5;
     public static final long   ttl = TOKEN_PRE_TTL * 60 * 60 * 24;
     public static final String LOGIN_KEY = "smartcampus:login:";
+    public static final String REDIS_KEY_PREFIX = "chat:memory:";
+
     //todo 后续可以进行添加违法关键词
     public static  String[] illegalContentList={
             "赌博",      // 赌博相关

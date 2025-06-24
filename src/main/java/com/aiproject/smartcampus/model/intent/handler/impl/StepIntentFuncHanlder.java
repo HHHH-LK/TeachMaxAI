@@ -6,7 +6,7 @@ import com.aiproject.smartcampus.commons.delayedtask.IntentBatchTask;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
 import com.aiproject.smartcampus.commons.utils.JsonUtils;
-import com.aiproject.smartcampus.model.intent.handler.AutoRegisterHandler;
+import com.aiproject.smartcampus.model.intent.handler.EnhancedAutoRegisterHandler;
 import com.aiproject.smartcampus.model.prompts.UserPrompts;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import com.aiproject.smartcampus.pojo.bo.ToolList;
@@ -41,7 +41,7 @@ import static com.aiproject.smartcampus.contest.CommonContest.TOOL_SCAN_NAME;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class StepIntentFuncHanlder extends AutoRegisterHandler {
+public class StepIntentFuncHanlder extends EnhancedAutoRegisterHandler {
 
     // 注入工具
     private final ToolList toolList;
@@ -51,7 +51,6 @@ public class StepIntentFuncHanlder extends AutoRegisterHandler {
     private final ResultCilent resultCilent;
     private final IntentDelayedQueueClien intentDelayedQueueClien;
 
-    private final String functionDescription = "工具函数处理器，执行特定的工具调用和功能操作";
 
     @Override
     public String run(String intent, List<CompletableFuture<String>> result) {
@@ -60,7 +59,6 @@ public class StepIntentFuncHanlder extends AutoRegisterHandler {
             // 更新任务状态为执行中
             TaskAction runningAction = TaskAction.statusUpdate(intent, "RUNNING");
             statusCilent.push(runningAction);
-
             String finalResult = null;
             int inDegree = createDiagram.getInDegree(intent);
             if (inDegree == 0) {
@@ -70,7 +68,6 @@ public class StepIntentFuncHanlder extends AutoRegisterHandler {
                 // 有依赖任务，需要等待前置条件
                 finalResult = executeWithDependencies(intent, result);
             }
-
             log.info("工具执行结果为{}", finalResult);
             return finalResult != null ? finalResult : null;
         } catch (Exception e) {
@@ -104,7 +101,6 @@ public class StepIntentFuncHanlder extends AutoRegisterHandler {
             // 减少相关任务的入度
             TaskAction decreaseAction = TaskAction.indegreeDecrease(intent);
             statusCilent.push(decreaseAction);
-
             return result;
         } catch (Exception e) {
             log.error("执行直接工具任务[{}]失败", intent, e);

@@ -118,6 +118,14 @@
             <version>${langchain4j-pinecone.version}</version>
         </dependency>
 
+        <!--mp4信息读取-->
+        <dependency>
+            <groupId>com.assemblyai</groupId>
+            <artifactId>assemblyai-java</artifactId>
+            <version>1.0.10</version>
+        </dependency>
+
+
         <!--爬取网页-->
         <dependency>
             <groupId>org.jsoup</groupId>

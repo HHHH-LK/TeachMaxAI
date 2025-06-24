@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.commons.delayedtask;
 
-import com.aiproject.smartcampus.commons.client.HandlerRegiserCilent;
+import com.aiproject.smartcampus.commons.client.EnhancedHandlerRegisterClient;
 import com.aiproject.smartcampus.commons.client.ResultCilent;
 import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.model.intent.handler.Handler;
@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 @Slf4j
 public class IntentDelayedQueueClien {
 
-    private final HandlerRegiserCilent handlerRegiserCilent;
+    private final EnhancedHandlerRegisterClient handlerRegiserCilent;
     private final DelayQueue<IntentBatchTask> intentBatchTaskQueue = new DelayQueue<>();
     private final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(20);
     private volatile boolean running = true;
@@ -229,7 +229,7 @@ public class IntentDelayedQueueClien {
 
     /**
      * 清除延时任务列表
-     * */
+     */
     public void clearProcessingTasks() {
         intentBatchTaskQueue.clear();
     }

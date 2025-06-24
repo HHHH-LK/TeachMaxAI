@@ -38,7 +38,6 @@ public class ChatBaseHandler extends ChatHandler {
     //处理记忆是否能够回答用户问题
     @Override
     public void chatHandle(ChatHandlerquery chatHandlerquery, ChatHandlerResponse handlerResponse) {
-
         try{
             log.info("执行记忆搜索中。。。。。");
             memoryMap=chatHandlerquery.getQueryMap();

@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -15,8 +18,21 @@ class AgentTest {
 
     @Test
     void start() {
-        String answer = agent.start("高考试卷题型一般怎么分布");
+        long l = System.currentTimeMillis();
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now.toString());
+        System.out.println(l);
+        String answer = agent.start("我十四周有哪些课程，请只返回相关名字");
         System.out.println(answer);
+        LocalDateTime now2 = LocalDateTime.now();
+        long l1 = System.currentTimeMillis();
+        System.out.println(l1 - l);
+        System.out.println( Duration.between(now, now2));
+
+
     }
+
+
+
 
 }

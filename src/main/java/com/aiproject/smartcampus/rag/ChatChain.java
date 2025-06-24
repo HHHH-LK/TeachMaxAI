@@ -36,13 +36,12 @@ public class ChatChain {
     private final LocalStore store;
     private final SearchApiWebSearchEngine searchEngine;
     private Map<String, ChatMemory> memoryMap = new ConcurrentHashMap<>();
-
-
-    public String chat(String userMessage,String memoryId){
+    
+    public String chat(String userMessage, String memoryId) {
         //构建调用链
         ChatBaseHandler chatbaseChain = new ChatBaseHandler(chatLanguageModel, store);
-        RagHandler ragChain = new RagHandler(contentRetriever,chatLanguageModel);
-        FunctionCallingHandler funcChain = new FunctionCallingHandler(toolList, chatLanguageModel,searchEngine);
+        RagHandler ragChain = new RagHandler(contentRetriever, chatLanguageModel);
+        FunctionCallingHandler funcChain = new FunctionCallingHandler(toolList, chatLanguageModel, searchEngine);
         //构建请求响应
         ChatHandlerquery chatHandlerquery = new ChatHandlerquery();
         chatHandlerquery.setQueryContent(userMessage);
@@ -50,7 +49,7 @@ public class ChatChain {
         chatHandlerquery.setQueryMap(memoryMap);
         ChatHandlerResponse chatHandlerResponse = new ChatHandlerResponse();
         //调用链处理
-         chatbaseChain.setNextHandler(ragChain).setNextHandler(funcChain);
+        chatbaseChain.setNextHandler(ragChain).setNextHandler(funcChain);
         chatbaseChain.chatHandle(chatHandlerquery, chatHandlerResponse);
         //获取响应结果
         return chatHandlerResponse.getChatAnswer();

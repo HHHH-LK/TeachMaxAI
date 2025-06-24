@@ -33,9 +33,19 @@ public class CommonController {
 
     }
 
+
+    @PostMapping("agent/chat")
+    @Operation(summary = "test", description = "test")
+    public Result testRegister(String content, String id) throws Exception {
+
+        return null;
+
+    }
+
+
     /**
      * 用户信息填写
-     * */
+     */
     @PostMapping("/register")
     @Operation(summary = "用户注册信息填写", description = "用户进入系统前的完整信息登记")
     public Result login(@RequestParam("token") String registrationToken, @RequestBody UserRegisterDTO userRegisterDTO) throws Exception {
@@ -53,7 +63,7 @@ public class CommonController {
     //用户退出功能
     @GetMapping("/logout")
     @Operation(summary = "用户退出", description = "用户退出功能")
-    public Result logout(@RequestParam(value = "token") String token)  {
+    public Result logout(@RequestParam(value = "token") String token) {
         return commonService.userLogout(token);
     }
 
@@ -66,31 +76,39 @@ public class CommonController {
 
     //定时消息实时通知
     @GetMapping("/notificate")
-    @Operation(summary = "定时消息实时通知",description = "定时消息实时通知")
+    @Operation(summary = "定时消息实时通知", description = "定时消息实时通知")
     public Result notificate(@RequestParam(value = "userId") Integer userId) throws Exception {
         return commonService.notificateService(userId);
     }
 
     //发布系统通知
     @GetMapping("/broadcastNotification")
-    @Operation(summary = "发布系统通知",description = "发布系统通知")
-    public Result getAllUser(@RequestParam(value = "content")  String content) {
+    @Operation(summary = "发布系统通知", description = "发布系统通知")
+    public Result getAllUser(@RequestParam(value = "content") String content) {
         return commonService.broadcastNotification(content);
     }
 
     /**
      * 消息确认
-     * */
+     */
     @PostMapping("/notificationConfirm")
     @Operation(summary = "消息确认", description = "消息确认")
-    public Result notificationConfirm(String charater,String userId , String notificatioonId,String content) throws Exception {
+    public Result notificationConfirm(String charater, String userId, String notificatioonId, String content) throws Exception {
 
-        return commonService.notificationConfirm(charater,userId,notificatioonId,content);
+        return commonService.notificationConfirm(charater, userId, notificatioonId, content);
     }
 
 
+    /**
+     * agent使用
+     */
 
+    @PostMapping("/agent")
+    @Operation(summary = "agent使用", description = "agent使用")
+    public Result agentUser(String content) {
 
+        return null;
+    }
 
 
 }

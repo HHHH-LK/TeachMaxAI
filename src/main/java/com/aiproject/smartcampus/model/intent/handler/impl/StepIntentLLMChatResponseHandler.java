@@ -5,7 +5,7 @@ import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.commons.delayedtask.IntentBatchTask;
 import com.aiproject.smartcampus.commons.delayedtask.IntentDelayedQueueClien;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
-import com.aiproject.smartcampus.model.intent.handler.AutoRegisterHandler;
+import com.aiproject.smartcampus.model.intent.handler.EnhancedAutoRegisterHandler;
 import com.aiproject.smartcampus.model.prompts.UserPrompts;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class StepIntentLLMChatResponseHandler extends AutoRegisterHandler {
+public class StepIntentLLMChatResponseHandler extends EnhancedAutoRegisterHandler {
 
     private final CreateDiagram createDiagram;
     private final ChatLanguageModel chatLanguageModel;
@@ -41,7 +41,6 @@ public class StepIntentLLMChatResponseHandler extends AutoRegisterHandler {
     private final ResultCilent resultCilent;
     private final StatusCilent statusCilent;
 
-    private final String functionDescription = "基础大语言模型对话处理器，处理一般性对话和问答";
 
     @Override
     public String run(String intent, List<CompletableFuture<String>> result) {
@@ -97,7 +96,7 @@ public class StepIntentLLMChatResponseHandler extends AutoRegisterHandler {
         if (result != null && result.size() == expectedSize && isOKTask(result)) {
             return executeTaskWithResults(intent, result);
         } else {
-             handleMissingDependencies(intent, expectedSize);
+            handleMissingDependencies(intent, expectedSize);
             return null;
         }
     }
@@ -188,7 +187,7 @@ public class StepIntentLLMChatResponseHandler extends AutoRegisterHandler {
      * 等待依赖任务完成
      */
     private List<CompletableFuture<String>> waitForDependencies(String intent, int expectedSize) {
-         List<CompletableFuture<String>> dependencyResults = null;
+        List<CompletableFuture<String>> dependencyResults = null;
         int retryCount = 0;
         final int maxRetries = 10;
         final long sleepInterval = 200;

@@ -1,11 +1,14 @@
 package com.aiproject.smartcampus.model.prompts;
 
+import org.springframework.stereotype.Component;
+
 /**
  * @program: SmartCampus
  * @description: 用户提示词
  * @author: lk
  * @create: 2025-06-04 17:22
  **/
+
 
 public class UserPrompts {
 
@@ -89,5 +92,70 @@ public class UserPrompts {
 
     }
 
+    public static String getHandlerPrompts(String intent) {
+        return String.format(
+                """
+                你是一个智能任务分析器，需要根据用户意图选择最合适的处理器。请按照以下优先级分析用户意图：
+                
+                用户意图：%s
+                
+                **分析流程（按优先级顺序）：**
+                
+                **第一优先级：自身能力评估**
+                首先判断该意图是否可以通过LLM自身的知识和推理能力直接解决：
+                - 一般性对话、问答
+                - 创意写作、建议、分析
+                - 基础知识解答
+                - 逻辑推理、总结归纳
+                - 情感支持、聊天互动
+                - 语言翻译、文本处理
+                
+                **分析流程（按优先级顺序）：**
+                
+                **第一优先级：自身能力评估**
+                首先判断该意图是否可以通过LLM自身的知识和推理能力直接解决：
+                - 一般性对话、问答
+                - 创意写作、建议、分析
+                - 基础知识解答
+                - 逻辑推理、总结归纳
+                - 情感支持、聊天互动
+                - 语言翻译、文本处理
+                
+                **如果自身能力足够解决，默认选择：SteptIntentMemoryChatHandler**
+                （在对话场景中，记忆功能几乎总是有益的，能提供更好的上下文连续性）
+                
+                **特殊情况下选择基础LLM处理器的场景：**
+                - 系统初始化或测试场景
+                - 明确标注为"忽略历史"的独立查询
+                - 性能敏感且确定不需要上下文的场景
+                
+                **第二优先级：专门功能需求**
+                如果自身能力不足，再根据具体需求选择专门处理器：
+                
+                1. **StepIntentFuncHanlder** - 工具函数处理器  
+                   - 需要调用特定工具或执行具体功能操作
+                   - 关键词：计算、执行、调用、操作、处理数据、生成图表、发送邮件、创建文件
+                   - 示例：复杂数学计算、数据处理、文件操作、系统调用、API调用
+                
+                2. **SeptIntentRagHandler** - 增强检索生成处理器
+                   - 需要基于特定知识库或文档检索信息
+                   - 关键词：查询特定资料、搜索文档、检索知识库、获取专业资料
+                   - 示例：查找特定文档、检索专业知识、基于企业知识库回答
+                
+                判断原则：
+                1. **默认使用记忆对话处理器**：对于所有常规对话都应该保持记忆，提供连贯体验
+                2. **明确的工具需求**：需要执行具体操作、调用外部工具时选择工具处理器
+                3. **特定资料检索**：需要从知识库或文档中查找特定信息时选择RAG处理器
+                4. **基础处理器**：仅在特殊场景下明确不需要记忆时使用
+                
+                请只返回处理器的类名，不要添加任何解释：
+                - SeptIntentRagHandler
+                - StepIntentFuncHanlder  
+                - SteptIntentMemoryChatHandler
+                - StepIntentLLMChatResponseHandler
+                """,
+                intent
+        );
+    }
 
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -19,7 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @program: SmartCampus
- * @description: 建图
+ * @description: 建图 - 修复版
  * @author: lk
  * @create: 2025-05-28 21:51
  **/
@@ -34,153 +35,327 @@ public class CreateDiagram {
     private final TaskClient taskClient;
     private final TaskStatusChange taskStatusChange;
 
-    private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     //邻接表
-    private Map<String, List<String>> adjList = new ConcurrentHashMap<>();
-    //入度表
-    private Map<String, AtomicInteger> intentMap = new ConcurrentHashMap<>();
-    private Map<String, AtomicInteger> reIntentMap = new ConcurrentHashMap<>();
-    private List<String> readyList = new ArrayList<>();
+    private final Map<String, List<String>> adjList = new ConcurrentHashMap<>();
+    //当前入度表 - 动态变化
+    private final Map<String, AtomicInteger> intentMap = new ConcurrentHashMap<>();
+    //原始入度表 - 保存初始值不变
+    private final Map<String, AtomicInteger> reIntentMap = new ConcurrentHashMap<>();
+    //使用线程安全的List
+    private final List<String> readyList = new CopyOnWriteArrayList<>();
 
     public Map<String, List<String>> getAdjList() {
-        return adjList;
+        return new ConcurrentHashMap<>(adjList);
     }
 
     public Map<String, AtomicInteger> getIntentMap() {
-        return intentMap;
+        return new ConcurrentHashMap<>(intentMap);
     }
 
-    //最先初始化
+    //最先初始化 - 添加锁保护
     public void init() {
-        List<Node> nodeList = taskClient.getTaskList();
-        List<Side> sideList = taskClient.getTaskRelation();
-        //清空上一次的信息
-        if (!adjList.isEmpty()) {
-            adjList.clear();
-        }
-        if (!intentMap.isEmpty()) {
-            intentMap.clear();
-        }
-        //提前定义相关依赖信息
-        for (Node node : nodeList) {
-            adjList.put(node.getIntent(), new ArrayList<>());
-            intentMap.put(node.getIntent(), new AtomicInteger(0));
-        }
-        for (Side side : sideList) {
-            adjList.get(side.getFrom()).add(side.getTo());
-            intentMap.computeIfAbsent(side.getTo(), k -> new AtomicInteger(0)).incrementAndGet();
-        }
-        //复制入度表（）
-        reIntentMap = new ConcurrentHashMap<>();
-        for (Map.Entry<String, AtomicInteger> entry : intentMap.entrySet()) {
-            reIntentMap.put(entry.getKey(), new AtomicInteger(entry.getValue().get()));
-        }
-    }
-
-    //(基于拓扑)获取就绪列表 加上写锁保证原子性
-    public List<String> getReadyList() {
         readWriteLock.writeLock().lock();
         try {
-            //释放就绪队列
+            log.info("开始初始化任务图");
+
+            List<Node> nodeList = taskClient.getTaskList();
+            List<Side> sideList = taskClient.getTaskRelation();
+
+            //清空上一次的信息
+            adjList.clear();
+            intentMap.clear();
+            reIntentMap.clear();
             readyList.clear();
-            //寻找所有入度为0的任务
-            for (Map.Entry<String, AtomicInteger> entry : intentMap.entrySet()) {
-                //获取任务并判断任务是否执行完毕
-                String intent = entry.getKey();
-                String status = taskStatusChange.getStatus(intent);
-                if (entry.getValue().get() == 0 && status.equals("UNDO") || status.equals("ERROR")) {
-                    readyList.add(entry.getKey());
+
+            //提前定义相关依赖信息
+            for (Node node : nodeList) {
+                adjList.put(node.getIntent(), new ArrayList<>());
+                intentMap.put(node.getIntent(), new AtomicInteger(0));
+            }
+
+            //建立边的关系
+            for (Side side : sideList) {
+                List<String> children = adjList.get(side.getFrom());
+                if (children != null) {
+                    children.add(side.getTo());
+                    intentMap.computeIfAbsent(side.getTo(), k -> new AtomicInteger(0)).incrementAndGet();
+                } else {
+                    log.warn("任务 {} 不存在于节点列表中", side.getFrom());
                 }
             }
-            return readyList;
 
+            //复制入度表作为原始入度保存
+            reIntentMap.clear();
+            for (Map.Entry<String, AtomicInteger> entry : intentMap.entrySet()) {
+                reIntentMap.put(entry.getKey(), new AtomicInteger(entry.getValue().get()));
+            }
+
+            log.info("任务图初始化完成，节点数: {}, 边数: {}", nodeList.size(), sideList.size());
+
+        } catch (Exception e) {
+            log.error("任务图初始化失败", e);
+            throw new RuntimeException("任务图初始化失败", e);
         } finally {
             readWriteLock.writeLock().unlock();
-
         }
+    }
 
+    //(基于拓扑)获取就绪列表 - 修复逻辑错误
+    public List<String> getReadyList() {
+        readWriteLock.readLock().lock(); // 改为读锁，因为只是读取数据
+        try {
+            List<String> currentReadyList = new ArrayList<>();
+
+            //寻找所有入度为0的任务
+            for (Map.Entry<String, AtomicInteger> entry : intentMap.entrySet()) {
+                String intent = entry.getKey();
+                String status = taskStatusChange.getStatus(intent);
+
+                // 修复：正确的逻辑判断，添加括号
+                if (entry.getValue().get() == 0 && (status.equals("UNDO") || status.equals("ERROR"))) {
+                    currentReadyList.add(intent);
+                }
+            }
+
+            log.debug("当前就绪任务: {}", currentReadyList);
+            return currentReadyList;
+
+        } catch (Exception e) {
+            log.error("获取就绪列表失败", e);
+            return new ArrayList<>();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
     }
 
     //加入元素到就绪队列中
     public void addReadyList(String intent) {
-        readWriteLock.writeLock().lock();
-        try {
-            readyList.add(intent);
-        } finally {
-            readWriteLock.writeLock().unlock();
+        if (intent != null && !intent.trim().isEmpty()) {
+            readyList.add(intent.trim());
+            log.debug("添加任务到就绪列表: {}", intent);
         }
     }
 
-    //修改入度
+    //修改入度 - 修复空指针风险
     public void updateInDegree(String intent) {
         readWriteLock.writeLock().lock();
         try {
-            //遍历临街表中的所有相邻节点
-            for (String adj : adjList.get(intent)) {
-                intentMap.computeIfAbsent(adj, k -> new AtomicInteger(0)).decrementAndGet();
+            List<String> children = adjList.get(intent);
+            if (children != null && !children.isEmpty()) {
+                //遍历邻接表中的所有相邻节点
+                for (String child : children) {
+                    AtomicInteger childInDegree = intentMap.get(child);
+                    if (childInDegree != null && childInDegree.get() > 0) {
+                        int newInDegree = childInDegree.decrementAndGet();
+                        log.debug("任务 {} 的入度减少为: {}", child, newInDegree);
+                    }
+                }
             }
+        } catch (Exception e) {
+            log.error("更新入度失败，任务: {}", intent, e);
         } finally {
             readWriteLock.writeLock().unlock();
         }
     }
 
-    //获取节点的入度信息
+    //获取节点的原始入度信息 - 修复空指针风险
     public int getInDegree(String intent) {
         readWriteLock.readLock().lock();
         try {
-            return reIntentMap.get(intent).get();
+            AtomicInteger inDegree = reIntentMap.get(intent);
+            return inDegree != null ? inDegree.get() : 0;
+        } catch (Exception e) {
+            log.error("获取入度失败，任务: {}", intent, e);
+            return 0;
         } finally {
             readWriteLock.readLock().unlock();
         }
-
     }
 
-    //加入信息到入度表中
+    //获取节点的当前入度信息
+    public int getCurrentInDegree(String intent) {
+        readWriteLock.readLock().lock();
+        try {
+            AtomicInteger inDegree = intentMap.get(intent);
+            return inDegree != null ? inDegree.get() : 0;
+        } catch (Exception e) {
+            log.error("获取当前入度失败，任务: {}", intent, e);
+            return 0;
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    //加入信息到入度表中 - 添加参数验证
     public void addInDegree(String intent, AtomicInteger inDegree) {
+        if (intent == null || intent.trim().isEmpty() || inDegree == null) {
+            log.warn("无效的参数，跳过添加入度: intent={}, inDegree={}", intent, inDegree);
+            return;
+        }
+
         readWriteLock.writeLock().lock();
         try {
-            reIntentMap.put(intent, inDegree);
+            reIntentMap.put(intent.trim(), inDegree);
+            intentMap.put(intent.trim(), new AtomicInteger(inDegree.get()));
+            log.debug("添加任务入度: {} -> {}", intent, inDegree.get());
         } finally {
             readWriteLock.writeLock().unlock();
         }
-
     }
-    //获取父节点
+
+    //获取父节点 - 添加错误处理
     public List<String> getParetents(String intent) {
-        Lock lock = readWriteLock.readLock();
-        lock.lock();
-        try{
-            ArrayList<String> paretrntsList = new ArrayList<>();
+        readWriteLock.readLock().lock();
+        try {
+            List<String> parentsList = new ArrayList<>();
+
+            if (intent == null || intent.trim().isEmpty()) {
+                log.warn("任务名称为空，无法获取父节点");
+                return parentsList;
+            }
+
             //遍历邻接表，如果包含该节点就说明是父节点
             for (Map.Entry<String, List<String>> entry : adjList.entrySet()) {
-                if (entry.getValue().contains(intent)) {
-                    paretrntsList.add(entry.getKey());
+                List<String> children = entry.getValue();
+                if (children != null && children.contains(intent.trim())) {
+                    parentsList.add(entry.getKey());
                 }
             }
 
-            return paretrntsList;
-        }finally {
-            lock.unlock();
+            log.debug("任务 {} 的父节点: {}", intent, parentsList);
+            return parentsList;
+
+        } catch (Exception e) {
+            log.error("获取父节点失败，任务: {}", intent, e);
+            return new ArrayList<>();
+        } finally {
+            readWriteLock.readLock().unlock();
         }
     }
 
-    //清除所有节点
+    //获取子节点
+    public List<String> getChildren(String intent) {
+        readWriteLock.readLock().lock();
+        try {
+            if (intent == null || intent.trim().isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            List<String> children = adjList.get(intent.trim());
+            return children != null ? new ArrayList<>(children) : new ArrayList<>();
+
+        } catch (Exception e) {
+            log.error("获取子节点失败，任务: {}", intent, e);
+            return new ArrayList<>();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    //获取所有任务
+    public List<String> getAllTasks() {
+        readWriteLock.readLock().lock();
+        try {
+            return new ArrayList<>(adjList.keySet());
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    //检查是否还有未完成的任务
+    public boolean hasUnfinishedTasks() {
+        readWriteLock.readLock().lock();
+        try {
+            for (String task : adjList.keySet()) {
+                String status = taskStatusChange.getStatus(task);
+                if ("UNDO".equals(status) || "RUNNING".equals(status) || "ERROR".equals(status)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("检查未完成任务失败", e);
+            return true; // 出错时保守返回true
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    //清除所有节点 - 修复重复清理
     public void clear() {
-        Lock lock = readWriteLock.writeLock();
-        try{
-            lock.lock();
+        readWriteLock.writeLock().lock();
+        try {
             readyList.clear();
             intentMap.clear();
             reIntentMap.clear();
             adjList.clear();
-            reIntentMap.clear();
             log.info("图节点清除成功");
-        }catch(Exception e){
-            log.error("图节点清除失败");
-        }finally {
-            lock.unlock();
+        } catch (Exception e) {
+            log.error("图节点清除失败", e);
+            try {
+                readyList.clear();
+                intentMap.clear();
+                reIntentMap.clear();
+                adjList.clear();
+            } catch (Exception clearException) {
+                log.error("强制清理也失败", clearException);
+            }
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
-
     }
+
+    //添加调试信息方法
+    public void printDebugInfo() {
+        readWriteLock.readLock().lock();
+        try {
+            log.info("=== 图调试信息 ===");
+            log.info("邻接表: {}", adjList);
+            log.info("当前入度: {}", intentMap);
+            log.info("原始入度: {}", reIntentMap);
+            log.info("就绪列表: {}", readyList);
+            log.info("===============");
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    //验证图的完整性
+    public boolean validateGraph() {
+        readWriteLock.readLock().lock();
+        try {
+            // 检查是否有孤立节点或无效边
+            for (Map.Entry<String, List<String>> entry : adjList.entrySet()) {
+                String from = entry.getKey();
+                List<String> children = entry.getValue();
+
+                if (!intentMap.containsKey(from)) {
+                    log.error("邻接表中的节点 {} 不存在于入度表中", from);
+                    return false;
+                }
+                if (children != null) {
+                    for (String child : children) {
+                        if (!intentMap.containsKey(child)) {
+                            log.error("子节点 {} 不存在于入度表中", child);
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            log.info("图结构验证通过");
+            return true;
+
+        } catch (Exception e) {
+            log.error("图结构验证失败", e);
+            return false;
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+
+
 
 }
