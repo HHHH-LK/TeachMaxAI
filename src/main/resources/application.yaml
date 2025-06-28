@@ -1,5 +1,5 @@
 server:
-  port: 8101
+  port: 8102
   address: localhost
 
 spring:
@@ -7,7 +7,7 @@ spring:
     name: smartcampus            # 应用名称，供日志输出使用
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/smart_campus?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: 10280017
   data:
@@ -19,10 +19,10 @@ langchain4j:
   community:
     dashscope:
       chat-model:
-        api-key: ${DASHSCOPE_API_KEY}
+        api-key: ${OTHER_DASHSCOPE_API_KEY}
         model-name: qwen-max-latest
       embedding-model:
-        api-key: ${DASHSCOPE_API_KEY}
+        api-key: ${OTHER_DASHSCOPE_API_KEY}
         model-name: text-embedding-v3
 
 logging:

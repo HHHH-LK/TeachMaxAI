@@ -23,8 +23,8 @@ public abstract class EnhancedAutoRegisterHandler implements Handler {
     public void setHandlerRegisterClient(){
         //自动注册逻辑
         String handlerName = this.getClass().getSimpleName();
+        log.info("处理器已注册" + handlerName);
         handlerRegisterClient.addHandler(handlerName, this);
-
 
     }
 

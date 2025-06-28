@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.pojo.dto;
 
-import com.aiproject.smartcampus.pojo.po.ManagePerson;
+import com.aiproject.smartcampus.pojo.po.Admin;
+
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.aiproject.smartcampus.pojo.po.Teacher;
 import lombok.Data;
@@ -18,6 +19,6 @@ public class UserRegisterDTO {
     private String character;
     private Teacher teacher;
     private Student student;
-    private ManagePerson managePerson;
+    private Admin admin;
 
 }

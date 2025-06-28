@@ -5,9 +5,9 @@ import com.aiproject.smartcampus.handler.memorystorehandler.MemoryStoreHandler;
 import com.aiproject.smartcampus.mapper.AIMapper;
 import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerResponse;
 import com.aiproject.smartcampus.pojo.bo.handlerentity.MemoryStoreHandlerquery;
-import com.aiproject.smartcampus.pojo.po.LocalMessage;
 import com.aiproject.smartcampus.commons.utils.ChatMemoryBuilder;
 import com.aiproject.smartcampus.commons.utils.CollectionUtils;
+import com.aiproject.smartcampus.pojo.po.LocalMessage;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageDeserializer;
@@ -91,7 +91,7 @@ public class MemoryDataBaseMemoryStoreHandler extends MemoryStoreHandler {
 
         // 2. 插入新记录
         LocalMessage record = new LocalMessage();
-        record.setUserId(userId);
+        record.setUserId(Integer.valueOf(userId));
         record.setContent(ChatMessageSerializer.messagesToJson(newMessages));
         record.setCreateTime(LocalDateTime.now());
         int inserted = aiMapper.insert(record);

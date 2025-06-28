@@ -20,9 +20,9 @@ class AgentTest {
     void start() {
         long l = System.currentTimeMillis();
         LocalDateTime now = LocalDateTime.now();
-        System.out.println(now.toString());
+        System.out.println(now);
         System.out.println(l);
-        String answer = agent.start("我十四周有哪些课程，请只返回相关名字");
+        String answer = agent.start("湖南有什么历史");
         System.out.println(answer);
         LocalDateTime now2 = LocalDateTime.now();
         long l1 = System.currentTimeMillis();
