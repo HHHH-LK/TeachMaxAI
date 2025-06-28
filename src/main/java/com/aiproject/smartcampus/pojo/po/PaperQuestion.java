@@ -9,7 +9,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-// 13. 试卷题目关联表
+/**
+ * @author lk_hhh
+ */ // 13. 试卷题目关联表
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

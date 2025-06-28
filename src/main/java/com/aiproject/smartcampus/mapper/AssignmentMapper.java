@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-// 6. 作业Mapper
+/**
+ * @author lk_hhh
+ */ // 6. 作业Mapper
 @Repository
 @Mapper
 public interface AssignmentMapper extends BaseMapper<Assignment> {

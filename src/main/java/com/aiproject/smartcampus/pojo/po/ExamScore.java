@@ -9,7 +9,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-// 10. 考试成绩表
+/**
+ * @author lk_hhh
+ */ // 10. 考试成绩表
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

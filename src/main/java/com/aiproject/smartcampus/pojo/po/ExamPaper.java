@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
-// 9. 试卷表
+/**
+ * @author lk_hhh
+ */ // 9. 试卷表
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

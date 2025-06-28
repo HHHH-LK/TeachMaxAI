@@ -13,7 +13,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-// 11. 题库Mapper
+/**
+ * @author lk_hhh
+ */ // 11. 题库Mapper
 @Repository
 @Mapper
 public interface QuestionBankMapper extends BaseMapper<QuestionBank> {

@@ -13,7 +13,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-// 2. 学生Mapper
+/**
+ * @author lk_hhh
+ */ // 2. 学生Mapper
 @Repository
 @Mapper
 public interface StudentMapper extends BaseMapper<Student> {

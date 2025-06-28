@@ -7,6 +7,9 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+/**
+ * @author lk_hhh
+ */
 @Mapper
 public interface AIMapper extends BaseMapper<LocalMessage> {
 

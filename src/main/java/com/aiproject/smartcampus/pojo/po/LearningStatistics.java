@@ -11,7 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
-// 16. 学习统计表
+/**
+ * @author lk_hhh
+ */ // 16. 学习统计表
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

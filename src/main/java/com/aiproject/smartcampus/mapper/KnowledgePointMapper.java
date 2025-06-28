@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 
-// 10. 知识点Mapper
+/**
+ * @author lk_hhh
+ */ // 10. 知识点Mapper
 @Repository
 @Mapper
 public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {

@@ -13,7 +13,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-// 13. 学生知识掌握Mapper
+/**
+ * @author lk_hhh
+ */ // 13. 学生知识掌握Mapper
 @Repository
 @Mapper
 public interface StudentKnowledgeMasteryMapper extends BaseMapper<StudentKnowledgeMastery> {

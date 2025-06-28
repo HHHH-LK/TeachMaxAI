@@ -14,7 +14,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-// 14. 学习统计Mapper
+/**
+ * @author lk_hhh
+ */ // 14. 学习统计Mapper
 @Repository
 @Mapper
 public interface LearningStatisticsMapper extends BaseMapper<LearningStatistics> {

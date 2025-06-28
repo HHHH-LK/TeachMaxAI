@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import java.util.Date;
 
 /**
+ * @author lk_hhh
  * @description: 试卷-学生关联表
  */
 @Data

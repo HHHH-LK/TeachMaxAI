@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * @author lk_hhh
  * @description: 试卷-学科关联表
  */
 @Data

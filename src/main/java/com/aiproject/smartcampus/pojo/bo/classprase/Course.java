@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * 实体类：课程信息
+ * @author lk_hhh
  */
 @Data
 @AllArgsConstructor

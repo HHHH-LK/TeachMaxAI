@@ -9,7 +9,9 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
-//试卷主体类 作业同理
+/**
+ * @author lk_hhh
+ */ //试卷主体类 作业同理
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("exams")

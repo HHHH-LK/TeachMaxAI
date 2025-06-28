@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-// 4. 课程Mapper
+/**
+ * @author lk_hhh
+ */ // 4. 课程Mapper
 @Repository
 @Mapper
 public interface CourseMapper extends BaseMapper<Course> {

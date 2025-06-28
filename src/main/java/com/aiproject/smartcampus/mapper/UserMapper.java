@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 
-// 1. 用户Mapper
+/**
+ * @author lk_hhh
+ */ // 1. 用户Mapper
 @Repository
 @Mapper
 public interface UserMapper extends BaseMapper<User> {

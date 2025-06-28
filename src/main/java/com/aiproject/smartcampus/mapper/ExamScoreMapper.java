@@ -15,7 +15,9 @@ import java.util.Map;
 
 
 
-// 9. 考试成绩Mapper
+/**
+ * @author lk_hhh
+ */ // 9. 考试成绩Mapper
 @Repository
 @Mapper
 public interface ExamScoreMapper extends BaseMapper<ExamScore> {

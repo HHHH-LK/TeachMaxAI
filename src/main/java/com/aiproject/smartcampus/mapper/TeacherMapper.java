@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 
-// 3. 教师Mapper
+/**
+ * @author lk_hhh
+ */ // 3. 教师Mapper
 @Repository
 @Mapper
 public interface TeacherMapper extends BaseMapper<Teacher> {
