@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.service;
 
+import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -11,7 +12,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  **/
 
 public interface StudentService extends IService<Student>{
-
 
 
 }

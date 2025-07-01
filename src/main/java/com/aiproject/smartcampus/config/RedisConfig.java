@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.config;
 
 
 import com.aiproject.smartcampus.pojo.bo.CacheEntry;
+import com.aiproject.smartcampus.pojo.po.Student;
 import dev.langchain4j.memory.ChatMemory;
 import okhttp3.Cache;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,18 @@ public class RedisConfig {
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.afterPropertiesSet();
 
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, Student> studentRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Student> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Student.class));
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Student.class));
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 

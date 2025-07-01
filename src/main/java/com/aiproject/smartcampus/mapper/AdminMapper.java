@@ -168,4 +168,6 @@ public interface AdminMapper extends BaseMapper<Admin> {
             "</foreach>" +
             "</script>")
     int batchUpdateStatus(@Param("adminIds") List<Integer> adminIds, @Param("status") String status);
+
+
 }

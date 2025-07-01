@@ -123,6 +123,8 @@ public class QuestionBank implements Serializable {
     @TableField(exist = false)
     private Teacher creator;
 
+
+
     // ==================== 枚举定义 ====================
 
     /**
@@ -198,6 +200,17 @@ public class QuestionBank implements Serializable {
             return MEDIUM; // 默认值
         }
     }
+
+
+    public boolean isTrueFalse() {
+        return this.questionType == QuestionType.TRUE_FALSE;
+    }
+
+    public boolean isChoiceQuestion() {
+        return this.questionType == QuestionType.SINGLE_CHOICE
+                || this.questionType == QuestionType.MULTIPLE_CHOICE;
+    }
+
 
 
 }

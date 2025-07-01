@@ -1,9 +1,15 @@
 package com.aiproject.smartcampus.controller;
 
+import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.mapper.StudentMapper;
+import com.aiproject.smartcampus.mapper.TeacherMapper;
+import com.aiproject.smartcampus.pojo.po.Student;
+import com.aiproject.smartcampus.pojo.vo.StudentsImformationVO;
 import com.aiproject.smartcampus.service.AdminService;
+import com.aiproject.smartcampus.service.StudentService;
+import com.aiproject.smartcampus.service.TeacherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: SmartCampus
@@ -20,10 +26,46 @@ public class ManagePersonController {
 
     private final AdminService adminService;
 
+    //学生相关管理
 
+    /**
+     * 根据学号查询学生信息
+     * */
+    @GetMapping("/getstudent/student_number")
+    public Result<Student> getStudentsBystudentNumber(@RequestParam(value = "studentNumber") String studentNumber){
 
+        return adminService.getStudentBystudentNumber(studentNumber);
 
+    }
 
+    /**
+     * 根据学号删除学生信息
+     * */
+    @PostMapping("/deletestudent/student_number")
+    public Result deleteStudentsBystudentNumber(@RequestParam(value = "studentNumber") String studentNumber){
+
+        return adminService.deleteStudentBystudentNumber(studentNumber);
+
+    }
+
+    /**
+     * 根据学号修改学生信息
+     * */
+    @PostMapping("/updatestudent/student_number")
+    public Result updateStudentsByStudentId(@RequestBody Student student){
+
+        return adminService.updateStudentBystudentNumber(student);
+
+    }
+
+    /**
+     * 新增学生信息
+     * */
+    @PostMapping("/addstudent")
+    public Result addStudent(@RequestBody Student student){
+
+        return adminService.addStudent(student);
+    }
 
 
 }
