@@ -16,7 +16,8 @@ import java.util.Map;
 
 /**
  * @author lk_hhh
- */ // 14. 学习统计Mapper
+ */
+// 14. 学习统计Mapper
 @Repository
 @Mapper
 public interface LearningStatisticsMapper extends BaseMapper<LearningStatistics> {

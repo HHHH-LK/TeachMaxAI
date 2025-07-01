@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.controller;
 
+import com.aiproject.smartcampus.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/managePerson")
 public class ManagePersonController {
+
+    private final AdminService adminService;
+
+
+
+
 
 
 

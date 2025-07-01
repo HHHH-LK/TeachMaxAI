@@ -22,7 +22,7 @@ class AgentTest {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now);
         System.out.println(l);
-        String answer = agent.start("湖南有什么历史");
+        String answer = agent.start("帮我生成一份基于解三角形的变换公式生成一套题目便于学生掌握知识点，并以每道每道题的方式以json的形式输出，");
         System.out.println(answer);
         LocalDateTime now2 = LocalDateTime.now();
         long l1 = System.currentTimeMillis();

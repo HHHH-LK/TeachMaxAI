@@ -10,10 +10,14 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.poi.xslf.usermodel.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.awt.*;
+import java.io.*;
 import java.util.List;
 
 import static com.aiproject.smartcampus.model.prompts.SystemPrompts.INITENT_ANALYSIS_PROMPT;
@@ -132,6 +136,51 @@ class SmartCampusApplicationTests {
         System.out.println("----------------------------");
         ChatResponse chatResponse1 = chatLanguageModel.chat(SystemMessage.from(INITENT_SPIDLER_PROMPT), UserMessage.from(text));
         System.out.println(chatResponse1.aiMessage().text());
+
+
+    }
+
+
+    @Test
+
+    void test3(){
+        ChatResponse chat = chatLanguageModel.chat(UserMessage.from("帮我生成一个关于保护环境的ppt"));
+        System.out.println(chat.aiMessage().text());
+
+
+    }
+
+
+    @Test
+    void test4() throws IOException {
+
+            XMLSlideShow ppt = new XMLSlideShow();
+            // 创建幻灯片
+            XSLFSlide slide = ppt.createSlide();
+            // 添加标题
+            XSLFTextBox title = slide.createTextBox();
+            title.setAnchor(new Rectangle(50, 50, 600, 50));
+            title.setText("这是PPT标题");
+
+            // 添加正文
+            XSLFTextBox content = slide.createTextBox();
+            content.setAnchor(new Rectangle(50, 150, 600, 300));
+            content.setText("这里是PPT内容，支持多行文本");
+
+            // 保存文件
+            try (FileOutputStream out = new FileOutputStream("demo.pptx")) {
+                ppt.write(out);
+            }
+
+            System.out.println("PPT生成成功！");
+    }
+
+
+    @Test
+    void test5() throws IOException {
+
+        ChatResponse chat = chatLanguageModel.chat(UserMessage.from("帮我生成一张垃圾分类的相关图片"));
+        System.out.println(chat.aiMessage().text());
 
 
     }

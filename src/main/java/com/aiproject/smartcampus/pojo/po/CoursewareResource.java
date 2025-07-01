@@ -9,26 +9,39 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @program: SmartCampus
- * @description: 题库表实体类
+ * @description: 课件资源表实体类
  * @author: lk
- * @create: 2025-06-28
+ * @create: 2025-07-01
  **/
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("question_bank")
-public class QuestionBank implements Serializable {
+@TableName("courseware_resources")
+public class CoursewareResource implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 题目ID
+     * 资源ID
      */
-    @TableId(value = "question_id", type = IdType.AUTO)
-    private Integer questionId;
+    @TableId(value = "resource_id", type = IdType.AUTO)
+    private Integer resourceId;
+
+    /**
+     * 资源标题
+     */
+    @TableField("resource_title")
+    private String resourceTitle;
+
+    /**
+     * 资源描述
+     */
+    @TableField("resource_description")
+    private String resourceDescription;
 
     /**
      * 所属课程ID
@@ -37,59 +50,58 @@ public class QuestionBank implements Serializable {
     private Integer courseId;
 
     /**
-     * 关联知识点ID
-     */
-    @TableField("point_id")
-    private Integer pointId;
-
-    /**
-     * 题目类型
-     */
-    @TableField("question_type")
-    private QuestionType questionType;
-
-    /**
-     * 题目内容
-     */
-    @TableField("question_content")
-    private String questionContent;
-
-    /**
-     * 题目选项(JSON格式)
-     * 格式: [{"label":"A","content":"选项内容","is_correct":true}]
-     */
-    @TableField("question_options")
-    private String questionOptions;
-
-    /**
-     * 正确答案(JSON格式)，支持多种格式
-     */
-    @TableField("correct_answer")
-    private String correctAnswer;
-
-    /**
-     * 答案解析
-     */
-    @TableField("explanation")
-    private String explanation;
-
-    /**
-     * 难度等级
-     */
-    @TableField("difficulty_level")
-    private DifficultyLevel difficultyLevel;
-
-    /**
-     * 题目分值
-     */
-    @TableField("score_points")
-    private BigDecimal scorePoints;
-
-    /**
      * 创建教师ID
      */
-    @TableField("created_by")
-    private Integer createdBy;
+    @TableField("teacher_id")
+    private Integer teacherId;
+
+    /**
+     * 资源类型
+     */
+    @TableField("resource_type")
+    private ResourceType resourceType;
+
+    /**
+     * 文件名
+     */
+    @TableField("file_name")
+    private String fileName;
+
+    /**
+     * 文件URL
+     */
+    @TableField("file_url")
+    private String fileUrl;
+
+    /**
+     * 文件大小(MB)
+     */
+    @TableField("file_size_mb")
+    private BigDecimal fileSizeMb;
+
+    /**
+     * 标签，逗号分隔
+     */
+    @TableField("tags")
+    private String tags;
+
+    /**
+     * 下载次数
+     */
+    @TableField("download_count")
+    private Integer downloadCount;
+
+    /**
+     * 是否公开（0-私有，1-公开）
+     */
+    @TableField("is_public")
+    private Boolean isPublic;
+
+    /**
+     * 状态
+     */
+    @TableField("status")
+    private ResourceStatus status;
 
     /**
      * 创建时间
@@ -112,35 +124,36 @@ public class QuestionBank implements Serializable {
     private Course course;
 
     /**
-     * 关联知识点信息
+     * 创建教师信息
      */
     @TableField(exist = false)
-    private KnowledgePoint knowledgePoint;
+    private Teacher teacher;
 
     /**
-     * 创建者信息
+     * 下载记录列表
      */
     @TableField(exist = false)
-    private Teacher creator;
+    private List<ResourceDownload> downloads;
 
     // ==================== 枚举定义 ====================
 
     /**
-     * 题目类型枚举
+     * 资源类型枚举
      */
-    public enum QuestionType {
-        SINGLE_CHOICE("single_choice", "单选题"),
-        MULTIPLE_CHOICE("multiple_choice", "多选题"),
-        TRUE_FALSE("true_false", "判断题"),
-        FILL_BLANK("fill_blank", "填空题"),
-        SHORT_ANSWER("short_answer", "简答题");
+    public enum ResourceType {
+        COURSEWARE("courseware", "课程资料"),
+        EXERCISE("exercise", "练习题"),
+        VIDEO("video", "视频资源"),
+        DOCUMENT("document", "文档资源"),
+        IMAGE("image", "图片资源"),
+        OTHER("other", "其他类型资源");
 
         @EnumValue  // 告诉MyBatis-Plus使用这个字段的值与数据库交互
         @JsonValue  // JSON序列化时返回这个值
         private final String value;
         private final String description;
 
-        QuestionType(String value, String description) {
+        ResourceType(String value, String description) {
             this.value = value;
             this.description = description;
         }
@@ -153,30 +166,29 @@ public class QuestionBank implements Serializable {
             return description;
         }
 
-        public static QuestionType fromValue(String value) {
-            for (QuestionType type : QuestionType.values()) {
+        public static ResourceType fromValue(String value) {
+            for (ResourceType type : ResourceType.values()) {
                 if (type.getValue().equals(value)) {
                     return type;
                 }
             }
-            return SINGLE_CHOICE; // 默认值
+            return ResourceType.OTHER; // 默认值
         }
     }
 
     /**
-     * 难度等级枚举
+     * 资源状态枚举
      */
-    public enum DifficultyLevel {
-        EASY("easy", "简单"),
-        MEDIUM("medium", "中等"),
-        HARD("hard", "困难");
+    public enum ResourceStatus {
+        ACTIVE("active", "活跃"),
+        INACTIVE("inactive", "非活跃");
 
         @EnumValue  // 告诉MyBatis-Plus使用这个字段的值与数据库交互
         @JsonValue  // JSON序列化时返回这个值
         private final String value;
         private final String description;
 
-        DifficultyLevel(String value, String description) {
+        ResourceStatus(String value, String description) {
             this.value = value;
             this.description = description;
         }
@@ -189,13 +201,13 @@ public class QuestionBank implements Serializable {
             return description;
         }
 
-        public static DifficultyLevel fromValue(String value) {
-            for (DifficultyLevel level : DifficultyLevel.values()) {
-                if (level.getValue().equals(value)) {
-                    return level;
+        public static ResourceStatus fromValue(String value) {
+            for (ResourceStatus status : ResourceStatus.values()) {
+                if (status.getValue().equals(value)) {
+                    return status;
                 }
             }
-            return MEDIUM; // 默认值
+            return ResourceStatus.ACTIVE; // 默认值
         }
     }
 

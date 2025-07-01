@@ -114,7 +114,6 @@ public class StepIntentFuncHanlder extends EnhancedAutoRegisterHandler {
     private String executeWithDependencies(String intent, List<CompletableFuture<String>> result) {
         List<String> parentTasks = createDiagram.getParetents(intent);
         int expectedSize = parentTasks.size();
-
         // 检查是否有足够的前置结果
         if (result != null && result.size() == expectedSize && isOKTask(result)) {
             return executeTaskWithResults(intent, result);

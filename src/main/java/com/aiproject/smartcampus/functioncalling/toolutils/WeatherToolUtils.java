@@ -19,6 +19,13 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 /**
+ * @program: lecture-langchain-20250525
+ * @description: 获取当前天气工具类
+ * @author: lk
+ * @create: 2025-05-16 16:15
+ **/
+
+/**
  * 天气枚举及查询实现
  */
 @Getter
@@ -35,12 +42,6 @@ public enum WeatherToolUtils {
     private static final String TEMP_UNIT = "celsius";
     private static final String WIND_UNIT = "kmh";
 
-    /**
-     * @program: lecture-langchain-20250525
-     * @description: 获取当前天气工具类
-     * @author: lk
-     * @create: 2025-05-16 16:15
-     **/
 
     public static WeatherInfo getWeatherInfo(String city) throws Exception {
         // 1. 地理编码：获取经纬度
@@ -79,6 +80,7 @@ public enum WeatherToolUtils {
 
         return new WeatherInfo(cond, minT, maxT, windDesc);
     }
+
     // WMO weathercode 映射
     private static WeatherToolUtils mapWeatherCode(int code) {
         if (code == 0) {

@@ -118,6 +118,43 @@
             <version>${langchain4j-pinecone.version}</version>
         </dependency>
 
+        <!-- Apache POI 核心 -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+
+        <!--阿里云oss服务-->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.17.2</version> <!-- 推荐使用较新版本 -->
+        </dependency>
+
+
+        <!--重试机制-->
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+            <version>1.3.1</version> <!-- 或使用最新稳定版本 -->
+        </dependency>
+
+
+        <!-- Apache POI 依赖的XML处理库 -->
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>5.1.1</version>
+        </dependency>
+        <!--只能生存图片-->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+
         <!--mp4信息读取-->
         <dependency>
             <groupId>com.assemblyai</groupId>

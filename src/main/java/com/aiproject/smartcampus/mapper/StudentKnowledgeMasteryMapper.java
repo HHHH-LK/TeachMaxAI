@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.mapper;
 
+import com.aiproject.smartcampus.pojo.bo.KnowledgepointBO;
 import com.aiproject.smartcampus.pojo.bo.classprase.Course;
 import com.aiproject.smartcampus.pojo.po.Exam;
 import com.aiproject.smartcampus.pojo.po.ExamScore;
@@ -19,7 +20,7 @@ import java.util.Map;
 @Repository
 @Mapper
 public interface StudentKnowledgeMasteryMapper extends BaseMapper<StudentKnowledgeMastery> {
-    
+
     /**
      * 查询学生知识点掌握情况
      */
@@ -27,7 +28,7 @@ public interface StudentKnowledgeMasteryMapper extends BaseMapper<StudentKnowled
             "LEFT JOIN knowledge_points kp ON skm.point_id = kp.point_id " +
             "WHERE skm.student_id = #{studentId}")
     List<StudentKnowledgeMastery> findByStudentId(@Param("studentId") Integer studentId);
-    
+
     /**
      * 查询课程知识点掌握情况
      */
@@ -35,7 +36,7 @@ public interface StudentKnowledgeMasteryMapper extends BaseMapper<StudentKnowled
             "LEFT JOIN knowledge_points kp ON skm.point_id = kp.point_id " +
             "WHERE skm.student_id = #{studentId} AND kp.course_id = #{courseId}")
     List<StudentKnowledgeMastery> findByStudentAndCourse(@Param("studentId") Integer studentId, @Param("courseId") Integer courseId);
-    
+
     /**
      * 知识点掌握统计
      */
@@ -47,4 +48,17 @@ public interface StudentKnowledgeMasteryMapper extends BaseMapper<StudentKnowled
             "WHERE skm.student_id = #{studentId} AND kp.course_id = #{courseId} " +
             "GROUP BY mastery_level")
     List<Map<String, Object>> getMasteryStatistics(@Param("studentId") Integer studentId, @Param("courseId") Integer courseId);
+
+    /**
+     * 查询未掌握的知识点
+     */
+    @Select("select point_name, description, point_id,course_id\n" +
+            "from knowledge_points\n" +
+            "where point_id in (select point_id\n" +
+            "                   from student_knowledge_mastery\n" +
+            "                   where student_id = #{studentId}\n" +
+            "                     and mastery_level != 'mastered'\n" +
+            "                     and course_id = #{courseId})")
+    List<KnowledgepointBO> getNotMasterKnowledgepoints(@Param("studentId") Integer studentId, @Param("courseId") Integer courseId);
+
 }
