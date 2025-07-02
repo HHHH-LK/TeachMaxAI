@@ -1,0 +1,82 @@
+package com.aiproject.smartcampus.controller;
+
+import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.service.CourseEnrollmentService;
+import com.aiproject.smartcampus.service.CourseService;
+import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 课程（选课）相关接口
+ */
+@RestController
+@Slf4j
+@RequestMapping("/course")
+@Api(tags = "课表相关接口")
+@RequiredArgsConstructor
+public class CourseController {
+
+    private final CourseService courseService;
+    private final CourseEnrollmentService courseEnrollmentService;
+
+    /**
+     * 获取所有课表(包含教师信息)
+     * @return
+     */
+    @GetMapping("/all")
+    @Operation(summary = "获取所有课表")
+    public Result<List<Course>> findAllCourses(){
+        return courseService.findAllCourses();
+    }
+
+    /**
+     * 更新课表
+     * @return
+     */
+    @PutMapping("/update/course")
+    @Operation(summary = "更新课表")
+    public Result<String> updateCourse(@RequestBody Course course){
+        return courseService.updateCourse(course);
+    }
+
+    /**
+     * 删除课程
+     * @param courseId
+     * @return
+     */
+    @DeleteMapping("/delete/{courseId}")
+    @Operation(summary = "删除课程")
+    public Result<String> deleteCourse(@PathVariable("courseId") Integer courseId){
+        return courseService.deleteCourse(courseId);
+    }
+
+    /**
+     * 添加课程
+     * @param course
+     * @return
+     */
+    @PostMapping("/add/course")
+    @Operation(summary = "添加课程")
+    public Result<String> addCourse(@RequestBody Course course){
+        return courseService.addCourse(course);
+    }
+
+
+    /**
+     * 添加选课记录
+     */
+    @PostMapping("/add/{courseId}")
+    @Operation(summary = "添加选课记录")
+    public Result<String> addEnrollment(@PathVariable("courseId") Integer courseId){
+       return courseEnrollmentService.addCourseEnrollment(courseId);
+    }
+
+
+
+}

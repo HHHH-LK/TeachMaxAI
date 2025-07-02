@@ -1,10 +1,9 @@
 package com.aiproject.smartcampus.mapper;
 
-import com.aiproject.smartcampus.pojo.bo.classprase.Course;
+
+import com.aiproject.smartcampus.pojo.po.Course;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -49,4 +48,28 @@ public interface CourseMapper extends BaseMapper<Course> {
             "FROM courses c LEFT JOIN course_enrollments ce ON c.course_id = ce.course_id " +
             "WHERE c.teacher_id = #{teacherId} GROUP BY c.course_id")
     List<Map<String, Object>> getCourseStatistics(@Param("teacherId") Integer teacherId);
+
+
+    @Select("select c.*," +
+            "       t.employee_number,t.department,t.user_id," +
+            "       u.username,u.real_name,u.email,u.user_type,u.phone,u.status as user_status,u.created_at as user_created_at" +
+            " from courses c" +
+            "         left join teachers t using(teacher_id)" +
+            "         left join users u using(user_id)")
+    @Results({
+            @Result(property = "teacher.teacherId", column = "teacher_id"),
+            @Result(property = "teacher.employeeNumber", column = "employee_number"),
+            @Result(property = "teacher.department", column = "department"),
+            @Result(property = "teacher.userId", column = "user_id"),
+            @Result(property = "teacher.user.userId", column = "user_id"),
+            @Result(property = "teacher.user.username", column = "username"),
+            @Result(property = "teacher.user.realName", column = "real_name"),
+            @Result(property = "teacher.user.email", column = "email"),
+            @Result(property = "teacher.user.phone", column = "phone"),
+            @Result(property = "teacher.user.userType", column = "user_type"),
+            @Result(property = "teacher.user.status", column = "user_status"),
+            @Result(property = "teacher.user.createdAt", column = "user_created_at")
+    })
+    List<Course> findAllCourse();
+
 }

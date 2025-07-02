@@ -1,8 +1,10 @@
 package com.aiproject.smartcampus.service;
 
-import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.po.Student;
+import com.aiproject.smartcampus.pojo.vo.StudentSelectAllVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * @program: SmartCampus
@@ -13,5 +15,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface StudentService extends IService<Student>{
 
+     List<StudentSelectAllVO> selectAllStudents();
+
+     Student findByStudentNumber( String studentNumber);
+
+     List<Student> findByClassName(String className);
+
+     void updateStudent(Student student);
 
 }
