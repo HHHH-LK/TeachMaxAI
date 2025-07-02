@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.service.StudentService;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/usr")
 @Slf4j
 @RequiredArgsConstructor
+@Api(tags = "用户管理")
 public class UserController {
 
     private final StudentService studentService;
