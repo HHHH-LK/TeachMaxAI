@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiproject.smartcampus.mapper.KnowledgePointMapper">
+
+    <!-- 获取简化的知识点分析数据 -->
+    <select id="getSimpleKnowledgeAnalysis" resultType="com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO">
+        SELECT
+        -- 基础信息
+        kp.point_id as pointId,
+        kp.point_name as pointName,
+        kp.description,
+        kp.difficulty_level as difficultyLevel,
+        kp.keywords,
+
+        -- 答题统计
+        COALESCE(answer_stats.total_answered, 0) as totalAnswered,
+        COALESCE(answer_stats.correct_count, 0) as correctCount,
+        COALESCE(answer_stats.wrong_count, 0) as wrongCount,
+        COALESCE(answer_stats.accuracy_rate, 0.0) as accuracyRate
+
+        FROM knowledge_points kp
+        LEFT JOIN (
+        SELECT
+        qb.point_id,
+        COUNT(*) as total_answered,
+        SUM(CASE WHEN sa.is_correct = 1 THEN 1 ELSE 0 END) as correct_count,
+        SUM(CASE WHEN sa.is_correct = 0 THEN 1 ELSE 0 END) as wrong_count,
+        ROUND(AVG(CASE WHEN sa.is_correct = 1 THEN 1 ELSE 0 END) * 100, 2) as accuracy_rate
+        FROM student_answers sa
+        INNER JOIN question_bank qb ON sa.question_id = qb.question_id
+        WHERE sa.student_id = #{studentId}
+        GROUP BY qb.point_id
+        ) answer_stats ON kp.point_id = answer_stats.point_id
+
+        WHERE kp.point_id IN
+        <foreach collection="pointIds" item="pointId" open="(" separator="," close=")">
+            #{pointId}
+        </foreach>
+
+        ORDER BY accuracyRate ASC
+    </select>
+
+</mapper>

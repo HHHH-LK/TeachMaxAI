@@ -57,6 +57,7 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
                 }
         );
     }
+
     //销毁线程
     @PreDestroy
     public void destroy(){

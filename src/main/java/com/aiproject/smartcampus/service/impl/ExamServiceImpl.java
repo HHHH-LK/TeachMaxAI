@@ -26,7 +26,6 @@ public class ExamServiceImpl implements ExamService {
         return null;
     }
 
-
     @Override
     public Result<List<ExamDTO>> getExamsByQuery(ExamQueryDTO queryDTO) {
         return null;

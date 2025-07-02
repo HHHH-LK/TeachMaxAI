@@ -4,10 +4,12 @@ import com.aiproject.smartcampus.functioncalling.toolutils.NotMasterTestCreateto
 import com.aiproject.smartcampus.mapper.QuestionBankMapper;
 import com.aiproject.smartcampus.mapper.StudentKnowledgeMasteryMapper;
 import com.aiproject.smartcampus.pojo.bo.KnowledgepointBO;
+import com.aiproject.smartcampus.pojo.bo.TestTaskBO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,9 +26,13 @@ class NotMasterTestCreateToolTest {
     @Test
     void createTest(){
 
-        notMasterTestCreateTool.setStudentId(1);
-        notMasterTestCreateTool.setCourseId(1);
+        TestTaskBO testTaskBO = new TestTaskBO();
+        testTaskBO.setStudentId(1);
+        notMasterTestCreateTool.setTestTaskBO(testTaskBO);
+        notMasterTestCreateTool.setSimpleKnowledgeAnalysisBOList(new ArrayList<>());
         notMasterTestCreateTool.run();
+        String result = notMasterTestCreateTool.getResult();
+        System.out.println(result);
 
 
     }

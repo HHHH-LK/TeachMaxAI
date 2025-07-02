@@ -2,8 +2,10 @@ package com.aiproject.smartcampus.config;
 
 import com.aiproject.smartcampus.pojo.bo.CacheEntry;
 import com.aiproject.smartcampus.pojo.po.Admin;
+import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.aiproject.smartcampus.pojo.po.Teacher;
+import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -131,4 +133,21 @@ public class RedisConfig {
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
+
+    @Bean
+    public RedisTemplate<String, KnowledgePointSimpleVO> knowledgePointSimpleVORedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, KnowledgePointSimpleVO> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        Jackson2JsonRedisSerializer<KnowledgePointSimpleVO> serializer = createJsonSerializer(KnowledgePointSimpleVO.class);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+
 }

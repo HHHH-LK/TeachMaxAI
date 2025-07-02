@@ -1,5 +1,5 @@
 server:
-  port: 8103
+  port: 8104
   address: localhost
 
 spring:
@@ -15,9 +15,13 @@ spring:
       host: localhost
       port: 6379
 
-mybatis:
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  # 禁用自动类型别名注册，避免冲突
+  type-aliases-package: ""  # 设置为空字符串
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 langchain4j:
   community:
@@ -31,6 +35,8 @@ langchain4j:
 
 logging:
   level:
+    org.apache.ibatis.session: WARN
+    org.mybatis.spring: WARN
     com.hmall: DEBUG             # 设置包级别日志
     com.aiproject.smartcampus.commons.utils.aliyunossutils: DEBUG  # OSS相关日志
   pattern:
