@@ -2750,3 +2750,306 @@ Caused by: com.alibaba.dashscope.exception.ApiException: {"statusCode":-1,"messa
 Caused by: java.io.EOFException: null
 	... 85 common frames omitted
 
+19:37:29:583  INFO 5593 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Starting CourseEnrollmentServiceImplTest using Java 23.0.2 with PID 5593 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+19:37:29:584  INFO 5593 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : No active profile set, falling back to 1 default profile: "default"
+19:37:29:898  INFO 5593 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:37:29:899  INFO 5593 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:37:29:915  INFO 5593 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+19:37:30:230  INFO 5593 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:37:30:232  INFO 5593 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:37:30:481  WARN 5593 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+19:37:36:306  INFO 5593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+19:37:36:307  INFO 5593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:37:36:308  INFO 5593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+19:37:36:308  INFO 5593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+19:37:36:309  INFO 5593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+19:37:36:309  INFO 5593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:37:36:310  INFO 5593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+19:37:36:310  INFO 5593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:37:36:429  INFO 5593 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:37:36:476  INFO 5593 --- [smartcampus] [redisson-netty-5-23] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:37:36:480  INFO 5593 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:37:36:494  INFO 5593 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:37:37:381  INFO 5593 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Started CourseEnrollmentServiceImplTest in 7.959 seconds (process running for 8.593)
+19:37:37:382  INFO 5593 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:37:37:633  INFO 5593 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 addCourseEnrollment 参数校验通过
+19:37:37:662  INFO 5593 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+19:37:37:718  INFO 5593 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@11736ebc
+19:37:37:718  INFO 5593 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+19:37:37:741  INFO 5593 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息成功，学生id：3,课程id：1
+19:37:37:857  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+19:37:37:858  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:37:37:858  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+19:38:07:859 ERROR 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+19:38:07:861 ERROR 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+19:38:07:861 ERROR 5593 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+19:38:07:868  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+19:38:07:872  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+19:38:07:881  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+19:38:07:882  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+19:38:07:882  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+19:38:07:883  INFO 5593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+19:42:15:683  INFO 7466 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Starting CourseEnrollmentServiceImplTest using Java 23.0.2 with PID 7466 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+19:42:15:684  INFO 7466 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : No active profile set, falling back to 1 default profile: "default"
+19:42:16:089  INFO 7466 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:42:16:090  INFO 7466 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:42:16:107  INFO 7466 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+19:42:16:469  INFO 7466 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:42:16:471  INFO 7466 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:42:16:819  WARN 7466 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+19:42:23:100  INFO 7466 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+19:42:23:101  INFO 7466 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:42:23:102  INFO 7466 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+19:42:23:102  INFO 7466 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+19:42:23:103  INFO 7466 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+19:42:23:103  INFO 7466 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:42:23:104  INFO 7466 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+19:42:23:104  INFO 7466 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:42:23:220  INFO 7466 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:42:23:270  INFO 7466 --- [smartcampus] [redisson-netty-5-23] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:42:23:296  INFO 7466 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:42:23:309  INFO 7466 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:42:24:244  INFO 7466 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Started CourseEnrollmentServiceImplTest in 8.717 seconds (process running for 9.425)
+19:42:24:246  INFO 7466 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:42:24:493  INFO 7466 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 addCourseEnrollment 参数校验通过
+19:42:24:525  INFO 7466 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+19:42:24:582  INFO 7466 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@649df002
+19:42:24:583  INFO 7466 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+19:42:24:734  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+19:42:24:734  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:42:24:734  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+19:42:54:740 ERROR 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+19:42:58:432 ERROR 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+19:42:58:431 ERROR 7466 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+19:43:30:025 ERROR 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，请管理员进行检查
+19:43:32:034  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+19:43:32:039  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+19:43:32:045  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+19:43:32:045  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+19:43:32:046  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+19:43:32:046  INFO 7466 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+19:43:44:166  INFO 8042 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Starting CourseEnrollmentServiceImplTest using Java 23.0.2 with PID 8042 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+19:43:44:167  INFO 8042 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : No active profile set, falling back to 1 default profile: "default"
+19:43:44:606  INFO 8042 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:43:44:608  INFO 8042 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:43:44:627  INFO 8042 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces.
+19:43:45:010  INFO 8042 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:43:45:013  INFO 8042 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:43:45:312  WARN 8042 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+19:43:55:415  INFO 8042 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+19:43:55:416  INFO 8042 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:43:55:417  INFO 8042 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+19:43:55:417  INFO 8042 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+19:43:55:418  INFO 8042 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+19:43:55:418  INFO 8042 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:43:55:419  INFO 8042 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+19:43:55:419  INFO 8042 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:43:55:535  INFO 8042 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:43:55:582  INFO 8042 --- [smartcampus] [redisson-netty-5-14] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:43:55:586  INFO 8042 --- [smartcampus] [redisson-netty-5-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:43:55:599  INFO 8042 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:43:56:499  INFO 8042 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Started CourseEnrollmentServiceImplTest in 12.541 seconds (process running for 13.204)
+19:43:56:500  INFO 8042 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:43:56:750  INFO 8042 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 addCourseEnrollment 参数校验通过
+19:43:56:781  INFO 8042 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+19:43:56:835  INFO 8042 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@775c865f
+19:43:56:836  INFO 8042 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+19:43:56:980  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+19:43:56:981  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:43:56:981  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+19:44:26:986 ERROR 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+19:44:29:795 ERROR 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+19:44:29:795 ERROR 8042 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+19:44:29:800  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+19:44:29:804  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+19:44:29:811  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+19:44:29:811  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+19:44:29:812  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+19:44:29:812  INFO 8042 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+19:44:32:002  INFO 8362 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Starting CourseEnrollmentServiceImplTest using Java 23.0.2 with PID 8362 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+19:44:32:003  INFO 8362 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : No active profile set, falling back to 1 default profile: "default"
+19:44:32:451  INFO 8362 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:44:32:453  INFO 8362 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:44:32:476  INFO 8362 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 10 ms. Found 0 Redis repository interfaces.
+19:44:32:857  INFO 8362 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:44:32:859  INFO 8362 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:44:33:237  WARN 8362 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+19:44:40:196  INFO 8362 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+19:44:40:197  INFO 8362 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:44:40:198  INFO 8362 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+19:44:40:198  INFO 8362 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+19:44:40:198  INFO 8362 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+19:44:40:199  INFO 8362 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:44:40:200  INFO 8362 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+19:44:40:200  INFO 8362 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:44:40:317  INFO 8362 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:44:40:363  INFO 8362 --- [smartcampus] [redisson-netty-5-21] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:44:40:367  INFO 8362 --- [smartcampus] [redisson-netty-5-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:44:40:381  INFO 8362 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:44:41:308  INFO 8362 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Started CourseEnrollmentServiceImplTest in 9.471 seconds (process running for 10.094)
+19:44:41:311  INFO 8362 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:44:41:613  INFO 8362 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 addCourseEnrollment 参数校验通过
+19:44:41:641  INFO 8362 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+19:44:41:697  INFO 8362 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@649df002
+19:44:41:698  INFO 8362 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+19:44:41:842  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+19:44:41:842  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:44:41:842  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+19:45:11:844 ERROR 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+19:45:11:845 ERROR 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+19:45:11:845 ERROR 8362 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+19:45:11:850  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+19:45:11:853  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+19:45:11:861  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+19:45:11:862  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+19:45:11:862  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+19:45:11:862  INFO 8362 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+19:45:13:331  INFO 8634 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Starting CourseEnrollmentServiceImplTest using Java 23.0.2 with PID 8634 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+19:45:13:331  INFO 8634 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : No active profile set, falling back to 1 default profile: "default"
+19:45:13:729  INFO 8634 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:45:13:730  INFO 8634 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:45:13:748  INFO 8634 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces.
+19:45:14:076  INFO 8634 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:45:14:079  INFO 8634 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:45:14:344  WARN 8634 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+19:45:18:172  INFO 8634 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+19:45:18:172  INFO 8634 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:45:18:173  INFO 8634 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+19:45:18:174  INFO 8634 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+19:45:18:174  INFO 8634 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+19:45:18:174  INFO 8634 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:45:18:176  INFO 8634 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+19:45:18:176  INFO 8634 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:45:18:282  INFO 8634 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:45:18:330  INFO 8634 --- [smartcampus] [redisson-netty-5-19] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:45:18:334  INFO 8634 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:45:18:347  INFO 8634 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:45:19:164  INFO 8634 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Started CourseEnrollmentServiceImplTest in 6.007 seconds (process running for 6.637)
+19:45:19:165  INFO 8634 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:45:19:393  INFO 8634 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 addCourseEnrollment 参数校验通过
+19:45:19:420  INFO 8634 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+19:45:19:473  INFO 8634 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5cf4c93
+19:45:19:474  INFO 8634 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+19:45:19:618  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+19:45:19:618  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:45:19:618  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+19:45:49:624 ERROR 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+19:45:49:625 ERROR 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+19:45:49:624 ERROR 8634 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+19:45:49:629  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+19:45:49:632  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+19:45:49:638  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+19:45:49:639  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+19:45:49:640  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+19:45:49:640  INFO 8634 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+19:47:04:060  INFO 9374 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Starting CourseEnrollmentServiceImplTest using Java 23.0.2 with PID 9374 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+19:47:04:061  INFO 9374 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : No active profile set, falling back to 1 default profile: "default"
+19:47:04:417  INFO 9374 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:47:04:418  INFO 9374 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:47:04:435  INFO 9374 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+19:47:04:794  INFO 9374 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:47:04:797  INFO 9374 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:47:05:049  WARN 9374 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+19:47:07:568  INFO 9374 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+19:47:07:569  INFO 9374 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:47:07:570  INFO 9374 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+19:47:07:570  INFO 9374 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+19:47:07:571  INFO 9374 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+19:47:07:571  INFO 9374 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:47:07:572  INFO 9374 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+19:47:07:572  INFO 9374 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:47:07:686  INFO 9374 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:47:07:734  INFO 9374 --- [smartcampus] [redisson-netty-5-16] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:47:07:740  INFO 9374 --- [smartcampus] [redisson-netty-5-23] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:47:07:756  INFO 9374 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:47:08:685  INFO 9374 --- [smartcampus] [main] .a.s.s.i.CourseEnrollmentServiceImplTest : Started CourseEnrollmentServiceImplTest in 4.749 seconds (process running for 5.213)
+19:47:08:686  INFO 9374 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:47:08:930  INFO 9374 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 addCourseEnrollment 参数校验通过
+19:47:08:958  INFO 9374 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+19:47:09:012  INFO 9374 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@ba76911
+19:47:09:013  INFO 9374 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+19:47:09:035  INFO 9374 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息成功，学生id：3,课程id：3
+19:47:09:155  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+19:47:09:155  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+19:47:09:156  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+19:47:39:161 ERROR 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+19:47:39:164 ERROR 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+19:47:39:164 ERROR 9374 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+19:47:39:172  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+19:47:39:176  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+19:47:39:189  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+19:47:39:190  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+19:47:39:190  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+19:47:39:190  INFO 9374 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0

@@ -1,9 +1,11 @@
 package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
 import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
 import com.aiproject.smartcampus.mapper.CourseMapper;
 import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.po.User;
 import com.aiproject.smartcampus.service.CourseService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -40,13 +42,12 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
      */
     @Override
     public Result<String> updateCourse(Course course) {
-        // todo 校验用户权限
-        String userType="admin";
+        User.UserType userType = UserLocalThreadUtils.getUserInfo().getUserType();
         //参数校验
         //用户信息是否存在
-        if(userType.isBlank()){return Result.error(ERROR_USERINFO);}
+        if(userType.toString().isBlank()){return Result.error(ERROR_USERINFO);}
         //权限校验
-        if(!userType.equals("admin")) {return Result.error(NO_PERMISSION_UPDATE);}
+        if(!"admin".equals(userType)) {return Result.error(NO_PERMISSION_UPDATE);}
         //课程参数校验
         if(course.getCourseId() == null){return Result.error(NO_EXIST_COURSE_ID);}
         if(course.getCourseName().isBlank()){return Result.error(NO_EXIST_COURSE_NAME);}
@@ -58,9 +59,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public Result<String> deleteCourse(Integer courseId) {
         // todo 校验用户权限
-        String userType="admin";
+        User.UserType userType = UserLocalThreadUtils.getUserInfo().getUserType();
         //权限校验
-        if(!userType.equals("admin")) {return Result.error(NO_PERMISSION_DELETE);}
+        if(!"admin".equals(userType)) {return Result.error(NO_PERMISSION_DELETE);}
 
         //查询课程是否存在
         Course course = courseMapper.selectById(courseId);
@@ -73,9 +74,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public Result<String> addCourse(Course course) {
         // todo 校验用户权限
-        String userType="admin";
+        User.UserType userType = UserLocalThreadUtils.getUserInfo().getUserType();
         //权限校验
-        if(!userType.equals("admin")) {return Result.error(NO_PERMISSION_ADD);}
+        if(!"admin".equals(userType)) {return Result.error(NO_PERMISSION_ADD);}
 
         //判断课程是否存在
         LambdaQueryWrapper<Course> queryWrapper = new LambdaQueryWrapper<>();

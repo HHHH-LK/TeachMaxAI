@@ -5,6 +5,7 @@ import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
 import com.aiproject.smartcampus.mapper.KnowlegeMapper;
 import com.aiproject.smartcampus.mapper.UserMapper;
 import com.aiproject.smartcampus.pojo.dto.UserLoginDTO;
+import com.aiproject.smartcampus.pojo.po.User;
 import com.aiproject.smartcampus.service.KnoledgeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     public Result getAllNotMasterKnoledge() {
 
         //  获取出当前用户信息
-        UserLoginDTO userInfo = UserLocalThreadUtils.getUserInfo();
+        User userInfo = UserLocalThreadUtils.getUserInfo();
         // 获取当前学生的学号
 
 

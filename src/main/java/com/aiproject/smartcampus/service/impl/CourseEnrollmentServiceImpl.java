@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
 import com.aiproject.smartcampus.mapper.CourseMapper;
 import com.aiproject.smartcampus.pojo.po.Course;
@@ -26,6 +27,7 @@ import static com.aiproject.smartcampus.contest.CourseContest.NO_EXIST_COURSE;
 @RequiredArgsConstructor
 public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMapper, CourseEnrollment> implements CourseEnrollmentService {
 
+    private final UserToTypeUtils userToTypeUtils;
     private final CourseMapper courseMapper;
     private final CourseEnrollmentMapper courseEnrollmentMapper;
     private static final ExecutorService ADD_COURSEENROLLMENTS_EXECUTOR = Executors.newSingleThreadExecutor();
@@ -91,8 +93,7 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
      * */
     @Override
     public Result<String> addCourseEnrollment(Integer courseId) {
-        // todo 线程变量获取当前用户id
-        Integer studentId=1;
+        String studentId = userToTypeUtils.change();
         //校验课程是否存在
         Course course = courseMapper.selectById(courseId);
         if (course == null) {
@@ -111,7 +112,7 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 
         //异步处理选课信息
         CourseEnrollment courseEnrollment = new CourseEnrollment()
-                .setStudentId(studentId)
+                .setStudentId(Integer.valueOf(studentId))
                 .setCourseId(courseId)
                 .setEnrollmentDate(LocalDateTime.now());
         //将选课信息放入阻塞队列

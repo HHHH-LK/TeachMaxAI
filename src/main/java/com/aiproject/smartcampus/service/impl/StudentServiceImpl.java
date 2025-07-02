@@ -41,6 +41,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public List<StudentSelectAllVO> selectAllStudents() {
         return studentMapper.selectAllStudents();
     }
+
     /**
      * 根据学生学号查询学生信息
      * @param studentNumber

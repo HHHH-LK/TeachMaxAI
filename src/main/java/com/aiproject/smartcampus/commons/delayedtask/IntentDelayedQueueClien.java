@@ -242,11 +242,11 @@ public class IntentDelayedQueueClien {
         // 关闭线程池
         EXECUTOR_SERVICE.shutdown();
         try {
-            if (!EXECUTOR_SERVICE.awaitTermination(60, TimeUnit.SECONDS)) {
+            if (!EXECUTOR_SERVICE.awaitTermination(120, TimeUnit.SECONDS)) {
                 log.warn("线程池未在60秒内关闭，强制关闭");
                 EXECUTOR_SERVICE.shutdownNow();
                 // 再等待一段时间
-                if (!EXECUTOR_SERVICE.awaitTermination(30, TimeUnit.SECONDS)) {
+                if (!EXECUTOR_SERVICE.awaitTermination(60, TimeUnit.SECONDS)) {
                     log.error("线程池强制关闭失败");
                 }
             }

@@ -73,6 +73,8 @@
                 }
                 throw new IllegalArgumentException("Unknown UserType value: " + value);
             }
+
+
         }
 
         /**
