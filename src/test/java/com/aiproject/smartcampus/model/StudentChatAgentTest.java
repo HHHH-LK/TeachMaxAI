@@ -7,14 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 @SpringBootTest
-class AgentTest {
+class StudentChatAgentTest {
 
     @Autowired
-    private Agent agent;
+    private StudentChatAgent agent;
 
     @Test
     void start() {

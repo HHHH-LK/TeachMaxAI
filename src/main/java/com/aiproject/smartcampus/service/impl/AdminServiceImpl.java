@@ -167,6 +167,10 @@ public class AdminServiceImpl implements AdminService {
         return Result.success();
     }
 
+    /**
+     * 新增学生
+     * */
+
     @Override
     public Result addStudent(Student student) {
 
@@ -188,7 +192,7 @@ public class AdminServiceImpl implements AdminService {
             studentRedisTemplate.opsForValue().set(redisKey, student);
             studentRedisTemplate.expire(redisKey, expireTime);
             log.info("学生【{}】新增信息已同步到redis中", studentNumber);
-
+            //手动开启事务
             transactionTemplate.execute(status -> {
                 try {
                     User user = student.getUser();
@@ -208,6 +212,16 @@ public class AdminServiceImpl implements AdminService {
 
         return Result.success();
     }
+
+
+
+    // 教室端
+
+
+    /**
+     * 根据工号查询教师信息
+     * */
+
 
 
 }
