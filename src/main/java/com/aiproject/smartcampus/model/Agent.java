@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class StudentChatAgent {
+public class Agent {
 
     private final Intent intentHandler;
     //注入意图处理器

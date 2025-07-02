@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 
 
 @SpringBootTest
-class StudentChatAgentTest {
+class AgentTest {
 
     @Autowired
-    private StudentChatAgent agent;
+    private Agent agent;
 
     @Test
     void start() {

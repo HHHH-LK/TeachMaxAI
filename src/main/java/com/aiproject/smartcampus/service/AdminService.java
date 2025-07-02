@@ -14,4 +14,6 @@ public interface AdminService   {
     Result updateStudentBystudentNumber(Student student);
 
     Result addStudent(Student student);
+
+    Result updateUserStatus(String userId, String status);
 }

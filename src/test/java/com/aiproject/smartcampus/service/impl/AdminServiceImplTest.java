@@ -84,4 +84,14 @@ class AdminServiceImplTest {
 
     }
 
+    @Test
+    void updateStudentStatus(){
+
+        Result inactive = adminService.updateUserStatus("9", "active");
+        String message = inactive.getMessage();
+        System.out.println(message);
+
+
+    }
+
 }

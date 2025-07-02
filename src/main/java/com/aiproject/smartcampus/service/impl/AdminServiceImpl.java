@@ -2,17 +2,23 @@ package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.exception.StudentExpection;
+import com.aiproject.smartcampus.exception.UserExpection;
 import com.aiproject.smartcampus.mapper.AdminMapper;
 import com.aiproject.smartcampus.mapper.StudentMapper;
+import com.aiproject.smartcampus.mapper.TeacherMapper;
 import com.aiproject.smartcampus.mapper.UserMapper;
+import com.aiproject.smartcampus.pojo.po.Admin;
 import com.aiproject.smartcampus.pojo.po.Student;
+import com.aiproject.smartcampus.pojo.po.Teacher;
 import com.aiproject.smartcampus.pojo.po.User;
 import com.aiproject.smartcampus.service.AdminService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -20,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * @program: SmartCampus
@@ -36,15 +42,22 @@ import java.util.concurrent.Executors;
 public class AdminServiceImpl implements AdminService {
 
     private final AdminMapper adminMapper;
-
+    private final TeacherMapper teacherMapper;
     private final StudentMapper studentMapper;
     private final RedisTemplate<String, Student> studentRedisTemplate;
-    private final String StudentIdredisPrefix = "user:student:studentId";
+    private final RedisTemplate<String, Teacher> teacherRedisTemplate;
+    private final RedisTemplate<String, Admin> adminRedisTemplate;
+    private final String StudentIdredisPrefix = "system:student:studentNumber";
+    private final String UserIdredisPrefix = "system:user:userId";
+    private final String TeacherIdredisPrefix = "system:teacher:teacherNumber";
+    private final String AdminIdredisPrefix = "system:admin:adminNumber";
     private final Duration expireTime = Duration.ofDays(3);
     private final UserMapper userMapper;
     private final TransactionTemplate transactionTemplate;
     @Resource(name = "transactionAwareExecutor")
     private Executor executor;
+    @Autowired
+    private RedisTemplate<Object, Object> redisTemplate;
 
 
     //学生管理
@@ -169,7 +182,7 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 新增学生
-     * */
+     */
 
     @Override
     public Result addStudent(Student student) {
@@ -213,6 +226,113 @@ public class AdminServiceImpl implements AdminService {
         return Result.success();
     }
 
+    @Override
+    public Result updateUserStatus(String userId, String status) {
+        // 查询数据库是否存在相关信息
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUserId, userId);
+        User user = userMapper.selectOne(queryWrapper);
+        if (user == null) {
+            log.error("用户【{}】不存在", userId);
+            throw new UserExpection("用户不存在");
+        }
+
+        // 使用事务同步更新数据库和Redis
+        return transactionTemplate.execute(transactionStatus -> {
+            try {
+                log.info("开始更新用户[{}]状态为[{}]", userId, status);
+
+                // 1. 更新数据库
+                LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+                updateWrapper.eq(User::getUserId, userId);
+                updateWrapper.set(User::getStatus, status);
+                int updateCount = userMapper.update(null, updateWrapper);
+
+                if (updateCount == 0) {
+                    log.error("数据库更新失败，用户[{}]", userId);
+                    throw new UserExpection("用户状态更新失败");
+                }
+
+                log.info("数据库更新成功，用户[{}]状态已修改为[{}]", userId, status);
+
+                // 2. 重新查询最新数据
+                LambdaQueryWrapper<User> freshQueryWrapper = new LambdaQueryWrapper<>();
+                freshQueryWrapper.eq(User::getUserId, userId);
+                User updatedUser = userMapper.selectOne(freshQueryWrapper);
+
+                // 3. 更新Redis缓存
+                updateRedisCache(updatedUser);
+
+                log.info("用户[{}]状态更新完成", userId);
+                return Result.success();
+
+            } catch (Exception e) {
+                log.error("更新用户[{}]状态失败: {}", userId, e.getMessage(), e);
+                transactionStatus.setRollbackOnly();
+                throw new UserExpection("用户状态更新失败: " + e.getMessage());
+            }
+        });
+    }
+
+    private void updateRedisCache(User user) {
+        try {
+            switch (user.getUserType()) {
+                case STUDENT: {
+                    LambdaQueryWrapper<Student> queryWrapper = new LambdaQueryWrapper<>();
+                    queryWrapper.eq(Student::getUserId, user.getUserId());
+                    Student student = studentMapper.selectOne(queryWrapper);
+
+                    if (student != null) {
+                        student.setUser(user);
+                        String key = StudentIdredisPrefix + student.getStudentNumber();
+                        studentRedisTemplate.opsForValue().set(key, student);
+                        studentRedisTemplate.expire(key, expireTime);
+                        log.info("学生[{}]Redis缓存已更新", student.getStudentNumber());
+                    }
+                    break;
+                }
+
+                case TEACHER: {
+                    LambdaQueryWrapper<Teacher> queryWrapper = new LambdaQueryWrapper<>();
+                    queryWrapper.eq(Teacher::getUserId, user.getUserId());
+                    Teacher teacher = teacherMapper.selectOne(queryWrapper);
+
+                    if (teacher != null) {
+                        teacher.setUser(user);
+                        String key = TeacherIdredisPrefix + teacher.getEmployeeNumber();
+                        teacherRedisTemplate.opsForValue().set(key, teacher);
+                        teacherRedisTemplate.expire(key, expireTime);
+                        log.info("教师[{}]Redis缓存已更新", teacher.getEmployeeNumber());
+                    }
+                    break;
+                }
+
+                case ADMIN: {
+                    LambdaQueryWrapper<Admin> queryWrapper = new LambdaQueryWrapper<>();
+                    queryWrapper.eq(Admin::getUserId, user.getUserId());
+                    Admin admin = adminMapper.selectOne(queryWrapper);
+
+                    if (admin != null) {
+                        admin.setUser(user);
+                        String key = AdminIdredisPrefix + admin.getAdminNumber();
+                        adminRedisTemplate.opsForValue().set(key, admin);
+                        adminRedisTemplate.expire(key, expireTime);
+                        log.info("管理员[{}]Redis缓存已更新", admin.getAdminNumber());
+                    }
+                    break;
+                }
+
+                default:
+                    throw new UserExpection("用户角色不存在");
+            }
+        } catch (Exception e) {
+            log.error("更新Redis缓存失败: {}", e.getMessage(), e);
+            // 这里可以选择抛出异常让事务回滚，或者只记录日志继续执行
+            // 如果Redis更新失败不影响业务，可以只记录日志
+            // 如果需要强一致性，可以抛出异常
+            throw new RuntimeException("Redis缓存更新失败", e);
+        }
+    }
 
 
     // 教室端
@@ -222,6 +342,10 @@ public class AdminServiceImpl implements AdminService {
      * 根据工号查询教师信息
      * */
 
+
+    /**
+     * 修改用户状态
+     * */
 
 
 }

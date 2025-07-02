@@ -67,5 +67,15 @@ public class ManagePersonController {
         return adminService.addStudent(student);
     }
 
+    /**
+     * 修改用户状态
+     * */
+    @PostMapping("/updateuserstatus")
+    public Result updateUserStatus(String userId,String status){
+
+
+        return adminService.updateUserStatus(userId,status);
+    }
+
 
 }

@@ -1,10 +1,15 @@
 package com.aiproject.smartcampus.config;
 
-
 import com.aiproject.smartcampus.pojo.bo.CacheEntry;
+import com.aiproject.smartcampus.pojo.po.Admin;
 import com.aiproject.smartcampus.pojo.po.Student;
-import dev.langchain4j.memory.ChatMemory;
-import okhttp3.Cache;
+import com.aiproject.smartcampus.pojo.po.Teacher;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -12,6 +17,8 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.text.SimpleDateFormat;
 
 /**
  * @program: SmartTeachAgent
@@ -27,18 +34,53 @@ public class RedisConfig {
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory();
     }
+
+    /**
+     * 创建配置了JavaTimeModule的ObjectMapper
+     */
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // 🔥 关键配置：注册JSR310模块处理Java 8时间类型
+        objectMapper.registerModule(new JavaTimeModule());
+
+        // 禁用将日期写为时间戳
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        // 配置时间格式
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+
+        // 设置可见性
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+
+        // 激活默认类型（可选，根据需要）
+        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+
+        return objectMapper;
+    }
+
+    /**
+     * 创建配置了ObjectMapper的Jackson2JsonRedisSerializer
+     */
+    private <T> Jackson2JsonRedisSerializer<T> createJsonSerializer(Class<T> clazz) {
+        Jackson2JsonRedisSerializer<T> serializer = new Jackson2JsonRedisSerializer<>(clazz);
+        serializer.setObjectMapper(createObjectMapper());
+        return serializer;
+    }
+
     @Bean
     public RedisTemplate<String, CacheEntry> chatMemoryredisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        //序列化
         RedisTemplate<String, CacheEntry> redisTemplate = new RedisTemplate<>();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(CacheEntry.class));
-        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(CacheEntry.class));
-        // 初始化
+
+        // 使用配置了JavaTimeModule的序列化器
+        Jackson2JsonRedisSerializer<CacheEntry> serializer = createJsonSerializer(CacheEntry.class);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.afterPropertiesSet();
-
         return redisTemplate;
     }
 
@@ -47,12 +89,46 @@ public class RedisConfig {
         RedisTemplate<String, Student> redisTemplate = new RedisTemplate<>();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Student.class));
-        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Student.class));
+
+        // 使用配置了JavaTimeModule的序列化器
+        Jackson2JsonRedisSerializer<Student> serializer = createJsonSerializer(Student.class);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 
+    @Bean
+    public RedisTemplate<String, Teacher> teacherRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Teacher> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
 
+        // 使用配置了JavaTimeModule的序列化器
+        Jackson2JsonRedisSerializer<Teacher> serializer = createJsonSerializer(Teacher.class);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, Admin> adminRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Admin> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        // 使用配置了JavaTimeModule的序列化器
+        Jackson2JsonRedisSerializer<Admin> serializer = createJsonSerializer(Admin.class);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
 }

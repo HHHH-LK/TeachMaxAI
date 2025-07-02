@@ -1,8 +1,9 @@
 package com.aiproject.smartcampus.commons.utils;
 
 
-import com.aiproject.smartcampus.pojo.dto.UserRegisterDTO;
+import com.aiproject.smartcampus.pojo.dto.UserLoginDTO;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 /**
  * @program: SmartCampus
@@ -12,14 +13,14 @@ import lombok.Data;
  **/
 
 @Data
-public class   UserLocalThreadUtils {
+public class  UserLocalThreadUtils {
 
-    private static ThreadLocal<UserRegisterDTO> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<UserLoginDTO> threadLocal = new ThreadLocal<>();
 
-    public static UserRegisterDTO getUserInfo(){
+    public static UserLoginDTO getUserInfo(){
         return threadLocal.get();
     }
-    public static void setUserInfo(UserRegisterDTO user){threadLocal.set(user);}
+    public static void setUserInfo(UserLoginDTO user){threadLocal.set(user);}
     public static void removeUserInfo(){threadLocal.remove();}
 
 }
