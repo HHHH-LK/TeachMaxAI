@@ -59,4 +59,8 @@ public class Result<T> {
     public static <T> Result<T> of(int code, T data, String message) {
         return new Result<>(code, data, message);
     }
+
+    public Result put(T token, T token1) {
+        return null;
+    }
 }

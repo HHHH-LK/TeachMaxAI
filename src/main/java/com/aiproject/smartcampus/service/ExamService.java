@@ -9,17 +9,14 @@ public interface ExamService {
     // 创建试卷
     Result<ExamCreateResponseDTO> createExam(ExamDTO examDTO);
 
-    // 发布试卷
-    Result<ExamCreateResponseDTO> publishExam(Long examId, ExamPublishDTO publishDTO);
-
-    // 修改试卷
-    Result updateExam(Long examId, ExamDTO examDTO);
-
-    // 查询试卷
-    Result<List<ExamDTO>> getExamsByQuery(ExamQueryDTO queryDTO);
-
-    // 获取试卷详情
-    Result<ExamDTO> getExamDetail(Long examId);
+//    // 发布试卷
+//    Result<ExamCreateResponseDTO> publishExam(Long examId);
+//
+//    // 修改试卷
+//    Result updateExam(Long examId, ExamDTO examDTO);
+//
+//    // 获取试卷详情
+//    Result<ExamDTO> getExamDetail(Long examId);
 
     // 删除试卷
     Result deleteExam(Long examId);
