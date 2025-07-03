@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiproject.smartcampus.mapper.ChapterKnowledgePointMapper">
+
+    <!-- 批量插入章节知识点关系 -->
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO chapter_knowledge_points
+        (chapter_id, point_id, point_order, is_core, created_at, updated_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.chapterId}, #{item.pointId}, #{item.pointOrder}, #{item.isCore}, #{item.createdAt}, #{item.updatedAt})
+        </foreach>
+    </insert>
+
+    <!-- 根据章节ID删除所有知识点关系 -->
+    <delete id="deleteByChapterId">
+        DELETE FROM chapter_knowledge_points WHERE chapter_id = #{chapterId}
+    </delete>
+
+</mapper>

@@ -1,107 +1,107 @@
-server:
-  port: 8104
-  address: localhost
+  server:
+    port: 8104
+    address: localhost
 
-spring:
-  application:
-    name: smartcampus            # 应用名称，供日志输出使用
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: root
-  data:
-    redis:
-      host: localhost
-      port: 6379
+  spring:
+    application:
+      name: smartcampus
+    datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      username: root
+      password: 10280017
+    data:
+      redis:
+        host: localhost
+        port: 6379
 
-mybatis-plus:
-  mapper-locations: classpath*:mapper/*.xml
-  # 禁用自动类型别名注册，避免冲突
-  type-aliases-package: ""  # 设置为空字符串
-  configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mybatis-plus:
+    mapper-locations: classpath*:mapper/*.xml
+    # 禁用自动类型别名注册，避免冲突
+    type-aliases-package: ""  # 设置为空字符串
+    configuration:
+      map-underscore-to-camel-case: true
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-mail:
-  host: smtp.qq.com    # SMTP服务器地址
-  port: 587                 # 端口
-  username: 3963077470@qq.com  # 邮箱用户名
-  password: xbtalymioxrzcgfg   # 邮箱密码或授权码
-  display-name: 教学实训
-  protocol: smtp
-  properties:
-    mail:
-      smtp:
-        socketFactoryClass: javax.net.ssl.SSLSocketFactory
-        #表示开启 DEBUG 模式，这样，邮件发送过程的日志会在控制台打印出来，方便排查错误
-        debug: true
-        ssl:
-          enable: true
-          trust: smtp.qq.com
+  mail:
+    host: smtp.qq.com    # SMTP服务器地址
+    port: 587                 # 端口
+    username: 3963077470@qq.com  # 邮箱用户名
+    password: xbtalymioxrzcgfg   # 邮箱密码或授权码
+    display-name: 教学实训
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          socketFactoryClass: javax.net.ssl.SSLSocketFactory
+          #表示开启 DEBUG 模式，这样，邮件发送过程的日志会在控制台打印出来，方便排查错误
+          debug: true
+          ssl:
+            enable: true
+            trust: smtp.qq.com
 
-  # 短信服务配置（根据服务商不同调整）
-sms:
-  ali:
-    access-key-id: your-access-key-id
-    access-key-secret: your-access-key-secret
-    sign-name: smart_campus
-    template-code: SMS_10001  # 验证码模板ID
-  tencent:
-    secret-id: your-secret-id  #企业资质
-    secret-key: your-secret-key
-    app-id: 1400000000
-    sign-name: 智慧校园
-    template-id: 123456
-
-
-    templates:
-      reset-password:
-        subject: 密码重置验证码
-        text: |-
-          您的验证码是：{code}
-          此验证码5分钟内有效，请勿告知他人
+    # 短信服务配置（根据服务商不同调整）
+  sms:
+    ali:
+      access-key-id: your-access-key-id
+      access-key-secret: your-access-key-secret
+      sign-name: smart_campus
+      template-code: SMS_10001  # 验证码模板ID
+    tencent:
+      secret-id: your-secret-id  #企业资质
+      secret-key: your-secret-key
+      app-id: 1400000000
+      sign-name: 智慧校园
+      template-id: 123456
 
 
-langchain4j:
-  community:
-    dashscope:
-      chat-model:
-        api-key: ${OTHER_DASHSCOPE_API_KEY}
-        model-name: qwen-max-latest
-      embedding-model:
-        api-key: ${OTHER_DASHSCOPE_API_KEY}
-        model-name: text-embedding-v3
+      templates:
+        reset-password:
+          subject: 密码重置验证码
+          text: |-
+            您的验证码是：{code}
+            此验证码5分钟内有效，请勿告知他人
+  
+
+  langchain4j:
+    community:
+      dashscope:
+        chat-model:
+          api-key: ${OTHER_DASHSCOPE_API_KEY}
+          model-name: qwen-max-latest
+        embedding-model:
+          api-key: ${OTHER_DASHSCOPE_API_KEY}
+          model-name: text-embedding-v3
 
 
-logging:
-  level:
-    org.apache.ibatis.session: WARN
-    org.mybatis.spring: WARN
-    com.hmall: DEBUG             # 设置包级别日志
-    com.aiproject.smartcampus.commons.utils.aliyunossutils: DEBUG  # OSS相关日志
-  pattern:
-    dateformat: HH:mm:ss:SSS     # 时间格式
-  file:
-    path: logs/${spring.application.name}   # 引用已定义的应用名
+  logging:
+    level:
+      org.apache.ibatis.session: WARN
+      org.mybatis.spring: WARN
+      com.hmall: DEBUG             # 设置包级别日志
+      com.aiproject.smartcampus.commons.utils.aliyunossutils: DEBUG  # OSS相关日志
+    pattern:
+      dateformat: HH:mm:ss:SSS     # 时间格式
+    file:
+      path: logs/${spring.application.name}   # 引用已定义的应用名
 
-# 接口文档配置
-knife4j:
-  enable: true
-  openapi:
-    title: "智慧校园"
-    version: 1.0
-    group:
-      default:
-        api-rule: package
-        api-rule-resources:
-          - com.aiproject.smartcampus.controller
+  # 接口文档配置
+  knife4j:
+    enable: true
+    openapi:
+      title: "智慧校园"
+      version: 1.0
+      group:
+        default:
+          api-rule: package
+          api-rule-resources:
+            - com.aiproject.smartcampus.controller
 
-# 阿里云OSS配置 - 使用您自己的bucket
-aliyun:
-  oss:
-    endpoint: https://oss-cn-beijing.aliyuncs.com
-    bucketName: smart-campus-resources-${random.int(1000,9999)}  # 使用唯一的bucket名称
-    region: cn-beijing
-    accessKeyId: LTAI5tHAaGZDfWRA5jTmiHsn
-    accessKeySecret: COEDRVsbvau1b0WdQHyU8kwsS9J9kl
+  # 阿里云OSS配置 - 使用您自己的bucket
+  aliyun:
+    oss:
+      endpoint: https://oss-cn-beijing.aliyuncs.com
+      bucketName: smart-campus-resources-${random.int(1000,9999)}  # 使用唯一的bucket名称
+      region: cn-beijing
+      accessKeyId: LTAI5tHAaGZDfWRA5jTmiHsn
+      accessKeySecret: COEDRVsbvau1b0WdQHyU8kwsS9J9kl

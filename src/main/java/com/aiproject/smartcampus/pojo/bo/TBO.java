@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * @program: ss
- * @description: 权重范围
+ * @description: 权重范围（用来进行抽取）
  * @author: lk_hhh
  * @create: 2025-07-03 02:41
  **/

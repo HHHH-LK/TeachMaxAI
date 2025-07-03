@@ -837,3 +837,593 @@ java.lang.InterruptedException: null
 04:05:07:623  INFO 46858 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
 04:05:07:623  INFO 46858 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
 04:05:07:623  INFO 46858 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+10:29:29:392  INFO 50593 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Starting KnoledgeServiceImplTest using Java 23.0.2 with PID 50593 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+10:29:29:393  INFO 50593 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : No active profile set, falling back to 1 default profile: "default"
+10:29:29:790  INFO 50593 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+10:29:29:791  INFO 50593 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+10:29:29:807  INFO 50593 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+10:29:30:135  INFO 50593 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+10:29:30:137  INFO 50593 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+10:29:30:396  WARN 50593 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+10:29:32:890  INFO 50593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+10:29:32:890  INFO 50593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+10:29:32:891  INFO 50593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+10:29:32:891  INFO 50593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+10:29:32:892  INFO 50593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+10:29:32:892  INFO 50593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+10:29:32:893  INFO 50593 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+10:29:32:893  INFO 50593 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+10:29:33:009  INFO 50593 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+10:29:33:065  INFO 50593 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+10:29:33:082  INFO 50593 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+10:29:33:095  INFO 50593 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+10:29:33:823  INFO 50593 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Started KnoledgeServiceImplTest in 4.571 seconds (process running for 5.049)
+10:29:33:824  INFO 50593 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+10:29:34:104  INFO 50593 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 createListTestUsingTByAgent 参数校验通过
+10:29:34:104  INFO 50593 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 开始基于用户自定义权重为学生[1]生成测试题，原始权重数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8)]
+10:29:34:104  INFO 50593 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 权重处理后的数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8)]
+10:29:34:125  INFO 50593 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+10:29:34:176  INFO 50593 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@797a5b31
+10:29:34:177  INFO 50593 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+10:29:34:205  INFO 50593 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 用户自定义权重数量[3]不超过目标数量[10]，返回全部
+10:29:34:205  INFO 50593 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 基于用户权重选择的知识点：[函数与极限, 函数的概念, 极限的概念]
+10:29:34:205  INFO 50593 --- [smartcampus] [main] c.a.s.f.NotMasterTestCreateTool          : 正在为学生[1]创建测试题，基于3个知识点分析数据
+10:29:34:205  INFO 50593 --- [smartcampus] [main] c.a.s.f.t.NotMasterTestCreatetoolUtils   : 为学生[1]基于3个知识点分析数据生成测试题
+10:30:32:457  INFO 50593 --- [smartcampus] [main] c.a.s.f.t.NotMasterTestCreatetoolUtils   : AI返回内容验证通过，包含9道题目
+10:30:32:457  INFO 50593 --- [smartcampus] [main] c.a.s.f.t.NotMasterTestCreatetoolUtils   : AI题目生成成功，清理后内容长度: 4237
+10:30:32:458  INFO 50593 --- [smartcampus] [main] c.a.s.f.NotMasterTestCreateTool          : 测试题生成成功，内容长度: 4237
+10:30:32:458  INFO 50593 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 基于用户自定义权重的测试题生成成功
+10:30:32:491  INFO 50593 --- [smartcampus] [pool-6-thread-1] c.a.s.f.t.NotMasterTestCreatetoolUtils   : 题目保存完成 - 成功: 9, 失败: 0
+10:30:32:591  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+10:30:32:591  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+10:30:32:591  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+10:31:02:592 ERROR 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+10:31:02:593 ERROR 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+10:31:02:593 ERROR 50593 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+10:31:02:595  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+10:31:02:596  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+10:31:02:599  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+10:31:02:600  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+10:31:02:600  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+10:31:02:600  INFO 50593 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+10:31:20:426  INFO 50713 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Starting KnoledgeServiceImplTest using Java 23.0.2 with PID 50713 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+10:31:20:427  INFO 50713 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : No active profile set, falling back to 1 default profile: "default"
+10:31:20:792  INFO 50713 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+10:31:20:793  INFO 50713 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+10:31:20:809  INFO 50713 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+10:31:21:118  INFO 50713 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+10:31:21:121  INFO 50713 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+10:31:21:361  WARN 50713 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+10:31:23:710  INFO 50713 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+10:31:23:710  INFO 50713 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+10:31:23:711  INFO 50713 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+10:31:23:711  INFO 50713 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+10:31:23:712  INFO 50713 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+10:31:23:712  INFO 50713 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+10:31:23:713  INFO 50713 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+10:31:23:713  INFO 50713 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+10:31:23:820  INFO 50713 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+10:31:23:863  INFO 50713 --- [smartcampus] [redisson-netty-5-23] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+10:31:23:878  INFO 50713 --- [smartcampus] [redisson-netty-5-20] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+10:31:23:894  INFO 50713 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+10:31:24:769  INFO 50713 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Started KnoledgeServiceImplTest in 4.476 seconds (process running for 4.946)
+10:31:24:771  INFO 50713 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+10:31:25:020  INFO 50713 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 createListTestUsingTByAgent 参数校验通过
+10:31:25:021  INFO 50713 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 开始基于用户自定义权重为学生[1]生成测试题，原始权重数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+10:31:25:021  INFO 50713 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 权重处理后的数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+10:31:25:039  INFO 50713 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+10:31:25:088  INFO 50713 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@54a04eae
+10:31:25:088  INFO 50713 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+10:31:25:121  INFO 50713 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 构建用户自定义权重区间成功，总权重：{:.4f}，区间表大小：57.15871577485515
+10:31:25:121  INFO 50713 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 完成用户自定义权重抽取，共抽取 10 个知识点，总尝试次数：32
+10:31:25:122  INFO 50713 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 基于用户权重选择的知识点：[函数的概念, 牛顿第二定律, 极限的概念, 牛顿第一定律, 段落大意, 基本导数公式, 函数与极限, 力学基础, 阅读理解, 导数与微分]
+10:31:25:122  INFO 50713 --- [smartcampus] [main] c.a.s.f.NotMasterTestCreateTool          : 正在为学生[1]创建测试题，基于10个知识点分析数据
+10:31:25:122  INFO 50713 --- [smartcampus] [main] c.a.s.f.t.NotMasterTestCreatetoolUtils   : 为学生[1]基于10个知识点分析数据生成测试题
+10:32:26:300  INFO 50713 --- [smartcampus] [main] c.a.s.f.t.NotMasterTestCreatetoolUtils   : AI返回内容验证通过，包含9道题目
+10:32:26:301  INFO 50713 --- [smartcampus] [main] c.a.s.f.t.NotMasterTestCreatetoolUtils   : AI题目生成成功，清理后内容长度: 4043
+10:32:26:302  INFO 50713 --- [smartcampus] [main] c.a.s.f.NotMasterTestCreateTool          : 测试题生成成功，内容长度: 4043
+10:32:26:302  INFO 50713 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 基于用户自定义权重的测试题生成成功
+10:32:26:330  INFO 50713 --- [smartcampus] [pool-6-thread-1] c.a.s.f.t.NotMasterTestCreatetoolUtils   : 题目保存完成 - 成功: 9, 失败: 0
+10:32:26:429  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+10:32:26:429  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+10:32:26:429  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+10:32:56:433 ERROR 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+10:32:56:434 ERROR 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+10:32:56:434 ERROR 50713 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+10:32:56:438  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+10:32:56:441  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+10:32:56:446  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+10:32:56:446  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+10:32:56:447  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+10:32:56:447  INFO 50713 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+13:37:19:111  INFO 56847 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Starting KnoledgeServiceImplTest using Java 23.0.2 with PID 56847 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+13:37:19:112  INFO 56847 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : No active profile set, falling back to 1 default profile: "default"
+13:37:19:501  INFO 56847 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+13:37:19:504  INFO 56847 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+13:37:19:522  INFO 56847 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+13:37:19:867  INFO 56847 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+13:37:19:869  INFO 56847 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+13:37:20:177  WARN 56847 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+13:37:20:269  WARN 56847 --- [smartcampus] [main] c.b.m.core.injector.DefaultSqlInjector   : interface com.aiproject.smartcampus.mapper.PostMapper ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+13:40:28:552  INFO 56847 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+13:40:28:552  INFO 56847 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+13:40:28:553  INFO 56847 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+13:40:28:553  INFO 56847 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+13:40:28:554  INFO 56847 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+13:40:28:554  INFO 56847 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+13:40:28:555  INFO 56847 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+13:40:28:555  INFO 56847 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+13:40:28:664  INFO 56847 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+13:40:28:718  INFO 56847 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+13:40:28:723  INFO 56847 --- [smartcampus] [redisson-netty-5-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+13:40:28:794  WARN 56847 --- [smartcampus] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 43911e5e-ad49-4ce1-8a6e-e4ab1f1ac587
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+13:40:28:798  INFO 56847 --- [smartcampus] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+13:40:28:832  INFO 56847 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+13:40:29:678  INFO 56847 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Started KnoledgeServiceImplTest in 190.721 seconds (process running for 191.864)
+13:40:29:795  INFO 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+13:40:29:796  INFO 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+13:40:29:796  INFO 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+13:40:29:958  INFO 56847 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 createListTestUsingTByAgent 参数校验通过
+13:40:29:958  INFO 56847 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 开始基于用户自定义权重为学生[1]生成测试题，原始权重数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+13:40:29:959  INFO 56847 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 权重处理后的数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+13:40:29:971  INFO 56847 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+13:40:31:049 ERROR 56847 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 查询知识点分析数据失败
+
+org.mybatis.spring.MyBatisSystemException: null
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:97) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:439) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at jdk.proxy2/jdk.proxy2.$Proxy110.selectList(Unknown Source) ~[na:na]
+	at org.mybatis.spring.SqlSessionTemplate.selectList(SqlSessionTemplate.java:224) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperMethod.executeForMany(MybatisMapperMethod.java:164) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperMethod.execute(MybatisMapperMethod.java:77) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperProxy$PlainMethodInvoker.invoke(MybatisMapperProxy.java:152) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperProxy.invoke(MybatisMapperProxy.java:89) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at jdk.proxy2/jdk.proxy2.$Proxy148.getSimpleKnowledgeAnalysis(Unknown Source) ~[na:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138) ~[spring-tx-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223) ~[spring-aop-6.2.6.jar:6.2.6]
+	at jdk.proxy2/jdk.proxy2.$Proxy149.getSimpleKnowledgeAnalysis(Unknown Source) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl.randomPointByT(KnoledgeServiceImpl.java:398) ~[classes/:na]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl.createListTestUsingTByAgent(KnoledgeServiceImpl.java:185) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor.invoke(MethodBeforeAdviceInterceptor.java:58) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728) ~[spring-aop-6.2.6.jar:6.2.6]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl$$SpringCGLIB$$0.createListTestUsingTByAgent(<generated>) ~[classes/:na]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImplTest.getKnoledgeInformationById3(KnoledgeServiceImplTest.java:76) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57) ~[junit5-rt.jar:na]
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38) ~[junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11) ~[idea_rt.jar:na]
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35) ~[junit-rt.jar:na]
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:231) ~[junit-rt.jar:na]
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55) ~[junit-rt.jar:na]
+Caused by: org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
+### The error may exist in file [/Users/lk_hhh/Documents/ss/SmartCampus/target/classes/mapper/KnowledgePointMapper.xml]
+### The error may involve com.aiproject.smartcampus.mapper.KnowledgePointMapper.getSimpleKnowledgeAnalysis
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
+	at org.apache.ibatis.exceptions.ExceptionFactory.wrapException(ExceptionFactory.java:30) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:156) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:147) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:142) ~[mybatis-3.5.16.jar:3.5.16]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:425) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	... 98 common frames omitted
+Caused by: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
+	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:84) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	at org.mybatis.spring.transaction.SpringManagedTransaction.openConnection(SpringManagedTransaction.java:80) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at org.mybatis.spring.transaction.SpringManagedTransaction.getConnection(SpringManagedTransaction.java:67) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at org.apache.ibatis.executor.BaseExecutor.getConnection(BaseExecutor.java:348) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.SimpleExecutor.prepareStatement(SimpleExecutor.java:89) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.SimpleExecutor.doQuery(SimpleExecutor.java:64) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.BaseExecutor.queryFromDatabase(BaseExecutor.java:336) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.BaseExecutor.query(BaseExecutor.java:158) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:110) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:90) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:154) ~[mybatis-3.5.16.jar:3.5.16]
+	... 103 common frames omitted
+Caused by: java.sql.SQLException: Access denied for user 'root'@'localhost' (using password: YES)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:130) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:825) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:446) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:239) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:188) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:137) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:360) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:202) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:461) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:550) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:98) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111) ~[HikariCP-5.1.0.jar:na]
+	at org.springframework.jdbc.datasource.DataSourceUtils.fetchConnection(DataSourceUtils.java:160) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	at org.springframework.jdbc.datasource.DataSourceUtils.doGetConnection(DataSourceUtils.java:118) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:81) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	... 113 common frames omitted
+
+13:40:31:053  WARN 56847 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 未能选择到任何知识点
+13:40:59:801 ERROR 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+13:40:59:803 ERROR 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+13:40:59:803 ERROR 56847 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+13:40:59:804  INFO 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+13:40:59:809  INFO 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+13:40:59:810  INFO 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+13:40:59:810  INFO 56847 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+13:41:01:357  INFO 57100 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Starting KnoledgeServiceImplTest using Java 23.0.2 with PID 57100 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+13:41:01:358  INFO 57100 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : No active profile set, falling back to 1 default profile: "default"
+13:41:01:778  INFO 57100 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+13:41:01:779  INFO 57100 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+13:41:01:796  INFO 57100 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+13:41:02:180  INFO 57100 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+13:41:02:182  INFO 57100 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+13:41:02:532  WARN 57100 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+13:41:05:025  INFO 57100 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+13:41:05:025  INFO 57100 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+13:41:05:026  INFO 57100 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+13:41:05:027  INFO 57100 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+13:41:05:027  INFO 57100 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+13:41:05:027  INFO 57100 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+13:41:05:029  INFO 57100 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+13:41:05:029  INFO 57100 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+13:41:05:137  INFO 57100 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+13:41:05:184  INFO 57100 --- [smartcampus] [redisson-netty-5-21] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+13:41:05:199  INFO 57100 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+13:41:05:275  WARN 57100 --- [smartcampus] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 9332e4ec-d954-4688-9156-7eed43639c0f
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+13:41:05:279  INFO 57100 --- [smartcampus] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+13:41:05:328  INFO 57100 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+13:41:06:192  INFO 57100 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Started KnoledgeServiceImplTest in 4.992 seconds (process running for 5.695)
+13:41:06:193  INFO 57100 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+13:41:06:441  INFO 57100 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 createListTestUsingTByAgent 参数校验通过
+13:41:06:441  INFO 57100 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 开始基于用户自定义权重为学生[1]生成测试题，原始权重数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+13:41:06:442  INFO 57100 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 权重处理后的数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+13:41:06:454  INFO 57100 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+13:41:07:537 ERROR 57100 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 查询知识点分析数据失败
+
+org.mybatis.spring.MyBatisSystemException: null
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:97) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:439) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at jdk.proxy2/jdk.proxy2.$Proxy110.selectList(Unknown Source) ~[na:na]
+	at org.mybatis.spring.SqlSessionTemplate.selectList(SqlSessionTemplate.java:224) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperMethod.executeForMany(MybatisMapperMethod.java:164) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperMethod.execute(MybatisMapperMethod.java:77) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperProxy$PlainMethodInvoker.invoke(MybatisMapperProxy.java:152) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at com.baomidou.mybatisplus.core.override.MybatisMapperProxy.invoke(MybatisMapperProxy.java:89) ~[mybatis-plus-core-3.5.8.jar:3.5.8]
+	at jdk.proxy2/jdk.proxy2.$Proxy148.getSimpleKnowledgeAnalysis(Unknown Source) ~[na:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138) ~[spring-tx-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223) ~[spring-aop-6.2.6.jar:6.2.6]
+	at jdk.proxy2/jdk.proxy2.$Proxy149.getSimpleKnowledgeAnalysis(Unknown Source) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl.randomPointByT(KnoledgeServiceImpl.java:398) ~[classes/:na]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl.createListTestUsingTByAgent(KnoledgeServiceImpl.java:185) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor.invoke(MethodBeforeAdviceInterceptor.java:58) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.6.jar:6.2.6]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728) ~[spring-aop-6.2.6.jar:6.2.6]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl$$SpringCGLIB$$0.createListTestUsingTByAgent(<generated>) ~[classes/:na]
+	at com.aiproject.smartcampus.service.impl.KnoledgeServiceImplTest.getKnoledgeInformationById3(KnoledgeServiceImplTest.java:76) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57) ~[junit5-rt.jar:na]
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38) ~[junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11) ~[idea_rt.jar:na]
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35) ~[junit-rt.jar:na]
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:231) ~[junit-rt.jar:na]
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55) ~[junit-rt.jar:na]
+Caused by: org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
+### The error may exist in file [/Users/lk_hhh/Documents/ss/SmartCampus/target/classes/mapper/KnowledgePointMapper.xml]
+### The error may involve com.aiproject.smartcampus.mapper.KnowledgePointMapper.getSimpleKnowledgeAnalysis
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
+	at org.apache.ibatis.exceptions.ExceptionFactory.wrapException(ExceptionFactory.java:30) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:156) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:147) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:142) ~[mybatis-3.5.16.jar:3.5.16]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:425) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	... 98 common frames omitted
+Caused by: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
+	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:84) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	at org.mybatis.spring.transaction.SpringManagedTransaction.openConnection(SpringManagedTransaction.java:80) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at org.mybatis.spring.transaction.SpringManagedTransaction.getConnection(SpringManagedTransaction.java:67) ~[mybatis-spring-3.0.3.jar:3.0.3]
+	at org.apache.ibatis.executor.BaseExecutor.getConnection(BaseExecutor.java:348) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.SimpleExecutor.prepareStatement(SimpleExecutor.java:89) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.SimpleExecutor.doQuery(SimpleExecutor.java:64) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.BaseExecutor.queryFromDatabase(BaseExecutor.java:336) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.BaseExecutor.query(BaseExecutor.java:158) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:110) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:90) ~[mybatis-3.5.16.jar:3.5.16]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:154) ~[mybatis-3.5.16.jar:3.5.16]
+	... 103 common frames omitted
+Caused by: java.sql.SQLException: Access denied for user 'root'@'localhost' (using password: YES)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:130) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:825) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:446) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:239) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:188) ~[mysql-connector-j-8.0.33.jar:8.0.33]
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:137) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:360) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:202) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:461) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:550) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:98) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111) ~[HikariCP-5.1.0.jar:na]
+	at org.springframework.jdbc.datasource.DataSourceUtils.fetchConnection(DataSourceUtils.java:160) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	at org.springframework.jdbc.datasource.DataSourceUtils.doGetConnection(DataSourceUtils.java:118) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:81) ~[spring-jdbc-6.2.6.jar:6.2.6]
+	... 113 common frames omitted
+
+13:41:07:542  WARN 57100 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 未能选择到任何知识点
+13:41:07:672  INFO 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+13:41:07:673  INFO 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+13:41:07:673  INFO 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+13:41:37:676 ERROR 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+13:41:41:838 ERROR 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+13:41:41:838 ERROR 57100 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+13:41:41:841  INFO 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+13:41:41:844  INFO 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+13:41:41:845  INFO 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+13:41:41:845  INFO 57100 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0
+13:49:43:938  INFO 57645 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Starting KnoledgeServiceImplTest using Java 23.0.2 with PID 57645 (started by lk_hhh in /Users/lk_hhh/Documents/ss/SmartCampus)
+13:49:43:939  INFO 57645 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : No active profile set, falling back to 1 default profile: "default"
+13:49:44:297  INFO 57645 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+13:49:44:298  INFO 57645 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+13:49:44:313  INFO 57645 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+13:49:44:644  INFO 57645 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+13:49:44:646  INFO 57645 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+13:49:44:970  WARN 57645 --- [smartcampus] [main] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+13:49:47:213  INFO 57645 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SeptIntentRagHandler
+13:49:47:214  INFO 57645 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+13:49:47:215  INFO 57645 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentFuncHanlder
+13:49:47:215  INFO 57645 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHanlder] 注册成功
+13:49:47:215  INFO 57645 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册StepIntentLLMChatResponseHandler
+13:49:47:215  INFO 57645 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+13:49:47:216  INFO 57645 --- [smartcampus] [main] c.a.s.m.i.h.EnhancedAutoRegisterHandler  : 处理器已注册SteptIntentMemoryChatHandler
+13:49:47:216  INFO 57645 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+13:49:47:307  INFO 57645 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+13:49:47:350  INFO 57645 --- [smartcampus] [redisson-netty-5-23] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+13:49:47:355  INFO 57645 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+13:49:47:368  INFO 57645 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+13:49:48:270  INFO 57645 --- [smartcampus] [main] c.a.s.s.impl.KnoledgeServiceImplTest     : Started KnoledgeServiceImplTest in 4.453 seconds (process running for 4.968)
+13:49:48:272  INFO 57645 --- [smartcampus] [scheduling-1] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+13:49:48:545  INFO 57645 --- [smartcampus] [main] c.a.smartcampus.aop.ParamCheckAspect     : 方法 createListTestUsingTByAgent 参数校验通过
+13:49:48:546  INFO 57645 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 开始基于用户自定义权重为学生[1]生成测试题，原始权重数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+13:49:48:546  INFO 57645 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 权重处理后的数据：[HavingTPointDTO(pointIds=1, T=5), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=8), HavingTPointDTO(pointIds=4, T=9), HavingTPointDTO(pointIds=5, T=9), HavingTPointDTO(pointIds=6, T=10), HavingTPointDTO(pointIds=7, T=1), HavingTPointDTO(pointIds=8, T=2), HavingTPointDTO(pointIds=9, T=1), HavingTPointDTO(pointIds=10, T=10), HavingTPointDTO(pointIds=11, T=5)]
+13:49:48:556  INFO 57645 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+13:49:48:609  INFO 57645 --- [smartcampus] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3ce17e4
+13:49:48:610  INFO 57645 --- [smartcampus] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+13:49:48:649  INFO 57645 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 构建用户自定义权重区间成功，总权重：57.15871577485515，区间表大小：11
+13:49:48:649  INFO 57645 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 完成用户自定义权重抽取，共抽取 10 个知识点，总尝试次数：57
+13:49:48:650  INFO 57645 --- [smartcampus] [main] c.a.s.service.impl.KnoledgeServiceImpl   : 基于用户权重选择的知识点：[力学基础, 极限的概念, 牛顿第一定律, 牛顿第二定律, 阅读理解, 基本导数公式, 函数的概念, 导数与微分, 段落大意, 函数与极限]
+13:49:48:650  INFO 57645 --- [smartcampus] [main] c.a.s.f.NotMasterTestCreateTool          : 正在为学生[1]创建测试题，基于10个知识点分析数据
+13:49:48:650  INFO 57645 --- [smartcampus] [main] c.a.s.f.t.NotMasterTestCreatetoolUtils   : 为学生[1]基于10个知识点分析数据生成测试题
+13:49:53:370  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.store.MemoryStoreScheduler         : Shutting down MemoryStore, flushing all data...
+13:49:53:371  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.store.LocalStore         : 数据已经写回到redis中
+13:49:53:372  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+13:50:23:376 ERROR 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+13:50:23:378 ERROR 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+13:50:23:378 ERROR 57645 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+13:50:23:381  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+13:50:23:385  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+13:50:23:390  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+13:50:23:391  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+13:50:23:392  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+13:50:23:392  INFO 57645 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0

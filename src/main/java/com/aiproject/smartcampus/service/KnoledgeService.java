@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.service;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
 
 import java.util.List;
 
@@ -20,4 +21,9 @@ public interface KnoledgeService {
      * agent多知识点生成错误练习
      * */
     Result createListTestByagent(List<String> pointIds);
+
+    /**
+     * 根据带权知识点进行自定义生成
+     * */
+    Result createListTestUsingTByAgent(List<HavingTPointDTO> pointIds);
 }

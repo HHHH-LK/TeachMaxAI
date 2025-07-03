@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiproject.smartcampus.mapper.ChapterQuestionMapper">
+
+    <!-- 批量插入章节题目关系 -->
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO chapter_questions
+        (chapter_id, question_id, question_type, created_at, updated_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.chapterId}, #{item.questionId}, #{item.questionType}, #{item.createdAt}, #{item.updatedAt})
+        </foreach>
+    </insert>
+
+    <!-- 根据章节ID删除所有题目关系 -->
+    <delete id="deleteByChapterId">
+        DELETE FROM chapter_questions WHERE chapter_id = #{chapterId}
+    </delete>
+
+</mapper>

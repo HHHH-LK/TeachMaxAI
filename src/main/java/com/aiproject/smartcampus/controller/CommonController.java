@@ -36,9 +36,6 @@ public class CommonController {
         return commonService.register(registerDTO);
     }
 
-
-
-
     @PostMapping("/password/verify")
     @Operation(summary = "密码找回验证", description = "验证手机/邮箱并发送验证码")
     public Result verifyResetPassword(@RequestBody PasswordResetVerificationDTO dto) {

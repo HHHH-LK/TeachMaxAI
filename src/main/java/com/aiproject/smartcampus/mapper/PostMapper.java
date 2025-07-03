@@ -8,9 +8,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * @author lk_hhh
+ */
 @Repository
 @Mapper
-public interface PostMapper extends BaseMapper<PostMapper> {
+public interface PostMapper extends BaseMapper<Post> {
     /**
      * 查询帖子列表（带用户信息）
      */

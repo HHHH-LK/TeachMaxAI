@@ -1,6 +1,8 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
+import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
 import com.aiproject.smartcampus.service.KnoledgeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +46,7 @@ public class KnowledgeController {
 
     }
 
+    //智能选取知识点进行生成
     @PostMapping("/ai/createTest")
     public Result createListTestByAgent(List<String> pointIds){
 
@@ -51,5 +54,11 @@ public class KnowledgeController {
 
     }
 
+    //根据所设定权重进行知识点题目的生成
+    @PostMapping("/ai/t/createTest")
+    public Result createListTestUsingTByAgent(List<HavingTPointDTO> pointIds){
+
+        return knoledgeService.createListTestUsingTByAgent(pointIds);
+    }
 
 }
