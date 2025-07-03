@@ -65,7 +65,9 @@ public class CommonServiceImpl implements CommonService {
                 loginAccount = loginDTO.getUsername();
             } else if ("phone".equals(loginDTO.getPrincipal())) {
                 loginAccount = loginDTO.getPhone();
-            } else {
+            } else if("email".equals(loginDTO.getPrincipal())) {
+                loginAccount = loginDTO.getEmail();
+            }else {
                 return Result.error("不支持的登录类型");
             }
 
