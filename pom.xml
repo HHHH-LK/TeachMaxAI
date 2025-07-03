@@ -102,6 +102,12 @@
             <version>3.0.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>alibabacloud-dysmsapi20170525</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+
         <!-- LangChain4j & RAG -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
@@ -165,14 +171,6 @@
         </dependency>
 
 
-        <!--mp4信息读取-->
-        <dependency>
-            <groupId>com.assemblyai</groupId>
-            <artifactId>assemblyai-java</artifactId>
-            <version>1.0.10</version>
-        </dependency>
-
-
         <!--爬取网页-->
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -222,6 +220,36 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- 邮件服务 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf-spring5</artifactId>
+            <version>3.1.2.RELEASE</version>
+
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
         </dependency>
     </dependencies>
 

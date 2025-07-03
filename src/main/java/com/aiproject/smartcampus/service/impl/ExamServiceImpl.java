@@ -15,26 +15,26 @@ public class ExamServiceImpl implements ExamService {
     public Result<ExamCreateResponseDTO> createExam(ExamDTO examDTO) {
         return null;
     }
-
-    @Override
-    public Result<ExamCreateResponseDTO> publishExam(Long examId, ExamPublishDTO publishDTO) {
-        return null;
-    }
-
-    @Override
-    public Result updateExam(Long examId, ExamDTO examDTO) {
-        return null;
-    }
-
-    @Override
-    public Result<List<ExamDTO>> getExamsByQuery(ExamQueryDTO queryDTO) {
-        return null;
-    }
-
-    @Override
-    public Result<ExamDTO> getExamDetail(Long examId) {
-        return null;
-    }
+//
+//    @Override
+//    public Result<ExamCreateResponseDTO> publishExam(Long examId, ExamPublishDTO publishDTO) {
+//        return null;
+//    }
+//
+//    @Override
+//    public Result updateExam(Long examId, ExamDTO examDTO) {
+//        return null;
+//    }
+//
+//    @Override
+//    public Result<List<ExamDTO>> getExamsByQuery(ExamQueryDTO queryDTO) {
+//        return null;
+//    }
+//
+//    @Override
+//    public Result<ExamDTO> getExamDetail(Long examId) {
+//        return null;
+//    }
 
     @Override
     public Result deleteExam(Long examId) {

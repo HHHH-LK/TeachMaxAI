@@ -1,8 +1,5 @@
 package com.aiproject.smartcampus.mapper;
 
-import com.aiproject.smartcampus.pojo.bo.classprase.Course;
-import com.aiproject.smartcampus.pojo.po.Exam;
-import com.aiproject.smartcampus.pojo.po.ExamScore;
 import com.aiproject.smartcampus.pojo.po.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -10,9 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -33,7 +28,15 @@ public interface UserMapper extends BaseMapper<User> {
      */
     @Select("SELECT * FROM users WHERE user_type = #{userType} AND status = 'active'")
     List<User> findByUserType(@Param("userType") String userType);
-    
+
+
+    @Select("SELECT * FROM users WHERE phone = #{phone} AND status = 'active'")
+    User findByUserPhone(@Param("phone") String phone);
+
+
+
+    @Select("SELECT * FROM users WHERE email = #{email} AND status = 'active'")
+    User findByUserEmail(@Param("email") String email);
     /**
      * 模糊查询用户
      */

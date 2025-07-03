@@ -1,16 +1,11 @@
 package com.aiproject.smartcampus.mapper;
 
-import com.aiproject.smartcampus.pojo.bo.classprase.Course;
-import com.aiproject.smartcampus.pojo.po.Exam;
-import com.aiproject.smartcampus.pojo.po.ExamScore;
 import com.aiproject.smartcampus.pojo.po.Teacher;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -42,4 +37,10 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
      */
     @Select("SELECT t.*, u.real_name FROM teachers t LEFT JOIN users u ON t.user_id = u.user_id WHERE t.department = #{department}")
     List<Teacher> findByDepartment(@Param("department") String department);
+
+    @Select("SELECT t.*, u.real_name FROM teachers t LEFT JOIN users u ON t.user_id = u.user_id WHERE t.teacher_id = #{teacher_id}")
+    Teacher findByTeacherID(@Param("teacher_id") Integer teacherId);
+
+    @Select("SELECT t.*, u.real_name FROM teachers t LEFT JOIN users u ON t.user_id = u.user_id WHERE t.user_id = #{user_id}")
+    Teacher findByUserID(@Param("user_id") Long userId);
 }

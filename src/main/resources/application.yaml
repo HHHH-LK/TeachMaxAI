@@ -9,7 +9,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: 10280017
+    password: root
   data:
     redis:
       host: localhost
@@ -23,6 +23,46 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+mail:
+  host: smtp.qq.com    # SMTP服务器地址
+  port: 587                 # 端口
+  username: 3963077470@qq.com  # 邮箱用户名
+  password: xbtalymioxrzcgfg   # 邮箱密码或授权码
+  display-name: 教学实训
+  protocol: smtp
+  properties:
+    mail:
+      smtp:
+        socketFactoryClass: javax.net.ssl.SSLSocketFactory
+        #表示开启 DEBUG 模式，这样，邮件发送过程的日志会在控制台打印出来，方便排查错误
+        debug: true
+        ssl:
+          enable: true
+          trust: smtp.qq.com
+
+  # 短信服务配置（根据服务商不同调整）
+sms:
+  ali:
+    access-key-id: your-access-key-id
+    access-key-secret: your-access-key-secret
+    sign-name: smart_campus
+    template-code: SMS_10001  # 验证码模板ID
+  tencent:
+    secret-id: your-secret-id  #企业资质
+    secret-key: your-secret-key
+    app-id: 1400000000
+    sign-name: 智慧校园
+    template-id: 123456
+
+
+    templates:
+      reset-password:
+        subject: 密码重置验证码
+        text: |-
+          您的验证码是：{code}
+          此验证码5分钟内有效，请勿告知他人
+
+
 langchain4j:
   community:
     dashscope:
@@ -32,6 +72,7 @@ langchain4j:
       embedding-model:
         api-key: ${OTHER_DASHSCOPE_API_KEY}
         model-name: text-embedding-v3
+
 
 logging:
   level:
