@@ -13,7 +13,7 @@ public interface CommonService {
 
     Result register(RegisterDTO registerDTO);
 
-    Result sendPasswordResetCode(PasswordResetVerificationDTO dto);
+//    Result sendPasswordResetCode(PasswordResetVerificationDTO dto);
 
     Result resetPassword(PasswordResetDTO dto);
 }

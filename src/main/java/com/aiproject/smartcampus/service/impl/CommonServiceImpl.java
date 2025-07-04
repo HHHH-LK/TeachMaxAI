@@ -56,6 +56,7 @@ public class CommonServiceImpl implements CommonService {
 //    private final EmailService emailService;
 
     @Override
+    @Transactional
     public Result login(LoginDTO loginDTO) {
 
             String loginAccount = null;
@@ -86,29 +87,26 @@ public class CommonServiceImpl implements CommonService {
                 return Result.error("用户不存在");
             }
             if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
+                System.out.println(passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash()));
                 return Result.error("密码错误");
             }
 
             // 3. 检查角色是否符合
-            if (!loginDTO.getUserType().equals(user.getUserType())) {
+            if (!loginDTO.getUserType().equals(user.getUserType().name())) {
+                System.out.println(loginDTO.getUserType()+":"+user.getUserType());
                 return Result.error("该账号不是" + loginDTO.getUserType() + "身份");
             }
 
             // 4. 生成令牌
             String token = JwtUtils.generateToken(user.getUserId(), user.getUserType());
+            System.out.println(token);
 
-            // 5. 根据角色补充信息
-            Result result = Result.success("登录成功").put("token", token);
-            if ("teacher".equals(user.getUserType())) {
-                User teacher = userMapper.findByUsername(user.getUsername());
-                result.put("teacher_info", teacher);
-            } else if ("student".equals(user.getUserType())) {
-                User student = userMapper.findByUsername(user.getUsername());
-                result.put("student_info", student);
-            }
+            // 5. 返回 token 和用户身份信息
+//            return Result.success("登录成功")
+//                    .put("token", token);
+//                    .put("userType", user.getUserType().name());
 
-            return result;
-
+            return Result.success(user.getUserType().name() + ":" + token);
 
 
     }
@@ -119,7 +117,7 @@ public class CommonServiceImpl implements CommonService {
             if (userMapper.findByUsername(registerDTO.getUsername()) != null) {
                 return Result.error("用户名已被注册");
             }
-            if (registerDTO.getPassword() != registerDTO.getRepassword()){
+            if (!registerDTO.getPassword().equals(registerDTO.getRepassword())){
                 return Result.error("两次输入的密码不一致");
             }
 
@@ -128,6 +126,7 @@ public class CommonServiceImpl implements CommonService {
             User user = new User();
             user.setUsername(registerDTO.getUsername());
             user.setPasswordHash(passwordEncoder.encode(registerDTO.getPassword()));
+            user.setRealName("张三");
             user.setUserType(User.UserType.valueOf(registerDTO.getUserType()));
             userMapper.insert(user);
 
@@ -147,79 +146,96 @@ public class CommonServiceImpl implements CommonService {
     }
 
     @Override
-    public Result sendPasswordResetCode(PasswordResetVerificationDTO dto) {
-
-            User user = null;
-            String identifier = null;
-
-            // 根据类型确定查询方式
-            if ("phone".equals(dto.getCredential())) {
-                user = userMapper.findByUserPhone(dto.getValue());
-                identifier = dto.getValue();
-            } else if ("email".equals(dto.getCredential())) {
-                user = userMapper.findByUserEmail((dto.getValue()));
-                identifier = dto.getValue();
-            }
-
-            if (user == null) {
-                return Result.error("未找到关联账户");
-            }
-
-            // 生成6位验证码
-            String verificationCode = String.valueOf((int) (Math.random() * 900000 + 100000));
-
-            // 存储验证码到Redis（5分钟有效）
-            String redisKey = "pwd_reset:" + identifier;
-            redisTemplate.opsForValue().set(redisKey, verificationCode, 5, TimeUnit.MINUTES);
-
-            // 发送验证码
-            if ("phone".equals(dto.getCredential())) {
-                // smsService.sendVerificationCode(dto.getValue(), verificationCode);
-                System.out.println("发送短信验证码到: " + dto.getValue() + ", 验证码: " + verificationCode);
-            } else if ("email".equals(dto.getCredential())) {
-
-//            emailService.sendPasswordResetEmail(dto.getValue(), verificationCode);
-                System.out.println("发送邮件验证码到: " + dto.getValue() + ", 验证码: " + verificationCode);
-            }
-
-            return Result.success("验证码已发送");
-
-
-    }
-
-    @Override
     public Result resetPassword(PasswordResetDTO dto) {
+        if (userMapper.findByUsername(dto.getUsername()) == null ){
+            return Result.error("用户未注册");
+        }
 
-            String redisKey = "pwd_reset:" + dto.getValue();
-            String storedCode = redisTemplate.opsForValue().get(redisKey);
+        if (!dto.getNewPassword().equals(dto.getReNewPassword())){
+            return Result.error("两次密码输入不一致");
+        }
 
-            // 验证码校验
-            if (storedCode == null || !storedCode.equals(dto.getVerifyCode())) {
-                return Result.error("验证码错误或已过期");
-            }
+        User user = userMapper.findByUsername(dto.getUsername());
+        user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        userMapper.updateById(user);
 
-            // 查询用户
-            User user = null;
-            if ("phone".equals(dto.getCredential())) {
-                user = userMapper.findByUserPhone(dto.getValue());
-            } else if ("email".equals(dto.getCredential())) {
-                user = userMapper.findByUserEmail(dto.getValue());
-            }
-
-            if (user == null) {
-                return Result.error("用户不存在");
-            }
-
-            // 更新密码
-            user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
-            userMapper.updateById(user);
-
-            // 清除验证码
-            redisTemplate.delete(redisKey);
-
-            return Result.success("密码重置成功");
-
-
+        return Result.success("密码重置成功");
     }
+//
+//    @Override
+//    public Result sendPasswordResetCode(PasswordResetVerificationDTO dto) {
+//
+//            User user = null;
+//            String identifier = null;
+//
+//            // 根据类型确定查询方式
+//            if ("phone".equals(dto.getCredential())) {
+//                user = userMapper.findByUserPhone(dto.getValue());
+//                identifier = dto.getValue();
+//            } else if ("email".equals(dto.getCredential())) {
+//                user = userMapper.findByUserEmail((dto.getValue()));
+//                identifier = dto.getValue();
+//            }
+//
+//            if (user == null) {
+//                return Result.error("未找到关联账户");
+//            }
+//
+//            // 生成6位验证码
+//            String verificationCode = String.valueOf((int) (Math.random() * 900000 + 100000));
+//
+//            // 存储验证码到Redis（5分钟有效）
+//            String redisKey = "pwd_reset:" + identifier;
+//            redisTemplate.opsForValue().set(redisKey, verificationCode, 5, TimeUnit.MINUTES);
+//
+//            // 发送验证码
+//            if ("phone".equals(dto.getCredential())) {
+//                // smsService.sendVerificationCode(dto.getValue(), verificationCode);
+//                System.out.println("发送短信验证码到: " + dto.getValue() + ", 验证码: " + verificationCode);
+//            } else if ("email".equals(dto.getCredential())) {
+//
+////            emailService.sendPasswordResetEmail(dto.getValue(), verificationCode);
+//                System.out.println("发送邮件验证码到: " + dto.getValue() + ", 验证码: " + verificationCode);
+//            }
+//
+//            return Result.success("验证码已发送");
+//
+//
+//    }
+//`1s
+//    @Override
+//    public Result resetPassword(PasswordResetDTO dto) {
+//
+//            String redisKey = "pwd_reset:" + dto.getValue();
+//            String storedCode = redisTemplate.opsForValue().get(redisKey);
+//
+//            // 验证码校验
+//            if (storedCode == null || !storedCode.equals(dto.getVerifyCode())) {
+//                return Result.error("验证码错误或已过期");
+//            }
+//
+//            // 查询用户
+//            User user = null;
+//            if ("phone".equals(dto.getCredential())) {
+//                user = userMapper.findByUserPhone(dto.getValue());
+//            } else if ("email".equals(dto.getCredential())) {
+//                user = userMapper.findByUserEmail(dto.getValue());
+//            }
+//
+//            if (user == null) {
+//                return Result.error("用户不存在");
+//            }
+//
+//            // 更新密码
+//            user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+//            userMapper.updateById(user);
+//
+//            // 清除验证码
+//            redisTemplate.delete(redisKey);
+//
+//            return Result.success("密码重置成功");
+//
+//
+//    }
 
 }
