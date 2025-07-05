@@ -39,7 +39,7 @@ public class StepIntentRouter implements StepRouter {
     // 🔧 优化后的配置常量
     private static final int MAX_EXECUTION_TIME_MINUTES = 10;           // 总超时时间：10分钟
     private static final int MAX_LAYERS = 50;                           // 最大层数：50层
-    private static final int MAX_EMPTY_RETRIES = 15;                   // 空层最大重试次数：5 -> 15
+    private static final int MAX_EMPTY_RETRIES = 100;                   // 空层最大重试次数：5 -> 15
     private static final long EMPTY_LAYER_WAIT_MS = 10_000;           // 空层等待时间：5s -> 10s
     private static final long STATE_UPDATE_WAIT_MS = 2_000;           // 状态更新等待：500ms -> 2s
     private static final long LAYER_COMPLETION_WAIT_MS = 3_000;       // 层完成等待：5s -> 3s

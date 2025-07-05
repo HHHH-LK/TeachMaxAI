@@ -53,6 +53,7 @@
             STUDENT("student"),
             TEACHER("teacher"),
             ADMIN("admin");
+
             @EnumValue  // 告诉MyBatis-Plus使用这个字段的值与数据库交互
             @JsonValue  // JSON序列化时返回这个值
             private final String value;

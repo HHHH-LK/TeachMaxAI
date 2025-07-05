@@ -9,7 +9,7 @@
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       username: root
-      password: 10280017
+      password: root
     data:
       redis:
         host: localhost
@@ -67,10 +67,10 @@
     community:
       dashscope:
         chat-model:
-          api-key: ${OTHER_DASHSCOPE_API_KEY}
+          api-key: sk-555410695a424051bcab7b09354790a9
           model-name: qwen-max-latest
         embedding-model:
-          api-key: ${OTHER_DASHSCOPE_API_KEY}
+          api-key: sk-555410695a424051bcab7b09354790a9
           model-name: text-embedding-v3
 
 

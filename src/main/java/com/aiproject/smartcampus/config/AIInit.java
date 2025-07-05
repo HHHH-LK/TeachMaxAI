@@ -33,7 +33,7 @@ public class AIInit {
 
         EmbeddingStore<TextSegment> embeddingStore = PineconeEmbeddingStore.builder()
                 //读取系统变量中的数据
-                .apiKey(System.getenv("PINECONE_API_KEY"))
+                .apiKey("pcsk_5Vn5ac_NbW7FED2eAdNwiNfLpaqo7EfdPva2VawJgnsYVwWNj9AQ8CWzsi8jiQLRtLBrTy")
                 .index("index-v3")
                 .nameSpace("SmartCampus-namespace")
                 .createIndex(PineconeServerlessIndexConfig.builder()

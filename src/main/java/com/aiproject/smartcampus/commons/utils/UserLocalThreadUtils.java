@@ -15,12 +15,25 @@ import lombok.Data;
 public class   UserLocalThreadUtils {
 
     private static ThreadLocal<User> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<String> userMemoryLocal = new ThreadLocal<>();
 
     public static User getUserInfo(){
         return threadLocal.get();
     }
     public static void setUserInfo(User user){threadLocal.set(user);}
     public static void removeUserInfo(){threadLocal.remove();}
+
+    public static String getUserMemory(){
+        return userMemoryLocal.get();
+    }
+
+    public static void setUserMemory(String userMemory){
+        userMemoryLocal.set(userMemory);
+    }
+
+    public static void removeUserMemory(){
+        userMemoryLocal.remove();
+    }
 
     public static String test(){
         return "1";

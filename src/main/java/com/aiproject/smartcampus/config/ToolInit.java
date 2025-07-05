@@ -53,7 +53,7 @@ public class ToolInit {
     //联网能力初始化
     @Bean
     public SearchApiWebSearchEngine SearchEngine() {
-        String apiKey = System.getenv("SEARCH_API_KEY");
+        String apiKey = "4RuC6H6JSBLMYaS9ReRzdBwd";
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException("联网搜索apikey不能为空");
         }

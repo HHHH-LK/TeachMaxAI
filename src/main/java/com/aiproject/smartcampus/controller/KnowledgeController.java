@@ -51,16 +51,18 @@ public class KnowledgeController {
 
     //智能选取知识点进行生成
     @PostMapping("/ai/createTest")
-    public Result createListTestByAgent(List<String> pointIds){
+    public Result createListTestByAgent(@RequestBody List<String> pointIds){
 
+        log.info("pointIds:{}",pointIds);
         return knoledgeService.createListTestByagent(pointIds);
 
     }
 
     //根据所设定权重进行知识点题目的生成
     @PostMapping("/ai/t/createTest")
-    public Result createListTestUsingTByAgent(List<HavingTPointDTO> pointIds){
+    public Result createListTestUsingTByAgent(@RequestBody List<HavingTPointDTO> pointIds){
 
+        log.info("pointIds:{}",pointIds);
         return knoledgeService.createListTestUsingTByAgent(pointIds);
     }
 

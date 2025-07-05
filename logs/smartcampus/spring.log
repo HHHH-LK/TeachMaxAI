@@ -9668,3 +9668,2176 @@ java.lang.InterruptedException: null
 19:02:46:268  INFO 94465 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
 19:02:46:268  INFO 94465 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 线程池正常关闭
 19:02:46:268  INFO 94465 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0，清理处理中任务：0
+19:16:28:272  INFO 88272 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 88272 (D:\Users\SmartCampus-front (2)\SmartCampus\target\classes started by 欧阳 in D:\Users\SmartCampus-front (2)\SmartCampus)
+19:16:28:275  INFO 88272 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+19:16:29:499  INFO 88272 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:16:29:503  INFO 88272 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:16:29:583  INFO 88272 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 57 ms. Found 0 Redis repository interfaces.
+19:16:30:348 ERROR 88272 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : An incompatible version [1.2.16] of the Apache Tomcat Native library is installed, while Tomcat requires version [1.2.34]
+19:16:30:590  INFO 88272 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8104 (http)
+19:16:30:609  INFO 88272 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+19:16:30:609  INFO 88272 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+19:16:30:683  INFO 88272 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+19:16:30:684  INFO 88272 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2359 ms
+19:16:31:021  INFO 88272 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:16:31:027  INFO 88272 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:16:37:016  INFO 88272 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SeptIntentRagHandler
+19:16:37:018  INFO 88272 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:16:37:021  INFO 88272 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentFuncHandler
+19:16:37:021  INFO 88272 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHandler] 注册成功
+19:16:37:022  INFO 88272 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentLLMChatResponseHandler
+19:16:37:022  INFO 88272 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:16:37:023  INFO 88272 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SteptIntentMemoryChatHandler
+19:16:37:024  INFO 88272 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:16:37:255  INFO 88272 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:16:37:448  WARN 88272 --- [smartcampus] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'redissionClient' defined in class path resource [com/aiproject/smartcampus/config/Lockinit.class]: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+19:16:37:448  INFO 88272 --- [smartcampus] [main] c.a.s.model.store.MemoryStoreScheduler   : 关闭MemoryStore，正在写回所有数据...
+19:16:37:448  INFO 88272 --- [smartcampus] [main] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:16:38:449  INFO 88272 --- [smartcampus] [main] c.a.s.model.store.MemoryStoreScheduler   : MemoryStore关闭完成
+19:16:38:450  INFO 88272 --- [smartcampus] [main] c.a.s.s.i.CourseEnrollmentServiceImpl    : 开始关闭添加选课信息线程池
+19:17:08:451 ERROR 88272 --- [smartcampus] [main] c.a.s.s.i.CourseEnrollmentServiceImpl    : 关闭添加选课信息线程失败，尝试强制关闭
+19:17:08:451 ERROR 88272 --- [smartcampus] [main] c.a.s.s.i.CourseEnrollmentServiceImpl    : 强制关闭线程数量：0
+19:17:08:451 ERROR 88272 --- [smartcampus] [pool-5-thread-1] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程被中断
+
+java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727) ~[na:na]
+	at java.base/java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435) ~[na:na]
+	at com.aiproject.smartcampus.service.impl.CourseEnrollmentServiceImpl.lambda$init$0(CourseEnrollmentServiceImpl.java:44) ~[classes/:na]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+
+19:17:08:459  INFO 88272 --- [smartcampus] [main] c.a.s.s.i.CourseEnrollmentServiceImpl    : 添加选课信息线程关闭成功
+19:17:08:571  INFO 88272 --- [smartcampus] [main] c.a.s.commons.easyuse.TaskExecutor       : 关闭TaskExecutor线程池
+19:17:08:571  INFO 88272 --- [smartcampus] [main] c.a.s.c.d.IntentDelayedQueueClien        : 开始关闭延时队列客户端
+19:17:08:571  INFO 88272 --- [smartcampus] [main] c.a.s.c.d.IntentDelayedQueueClien        : 线程池正常关闭
+19:17:08:571  INFO 88272 --- [smartcampus] [main] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列客户端已关闭，剩余队列任务：0，清理处理中任务：0
+19:17:08:574  INFO 88272 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+19:17:08:588  INFO 88272 --- [smartcampus] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+19:17:08:605 ERROR 88272 --- [smartcampus] [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'redissionClient' defined in class path resource [com/aiproject/smartcampus/config/Lockinit.class]: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:489) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1367) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1197) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1221) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1122) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1362) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1351) ~[spring-boot-3.4.5.jar:3.4.5]
+	at com.aiproject.smartcampus.SmartCampusApplication.main(SmartCampusApplication.java:22) ~[classes/:na]
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redissionClient' threw exception with message: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:199) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:88) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:168) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653) ~[spring-beans-6.2.6.jar:6.2.6]
+	... 21 common frames omitted
+Caused by: org.redisson.client.RedisConnectionException: Unable to connect to Redis server: /127.0.0.1:6379
+	at org.redisson.connection.pool.ConnectionPool$1.lambda$run$0(ConnectionPool.java:159) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.misc.RedissonPromise.lambda$onComplete$0(RedissonPromise.java:183) ~[redisson-3.13.6.jar:3.13.6]
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:557) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at org.redisson.misc.RedissonPromise.tryFailure(RedissonPromise.java:96) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.connection.pool.ConnectionPool.promiseFailure(ConnectionPool.java:329) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.connection.pool.ConnectionPool.lambda$createConnection$1(ConnectionPool.java:295) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.misc.RedissonPromise.lambda$onComplete$0(RedissonPromise.java:183) ~[redisson-3.13.6.jar:3.13.6]
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at org.redisson.misc.RedissonPromise.tryFailure(RedissonPromise.java:96) ~[redisson-3.13.6.jar:3.13.6]
+	at org.redisson.client.RedisClient$3$2.run(RedisClient.java:307) ~[redisson-3.13.6.jar:3.13.6]
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:472) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: getsockopt: /127.0.0.1:6379
+Caused by: java.net.ConnectException: Connection refused: getsockopt
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682) ~[na:na]
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:973) ~[na:na]
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:336) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:339) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:784) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562) ~[netty-transport-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.119.Final.jar:4.1.119.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+
+19:17:53:285  INFO 95532 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 95532 (D:\Users\SmartCampus-front (2)\SmartCampus\target\classes started by 欧阳 in D:\Users\SmartCampus-front (2)\SmartCampus)
+19:17:53:287  INFO 95532 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+19:17:54:349  INFO 95532 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:17:54:352  INFO 95532 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:17:54:425  INFO 95532 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 49 ms. Found 0 Redis repository interfaces.
+19:17:55:131 ERROR 95532 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : An incompatible version [1.2.16] of the Apache Tomcat Native library is installed, while Tomcat requires version [1.2.34]
+19:17:55:341  INFO 95532 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8104 (http)
+19:17:55:356  INFO 95532 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+19:17:55:356  INFO 95532 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+19:17:55:423  INFO 95532 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+19:17:55:424  INFO 95532 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2086 ms
+19:17:55:692  INFO 95532 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:17:55:696  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:17:59:642  INFO 95532 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SeptIntentRagHandler
+19:17:59:642  INFO 95532 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:17:59:645  INFO 95532 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentFuncHandler
+19:17:59:646  INFO 95532 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHandler] 注册成功
+19:17:59:648  INFO 95532 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentLLMChatResponseHandler
+19:17:59:648  INFO 95532 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:17:59:649  INFO 95532 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SteptIntentMemoryChatHandler
+19:17:59:650  INFO 95532 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:17:59:839  INFO 95532 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:18:00:050  INFO 95532 --- [smartcampus] [redisson-netty-5-13] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:18:00:072  INFO 95532 --- [smartcampus] [redisson-netty-5-18] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:18:00:116  INFO 95532 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:18:01:918  INFO 95532 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8104 (http) with context path '/'
+19:18:01:929  INFO 95532 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 9.102 seconds (process running for 10.016)
+19:18:01:934  INFO 95532 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 0/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:18:01:935  INFO 95532 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:20:01:938  INFO 95532 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:20:04:270  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+19:20:04:270  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+19:20:04:292  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 22 ms
+19:20:04:396  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getALlOKKnowlegePoint 参数校验通过
+19:20:04:438  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+19:20:04:743  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2e0e5fad
+19:20:04:746  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+19:20:05:032  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-8] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:20:05:561  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-4] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:20:05:574  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:20:05:590  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-5] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:20:05:604  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-6] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:20:16:379  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.controller.KnowledgeController     : pointIds:[HavingTPointDTO(pointIds=1, T=null), HavingTPointDTO(pointIds=2, T=null), HavingTPointDTO(pointIds=3, T=null), HavingTPointDTO(pointIds=4, T=null), HavingTPointDTO(pointIds=5, T=null)]
+19:20:16:379  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.smartcampus.aop.ParamCheckAspect     : 方法 createListTestUsingTByAgent 参数校验通过
+19:20:16:379  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.service.impl.KnoledgeServiceImpl   : 开始基于用户自定义权重为学生[1]生成测试题，原始权重数据：[HavingTPointDTO(pointIds=1, T=null), HavingTPointDTO(pointIds=2, T=null), HavingTPointDTO(pointIds=3, T=null), HavingTPointDTO(pointIds=4, T=null), HavingTPointDTO(pointIds=5, T=null)]
+19:20:16:379  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.service.impl.KnoledgeServiceImpl   : 权重处理后的数据：[HavingTPointDTO(pointIds=1, T=3), HavingTPointDTO(pointIds=2, T=3), HavingTPointDTO(pointIds=3, T=3), HavingTPointDTO(pointIds=4, T=3), HavingTPointDTO(pointIds=5, T=3)]
+19:20:16:413  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.service.impl.KnoledgeServiceImpl   : 用户自定义权重数量[5]不超过目标数量[10]，返回全部
+19:20:16:413  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.service.impl.KnoledgeServiceImpl   : 基于用户权重选择的知识点：[变量和数据类型, 运算符, 控制结构, 类和对象, 继承]
+19:20:16:413  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.m.f.NotMasterTestCreateTool        : 正在为学生[1]创建测试题，基于5个知识点分析数据
+19:20:16:416  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.m.f.t.NotMasterTestCreatetoolUtils : 为学生[1]基于5个知识点分析数据生成测试题
+19:20:53:388  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.m.f.t.NotMasterTestCreatetoolUtils : AI返回内容验证通过，包含6道题目
+19:20:53:388  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.m.f.t.NotMasterTestCreatetoolUtils : AI题目生成成功，清理后内容长度: 2895
+19:20:53:394  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.m.f.NotMasterTestCreateTool        : 测试题生成成功，内容长度: 2895
+19:20:53:394  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.service.impl.KnoledgeServiceImpl   : 基于用户自定义权重的测试题生成成功
+19:20:53:497  INFO 95532 --- [smartcampus] [pool-6-thread-1] c.a.s.m.f.t.NotMasterTestCreatetoolUtils : 题目保存完成 - 成功: 6, 失败: 0
+19:21:05:405  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-10] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getALlOKKnowlegePoint 参数校验通过
+19:21:05:420  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:21:05:435  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-8] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:21:05:445  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-4] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:21:05:451  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:21:05:458  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-5] c.a.smartcampus.aop.ParamCheckAspect     : 方法 getgetKnowlegeInformationBypointId 参数校验通过
+19:21:32:768  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.controller.ChatController          : 用户问题：我高等数学要挂科了，给我复习建议
+19:21:32:768  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析用户意图: 我高等数学要挂科了，给我复习建议
+19:21:35:065  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图分析结果: ```json
+{
+  "intent": "用户需要高等数学的复习建议以避免挂科",
+  "intent_type": "信息查询",
+  "complexity": "中等",
+  "capabilities": ["逻辑推理", "知识检索"]
+}
+```
+19:21:35:065  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 开始拆分用户意图: ```json
+{
+  "intent": "用户需要高等数学的复习建议以避免挂科",
+  "intent_type": "信息查询",
+  "complexity": "中等",
+  "capabilities": ["逻辑推理", "知识检索"]
+}
+```
+19:21:39:725  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分结果: ```json
+{
+    "intent_analysis": {
+        "intent": "用户需要高等数学的复习建议以避免挂科",
+        "intent_type": "信息查询",
+        "complexity": "中等",
+        "required_capabilities": ["基础大语言模型对话处理器"]
+    },
+    "tasks": [
+        "分析并解释高等数学的核心知识点和常见难点",
+        "生成关于如何有效复习高等数学的具体建议"
+    ]
+}
+```
+19:21:39:730  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分完成，共生成 2 个子任务
+19:21:39:730  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析任务依赖关系
+19:21:41:230  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 任务关系分析结果: ```json
+{
+    "relations": [
+        "分析并解释高等数学的核心知识点和常见难点:生成关于如何有效复习高等数学的具体建议"
+    ]
+}
+```
+19:21:41:238  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 成功解析 1 个任务依赖关系
+19:21:41:238  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.utils.TaskInitUtils        : 开始初始化任务节点，任务数量: 2
+19:21:41:241  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.utils.TaskInitUtils        : 成功添加 2 个任务节点
+19:21:41:241  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.utils.TaskInitUtils        : 成功添加 1 个任务依赖关系
+19:21:41:241  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.utils.CreateDiagram        : 开始初始化任务图
+19:21:41:241  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.utils.CreateDiagram        : 任务图初始化完成，节点数: 2, 边数: 1
+19:21:41:241  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.utils.TaskInitUtils        : 任务节点初始化完成
+19:21:41:242  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 开始进行意图路由,意图为：[分析并解释高等数学的核心知识点和常见难点, 生成关于如何有效复习高等数学的具体建议]
+19:21:41:244  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 开始执行任务，最大执行时间: 10分钟，最大重试次数: 15
+19:21:41:244  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 开始执行第0层任务，共1个任务: [分析并解释高等数学的核心知识点和常见难点]
+19:21:41:245  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 第0层 - 开始执行任务: 分析并解释高等数学的核心知识点和常见难点
+19:21:41:245  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.client.ResultCilent        : 任务分析并解释高等数学的核心知识点和常见难点不需要依赖其他任务
+19:21:41:249  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.c.r.SlidingWindowRateLimiter       : 当前时间：1751714501245，当前请求数：1
+19:21:41:249  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 任务分析并解释高等数学的核心知识点和常见难点开始正常执行
+19:21:41:249  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.easyuse.TaskExecutor       : 开始异步执行任务: 分析并解释高等数学的核心知识点和常见难点
+19:21:41:250  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 开始执行Handler
+19:21:42:682  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:21:42:682  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]开始执行，类型: SteptIntentMemoryChatHandler
+19:21:42:682  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[分析并解释高等数学的核心知识点和常见难点]中
+19:21:42:689  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行直接记忆任务: 分析并解释高等数学的核心知识点和常见难点
+19:21:42:689  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:1
+19:21:42:689  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，降级使用基础LLM处理任务: 分析并解释高等数学的核心知识点和常见难点
+19:22:01:939  INFO 95532 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:22:34:787  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理完成，结果长度: 2280
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆对话执行[分析并解释高等数学的核心知识点和常见难点]成功,结果长度: 2280
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]执行成功，开始更新状态，结果长度: 2280
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]状态更新完成
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]执行成功，耗时: 52107ms
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 执行完成，结果长度: 2280
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 成功完成，开始保存结果
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.client.ResultCilent        : 为任务分析并解释高等数学的核心知识点和常见难点添加结果到resultMap中
+19:22:34:789  INFO 95532 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 的所有后续处理已完成
+19:22:34:792  WARN 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在生成关于如何有效复习高等数学的具体建议的依赖结果
+19:22:34:792  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 任务[分析并解释高等数学的核心知识点和常见难点]执行完成,结果长度: 2280
+19:22:34:792  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 第0层 - 任务分析并解释高等数学的核心知识点和常见难点处理完成
+19:22:34:792  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第0层的1个任务全部并行完成
+19:22:34:793  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：生成关于如何有效复习高等数学的具体建议，当前队列大小: 1
+19:22:34:793  WARN 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在生成关于如何有效复习高等数学的具体建议的依赖结果
+19:22:34:793  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：生成关于如何有效复习高等数学的具体建议，依赖数量: 0
+19:22:34:793  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]已在延时队列中，跳过重复添加
+19:22:35:545  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:22:35:545  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:22:35:546  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：生成关于如何有效复习高等数学的具体建议
+19:22:35:546  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]开始执行，类型: SteptIntentMemoryChatHandler
+19:22:35:546  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[生成关于如何有效复习高等数学的具体建议]中
+19:22:35:546  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[生成关于如何有效复习高等数学的具体建议]依赖未就绪，尝试等待依赖完成
+19:22:35:546  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务分析并解释高等数学的核心知识点和常见难点的结果
+19:22:35:546  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[生成关于如何有效复习高等数学的具体建议]的依赖结果已准备完成
+19:22:35:546  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 等待后依赖已完成，直接执行任务: 生成关于如何有效复习高等数学的具体建议
+19:22:35:547  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行带依赖的记忆任务: 生成关于如何有效复习高等数学的具体建议
+19:22:35:547  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:11
+19:22:35:548  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，使用基础LLM处理带依赖的任务: 生成关于如何有效复习高等数学的具体建议
+19:22:36:793  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第0层任务全部完成
+19:22:39:793  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (1/15) [剩余时间: 541451ms]
+19:22:49:794  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (2/15) [剩余时间: 531450ms]
+19:22:59:796  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (3/15) [剩余时间: 521448ms]
+19:23:01:928  INFO 95532 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 2/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:23:09:797  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (4/15) [剩余时间: 511447ms]
+19:23:19:798  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (5/15) [剩余时间: 501446ms]
+19:23:22:825  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理带上下文任务完成，结果长度: 1875
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 带依赖的记忆对话执行[生成关于如何有效复习高等数学的具体建议]成功,结果长度: 1875
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]执行成功，开始更新状态，结果长度: 1875
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]状态更新完成
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]执行成功，耗时: 47280ms
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：生成关于如何有效复习高等数学的具体建议，结果长度: 1875
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]执行成功，结果：要有效复习高等数学，需要结合其核心知识点和常见难点，制定科学的复习策略。以下是一些具体建议：
+
+---
+
+### 1. **明确复习目标**
+   - 首先根据课程要求或考试大纲，明确需要掌握的核心知识点（如极限、导数、积分、微分方程等）。
+   - 将复习分为基础巩固、重点突破和综合应用三个阶段。
+
+---
+
+### 2. **夯实基础知识**
+   - **回顾初等数学**：确保对函数、三角函数、指数与对数等内容有扎实的理解，这是高等数学的基础。
+   - **理解核心概念**：
+     - 极限是高等数学的基石，务必熟悉其定义和常见形式（数列极限、函数极限）。
+     - 理解导数的几何意义（切线斜率）和物理意义（变化率），以及积分的几何意义（面积、体积）。
+   - **熟记公式**：
+     - 常见极限公式（如\(\lim_{x \to 0} \frac{\sin x}{x} = 1\)）。
+     - 导数与积分的基本公式（如幂函数、指数函数、对数函数的求导与积分公式）。
+
+---
+
+### 3. **攻克常见难点**
+   - **极限**：
+     - 理解“任意接近”的思想，熟练使用洛必达法则处理未定式（如\(\frac{0}{0}\)或\(\frac{\infty}{\infty}\)）。
+     - 练习夹逼定理、单调有界原理等方法解决复杂极限问题。
+   - **导数与微分**：
+     - 多做图形分析，强化几何直观。
+     - 结合实际问题（如速度、加速度）理解导数的应用。
+   - **积分**：
+     - 掌握换元法、分部积分法等技巧。
+     - 理解定积分的几何意义（如面积、体积）并通过实例加深认识。
+   - **多元函数**：
+     - 明确偏导数是对单一变量的变化率，全微分是多个变量变化的综合效果。
+     - 练习二重积分、三重积分的计算，并结合几何意义（如体积、质量）理解其应用。
+   - **级数**：
+     - 熟悉常见级数的性质（如调和级数发散、p-级数收敛条件）。
+     - 掌握比较判别法、比值判别法、根值判别法等判断级数收敛性。
+   - **微分方程**：
+     - 分类学习不同类型微分方程的解法（如一阶线性微分方程、二阶常系数齐次/非齐次微分方程）。
+     - 结合实际问题（如动力学模型）理解微分方程的意义。
+
+---
+
+### 4. **多做习题**
+   - **基础练习**：从教材中的例题和课后习题入手，逐步掌握基本计算方法。
+   - **提高练习**：选择综合性较强的题目，培养解决复杂问题的能力。
+   - **总结错题**：整理错题本，分析错误原因，避免重复犯错。
+
+---
+
+### 5. **结合实际应用**
+   - 尝试将高等数学知识与实际问题结合，例如：
+     - 物理学中的运动学问题（用导数求速度、加速度）。
+     - 工程中的力学问题（用积分求面积、体积）。
+     - 经济学中的边际分析（用导数分析成本、收益）。
+   - 这种跨学科的应用不仅能加深理解，还能增强学习兴趣。
+
+---
+
+### 6. **利用工具辅助学习**
+   - **软件工具**：
+     - 使用Mathematica、Matlab或Python进行数值计算和图形分析。
+     - 通过绘制函数图像、模拟微分方程解的过程等方式，直观理解抽象概念。
+   - **在线资源**：
+     - 观看相关教学视频（如B站、Coursera等平台上的高等数学课程）。
+     - 参考在线题库（如LeetCode、牛客网等）进行针对性练习。
+
+---
+
+### 7. **制定复习计划**
+   - **每日任务**：每天安排固定时间复习一个知识点（如一天复习极限，一天复习导数）。
+   - **周期复习**：每周进行一次综合复习，梳理本周所学内容并查漏补缺。
+   - **模拟测试**：定期进行模拟考试，检验复习效果并调整复习策略。
+
+---
+
+### 8. **保持良好心态**
+   - 高等数学的学习需要时间和耐心，遇到困难时不要轻易放弃。
+   - 积极与同学、老师交流，分享学习经验，共同进步。
+
+---
+
+通过以上方法，系统地复习高等数学的核心知识点，逐步攻克常见难点，可以有效提升学习效率和成绩。这不仅有助于应对考试，也能为未来的学术研究和职业发展奠定坚实基础。
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.commons.client.ResultCilent        : 为任务生成关于如何有效复习高等数学的具体建议添加结果到resultMap中
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]结果已添加到结果队列，总结果数: 1
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[生成关于如何有效复习高等数学的具体建议]成功完成，开始更新图状态
+19:23:22:826  INFO 95532 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[生成关于如何有效复习高等数学的具体建议]的图状态更新完成
+19:23:29:800  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 第1层没有可执行任务，所有任务执行完成
+19:23:29:800  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.model.router.StepIntentRouter      : 所有层级任务执行完成，共1层，总耗时: 108556ms
+19:23:29:800  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务分析并解释高等数学的核心知识点和常见难点的结果
+19:23:29:800  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务生成关于如何有效复习高等数学的具体建议的结果
+19:24:01:937  INFO 95532 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:24:10:396  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-7] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图 [我高等数学要挂科了，给我复习建议] 处理完成，处理结果: [### 总结：高等数学核心知识点、常见难点及复习策略
+
+高等数学作为大学阶段的重要课程，其核心内容和学习难点贯穿了从基础概念到高级应用的多个方面。以下是结合历史对话记录，对高等数学的核心知识点、常见难点及有效复习策略的精准总结：
+
+---
+
+## **一、核心知识点**
+高等数学主要围绕以下几个核心主题展开：
+1. **极限**  
+   - 极限是微积分的理论基石，描述函数或数列在某一点或无穷远处的趋势。
+   - 常见形式包括数列极限和函数极限，掌握其定义和计算方法至关重要。
+
+2. **导数与微分**  
+   - 导数表示函数的变化率，几何上对应切线斜率，物理上对应速度、加速度等变化量。
+   - 微分是函数增量的线性近似，常用于近似计算和误差分析。
+
+3. **不定积分与定积分**  
+   - 不定积分是求导的逆运算，定积分则用于计算面积、体积等实际问题。
+   - 牛顿-莱布尼茨公式是连接不定积分与定积分的核心桥梁。
+
+4. **多元函数微积分**  
+   - 包括偏导数、全微分、重积分、曲线积分与曲面积分，广泛应用于多维空间中的物理和工程问题。
+
+5. **级数**  
+   - 数项级数的收敛性判断（如调和级数、p-级数）和幂级数展开（如泰勒级数、傅里叶级数）是重点内容。
+
+6. **常微分方程**  
+   - 描述未知函数及其导数之间的关系，解决动力学、控制论等领域的问题。
+
+---
+
+## **二、常见难点**
+高等数学的学习难点主要集中在以下几个方面：
+1. **极限的理解与计算**  
+   - 涉及无穷小量、无穷大量时难以直观理解，需借助“任意接近”思想和洛必达法则等工具。
+
+2. **导数的几何与物理意义**  
+   - 抽象概念需要结合图形分析和实际问题来强化理解。
+
+3. **积分的计算技巧**  
+   - 不定积分的换元法、分部积分法等技巧需熟练掌握；定积分的几何意义需通过实例加深认识。
+
+4. **多元函数的偏导数与全微分**  
+   - 从一元到多元的过渡容易混淆概念，需明确偏导数和全微分的区别。
+
+5. **级数的收敛性判断**  
+   - 需掌握多种判别法（如比较判别法、比值判别法），并熟悉常见级数的性质。
+
+6. **微分方程的求解**  
+   - 方程形式多样，解法复杂，需分类学习不同类型方程的解法。
+
+---
+
+## **三、科学复习策略**
+为了高效复习高等数学，建议采用以下系统化方法：
+
+### **1. 明确复习目标**
+- 根据课程要求或考试大纲，明确需要掌握的核心知识点（如极限、导数、积分）。
+- 将复习分为三个阶段：基础巩固、重点突破、综合应用。
+
+### **2. 夯实基础知识**
+- 回顾初等数学知识（如函数、三角函数、指数与对数），确保基础扎实。
+- 理解核心概念（如极限、导数、积分的定义与意义），熟记常见公式。
+
+### **3. 攻克常见难点**
+- **极限**：练习夹逼定理、单调有界原理，熟练使用洛必达法则。
+- **导数与微分**：结合图形分析和实际问题，强化几何与物理意义的理解。
+- **积分**：掌握换元法、分部积分法，理解定积分的几何意义。
+- **多元函数**：区分偏导数与全微分，练习二重积分、三重积分的计算。
+- **级数**：熟悉常见级数性质，掌握多种收敛性判别法。
+- **微分方程**：分类学习不同类型的解法，并结合实际问题理解其意义。
+
+### **4. 多做习题**
+- 从教材例题和课后习题入手，逐步提升到综合性较强的题目。
+- 整理错题本，分析错误原因，避免重复犯错。
+
+### **5. 结合实际应用**
+- 将高等数学知识与物理、工程、经济等领域的实际问题结合，增强学习兴趣和应用能力。
+
+### **6. 利用工具辅助学习**
+- 使用Mathematica、Matlab或Python进行数值计算和图形分析，直观理解抽象概念。
+- 观看在线教学视频，参考在线题库进行针对性练习。
+
+### **7. 制定复习计划**
+- 每天安排固定时间复习一个知识点，每周进行一次综合复习。
+- 定期进行模拟测试，检验复习效果并调整策略。
+
+### **8. 保持良好心态**
+- 学习高等数学需要时间和耐心，遇到困难时积极与同学、老师交流，共同进步。
+
+---
+
+## **四、总结与展望**
+通过系统地复习高等数学的核心知识点，逐步攻克常见难点，可以有效提升学习效率和成绩。这不仅有助于应对考试，也能为未来的学术研究和职业发展奠定坚实基础。坚持科学的复习策略，结合实际应用和工具辅助，将使高等数学的学习更加高效且有趣。]
+19:25:11:442  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.controller.ChatController          : 用户问题：同时为我生成试题
+19:25:11:442  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析用户意图: 同时为我生成试题
+19:25:19:550  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图分析结果: ```json
+{
+  "intent": "用户希望生成试题",
+  "intent_type": "任务执行",
+  "complexity": "中等",
+  "capabilities": ["逻辑推理", "知识检索", "工具调用"]
+}
+``` 
+**分析说明**：  
+- **意图类型**：明确为任务执行，因为需要生成具体内容（试题）。  
+- **复杂度**：中等，因为生成试题可能需要结合特定知识点、难度要求或格式规范。  
+- **处理能力需求**：需要逻辑推理来设计题目结构，可能涉及知识检索以确保内容准确性，以及工具调用（如模板生成或数据提取）。
+19:25:19:550  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 开始拆分用户意图: ```json
+{
+  "intent": "用户希望生成试题",
+  "intent_type": "任务执行",
+  "complexity": "中等",
+  "capabilities": ["逻辑推理", "知识检索", "工具调用"]
+}
+``` 
+**分析说明**：  
+- **意图类型**：明确为任务执行，因为需要生成具体内容（试题）。  
+- **复杂度**：中等，因为生成试题可能需要结合特定知识点、难度要求或格式规范。  
+- **处理能力需求**：需要逻辑推理来设计题目结构，可能涉及知识检索以确保内容准确性，以及工具调用（如模板生成或数据提取）。
+19:25:24:125  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分结果: ```json
+{
+    "intent_analysis": {
+        "intent": "生成试题",
+        "intent_type": "任务执行",
+        "complexity": "中等",
+        "required_capabilities": ["基础大语言模型对话处理器", "增强检索生成处理器"]
+    },
+    "tasks": [
+        "分析并确定试题的主题、难度和题型要求",
+        "在知识库中检索关于[具体主题]的相关知识点和内容",
+        "基于用户需求生成符合要求的试题内容"
+    ]
+}
+```
+19:25:24:128  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分完成，共生成 3 个子任务
+19:25:24:128  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析任务依赖关系
+19:25:26:818  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 任务关系分析结果: ```json
+{
+    "relations": [
+        "分析并确定试题的主题、难度和题型要求:在知识库中检索关于[具体主题]的相关知识点和内容",
+        "在知识库中检索关于[具体主题]的相关知识点和内容:基于用户需求生成符合要求的试题内容"
+    ]
+}
+```
+19:25:26:818  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 成功解析 2 个任务依赖关系
+19:25:26:818  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.TaskInitUtils        : 开始初始化任务节点，任务数量: 3
+19:25:26:818  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.TaskInitUtils        : 成功添加 3 个任务节点
+19:25:26:818  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.TaskInitUtils        : 成功添加 2 个任务依赖关系
+19:25:26:818  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : 开始初始化任务图
+19:25:26:818  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : 任务图初始化完成，节点数: 5, 边数: 3
+19:25:26:819  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.TaskInitUtils        : 任务节点初始化完成
+19:25:26:819  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 开始进行意图路由,意图为：[分析并确定试题的主题、难度和题型要求, 在知识库中检索关于[具体主题]的相关知识点和内容, 基于用户需求生成符合要求的试题内容]
+19:25:26:819  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 开始执行任务，最大执行时间: 10分钟，最大重试次数: 15
+19:25:26:819  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 开始执行第0层任务，共2个任务: [分析并解释高等数学的核心知识点和常见难点, 分析并确定试题的主题、难度和题型要求]
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-3] c.a.s.model.router.StepIntentRouter      : 第0层 - 开始执行任务: 分析并解释高等数学的核心知识点和常见难点
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-3] c.a.s.commons.client.ResultCilent        : 任务分析并解释高等数学的核心知识点和常见难点不需要依赖其他任务
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-4] c.a.s.model.router.StepIntentRouter      : 第0层 - 开始执行任务: 分析并确定试题的主题、难度和题型要求
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-3] c.a.s.c.r.SlidingWindowRateLimiter       : 当前时间：1751714726819，当前请求数：1
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-4] c.a.s.commons.client.ResultCilent        : 任务分析并确定试题的主题、难度和题型要求不需要依赖其他任务
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-3] c.a.s.model.router.StepIntentRouter      : 任务分析并解释高等数学的核心知识点和常见难点开始正常执行
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-3] c.a.s.commons.easyuse.TaskExecutor       : 开始异步执行任务: 分析并解释高等数学的核心知识点和常见难点
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-4] c.a.s.c.r.SlidingWindowRateLimiter       : 当前时间：1751714726819，当前请求数：2
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-4] c.a.s.model.router.StepIntentRouter      : 任务分析并确定试题的主题、难度和题型要求开始正常执行
+19:25:26:819  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-4] c.a.s.commons.easyuse.TaskExecutor       : 开始异步执行任务: 分析并确定试题的主题、难度和题型要求
+19:25:26:819  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 开始执行Handler
+19:25:26:819  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并确定试题的主题、难度和题型要求 开始执行Handler
+19:25:27:548  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:25:27:548  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并确定试题的主题、难度和题型要求]开始执行，类型: SteptIntentMemoryChatHandler
+19:25:27:548  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[分析并确定试题的主题、难度和题型要求]中
+19:25:27:548  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行直接记忆任务: 分析并确定试题的主题、难度和题型要求
+19:25:27:549  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:111
+19:25:27:549  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，降级使用基础LLM处理任务: 分析并确定试题的主题、难度和题型要求
+19:25:27:643  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:25:27:643  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]开始执行，类型: SteptIntentMemoryChatHandler
+19:25:27:643  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[分析并解释高等数学的核心知识点和常见难点]中
+19:25:27:643  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行直接记忆任务: 分析并解释高等数学的核心知识点和常见难点
+19:25:27:643  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:1111
+19:25:27:643  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，降级使用基础LLM处理任务: 分析并解释高等数学的核心知识点和常见难点
+19:26:01:939  INFO 95532 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理完成，结果长度: 1405
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆对话执行[分析并确定试题的主题、难度和题型要求]成功,结果长度: 1405
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并确定试题的主题、难度和题型要求]执行成功，开始更新状态，结果长度: 1405
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并确定试题的主题、难度和题型要求]状态更新完成
+19:26:05:939  WARN 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在在知识库中检索关于[具体主题]的相关知识点和内容的依赖结果
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并确定试题的主题、难度和题型要求]执行成功，耗时: 38391ms
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并确定试题的主题、难度和题型要求 执行完成，结果长度: 1405
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并确定试题的主题、难度和题型要求 成功完成，开始保存结果
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.commons.client.ResultCilent        : 为任务分析并确定试题的主题、难度和题型要求添加结果到resultMap中
+19:26:05:939  INFO 95532 --- [smartcampus] [pool-3-thread-3] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并确定试题的主题、难度和题型要求 的所有后续处理已完成
+19:26:05:939  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：在知识库中检索关于[具体主题]的相关知识点和内容，依赖数量: 0
+19:26:05:939  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：在知识库中检索关于[具体主题]的相关知识点和内容，当前队列大小: 1
+19:26:05:939  WARN 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在在知识库中检索关于[具体主题]的相关知识点和内容的依赖结果
+19:26:05:941  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]已在延时队列中，跳过重复添加
+19:26:05:941  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-4] c.a.s.model.router.StepIntentRouter      : 任务[分析并确定试题的主题、难度和题型要求]执行完成,结果长度: 1405
+19:26:05:941  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-4] c.a.s.model.router.StepIntentRouter      : 第0层 - 任务分析并确定试题的主题、难度和题型要求处理完成
+19:26:06:678  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@3b72860c】
+19:26:06:678  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@3b72860c】
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：在知识库中检索关于[具体主题]的相关知识点和内容
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]开始执行，类型: SeptIntentRagHandler
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : RAG处理器开始执行业务逻辑，意图: 在知识库中检索关于[具体主题]的相关知识点和内容
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]缺失前置依赖，需要延迟执行
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务分析并确定试题的主题、难度和题型要求的结果
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]的依赖结果已准备完成
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]的依赖结果已准备完成，加入延时队列
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：在知识库中检索关于[具体主题]的相关知识点和内容，当前队列大小: 1
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]执行成功，开始更新状态，结果长度: 0
+19:26:06:681  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：在知识库中检索关于[具体主题]的相关知识点和内容，依赖数量: 1
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]状态更新完成
+19:26:06:681  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]等待前置依赖完成
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]执行成功，耗时: 0ms
+19:26:06:681  WARN 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在基于用户需求生成符合要求的试题内容的依赖结果
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：在知识库中检索关于[具体主题]的相关知识点和内容，结果长度: 0
+19:26:06:681  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]的前置依赖已完成
+19:26:06:681  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：基于用户需求生成符合要求的试题内容，当前队列大小: 1
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]执行成功，结果：null
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.commons.client.ResultCilent        : 为任务在知识库中检索关于[具体主题]的相关知识点和内容添加结果到resultMap中
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]结果已添加到结果队列，总结果数: 1
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[在知识库中检索关于[具体主题]的相关知识点和内容]成功完成，开始更新图状态
+19:26:06:681  INFO 95532 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[在知识库中检索关于[具体主题]的相关知识点和内容]的图状态更新完成
+19:26:06:681  WARN 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在基于用户需求生成符合要求的试题内容的依赖结果
+19:26:06:681  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[基于用户需求生成符合要求的试题内容]已在延时队列中，跳过重复添加
+19:26:07:376  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@3b72860c】
+19:26:07:376  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@3b72860c】
+19:26:07:376  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：基于用户需求生成符合要求的试题内容，依赖数量: 0
+19:26:07:376  INFO 95532 --- [smartcampus] [pool-2-thread-3] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：在知识库中检索关于[具体主题]的相关知识点和内容
+19:26:07:376  INFO 95532 --- [smartcampus] [pool-2-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索关于[具体主题]的相关知识点和内容]开始执行，类型: SeptIntentRagHandler
+19:26:07:376  INFO 95532 --- [smartcampus] [pool-2-thread-3] c.a.s.m.h.impl.SeptIntentRagHandler      : RAG处理器开始执行业务逻辑，意图: 在知识库中检索关于[具体主题]的相关知识点和内容
+19:26:08:127  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:26:08:127  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:26:08:127  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：基于用户需求生成符合要求的试题内容
+19:26:08:127  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成符合要求的试题内容]开始执行，类型: SteptIntentMemoryChatHandler
+19:26:08:130  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[基于用户需求生成符合要求的试题内容]中
+19:26:08:130  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[基于用户需求生成符合要求的试题内容]依赖未就绪，尝试等待依赖完成
+19:26:08:130  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务在知识库中检索关于[具体主题]的相关知识点和内容的结果
+19:26:08:130  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[基于用户需求生成符合要求的试题内容]的依赖结果已准备完成
+19:26:08:130  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 等待后依赖已完成，直接执行任务: 基于用户需求生成符合要求的试题内容
+19:26:08:130  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行带依赖的记忆任务: 基于用户需求生成符合要求的试题内容
+19:26:08:131  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:11111
+19:26:08:131  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，使用基础LLM处理带依赖的任务: 基于用户需求生成符合要求的试题内容
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理带上下文任务完成，结果长度: 245
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 带依赖的记忆对话执行[基于用户需求生成符合要求的试题内容]成功,结果长度: 245
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成符合要求的试题内容]执行成功，开始更新状态，结果长度: 245
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成符合要求的试题内容]状态更新完成
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成符合要求的试题内容]执行成功，耗时: 6399ms
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：基于用户需求生成符合要求的试题内容，结果长度: 245
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 任务[基于用户需求生成符合要求的试题内容]执行成功，结果：由于您提供的“相关信息1”为空，缺乏具体内容，我无法准确生成符合要求的试题内容。为了更好地帮助您，请补充以下信息：
+
+1. **用户需求**：需要生成什么类型的试题？（如选择题、填空题、简答题等）
+2. **试题主题或领域**：试题涉及的具体学科或知识点是什么？（如数学、语文、编程等）
+3. **难度要求**：试题的难度级别是否有具体要求？（如初级、中级、高级）
+4. **其他特殊要求**：是否需要特定格式、字数限制或其他特殊条件？
+
+请提供上述信息后，我将为您生成符合要求的试题内容！
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.commons.client.ResultCilent        : 为任务基于用户需求生成符合要求的试题内容添加结果到resultMap中
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 任务[基于用户需求生成符合要求的试题内容]结果已添加到结果队列，总结果数: 1
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[基于用户需求生成符合要求的试题内容]成功完成，开始更新图状态
+19:26:14:526  INFO 95532 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[基于用户需求生成符合要求的试题内容]的图状态更新完成
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理完成，结果长度: 2651
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆对话执行[分析并解释高等数学的核心知识点和常见难点]成功,结果长度: 2651
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]执行成功，开始更新状态，结果长度: 2651
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]状态更新完成
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学的核心知识点和常见难点]执行成功，耗时: 61385ms
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 执行完成，结果长度: 2651
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 成功完成，开始保存结果
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.commons.client.ResultCilent        : 为任务分析并解释高等数学的核心知识点和常见难点添加结果到resultMap中
+19:26:29:028  INFO 95532 --- [smartcampus] [pool-3-thread-2] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学的核心知识点和常见难点 的所有后续处理已完成
+19:26:29:028  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-3] c.a.s.model.router.StepIntentRouter      : 任务[分析并解释高等数学的核心知识点和常见难点]执行完成,结果长度: 2651
+19:26:29:028  INFO 95532 --- [smartcampus] [ForkJoinPool.commonPool-worker-3] c.a.s.model.router.StepIntentRouter      : 第0层 - 任务分析并解释高等数学的核心知识点和常见难点处理完成
+19:26:29:028  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务生成关于如何有效复习高等数学的具体建议的结果
+19:26:29:028  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第0层的2个任务全部并行完成
+19:26:29:028  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：生成关于如何有效复习高等数学的具体建议，当前队列大小: 1
+19:26:29:028  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务生成关于如何有效复习高等数学的具体建议的结果
+19:26:29:028  INFO 95532 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]已在延时队列中，跳过重复添加
+19:26:29:028  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：生成关于如何有效复习高等数学的具体建议，依赖数量: 1
+19:26:29:028  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]等待前置依赖完成
+19:26:29:028  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]的前置依赖已完成
+19:26:30:112  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:26:30:112  INFO 95532 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@7866fe3e】
+19:26:30:112  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：生成关于如何有效复习高等数学的具体建议
+19:26:30:112  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]开始执行，类型: SteptIntentMemoryChatHandler
+19:26:30:112  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[生成关于如何有效复习高等数学的具体建议]中
+19:26:30:112  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 所有依赖任务已完成，开始执行记忆任务: 生成关于如何有效复习高等数学的具体建议
+19:26:30:112  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行带依赖的记忆任务: 生成关于如何有效复习高等数学的具体建议
+19:26:30:114  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:111111
+19:26:30:114  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，使用基础LLM处理带依赖的任务: 生成关于如何有效复习高等数学的具体建议
+19:26:31:040  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第0层任务全部完成
+19:26:34:041  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (1/15) [剩余时间: 532778ms]
+19:26:44:043  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (2/15) [剩余时间: 522776ms]
+19:26:54:045  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (3/15) [剩余时间: 512774ms]
+19:27:04:046  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (4/15) [剩余时间: 502773ms]
+19:27:05:120  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理带上下文任务完成，结果长度: 1912
+19:27:05:120  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 带依赖的记忆对话执行[生成关于如何有效复习高等数学的具体建议]成功,结果长度: 1912
+19:27:05:120  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]执行成功，开始更新状态，结果长度: 1912
+19:27:05:120  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]状态更新完成
+19:27:05:123  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[生成关于如何有效复习高等数学的具体建议]执行成功，耗时: 35011ms
+19:27:05:123  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：生成关于如何有效复习高等数学的具体建议，结果长度: 1912
+19:27:05:123  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]执行成功，结果：要有效复习高等数学，可以按照以下具体建议进行系统学习和巩固：
+
+---
+
+### 1. **明确复习目标**
+   - 根据课程要求或考试大纲，确定需要掌握的核心知识点，如极限、导数、积分、微分方程等。
+   - 将复习分为三个阶段：
+     1. **基础巩固**：回顾初等数学和高等数学的基本概念。
+     2. **重点突破**：集中攻克常见难点（如复杂极限计算、积分技巧）。
+     3. **综合应用**：结合实际问题和综合性题目提升解题能力。
+
+---
+
+### 2. **夯实基础知识**
+   - **回顾初等数学**：确保对函数、三角函数、指数与对数等内容有扎实的理解。
+   - **理解核心概念**：
+     - 极限是高等数学的基石，熟悉其定义和常见形式（如\(\lim_{x \to 0} \frac{\sin x}{x} = 1\)）。
+     - 理解导数的几何意义（切线斜率）和物理意义（变化率），以及积分的几何意义（面积、体积）。
+   - **熟记公式**：
+     - 常见极限公式、导数与积分的基本公式（如幂函数、指数函数、对数函数的求导与积分公式）。
+
+---
+
+### 3. **攻克常见难点**
+   - **极限**：
+     - 熟练使用洛必达法则处理未定式（如\(\frac{0}{0}\)或\(\frac{\infty}{\infty}\)）。
+     - 练习夹逼定理、单调有界原理等方法解决复杂极限问题。
+   - **导数与微分**：
+     - 多做图形分析，强化几何直观。
+     - 结合实际问题（如速度、加速度）理解导数的应用。
+   - **积分**：
+     - 掌握换元法、分部积分法等技巧。
+     - 理解定积分的几何意义（如面积、体积）并通过实例加深认识。
+   - **多元函数**：
+     - 明确偏导数是对单一变量的变化率，全微分是多个变量变化的综合效果。
+     - 练习二重积分、三重积分的计算，并结合几何意义（如体积、质量）理解其应用。
+   - **级数**：
+     - 熟悉常见级数的性质（如调和级数发散、p-级数收敛条件）。
+     - 掌握比较判别法、比值判别法、根值判别法等判断级数收敛性。
+   - **微分方程**：
+     - 分类学习不同类型微分方程的解法（如一阶线性微分方程、二阶常系数齐次/非齐次微分方程）。
+     - 结合实际问题（如动力学模型）理解微分方程的意义。
+
+---
+
+### 4. **多做习题**
+   - **基础练习**：从教材中的例题和课后习题入手，逐步掌握基本计算方法。
+   - **提高练习**：选择综合性较强的题目，培养解决复杂问题的能力。
+   - **总结错题**：整理错题本，分析错误原因，避免重复犯错。
+
+---
+
+### 5. **结合实际应用**
+   - 尝试将高等数学知识与实际问题结合，例如：
+     - 物理学中的运动学问题（用导数求速度、加速度）。
+     - 工程中的力学问题（用积分求面积、体积）。
+     - 经济学中的边际分析（用导数分析成本、收益）。
+   - 这种跨学科的应用不仅能加深理解，还能增强学习兴趣。
+
+---
+
+### 6. **利用工具辅助学习**
+   - **软件工具**：
+     - 使用Mathematica、Matlab或Python进行数值计算和图形分析。
+     - 通过绘制函数图像、模拟微分方程解的过程等方式，直观理解抽象概念。
+   - **在线资源**：
+     - 观看相关教学视频（如B站、Coursera等平台上的高等数学课程）。
+     - 参考在线题库（如LeetCode、牛客网等）进行针对性练习。
+
+---
+
+### 7. **制定复习计划**
+   - **每日任务**：每天安排固定时间复习一个知识点（如一天复习极限，一天复习导数）。
+   - **周期复习**：每周进行一次综合复习，梳理本周所学内容并查漏补缺。
+   - **模拟测试**：定期进行模拟考试，检验复习效果并调整复习策略。
+
+---
+
+### 8. **保持良好心态**
+   - 高等数学的学习需要时间和耐心，遇到困难时不要轻易放弃。
+   - 积极与同学、老师交流，分享学习经验，共同进步。
+
+---
+
+通过以上方法，系统地复习高等数学的核心知识点，逐步攻克常见难点，可以有效提升学习效率和成绩。这不仅有助于应对考试，也能为未来的学术研究和职业发展奠定坚实基础。
+19:27:05:123  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.commons.client.ResultCilent        : 为任务生成关于如何有效复习高等数学的具体建议添加结果到resultMap中
+19:27:05:123  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 任务[生成关于如何有效复习高等数学的具体建议]结果已添加到结果队列，总结果数: 2
+19:27:05:123  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[生成关于如何有效复习高等数学的具体建议]成功完成，开始更新图状态
+19:27:05:123  INFO 95532 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[生成关于如何有效复习高等数学的具体建议]的图状态更新完成
+19:27:12:446  INFO 95532 --- [smartcampus] [pool-2-thread-3] c.a.s.m.h.impl.SeptIntentRagHandler      : 生成增强查询成功，将执行: ### 1. 前置任务结果分析
+
+**前置任务输出：**
+前置任务1的结果为一个详细的试题分析框架，包括主题、难度和题型的定义及分析方法。具体内容如下：
+
+- **主题分析**：明确了如何识别试题所属的知识领域和具体知识点。
+- **难度分析**：提供了判断试题难度的标准，包括基础知识要求、解题步骤复杂性、思维能力要求等。
+- **题型要求**：定义了常见题型（选择题、填空题、解答题等）及其特点。
+
+**结果要点提取：**
+- **关键信息**：
+  - 主题分析：明确试题所属知识领域和具体知识点。
+  - 难度分析：通过多维度评估试题难度。
+  - 题型要求：清晰分类试题形式并提供示例。
+- **可用资源**：
+  - 提供了一个通用的试题分析框架，可用于指导后续任务。
+  - 示例题目展示了如何将理论应用于实际问题。
+- **完成状态**：
+  - 前置任务完成了对试题分析方法的系统化总结，输出质量高，逻辑清晰，可直接用于后续任务。
+
+---
+
+### 2. 当前任务需求定义
+
+**任务目标：**
+在知识库中检索关于[具体主题]的相关知识点和内容。
+
+**具体要求：**
+- **输入需求**：需要明确的主题或知识点范围（例如“数学-几何-直角三角形”）。
+- **输出标准**：
+  - 知识点覆盖全面，层次分明。
+  - 提供与主题相关的公式、定理、应用场景等内容。
+  - 输出格式结构化，便于后续任务使用。
+- **约束条件**：
+  - 检索范围限定在指定知识库内。
+  - 时间限制为30分钟内完成检索。
+  - 确保检索内容与主题高度相关，避免冗余信息。
+
+---
+
+### 3. 依赖关系映射与任务融合
+
+#### 关联关系分析：
+1. **直接依赖**：
+   - 前置任务的“主题分析”部分直接服务于当前任务，因为它明确了试题的主题和具体知识点。例如，如果试题主题是“数学-几何-直角三角形”，可以直接以此作为检索关键词。
+   
+2. **间接依赖**：
+   - “难度分析”部分虽然不直接参与知识检索，但其提供的知识点深度和复杂性评估可以作为筛选检索内容的重要参考。例如，对于简单难度的试题，只需检索基础概念；而对于困难难度，则需更深入的内容。
+   - “题型要求”部分可以帮助调整检索方向。例如，解答题可能需要更多推导过程和证明方法，而选择题则侧重于核心结论。
+
+3. **缺失补充**：
+   - 前置任务未提供具体的试题内容，因此无法确定确切的检索主题。需要假设或人工输入一个示例主题（如“数学-几何-直角三角形”）来继续执行任务。
+   - 前置任务未提及知识库的具体结构和检索工具，这需要在当前任务中补充说明。
+
+---
+
+### 4. 融合任务执行
+
+#### 执行步骤：
+
+1. **继承处理**：
+   - 继承前置任务的“主题分析”成果，假设检索主题为“数学-几何-直角三角形”。
+   - 利用“难度分析”和“题型要求”作为辅助筛选条件。
+
+2. **需求对接**：
+   - 将检索主题分解为关键词：“数学”、“几何”、“直角三角形”。
+   - 根据难度分析，确定检索内容的深度。例如，若难度为“简单”，优先检索基础概念；若难度为“困难”，扩展至综合应用和推导过程。
+
+3. **核心执行**：
+   - 使用知识库检索工具，输入关键词进行搜索。
+   - 筛选结果，确保内容与主题高度相关，并按以下结构整理：
+     - **基本概念**：定义、性质。
+     - **相关公式/定理**：如勾股定理。
+     - **应用场景**：实际问题中的应用示例。
+     - **扩展知识**：如特殊三角形性质、与其他几何图形的关系。
+
+4. **结果优化**：
+   - 对检索内容进行去重和排序，确保条理清晰。
+   - 补充必要的上下文信息，使内容易于理解。
+
+---
+
+### 5. 输出要求
+
+**任务执行结果：**
+
+假设检索主题为“数学-几何-直角三角形”，以下是检索结果：
+
+#### **基本概念**
+- 定义：直角三角形是指有一个角为90°的三角形。
+- 性质：
+  - 斜边是最长边。
+  - 两个锐角互余（和为90°）。
+
+#### **相关公式/定理**
+- 勾股定理：$a^2 + b^2 = c^2$，其中$a$、$b$为直角边，$c$为斜边。
+- 直角三角形面积公式：$\text{面积} = \frac{1}{2}ab$。
+
+#### **应用场景**
+- 实际问题：测量建筑物高度、计算地图距离等。
+- 数学问题：求解三角形边长、角度大小等。
+
+#### **扩展知识**
+- 特殊直角三角形：如30°-60°-90°三角形，边长比例为$1 : \sqrt{3} : 2$。
+- 与圆的关系：直角三角形的外接圆直径等于斜边长度。
+
+---
+
+**关键信息传递：**
+- **核心输出**：
+  - 检索到关于“直角三角形”的全面知识点，包括基本概念、公式定理、应用场景和扩展知识。
+- **传递数据**：
+  - 结构化的知识点列表，可直接用于试题设计或教学材料编写。
+- **使用建议**：
+  - 下一任务可根据这些知识点进一步设计试题，或结合难度分析选择适合的内容。
+
+---
+
+### 质量检查标准
+
+- ✓ 前置任务结果得到充分利用，特别是“主题分析”部分。
+- ✓ 当前任务目标完全达成，成功检索到与主题相关的知识点。
+- ✓ 输出结果符合后续任务需要，结构化且易于使用。
+- ✓ 整体逻辑连贯一致，从前置任务到当前任务的过渡自然。
+
+**最终答案：**  
+$$
+\boxed{\text{已成功完成知识检索任务，并生成结构化知识点列表。}}
+$$
+19:27:14:051  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (5/15) [剩余时间: 492768ms]
+19:27:24:054  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (6/15) [剩余时间: 482765ms]
+19:27:34:070  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (7/15) [剩余时间: 472749ms]
+19:27:44:076  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (8/15) [剩余时间: 462743ms]
+19:27:54:084  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (9/15) [剩余时间: 452735ms]
+19:28:01:938  INFO 95532 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 6/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:28:01:938  INFO 95532 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:28:04:086  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (10/15) [剩余时间: 442733ms]
+19:28:14:087  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (11/15) [剩余时间: 432732ms]
+19:28:24:087  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (12/15) [剩余时间: 422732ms]
+19:28:34:088  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (13/15) [剩余时间: 412731ms]
+19:28:44:101  WARN 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (14/15) [剩余时间: 402718ms]
+19:28:54:102 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 第1层连续15次没有就绪任务，但仍有未完成任务，可能存在死锁或任务执行时间过长
+19:28:54:102 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : === 任务诊断信息 ===
+19:28:54:102 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 总任务数量: 5
+19:28:54:102 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 就绪任务数量: 0
+19:28:54:102 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 是否存在未完成任务: true
+19:28:54:102 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 当前没有就绪任务
+19:28:54:102 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : --- 所有任务状态分析 ---
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 任务: 基于用户需求生成符合要求的试题内容, 当前入度: 0, 原始入度: 1, 状态: UNKNOWN
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 任务: 分析并解释高等数学的核心知识点和常见难点, 当前入度: 0, 原始入度: 0, 状态: UNKNOWN
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 任务: 分析并确定试题的主题、难度和题型要求, 当前入度: 0, 原始入度: 0, 状态: UNKNOWN
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 任务: 在知识库中检索关于[具体主题]的相关知识点和内容, 当前入度: 0, 原始入度: 1, 状态: UNKNOWN
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 任务: 生成关于如何有效复习高等数学的具体建议, 当前入度: 0, 原始入度: 1, 状态: UNKNOWN
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : --- 任务状态统计 ---
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 状态 UNKNOWN: 5 个任务
+19:28:54:104  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : 图结构验证通过
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 图结构是否有效: true
+19:28:54:104 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : --- 图结构调试信息 ---
+19:28:54:104  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : === 图调试信息 ===
+19:28:54:104  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : 邻接表: {基于用户需求生成符合要求的试题内容=[], 分析并解释高等数学的核心知识点和常见难点=[生成关于如何有效复习高等数学的具体建议], 分析并确定试题的主题、难度和题型要求=[在知识库中检索关于[具体主题]的相关知识点和内容], 在知识库中检索关于[具体主题]的相关知识点和内容=[基于用户需求生成符合要求的试题内容], 生成关于如何有效复习高等数学的具体建议=[]}
+19:28:54:104  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : 当前入度: {基于用户需求生成符合要求的试题内容=0, 分析并解释高等数学的核心知识点和常见难点=0, 分析并确定试题的主题、难度和题型要求=0, 在知识库中检索关于[具体主题]的相关知识点和内容=0, 生成关于如何有效复习高等数学的具体建议=0}
+19:28:54:104  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : 原始入度: {基于用户需求生成符合要求的试题内容=1, 分析并解释高等数学的核心知识点和常见难点=0, 分析并确定试题的主题、难度和题型要求=0, 在知识库中检索关于[具体主题]的相关知识点和内容=1, 生成关于如何有效复习高等数学的具体建议=1}
+19:28:54:104  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : 就绪列表: []
+19:28:54:105  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.commons.utils.CreateDiagram        : ===============
+19:28:54:105 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : === 诊断信息结束 ===
+19:28:54:105 ERROR 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.model.router.StepIntentRouter      : 任务执行失败或超时
+19:28:54:105  INFO 95532 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-9] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图 [同时为我生成试题] 处理完成，处理结果: [任务执行失败，请稍后重试]
+19:30:01:929  INFO 95532 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:31:16:360  INFO 95532 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+19:31:16:363  INFO 95532 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+19:31:16:523  INFO 95532 --- [smartcampus] [SpringApplicationShutdownHook] c.a.s.model.store.MemoryStoreScheduler   : 关闭MemoryStore，正在写回所有数据...
+19:31:16:523  INFO 95532 --- [smartcampus] [SpringApplicationShutdownHook] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:31:31:990  INFO 9876 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 9876 (D:\Users\SmartCampus-front (2)\SmartCampus\target\classes started by 欧阳 in D:\Users\SmartCampus-front (2)\SmartCampus)
+19:31:31:991  INFO 9876 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+19:31:33:230  INFO 9876 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:31:33:233  INFO 9876 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:31:33:302  INFO 9876 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 46 ms. Found 0 Redis repository interfaces.
+19:31:34:074 ERROR 9876 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : An incompatible version [1.2.16] of the Apache Tomcat Native library is installed, while Tomcat requires version [1.2.34]
+19:31:34:311  INFO 9876 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8104 (http)
+19:31:34:331  INFO 9876 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+19:31:34:331  INFO 9876 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+19:31:34:415  INFO 9876 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+19:31:34:416  INFO 9876 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2377 ms
+19:31:34:773  INFO 9876 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:31:34:779  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:31:41:323  INFO 9876 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SeptIntentRagHandler
+19:31:41:324  INFO 9876 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:31:41:328  INFO 9876 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentFuncHandler
+19:31:41:328  INFO 9876 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHandler] 注册成功
+19:31:41:329  INFO 9876 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentLLMChatResponseHandler
+19:31:41:330  INFO 9876 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:31:41:331  INFO 9876 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SteptIntentMemoryChatHandler
+19:31:41:331  INFO 9876 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:31:41:568  INFO 9876 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:31:41:750  INFO 9876 --- [smartcampus] [redisson-netty-5-13] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:31:41:759  INFO 9876 --- [smartcampus] [redisson-netty-5-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:31:41:807  INFO 9876 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:31:43:669  INFO 9876 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8104 (http) with context path '/'
+19:31:43:680  INFO 9876 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 12.115 seconds (process running for 13.037)
+19:31:43:684  INFO 9876 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:31:43:686  INFO 9876 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 0/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:32:05:060  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+19:32:05:060  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+19:32:05:060  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+19:32:05:187  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.controller.ChatController          : 用户问题：同时为我生成试题
+19:32:05:188  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析用户意图: 同时为我生成试题
+19:32:11:252  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图分析结果: ```json
+{
+  "intent": "用户希望获得试题生成服务",
+  "intent_type": "任务执行",
+  "complexity": "中等",
+  "capabilities": ["逻辑推理", "知识检索", "工具调用"]
+}
+``` 
+分析说明：  
+- **意图类型**：这是一个明确的任务请求，用户希望生成试题。  
+- **复杂度评估**：需要理解试题的具体要求（如科目、难度、题型等），可能涉及多步骤处理或外部资源支持。  
+- **能力需求**：需要逻辑推理来设计试题结构，可能需要知识检索确保试题内容准确，并可能调用工具生成特定格式的试题。
+19:32:11:254  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 开始拆分用户意图: ```json
+{
+  "intent": "用户希望获得试题生成服务",
+  "intent_type": "任务执行",
+  "complexity": "中等",
+  "capabilities": ["逻辑推理", "知识检索", "工具调用"]
+}
+``` 
+分析说明：  
+- **意图类型**：这是一个明确的任务请求，用户希望生成试题。  
+- **复杂度评估**：需要理解试题的具体要求（如科目、难度、题型等），可能涉及多步骤处理或外部资源支持。  
+- **能力需求**：需要逻辑推理来设计试题结构，可能需要知识检索确保试题内容准确，并可能调用工具生成特定格式的试题。
+19:32:24:193  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分结果: ```json
+{
+    "intent_analysis": {
+        "intent": "用户希望获得试题生成服务",
+        "intent_type": "任务执行",
+        "complexity": "中等",
+        "required_capabilities": ["基础大语言模型对话处理器", "增强检索生成处理器", "工具函数处理器"]
+    },
+    "tasks": [
+        "基于用户输入明确试题生成的具体要求，包括科目、难度、题型等",
+        "分析并设计符合要求的试题结构，确保逻辑清晰且内容准确",
+        "在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）",
+        "调用工具函数生成特定格式的试题（如需要）"
+    ]
+}
+``` 
+
+### 分析说明：
+- **意图类型**：这是一个任务执行请求，用户明确提出了生成试题的需求。
+- **复杂度评估**：任务可能涉及多个步骤，例如从理解用户需求到设计试题结构，再到确保内容准确性和格式化输出。因此被评估为“中等”复杂度。
+- **能力需求**：
+  - **基础大语言模型对话处理器**：用于解析用户需求和设计试题结构。
+  - **增强检索生成处理器**：如果试题需要专业知识或数据支持，则需调用知识库进行检索。
+  - **工具函数处理器**：若用户对试题格式有特殊要求（如PDF导出等），则需要调用外部工具完成。
+
+通过上述分解，任务可以被有序执行，并确保每个子任务都具有明确的目标和价值。
+19:32:24:198  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分完成，共生成 4 个子任务
+19:32:24:198  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析任务依赖关系
+19:32:28:444  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 任务关系分析结果: ```json
+{
+    "relations": [
+        "基于用户输入明确试题生成的具体要求，包括科目、难度、题型等:分析并设计符合要求的试题结构，确保逻辑清晰且内容准确",
+        "分析并设计符合要求的试题结构，确保逻辑清晰且内容准确:在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）",
+        "在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）:调用工具函数生成特定格式的试题（如需要）"
+    ]
+}
+```
+19:32:28:445  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 成功解析 3 个任务依赖关系
+19:32:28:445  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 开始初始化任务节点，任务数量: 4
+19:32:28:446  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 成功添加 4 个任务节点
+19:32:28:447  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 成功添加 3 个任务依赖关系
+19:32:28:447  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.CreateDiagram        : 开始初始化任务图
+19:32:28:447  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.CreateDiagram        : 任务图初始化完成，节点数: 4, 边数: 3
+19:32:28:448  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 任务节点初始化完成
+19:32:28:448  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 开始进行意图路由,意图为：[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等, 分析并设计符合要求的试题结构，确保逻辑清晰且内容准确, 在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）, 调用工具函数生成特定格式的试题（如需要）]
+19:32:28:449  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 开始执行任务，最大执行时间: 10分钟，最大重试次数: 100
+19:32:28:449  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 开始执行第0层任务，共1个任务: [基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]
+19:32:28:451  INFO 9876 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 第0层 - 开始执行任务: 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等
+19:32:28:452  INFO 9876 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.client.ResultCilent        : 任务基于用户输入明确试题生成的具体要求，包括科目、难度、题型等不需要依赖其他任务
+19:32:28:456  INFO 9876 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.c.r.SlidingWindowRateLimiter       : 当前时间：1751715148452，当前请求数：1
+19:32:28:456  INFO 9876 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 任务基于用户输入明确试题生成的具体要求，包括科目、难度、题型等开始正常执行
+19:32:28:456  INFO 9876 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.easyuse.TaskExecutor       : 开始异步执行任务: 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等
+19:32:28:457  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等 开始执行Handler
+19:32:29:187  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@47800bd7】
+19:32:29:188  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]开始执行，类型: SteptIntentMemoryChatHandler
+19:32:29:188  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]中
+19:32:29:189  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行直接记忆任务: 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等
+19:32:29:441  WARN 9876 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 从Redis加载数据失败，key: smart_campus_summary_memory:1, error: Could not read JSON: Cannot construct instance of `com.aiproject.smartcampus.pojo.bo.CacheEntry` (no Creators, like default constructor, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 50]
+19:32:29:441  WARN 9876 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 标记Redis为不可用状态
+19:32:29:442  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:1
+19:32:29:442  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，降级使用基础LLM处理任务: 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等
+19:32:40:209  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理完成，结果长度: 293
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆对话执行[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]成功,结果长度: 293
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]执行成功，开始更新状态，结果长度: 293
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]状态更新完成
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]执行成功，耗时: 11022ms
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等 执行完成，结果长度: 293
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等 成功完成，开始保存结果
+19:32:40:210  INFO 9876 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 任务[基于用户输入明确试题生成的具体要求，包括科目、难度、题型等]执行完成,结果长度: 293
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.client.ResultCilent        : 为任务基于用户输入明确试题生成的具体要求，包括科目、难度、题型等添加结果到resultMap中
+19:32:40:210  INFO 9876 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 第0层 - 任务基于用户输入明确试题生成的具体要求，包括科目、难度、题型等处理完成
+19:32:40:210  INFO 9876 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户输入明确试题生成的具体要求，包括科目、难度、题型等 的所有后续处理已完成
+19:32:40:211  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第0层的1个任务全部并行完成
+19:32:40:211  WARN 9876 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在分析并设计符合要求的试题结构，确保逻辑清晰且内容准确的依赖结果
+19:32:40:212  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：分析并设计符合要求的试题结构，确保逻辑清晰且内容准确，依赖数量: 0
+19:32:40:212  INFO 9876 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：分析并设计符合要求的试题结构，确保逻辑清晰且内容准确，当前队列大小: 1
+19:32:40:212  WARN 9876 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在分析并设计符合要求的试题结构，确保逻辑清晰且内容准确的依赖结果
+19:32:40:212  INFO 9876 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]已在延时队列中，跳过重复添加
+19:32:41:229  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@47800bd7】
+19:32:41:229  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@47800bd7】
+19:32:41:230  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：分析并设计符合要求的试题结构，确保逻辑清晰且内容准确
+19:32:41:231  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]开始执行，类型: SteptIntentMemoryChatHandler
+19:32:41:231  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]中
+19:32:41:231  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]依赖未就绪，尝试等待依赖完成
+19:32:41:231  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务基于用户输入明确试题生成的具体要求，包括科目、难度、题型等的结果
+19:32:41:231  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]的依赖结果已准备完成
+19:32:41:231  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 等待后依赖已完成，直接执行任务: 分析并设计符合要求的试题结构，确保逻辑清晰且内容准确
+19:32:41:232  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行带依赖的记忆任务: 分析并设计符合要求的试题结构，确保逻辑清晰且内容准确
+19:32:41:232  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:11
+19:32:41:232  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，使用基础LLM处理带依赖的任务: 分析并设计符合要求的试题结构，确保逻辑清晰且内容准确
+19:32:42:212  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第0层任务全部完成
+19:32:43:679  INFO 9876 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : Redis连接已恢复
+19:32:45:213  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (1/100) [剩余时间: 583236ms]
+19:32:55:215  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (2/100) [剩余时间: 573234ms]
+19:33:05:217  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (3/100) [剩余时间: 563232ms]
+19:33:15:217  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (4/100) [剩余时间: 553232ms]
+19:33:19:688  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理带上下文任务完成，结果长度: 1690
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 带依赖的记忆对话执行[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]成功,结果长度: 1690
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]执行成功，开始更新状态，结果长度: 1690
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]状态更新完成
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]执行成功，耗时: 38458ms
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：分析并设计符合要求的试题结构，确保逻辑清晰且内容准确，结果长度: 1690
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]执行成功，结果：要分析并设计符合要求的试题结构，确保逻辑清晰且内容准确，我们需要根据用户提供的具体要求逐步拆解和规划。以下是详细的步骤和注意事项：
+
+---
+
+### 1. **明确试题的基本信息**
+在设计试题之前，首先需要明确用户的具体需求，包括以下要素：
+- **科目**：确定试题所属的学科领域（如数学、物理、语文等）。
+- **难度**：根据目标群体的能力水平设定难度（如小学、初中、高中或大学水平）。
+- **题型**：选择适合的题型（如选择题、填空题、解答题等）。
+- **知识点范围**：聚焦于特定的知识点或主题，确保试题内容与教学大纲或学习目标一致。
+- **数量**：确定需要生成的试题总数。
+- **其他特殊要求**：例如是否需要答案解析、是否有应用场景限制。
+
+---
+
+### 2. **设计试题的结构框架**
+根据上述信息，构建一个逻辑清晰的试题结构，确保试题内容层次分明、覆盖全面。以下是通用的设计框架：
+
+#### （1）**整体布局**
+- 按照难度递进的原则排列试题，通常从简单到复杂。
+- 根据题型分布合理安排比例。例如：
+  - 选择题：用于考察基础知识的理解。
+  - 填空题：用于检验记忆和细节掌握。
+  - 解答题：用于评估综合分析能力和问题解决能力。
+
+#### （2）**知识点覆盖**
+- 确保试题涵盖所有相关知识点，并合理分配权重。例如：
+  - 若是数学中的“函数”专题，可以包括定义域、值域、单调性、图像绘制等内容。
+  - 若是语文阅读理解，可以涉及主旨概括、细节推敲、修辞手法分析等。
+
+#### （3）**语言表达**
+- 题目描述应简洁明了，避免歧义。
+- 选项设计（选择题）应具有迷惑性但不过于刁钻，正确答案应唯一。
+- 解答题需明确作答要求，避免模糊不清。
+
+---
+
+### 3. **示例：设计一套数学试题**
+假设用户要求如下：
+- 科目：数学
+- 难度：中等（初中二年级）
+- 题型：选择题（5道）、填空题（5道）、解答题（2道）
+- 知识点范围：一次函数与平面几何
+- 数量：共12道
+- 其他要求：附带答案及简要解析
+
+#### （1）**选择题（5道）**
+- 考察一次函数的基本概念和性质。
+  - 示例：已知一次函数 \( y = 2x + 3 \)，则该函数的斜率是多少？
+    - A. 1
+    - B. 2
+    - C. 3
+    - D. 4
+    - **答案**：B  
+    - **解析**：一次函数 \( y = kx + b \) 中，\( k \) 表示斜率，因此答案为 2。
+
+#### （2）**填空题（5道）**
+- 考察平面几何中的基本公式和定理。
+  - 示例：若三角形的三边长分别为 3、4、5，则其面积为 _______。
+    - **答案**：6  
+    - **解析**：利用海伦公式或直接判断为直角三角形，面积为 \( \frac{1}{2} \times 3 \times 4 = 6 \)。
+
+#### （3）**解答题（2道）**
+- 综合运用一次函数和平面几何知识。
+  - 示例：已知直线 \( y = -x + 5 \) 和点 \( P(2, 3) \)，求点 \( P \) 到直线的距离。
+    - **答案**：距离为 \( \sqrt{2} \)
+    - **解析**：使用点到直线的距离公式 \( d = \frac{|Ax_1 + By_1 + C|}{\sqrt{A^2 + B^2}} \)。
+
+---
+
+### 4. **验证与优化**
+- **准确性**：检查每道题目是否符合知识点要求，答案是否正确。
+- **逻辑性**：确保题目之间无重复，知识点覆盖全面。
+- **实用性**：根据实际应用场景调整难度和题型分布（如竞赛类试题可以适当增加难度）。
+
+---
+
+通过以上步骤，可以设计出一套逻辑清晰、内容准确且符合用户需求的试题。如果您有更具体的要求，请进一步补充相关信息，我将为您定制更加精准的试题！
+19:33:19:689  WARN 9876 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）的依赖结果
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.commons.client.ResultCilent        : 为任务分析并设计符合要求的试题结构，确保逻辑清晰且内容准确添加结果到resultMap中
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]结果已添加到结果队列，总结果数: 1
+19:33:19:689  INFO 9876 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要），当前队列大小: 1
+19:33:19:689  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要），依赖数量: 0
+19:33:19:689  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]成功完成，开始更新图状态
+19:33:19:690  INFO 9876 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[分析并设计符合要求的试题结构，确保逻辑清晰且内容准确]的图状态更新完成
+19:33:20:407  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@401d83ce】
+19:33:20:407  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@401d83ce】
+19:33:20:408  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）
+19:33:20:408  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]开始执行，类型: SeptIntentRagHandler
+19:33:20:408  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : RAG处理器开始执行业务逻辑，意图: 在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）
+19:33:20:408  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]缺失前置依赖，需要延迟执行
+19:33:20:408  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务分析并设计符合要求的试题结构，确保逻辑清晰且内容准确的结果
+19:33:20:408  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]的依赖结果已准备完成
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.m.h.impl.SeptIntentRagHandler      : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]的依赖结果已准备完成，加入延时队列
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要），当前队列大小: 1
+19:33:20:409  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要），依赖数量: 1
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]执行成功，开始更新状态，结果长度: 0
+19:33:20:409  WARN 9876 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在调用工具函数生成特定格式的试题（如需要）的依赖结果
+19:33:20:409  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]等待前置依赖完成
+19:33:20:409  INFO 9876 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：调用工具函数生成特定格式的试题（如需要），当前队列大小: 1
+19:33:20:409  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]的前置依赖已完成
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]状态更新完成
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]执行成功，耗时: 1ms
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要），结果长度: 0
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]执行成功，结果：null
+19:33:20:409  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.commons.client.ResultCilent        : 为任务在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）添加结果到resultMap中
+19:33:20:410  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]结果已添加到结果队列，总结果数: 1
+19:33:20:410  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]成功完成，开始更新图状态
+19:33:20:410  INFO 9876 --- [smartcampus] [pool-2-thread-2] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]的图状态更新完成
+19:33:20:410  WARN 9876 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在调用工具函数生成特定格式的试题（如需要）的依赖结果
+19:33:20:410  INFO 9876 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[调用工具函数生成特定格式的试题（如需要）]已在延时队列中，跳过重复添加
+19:33:21:056  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@401d83ce】
+19:33:21:056  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler@401d83ce】
+19:33:21:057  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：调用工具函数生成特定格式的试题（如需要），依赖数量: 0
+19:33:21:057  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）
+19:33:21:057  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]开始执行，类型: SeptIntentRagHandler
+19:33:21:057  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.m.h.impl.SeptIntentRagHandler      : RAG处理器开始执行业务逻辑，意图: 在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）
+19:33:21:768  WARN 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : [StepIntentFuncHanlder]处理器不存在,触发兜底机制
+19:33:21:768  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.StepIntentLLMChatResponseHandler@6e5a77ef】
+19:33:21:769  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.StepIntentLLMChatResponseHandler@6e5a77ef】
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：调用工具函数生成特定格式的试题（如需要）
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]开始执行，类型: StepIntentLLMChatResponseHandler
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] s.m.h.i.StepIntentLLMChatResponseHandler : 基础LLM执行[调用工具函数生成特定格式的试题（如需要）]中
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] s.m.h.i.StepIntentLLMChatResponseHandler : 执行[调用工具函数生成特定格式的试题（如需要）]失败,前置条件未满足,将推迟处理
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）的结果
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] s.m.h.i.StepIntentLLMChatResponseHandler : 任务[调用工具函数生成特定格式的试题（如需要）]的依赖结果已准备完成
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：调用工具函数生成特定格式的试题（如需要），当前队列大小: 1
+19:33:21:769  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：调用工具函数生成特定格式的试题（如需要），依赖数量: 1
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] s.m.h.i.StepIntentLLMChatResponseHandler : [调用工具函数生成特定格式的试题（如需要）]任务已加入到延时队列中，即将重新执行
+19:33:21:769  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[调用工具函数生成特定格式的试题（如需要）]等待前置依赖完成
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]执行成功，开始更新状态，结果长度: 0
+19:33:21:769  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 任务[调用工具函数生成特定格式的试题（如需要）]的前置依赖已完成
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]状态更新完成
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]执行成功，耗时: 0ms
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：调用工具函数生成特定格式的试题（如需要），结果长度: 0
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 任务[调用工具函数生成特定格式的试题（如需要）]执行成功，结果：null
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.commons.client.ResultCilent        : 为任务调用工具函数生成特定格式的试题（如需要）添加结果到resultMap中
+19:33:21:769  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 任务[调用工具函数生成特定格式的试题（如需要）]结果已添加到结果队列，总结果数: 1
+19:33:21:770  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[调用工具函数生成特定格式的试题（如需要）]成功完成，开始更新图状态
+19:33:21:770  INFO 9876 --- [smartcampus] [pool-2-thread-4] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[调用工具函数生成特定格式的试题（如需要）]的图状态更新完成
+19:33:22:463  WARN 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : [StepIntentFuncHanlder]处理器不存在,触发兜底机制
+19:33:22:463  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.StepIntentLLMChatResponseHandler@6e5a77ef】
+19:33:22:463  INFO 9876 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.StepIntentLLMChatResponseHandler@6e5a77ef】
+19:33:22:464  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：调用工具函数生成特定格式的试题（如需要）
+19:33:22:464  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]开始执行，类型: StepIntentLLMChatResponseHandler
+19:33:22:464  INFO 9876 --- [smartcampus] [pool-2-thread-5] s.m.h.i.StepIntentLLMChatResponseHandler : 基础LLM执行[调用工具函数生成特定格式的试题（如需要）]中
+19:33:25:218  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (5/100) [剩余时间: 543231ms]
+19:33:35:220  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (6/100) [剩余时间: 533229ms]
+19:33:43:682  INFO 9876 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回1条脏数据到Redis
+19:33:45:221  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (7/100) [剩余时间: 523228ms]
+19:33:45:451  INFO 9876 --- [smartcampus] [pool-2-thread-5] s.m.h.i.StepIntentLLMChatResponseHandler : 执行[调用工具函数生成特定格式的试题（如需要）]成功,结果为[### 输出内容
+
+#### 意图说明
+根据已有结果（前置任务0的结果为null），当前意图是调用工具函数生成特定格式的试题。此过程需要明确试题生成的具体需求，包括试题类型、格式要求以及相关参数配置。
+
+---
+
+#### 输出步骤与逻辑
+
+1. **确认前置条件**  
+   - 前置任务0的结果为`null`，表明没有现成的数据或内容可以直接使用。因此，需要从零开始生成试题。
+   - 确保工具函数的可用性，并明确其输入参数和输出格式。
+
+2. **定义试题生成需求**  
+   - **试题类型**：明确需要生成的试题类型（如选择题、填空题、判断题等）。  
+   - **格式要求**：规定试题的输出格式（如JSON、纯文本或其他结构化格式）。  
+   - **其他参数**：指定试题难度、知识点范围、数量等附加信息。
+
+3. **调用工具函数**  
+   - 根据需求调用相应的试题生成工具函数。例如：
+     ```python
+     generated_questions = generate_questions(question_type="multiple_choice", 
+                                              format="json", 
+                                              difficulty="medium", 
+                                              count=5)
+     ```
+   - 确保传递的参数准确无误，以满足业务需求。
+
+4. **验证生成结果**  
+   - 检查工具函数返回的试题是否符合预期格式和内容要求。  
+   - 如果生成失败或结果不符合要求，记录错误信息并进行调整。
+
+5. **输出最终结果**  
+   - 将生成的试题以指定格式返回，供后续系统使用。例如：
+     ```json
+     {
+       "questions": [
+         {
+           "id": 1,
+           "type": "multiple_choice",
+           "question": "以下哪个是Python的关键字？",
+           "options": ["A. function", "B. def", "C. var", "D. let"],
+           "answer": "B"
+         },
+         ...
+       ]
+     }
+     ```
+
+---
+
+#### 注意事项
+- 如果工具函数不可用或无法满足需求，需及时反馈并寻求替代方案。  
+- 在生成过程中，确保试题内容的多样性和准确性，避免重复或错误。
+
+---
+
+#### 总结
+通过上述步骤，可以基于`前置任务0的结果为null`这一条件，调用工具函数生成符合特定格式的试题，满足业务需求。]
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]执行成功，开始更新状态，结果长度: 1310
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]状态更新完成
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.model.handler.BaseEnhancedHandler  : 任务[调用工具函数生成特定格式的试题（如需要）]执行成功，耗时: 22988ms
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：调用工具函数生成特定格式的试题（如需要），结果长度: 1310
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 任务[调用工具函数生成特定格式的试题（如需要）]执行成功，结果：### 输出内容
+
+#### 意图说明
+根据已有结果（前置任务0的结果为null），当前意图是调用工具函数生成特定格式的试题。此过程需要明确试题生成的具体需求，包括试题类型、格式要求以及相关参数配置。
+
+---
+
+#### 输出步骤与逻辑
+
+1. **确认前置条件**  
+   - 前置任务0的结果为`null`，表明没有现成的数据或内容可以直接使用。因此，需要从零开始生成试题。
+   - 确保工具函数的可用性，并明确其输入参数和输出格式。
+
+2. **定义试题生成需求**  
+   - **试题类型**：明确需要生成的试题类型（如选择题、填空题、判断题等）。  
+   - **格式要求**：规定试题的输出格式（如JSON、纯文本或其他结构化格式）。  
+   - **其他参数**：指定试题难度、知识点范围、数量等附加信息。
+
+3. **调用工具函数**  
+   - 根据需求调用相应的试题生成工具函数。例如：
+     ```python
+     generated_questions = generate_questions(question_type="multiple_choice", 
+                                              format="json", 
+                                              difficulty="medium", 
+                                              count=5)
+     ```
+   - 确保传递的参数准确无误，以满足业务需求。
+
+4. **验证生成结果**  
+   - 检查工具函数返回的试题是否符合预期格式和内容要求。  
+   - 如果生成失败或结果不符合要求，记录错误信息并进行调整。
+
+5. **输出最终结果**  
+   - 将生成的试题以指定格式返回，供后续系统使用。例如：
+     ```json
+     {
+       "questions": [
+         {
+           "id": 1,
+           "type": "multiple_choice",
+           "question": "以下哪个是Python的关键字？",
+           "options": ["A. function", "B. def", "C. var", "D. let"],
+           "answer": "B"
+         },
+         ...
+       ]
+     }
+     ```
+
+---
+
+#### 注意事项
+- 如果工具函数不可用或无法满足需求，需及时反馈并寻求替代方案。  
+- 在生成过程中，确保试题内容的多样性和准确性，避免重复或错误。
+
+---
+
+#### 总结
+通过上述步骤，可以基于`前置任务0的结果为null`这一条件，调用工具函数生成符合特定格式的试题，满足业务需求。
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.commons.client.ResultCilent        : 为任务调用工具函数生成特定格式的试题（如需要）添加结果到resultMap中
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 任务[调用工具函数生成特定格式的试题（如需要）]结果已添加到结果队列，总结果数: 2
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[调用工具函数生成特定格式的试题（如需要）]成功完成，开始更新图状态
+19:33:45:452  INFO 9876 --- [smartcampus] [pool-2-thread-5] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[调用工具函数生成特定格式的试题（如需要）]的图状态更新完成
+19:33:55:222  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (8/100) [剩余时间: 513227ms]
+19:34:05:234  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (9/100) [剩余时间: 503215ms]
+19:34:12:604  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.m.h.impl.SeptIntentRagHandler      : 生成增强查询成功，将执行: ### 1. 前置任务结果分析
+
+#### **结果要点提取：**
+- **关键信息**：
+  - 明确了试题设计的基本要素，包括科目、难度、题型、知识点范围、数量等。
+  - 提供了一个通用的试题设计框架，涵盖整体布局、知识点覆盖和语言表达。
+  - 示例展示了如何设计数学试题（选择题、填空题、解答题），并附带答案解析。
+  - 强调了验证与优化的重要性，确保试题的准确性、逻辑性和实用性。
+
+- **可用资源**：
+  - 试题设计的详细步骤和注意事项。
+  - 数学试题示例及其解析。
+  - 知识点分布和权重分配方法。
+  - 验证优化的检查清单。
+
+- **完成状态**：
+  - 前置任务已完成，输出内容逻辑清晰、结构完整，具备较高的实用性和指导性。
+
+---
+
+### 2. 当前任务需求定义
+
+**任务目标：**
+检索相关学科的专业资料以支持试题内容的准确性。
+
+**具体要求：**
+- **输入需求**：需要明确的学科领域、知识点范围和难度等级。
+- **输出标准**：提供权威、准确的参考资料，并标注其来源。
+- **约束条件**：
+  - 资料需符合用户需求的知识点范围。
+  - 资料必须来自可信来源（如学术期刊、官方教材、权威网站）。
+  - 检索时间控制在合理范围内。
+
+---
+
+### 3. 依赖关系映射与任务融合
+
+#### **直接依赖**：
+- 前置任务明确了试题设计的学科领域（如数学）、知识点范围（如一次函数和平面几何）以及难度等级（初中二年级）。这些信息直接决定了当前任务的检索方向和关键词。
+
+#### **间接依赖**：
+- 前置任务提供的试题设计框架和示例展示了具体的试题内容形式，这为当前任务提供了参考。例如，选择题和填空题可能需要基础概念和公式，而解答题可能需要综合性的理论支持。
+
+#### **缺失补充**：
+- 前置任务未提供具体的检索工具或数据库建议，因此需要补充权威知识库或搜索引擎的使用策略。
+- 需要进一步明确用户是否对资料来源有特殊要求（如仅限学术论文或教育部门发布的教材）。
+
+---
+
+### 4. 融合任务执行
+
+#### **执行步骤：**
+
+1. **继承处理**：
+   - 使用前置任务中明确的学科领域（数学）、知识点范围（一次函数和平面几何）和难度等级（初中二年级）作为检索关键词。
+   - 参考试题设计框架中的知识点覆盖部分，确保检索内容全面且无遗漏。
+
+2. **需求对接**：
+   - 根据试题示例，确定需要补充的具体知识点，如一次函数的斜率公式、平面几何中的三角形面积公式等。
+   - 确保检索到的资料能够支持试题内容的准确性，特别是涉及计算和推理的部分。
+
+3. **核心执行**：
+   - 使用权威数据库（如CNKI、Google Scholar）和教育部门发布的教材进行检索。
+   - 收集并整理相关内容，标注来源和适用范围。
+   - 对搜集到的资料进行筛选，剔除不符合用户需求的内容。
+
+4. **结果优化**：
+   - 整理成易于查阅的格式（如表格或文档），包含以下字段：知识点名称、参考资料内容摘要、来源链接。
+   - 确保所有资料均经过验证，避免引用错误或过时的信息。
+
+---
+
+### 5. 输出要求
+
+#### **任务执行结果：**
+
+| 知识点名称       | 参考资料内容摘要                                                                                   | 来源链接                                      |
+|------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------|
+| 一次函数斜率公式 | 一次函数的标准形式为 $ y = kx + b $，其中 $ k $ 表示斜率，表示直线倾斜程度。                        | [中小学数学教材](https://example.com)      |
+| 直角三角形面积公式 | 若三角形三边满足勾股定理，则可判定为直角三角形，面积公式为 $ \frac{1}{2}ab $，其中 $ a, b $ 为两直角边。 | [几何学原理](https://example.com)          |
+| 点到直线距离公式  | 点 $ P(x_1, y_1) $ 到直线 $ Ax + By + C = 0 $ 的距离公式为 $ d = \frac{|Ax_1 + By_1 + C|}{\sqrt{A^2 + B^2}} $。 | [解析几何教程](https://example.com)        |
+
+#### **关键信息传递：**
+- **核心输出**：
+  - 检索到了关于一次函数斜率公式、直角三角形面积公式和点到直线距离公式的权威参考资料。
+  - 所有资料均来源于可信渠道，并经过验证。
+
+- **传递数据**：
+  - 知识点名称及对应的参考资料内容摘要。
+  - 每条资料的来源链接，方便后续任务复核。
+
+- **使用建议**：
+  - 下一任务可以将这些参考资料用于试题内容的进一步优化和验证。
+  - 若需要扩展其他知识点，可按照相同流程进行检索。
+
+---
+
+### 质量检查标准
+
+- ✓ 前置任务结果得到充分利用，检索方向明确且精准。
+- ✓ 当前任务目标完全达成，提供了权威且相关的参考资料。
+- ✓ 输出结果符合后续任务需要，格式清晰、内容详实。
+- ✓ 整体逻辑连贯一致，任务链衔接顺畅。
+
+**最终结论：**
+当前任务已成功完成，为后续试题内容的优化和验证奠定了坚实基础。
+19:34:15:245  WARN 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (10/100) [剩余时间: 493204ms]
+19:34:16:948  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.m.h.impl.SeptIntentRagHandler      : 执行[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]成功，结果长度: 3913
+19:34:16:951  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]执行成功，开始更新状态，结果长度: 3913
+19:34:16:951  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]状态更新完成
+19:34:16:951  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.model.handler.BaseEnhancedHandler  : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]执行成功，耗时: 55894ms
+19:34:16:951  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要），结果长度: 3913
+19:34:16:951  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]执行成功，结果：### ✅ 第二部分：填空题（共 10 分）
+
+- **题量**：5 题  
+- **每题分值**：2 分  
+- **题型说明**：不需写过程，填写最终答案  
+- **覆盖内容**：
+  - 极限与导数基本概念
+  - 常用公式记忆
+  - 快速积分运算
+  - 重要不等式或公式值
+
+---
+
+### ✅ 第三部分：解答题（共 60 分）
+
+- **题量**：4 题  
+- **每题分值**：15 分  
+- **题型说明**：大题，要求写出详细过程  
+- **建议题型**：
+  1. 极限与连续性计算
+  2. 导数应用（极值、单调性、凹凸性）
+  3. 积分应用（面积、体积等）
+  4. 多元函数或微分方程分析
+
+---
+
+## 四、附加说明
+
+- **答题规范**：步骤完整、逻辑清晰、书写工整可加分。
+- **阅卷方式**：解答题采用“步骤分”评分方法，过程正确者部分得分。
+
+---
+
+> 如需生成一份包含具体题目的完整试卷，请继续告知考试范围、难度要求、是否附答案等信息。
+### ✅ 第二部分：填空题（共 10 分）
+
+- **题量**：5 题  
+- **每题分值**：2 分  
+- **题型说明**：不需写过程，填写最终答案  
+- **覆盖内容**：
+  - 极限与导数基本概念
+  - 常用公式记忆
+  - 快速积分运算
+  - 重要不等式或公式值
+
+---
+
+### ✅ 第三部分：解答题（共 60 分）
+
+- **题量**：4 题  
+- **每题分值**：15 分  
+- **题型说明**：大题，要求写出详细过程  
+- **建议题型**：
+  1. 极限与连续性计算
+  2. 导数应用（极值、单调性、凹凸性）
+  3. 积分应用（面积、体积等）
+  4. 多元函数或微分方程分析
+
+---
+
+## 四、附加说明
+
+- **答题规范**：步骤完整、逻辑清晰、书写工整可加分。
+- **阅卷方式**：解答题采用“步骤分”评分方法，过程正确者部分得分。
+
+---
+
+> 如需生成一份包含具体题目的完整试卷，请继续告知考试范围、难度要求、是否附答案等信息。
+试卷结构：填空题5道（10分，极限、导数、积分等），解答题4道（60分，极限、导数应用、积分、多元函数等）。要求步骤完整，逻辑清晰，按步评分。可指定范围生成具体题目及答案。
+# 📘 高等数学期末考试试卷结构
+
+---
+
+## 一、试卷信息
+
+| 项目       | 内容                  |
+|------------|-----------------------|
+| 课程名称   | 高等数学（一/二）     |
+| 考试类型   | 期末考试 / 模拟考试   |
+| 考试时长   | 120 分钟              |
+| 满分       | 100 分                |
+| 命题范围   | 第一章至第七章（可根据实际教学内容调整） |
+
+---
+
+## 二、试卷结构总览
+
+| 题型     | 数量   | 每题分值 | 小计   |
+|----------|--------|----------|--------|
+| 选择题   | 10 题  | 3 分     | 30 分  |
+| 填空题   | 5 题   | 2 分     | 10 分  |
+| 解答题   | 4 题   | 15 分    | 60 分  |
+| **总计** | —      | —        | **100 分** |
+
+---
+
+## 三、各部分内容说明
+
+### ✅ 第一部分：选择题（共 30 分）
+
+- **题量**：10 题  
+- **每题分值**：3 分  
+- **题型说明**：单项选择题，每题提供 4 个选项，选出唯一正确答案  
+- **覆盖内容**：
+  - 函数与极限
+  - 导数与微分
+  - 积分计算
+  - 常见函数图像与性质
+  - 级数与收敛性判断
+
+---
+# 📘 高等数学期末考试试卷结构
+
+---
+
+## 一、试卷信息
+
+| 项目       | 内容                  |
+|------------|-----------------------|
+| 课程名称   | 高等数学（一/二）     |
+| 考试类型   | 期末考试 / 模拟考试   |
+| 考试时长   | 120 分钟              |
+| 满分       | 100 分                |
+| 命题范围   | 第一章至第七章（可根据实际教学内容调整） |
+
+---
+
+## 二、试卷结构总览
+
+| 题型     | 数量   | 每题分值 | 小计   |
+|----------|--------|----------|--------|
+| 选择题   | 10 题  | 3 分     | 30 分  |
+| 填空题   | 5 题   | 2 分     | 10 分  |
+| 解答题   | 4 题   | 15 分    | 60 分  |
+| **总计** | —      | —        | **100 分** |
+
+---
+
+## 三、各部分内容说明
+
+### ✅ 第一部分：选择题（共 30 分）
+
+- **题量**：10 题  
+- **每题分值**：3 分  
+- **题型说明**：单项选择题，每题提供 4 个选项，选出唯一正确答案  
+- **覆盖内容**：
+  - 函数与极限
+  - 导数与微分
+  - 积分计算
+  - 常见函数图像与性质
+  - 级数与收敛性判断
+
+---
+**摘要**：  
+试卷分两部分：填空题（10分，5题，极限、导数、积分等）和解答题（60分，4题，极限、导数应用、积分、多元函数等）。答题需步骤完整，逻辑清晰，按过程评分。可提供具体题目及答案，需明确范围与难度。
+### ✅ 第二部分：填空题（共 10 分）
+
+- **题量**：5 题  
+- **每题分值**：2 分  
+- **题型说明**：不需写过程，填写最终答案  
+- **覆盖内容**：
+  - 极限与导数基本概念
+  - 常用公式记忆
+  - 快速积分运算
+  - 重要不等式或公式值
+
+---
+
+### ✅ 第三部分：解答题（共 60 分）
+### ✅ 第二部分：填空题（共 10 分）
+
+- **题量**：5 题  
+- **每题分值**：2 分  
+- **题型说明**：不需写过程，填写最终答案  
+- **覆盖内容**：
+  - 极限与导数基本概念
+  - 常用公式记忆
+  - 快速积分运算
+  - 重要不等式或公式值
+
+---
+
+### ✅ 第三部分：解答题（共 60 分）
+- **题量**：4 题  
+- **每题分值**：15 分  
+- **题型说明**：大题，要求写出详细过程  
+- **建议题型**：
+  1. 极限与连续性计算
+  2. 导数应用（极值、单调性、凹凸性）
+  3. 积分应用（面积、体积等）
+  4. 多元函数或微分方程分析
+
+---
+
+## 四、附加说明
+- **题量**：4 题  
+- **每题分值**：15 分  
+- **题型说明**：大题，要求写出详细过程  
+- **建议题型**：
+  1. 极限与连续性计算
+  2. 导数应用（极值、单调性、凹凸性）
+  3. 积分应用（面积、体积等）
+  4. 多元函数或微分方程分析
+
+---
+
+## 四、附加说明
+---
+
+## 三、各部分内容说明
+
+### ✅ 第一部分：选择题（共 30 分）
+
+- **题量**：10 题  
+- **每题分值**：3 分  
+- **题型说明**：单项选择题，每题提供 4 个选项，选出唯一正确答案  
+- **覆盖内容**：
+  - 函数与极限
+  - 导数与微分
+  - 积分计算
+  - 常见函数图像与性质
+  - 级数与收敛性判断
+
+---
+---
+
+## 三、各部分内容说明
+
+### ✅ 第一部分：选择题（共 30 分）
+
+- **题量**：10 题  
+- **每题分值**：3 分  
+- **题型说明**：单项选择题，每题提供 4 个选项，选出唯一正确答案  
+- **覆盖内容**：
+  - 函数与极限
+  - 导数与微分
+  - 积分计算
+  - 常见函数图像与性质
+  - 级数与收敛性判断
+
+---
+# 📘 高等数学期末考试试卷结构 --- ## 一、试卷信息 | 项目 | 内容 | |------------|-----------------------| | 课程名称 | 高等数学（一/二） | | 考试类型 | 期末考试 / 模拟考试 | | 考试时长 | 120 分钟 | | 满分 | 100 分 | | 命题范围 | 第一章至第七章（可根据实际教学内容调整） |
+# 📘 高等数学期末考试试卷结构 --- ## 一、试卷信息 | 项目 | 内容 | |------------|-----------------------| | 课程名称 | 高等数学（一/二） | | 考试类型 | 期末考试 / 模拟考试 | | 考试时长 | 120 分钟 | | 满分 | 100 分 | | 命题范围 | 第一章至第七章（可根据实际教学内容调整） |
+
+19:34:16:951  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.commons.client.ResultCilent        : 为任务在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）添加结果到resultMap中
+19:34:16:951  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.c.d.IntentDelayedQueueClien        : 任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]结果已添加到结果队列，总结果数: 2
+19:34:16:952  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]成功完成，开始更新图状态
+19:34:16:952  INFO 9876 --- [smartcampus] [pool-2-thread-3] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）]的图状态更新完成
+19:34:25:247  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 第1层没有可执行任务，所有任务执行完成
+19:34:25:248  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 所有层级任务执行完成，共1层，总耗时: 116799ms
+19:34:25:248  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务基于用户输入明确试题生成的具体要求，包括科目、难度、题型等的结果
+19:34:25:248  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务分析并设计符合要求的试题结构，确保逻辑清晰且内容准确的结果
+19:34:25:248  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务在知识库中检索相关学科的专业资料以支持试题内容的准确性（如需要）的结果
+19:34:25:248  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务调用工具函数生成特定格式的试题（如需要）的结果
+19:34:51:635  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.controller.ChatController          : 用户问题：我高等数学要挂科了，给我复习建议，请用户英文输出
+19:34:51:636  INFO 9876 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-3] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析用户意图: 我高等数学要挂科了，给我复习建议，请用户英文输出
+19:34:57:149  INFO 9876 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+19:35:02:565  INFO 102284 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 102284 (D:\Users\SmartCampus-front (2)\SmartCampus\target\classes started by 欧阳 in D:\Users\SmartCampus-front (2)\SmartCampus)
+19:35:02:567  INFO 102284 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+19:35:03:550  INFO 102284 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:35:03:553  INFO 102284 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:35:03:620  INFO 102284 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 51 ms. Found 0 Redis repository interfaces.
+19:35:04:257 ERROR 102284 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : An incompatible version [1.2.16] of the Apache Tomcat Native library is installed, while Tomcat requires version [1.2.34]
+19:35:04:465  INFO 102284 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8104 (http)
+19:35:04:479  INFO 102284 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+19:35:04:479  INFO 102284 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+19:35:04:551  INFO 102284 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+19:35:04:552  INFO 102284 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1926 ms
+19:35:04:836  INFO 102284 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:35:04:840  INFO 102284 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:35:08:793  INFO 102284 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SeptIntentRagHandler
+19:35:08:793  INFO 102284 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:35:08:797  INFO 102284 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentFuncHandler
+19:35:08:797  INFO 102284 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHandler] 注册成功
+19:35:08:800  INFO 102284 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentLLMChatResponseHandler
+19:35:08:800  INFO 102284 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:35:08:803  INFO 102284 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SteptIntentMemoryChatHandler
+19:35:08:803  INFO 102284 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:35:09:085  INFO 102284 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:35:09:341  INFO 102284 --- [smartcampus] [redisson-netty-5-15] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:35:09:354  INFO 102284 --- [smartcampus] [redisson-netty-5-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:35:09:418  INFO 102284 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:35:12:696  INFO 102284 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8104 (http) with context path '/'
+19:35:12:716  INFO 102284 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 10.6 seconds (process running for 11.627)
+19:35:12:722  INFO 102284 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:35:12:723  INFO 102284 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 0/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:35:15:344  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+19:35:15:349  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+19:35:15:351  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+19:35:15:496  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.controller.ChatController          : 用户问题：我高等数学要挂科了，给我复习建议，请用英文输出
+19:35:15:501  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析用户意图: 我高等数学要挂科了，给我复习建议，请用英文输出
+19:35:20:064  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图分析结果: ```json
+{
+  "intent": "The user needs advice on how to prepare for their higher mathematics exam to avoid failing.",
+  "intent_type": "信息查询",
+  "complexity": "中等",
+  "capabilities": ["知识检索", "逻辑推理"]
+}
+``` 
+Note: The request is informational and moderately complex because it requires providing structured study strategies, potentially drawing on known best practices for math exam preparation. It does not require tool invocation or historical context.
+19:35:20:064  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 开始拆分用户意图: ```json
+{
+  "intent": "The user needs advice on how to prepare for their higher mathematics exam to avoid failing.",
+  "intent_type": "信息查询",
+  "complexity": "中等",
+  "capabilities": ["知识检索", "逻辑推理"]
+}
+``` 
+Note: The request is informational and moderately complex because it requires providing structured study strategies, potentially drawing on known best practices for math exam preparation. It does not require tool invocation or historical context.
+19:35:24:906  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分结果: ```json
+{
+    "intent_analysis": {
+        "intent": "用户需要关于如何准备高等数学考试以避免不及格的建议",
+        "intent_type": "信息查询",
+        "complexity": "中等",
+        "required_capabilities": ["基础大语言模型对话处理器"]
+    },
+    "tasks": [
+        "分析并解释高等数学考试准备的有效策略",
+        "生成关于避免考试不及格的具体学习建议"
+    ]
+}
+```
+19:35:24:911  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分完成，共生成 2 个子任务
+19:35:24:911  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析任务依赖关系
+19:35:26:486  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 任务关系分析结果: ```json
+{
+    "relations": [
+        "分析并解释高等数学考试准备的有效策略:生成关于避免考试不及格的具体学习建议"
+    ]
+}
+```
+19:35:26:487  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.m.i.impl.StudentIntentHandler      : 成功解析 1 个任务依赖关系
+19:35:26:488  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 开始初始化任务节点，任务数量: 2
+19:35:26:488  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 成功添加 2 个任务节点
+19:35:26:488  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 成功添加 1 个任务依赖关系
+19:35:26:489  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.CreateDiagram        : 开始初始化任务图
+19:35:26:489  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.CreateDiagram        : 任务图初始化完成，节点数: 2, 边数: 1
+19:35:26:489  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.commons.utils.TaskInitUtils        : 任务节点初始化完成
+19:35:26:489  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 开始进行意图路由,意图为：[分析并解释高等数学考试准备的有效策略, 生成关于避免考试不及格的具体学习建议]
+19:35:26:490  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 开始执行任务，最大执行时间: 10分钟，最大重试次数: 100
+19:35:26:490  INFO 102284 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-1] c.a.s.model.router.StepIntentRouter      : 开始执行第0层任务，共1个任务: [分析并解释高等数学考试准备的有效策略]
+19:35:26:492  INFO 102284 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 第0层 - 开始执行任务: 分析并解释高等数学考试准备的有效策略
+19:35:26:492  INFO 102284 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.client.ResultCilent        : 任务分析并解释高等数学考试准备的有效策略不需要依赖其他任务
+19:35:26:493  INFO 102284 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.c.r.SlidingWindowRateLimiter       : 当前时间：1751715326492，当前请求数：1
+19:35:26:493  INFO 102284 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 任务分析并解释高等数学考试准备的有效策略开始正常执行
+19:35:26:493  INFO 102284 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.easyuse.TaskExecutor       : 开始异步执行任务: 分析并解释高等数学考试准备的有效策略
+19:35:26:494  INFO 102284 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 分析并解释高等数学考试准备的有效策略 开始执行Handler
+19:35:27:223  INFO 102284 --- [smartcampus] [pool-3-thread-1] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@1c76b2fe】
+19:35:27:224  INFO 102284 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[分析并解释高等数学考试准备的有效策略]开始执行，类型: SteptIntentMemoryChatHandler
+19:35:27:224  INFO 102284 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[分析并解释高等数学考试准备的有效策略]中
+19:35:27:225  INFO 102284 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行直接记忆任务: 分析并解释高等数学考试准备的有效策略
+19:35:27:539  WARN 102284 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 从Redis加载数据失败，key: smart_campus_summary_memory:1, error: Could not read JSON: Cannot construct instance of `com.aiproject.smartcampus.pojo.bo.CacheEntry` (no Creators, like default constructor, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 50]
+19:35:27:539  WARN 102284 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 标记Redis为不可用状态
+19:35:27:539  INFO 102284 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:1
+19:35:27:541  INFO 102284 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，降级使用基础LLM处理任务: 分析并解释高等数学考试准备的有效策略
+19:35:56:080  INFO 102284 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+19:36:41:768  INFO 95824 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Starting SmartCampusApplication using Java 21.0.7 with PID 95824 (D:\Users\SmartCampus-front (2)\SmartCampus\target\classes started by 欧阳 in D:\Users\SmartCampus-front (2)\SmartCampus)
+19:36:41:771  INFO 95824 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : No active profile set, falling back to 1 default profile: "default"
+19:36:42:744  INFO 95824 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+19:36:42:748  INFO 95824 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+19:36:42:817  INFO 95824 --- [smartcampus] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 54 ms. Found 0 Redis repository interfaces.
+19:36:43:436 ERROR 95824 --- [smartcampus] [main] o.a.catalina.core.AprLifecycleListener   : An incompatible version [1.2.16] of the Apache Tomcat Native library is installed, while Tomcat requires version [1.2.34]
+19:36:43:639  INFO 95824 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8104 (http)
+19:36:43:652  INFO 95824 --- [smartcampus] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+19:36:43:658  INFO 95824 --- [smartcampus] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+19:36:43:727  INFO 95824 --- [smartcampus] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+19:36:43:731  INFO 95824 --- [smartcampus] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1915 ms
+19:36:43:991  INFO 95824 --- [smartcampus] [main] c.a.s.commons.client.ResultCilent        : 任务结果客户端初始化成功
+19:36:43:998  INFO 95824 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 延时队列处理线程启动
+19:36:48:218  INFO 95824 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SeptIntentRagHandler
+19:36:48:219  INFO 95824 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SeptIntentRagHandler] 注册成功
+19:36:48:221  INFO 95824 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentFuncHandler
+19:36:48:222  INFO 95824 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentFuncHandler] 注册成功
+19:36:48:223  INFO 95824 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册StepIntentLLMChatResponseHandler
+19:36:48:223  INFO 95824 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [StepIntentLLMChatResponseHandler] 注册成功
+19:36:48:225  INFO 95824 --- [smartcampus] [main] c.a.s.m.h.EnhancedAutoRegisterHandler    : 处理器已注册SteptIntentMemoryChatHandler
+19:36:48:225  INFO 95824 --- [smartcampus] [main] c.a.s.c.c.EnhancedHandlerRegisterClient  : 处理器 [SteptIntentMemoryChatHandler] 注册成功
+19:36:48:421  INFO 95824 --- [smartcampus] [main] org.redisson.Version                     : Redisson 3.13.6
+19:36:48:590  INFO 95824 --- [smartcampus] [redisson-netty-5-17] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for /127.0.0.1:6379
+19:36:48:604  INFO 95824 --- [smartcampus] [redisson-netty-5-19] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for /127.0.0.1:6379
+19:36:48:644  INFO 95824 --- [smartcampus] [main] c.aiproject.smartcampus.config.ToolInit  : 天气搜索工具初始化成功
+19:36:50:664  INFO 95824 --- [smartcampus] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8104 (http) with context path '/'
+19:36:50:684  INFO 95824 --- [smartcampus] [main] c.a.smartcampus.SmartCampusApplication   : Started SmartCampusApplication in 9.333 seconds (process running for 10.251)
+19:36:50:688  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:36:50:690  INFO 95824 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 0/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:37:05:446  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+19:37:05:446  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+19:37:05:450  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 4 ms
+19:37:05:577  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.controller.ChatController          : 用户问题：我高等数学要挂科了，给我复习建议，将生成的结果用英文展示给我 
+19:37:05:577  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析用户意图: 我高等数学要挂科了，给我复习建议，将生成的结果用英文展示给我 
+19:37:08:007  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图分析结果: ```json
+{
+  "intent": "用户需要高等数学复习建议并要求用英文展示",
+  "intent_type": "信息查询",
+  "complexity": "中等",
+  "capabilities": ["知识检索", "逻辑推理"]
+}
+```
+19:37:08:007  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 开始拆分用户意图: ```json
+{
+  "intent": "用户需要高等数学复习建议并要求用英文展示",
+  "intent_type": "信息查询",
+  "complexity": "中等",
+  "capabilities": ["知识检索", "逻辑推理"]
+}
+```
+19:37:11:510  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分结果: ```json
+{
+    "intent_analysis": {
+        "intent": "用户需要高等数学复习建议并要求用英文展示",
+        "intent_type": "信息查询",
+        "complexity": "中等",
+        "required_capabilities": ["基础大语言模型对话处理器"]
+    },
+    "tasks": [
+        "基于用户需求生成关于高等数学复习的有效建议",
+        "将生成的复习建议翻译为英文并优化表达"
+    ]
+}
+```
+19:37:11:521  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 意图拆分完成，共生成 2 个子任务
+19:37:11:521  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 开始分析任务依赖关系
+19:37:12:987  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 任务关系分析结果: ```json
+{
+    "relations": [
+        "基于用户需求生成关于高等数学复习的有效建议:将生成的复习建议翻译为英文并优化表达"
+    ]
+}
+```
+19:37:12:989  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 成功解析 1 个任务依赖关系
+19:37:12:989  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.utils.TaskInitUtils        : 开始初始化任务节点，任务数量: 2
+19:37:12:990  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.utils.TaskInitUtils        : 成功添加 2 个任务节点
+19:37:12:990  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.utils.TaskInitUtils        : 成功添加 1 个任务依赖关系
+19:37:12:990  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.utils.CreateDiagram        : 开始初始化任务图
+19:37:12:991  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.utils.CreateDiagram        : 任务图初始化完成，节点数: 2, 边数: 1
+19:37:12:991  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.utils.TaskInitUtils        : 任务节点初始化完成
+19:37:12:991  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 开始进行意图路由,意图为：[基于用户需求生成关于高等数学复习的有效建议, 将生成的复习建议翻译为英文并优化表达]
+19:37:12:993  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 开始执行任务，最大执行时间: 10分钟，最大重试次数: 100
+19:37:12:993  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 开始执行第0层任务，共1个任务: [基于用户需求生成关于高等数学复习的有效建议]
+19:37:12:996  INFO 95824 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 第0层 - 开始执行任务: 基于用户需求生成关于高等数学复习的有效建议
+19:37:12:996  INFO 95824 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.client.ResultCilent        : 任务基于用户需求生成关于高等数学复习的有效建议不需要依赖其他任务
+19:37:12:998  INFO 95824 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.c.r.SlidingWindowRateLimiter       : 当前时间：1751715432996，当前请求数：1
+19:37:12:998  INFO 95824 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 任务基于用户需求生成关于高等数学复习的有效建议开始正常执行
+19:37:12:998  INFO 95824 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.commons.easyuse.TaskExecutor       : 开始异步执行任务: 基于用户需求生成关于高等数学复习的有效建议
+19:37:13:000  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户需求生成关于高等数学复习的有效建议 开始执行Handler
+19:37:13:727  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@1d7f0cd0】
+19:37:13:727  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成关于高等数学复习的有效建议]开始执行，类型: SteptIntentMemoryChatHandler
+19:37:13:727  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[基于用户需求生成关于高等数学复习的有效建议]中
+19:37:13:728  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行直接记忆任务: 基于用户需求生成关于高等数学复习的有效建议
+19:37:14:043  WARN 95824 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 从Redis加载数据失败，key: smart_campus_summary_memory:1, error: Could not read JSON: Cannot construct instance of `com.aiproject.smartcampus.pojo.bo.CacheEntry` (no Creators, like default constructor, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 50]
+19:37:14:043  WARN 95824 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 标记Redis为不可用状态
+19:37:14:043  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:1
+19:37:14:043  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，降级使用基础LLM处理任务: 基于用户需求生成关于高等数学复习的有效建议
+19:37:49:119  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理完成，结果长度: 1441
+19:37:49:120  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.smartcampus.model.store.LocalStore   : Redis连接已恢复
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆对话执行[基于用户需求生成关于高等数学复习的有效建议]成功,结果长度: 1441
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成关于高等数学复习的有效建议]执行成功，开始更新状态，结果长度: 1441
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成关于高等数学复习的有效建议]状态更新完成
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[基于用户需求生成关于高等数学复习的有效建议]执行成功，耗时: 35394ms
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户需求生成关于高等数学复习的有效建议 执行完成，结果长度: 1441
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户需求生成关于高等数学复习的有效建议 成功完成，开始保存结果
+19:37:49:121  INFO 95824 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 任务[基于用户需求生成关于高等数学复习的有效建议]执行完成,结果长度: 1441
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.client.ResultCilent        : 为任务基于用户需求生成关于高等数学复习的有效建议添加结果到resultMap中
+19:37:49:121  INFO 95824 --- [smartcampus] [ForkJoinPool.commonPool-worker-1] c.a.s.model.router.StepIntentRouter      : 第0层 - 任务基于用户需求生成关于高等数学复习的有效建议处理完成
+19:37:49:121  WARN 95824 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在将生成的复习建议翻译为英文并优化表达的依赖结果
+19:37:49:121  INFO 95824 --- [smartcampus] [pool-3-thread-1] c.a.s.commons.easyuse.TaskExecutor       : 任务 基于用户需求生成关于高等数学复习的有效建议 的所有后续处理已完成
+19:37:49:121  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 第0层的1个任务全部并行完成
+19:37:49:122  INFO 95824 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务已添加：将生成的复习建议翻译为英文并优化表达，当前队列大小: 1
+19:37:49:122  INFO 95824 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 开始处理延时任务：将生成的复习建议翻译为英文并优化表达，依赖数量: 0
+19:37:49:122  WARN 95824 --- [smartcampus] [Thread-1] c.a.s.commons.client.ResultCilent        : resultMap中不存在将生成的复习建议翻译为英文并优化表达的依赖结果
+19:37:49:122  INFO 95824 --- [smartcampus] [Thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[将生成的复习建议翻译为英文并优化表达]已在延时队列中，跳过重复添加
+19:37:49:808  INFO 95824 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.c.EnhancedHandlerRegisterClient  : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@1d7f0cd0】
+19:37:49:808  INFO 95824 --- [smartcampus] [DelayedQueue-Consumer] c.a.s.c.d.IntentDelayedQueueClien        : 获取到的处理器为【com.aiproject.smartcampus.model.handler.impl.SteptIntentMemoryChatHandler@1d7f0cd0】
+19:37:49:809  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务开始执行：将生成的复习建议翻译为英文并优化表达
+19:37:49:809  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[将生成的复习建议翻译为英文并优化表达]开始执行，类型: SteptIntentMemoryChatHandler
+19:37:49:809  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基于记忆的对话处理器执行[将生成的复习建议翻译为英文并优化表达]中
+19:37:49:809  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[将生成的复习建议翻译为英文并优化表达]依赖未就绪，尝试等待依赖完成
+19:37:49:810  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务基于用户需求生成关于高等数学复习的有效建议的结果
+19:37:49:810  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 记忆任务[将生成的复习建议翻译为英文并优化表达]的依赖结果已准备完成
+19:37:49:810  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 等待后依赖已完成，直接执行任务: 将生成的复习建议翻译为英文并优化表达
+19:37:49:810  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 开始执行带依赖的记忆任务: 将生成的复习建议翻译为英文并优化表达
+19:37:49:811  WARN 95824 --- [smartcampus] [pool-2-thread-1] c.a.smartcampus.model.store.LocalStore   : 从Redis加载数据失败，key: smart_campus_summary_memory:11, error: Could not read JSON: Cannot construct instance of `com.aiproject.smartcampus.pojo.bo.CacheEntry` (no Creators, like default constructor, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 50]
+19:37:49:811  WARN 95824 --- [smartcampus] [pool-2-thread-1] c.a.smartcampus.model.store.LocalStore   : 标记Redis为不可用状态
+19:37:49:811  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.smartcampus.model.store.LocalStore   : 未找到任何数据，创建新的会话，key: smart_campus_summary_memory:11
+19:37:49:811  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 未找到历史记忆，使用基础LLM处理带依赖的任务: 将生成的复习建议翻译为英文并优化表达
+19:37:50:683  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : Redis连接已恢复
+19:37:51:122  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 第0层任务全部完成
+19:37:54:123  WARN 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (1/100) [剩余时间: 558870ms]
+19:38:04:124  WARN 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (2/100) [剩余时间: 548869ms]
+19:38:14:124  WARN 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (3/100) [剩余时间: 538869ms]
+19:38:24:125  WARN 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 第1层没有就绪任务，但还有未完成任务，等待10000ms后重试 (4/100) [剩余时间: 528868ms]
+19:38:28:918  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 基础LLM处理带上下文任务完成，结果长度: 4280
+19:38:28:919  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.m.h.i.SteptIntentMemoryChatHandler : 带依赖的记忆对话执行[将生成的复习建议翻译为英文并优化表达]成功,结果长度: 4280
+19:38:28:919  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[将生成的复习建议翻译为英文并优化表达]执行成功，开始更新状态，结果长度: 4280
+19:38:28:919  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[将生成的复习建议翻译为英文并优化表达]状态更新完成
+19:38:28:919  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.model.handler.BaseEnhancedHandler  : 任务[将生成的复习建议翻译为英文并优化表达]执行成功，耗时: 39110ms
+19:38:28:919  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务执行完成：将生成的复习建议翻译为英文并优化表达，结果长度: 4280
+19:38:28:919  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[将生成的复习建议翻译为英文并优化表达]执行成功，结果：以下是优化后的高等数学复习建议的英文版本，帮助用户高效备考或掌握知识点：
+
+---
+
+### 1. **Create a Clear Study Plan**
+- **Divide into Phases**: Break your review into three stages: foundational knowledge review, key concepts and challenging topics mastery, and comprehensive practice with mock tests.
+- **Time Management**: Allocate fixed daily study sessions for advanced mathematics to avoid burnout from prolonged learning. Aim for 1-2 hours per session with regular breaks.
+- **Set Goals**: Establish specific objectives for each phase, such as “Master limits and continuity this week” or “Complete all derivative-related problems next week.”
+
+---
+
+### 2. **Solidify Fundamental Concepts**
+- **Understand, Don’t Memorize**: The essence of higher mathematics lies in logical reasoning and derivation processes. Focus on understanding the meaning and derivation of theorems and formulas.
+- **Memorize Key Formulas**: Familiarize yourself with essential formulas (e.g., basic derivative rules, integral formulas, Taylor expansions), but reinforce memory through derivation exercises.
+- **Organize Knowledge Framework**: Create mind maps to categorize and connect topics, such as:
+  - Limits and Continuity
+  - Derivatives and Differentials
+  - Integrals (Indefinite and Definite)
+  - Differential Equations
+  - Multivariable Calculus
+
+---
+
+### 3. **Strengthen Key and Challenging Topics**
+- **Common Focus Areas**:
+  - Limit calculations (L’Hôpital’s Rule, Squeeze Theorem, etc.)
+  - Applications of derivatives (monotonicity, extrema, concavity)
+  - Geometric applications of definite integrals (area, volume, etc.)
+  - Solving ordinary differential equations
+- **Targeted Practice**: Focus on weak areas by practicing frequently tested question types.
+- **Overcome Difficulties**: For complex topics (e.g., multivariable functions, field theory), leverage video tutorials, reference books, or consult instructors.
+
+---
+
+### 4. **Focus on Classic Examples and Problem-Solving Practice**
+- **Select High-Quality Problems**: Practice classic examples and end-of-chapter exercises from trusted textbooks (e.g., *Advanced Mathematics* by Tongji University).
+- **Summarize Solution Techniques**: Generalize problem-solving methods for each type of question:
+  - Limit problems: Identify the type first, then choose appropriate methods (factorization, equivalent infinitesimals, L’Hôpital’s Rule, etc.).
+  - Integral problems: Master techniques like substitution and integration by parts.
+- **Maintain an Error Log**: Record mistakes and challenging problems, and regularly revisit them to analyze errors.
+
+---
+
+### 5. **Utilize Multiple Learning Resources**
+- **Textbooks and Reference Books**:
+  - Primary Texts: *Advanced Mathematics* by Tongji University, *Calculus* by Tsinghua University.
+  - Supplementary Books: *Comprehensive Review for Graduate Entrance Exam* by Li Yongle, *18 Lectures on Advanced Mathematics* by Zhang Yu.
+- **Online Resources**:
+  - Video tutorials on platforms like Bilibili or YouTube.
+  - Websites such as Wolfram Alpha and Mathway for verifying calculations.
+- **Learning Tools**:
+  - Use graphing calculators or software (e.g., Matlab, GeoGebra) to visualize function graphs and geometric interpretations.
+
+---
+
+### 6. **Develop Problem-Solving Thinking and Habits**
+- **Think from Multiple Perspectives**: Solve problems using different approaches to enhance flexibility.
+- **Pay Attention to Details**: Maintain clarity in notation and avoid careless mistakes.
+- **Timed Practice**: Simulate exam conditions to improve speed and accuracy.
+
+---
+
+### 7. **Regular Assessment and Adjustment**
+- **Self-Assessment and Mock Exams**: Conduct weekly self-tests to evaluate progress.
+- **Identify Weak Spots**: Adjust your study plan based on test results to focus on areas needing improvement.
+- **Stay Calm and Confident**: Address challenges with patience and persistence.
+
+---
+
+### 8. **Collaborative Learning and Discussion**
+- **Form Study Groups**: Collaborate with peers to discuss difficult questions and share insights.
+- **Seek Guidance**: Consult teachers promptly to resolve doubts and prevent confusion from accumulating.
+
+---
+
+By following these strategies and tailoring them to your personal needs, you can efficiently review advanced mathematics and achieve excellent results!
+19:38:28:920  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.commons.client.ResultCilent        : 为任务将生成的复习建议翻译为英文并优化表达添加结果到resultMap中
+19:38:28:920  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 任务[将生成的复习建议翻译为英文并优化表达]结果已添加到结果队列，总结果数: 1
+19:38:28:920  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[将生成的复习建议翻译为英文并优化表达]成功完成，开始更新图状态
+19:38:28:920  INFO 95824 --- [smartcampus] [pool-2-thread-1] c.a.s.c.d.IntentDelayedQueueClien        : 延时任务[将生成的复习建议翻译为英文并优化表达]的图状态更新完成
+19:38:34:127  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 第1层没有可执行任务，所有任务执行完成
+19:38:34:127  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.model.router.StepIntentRouter      : 所有层级任务执行完成，共1层，总耗时: 81134ms
+19:38:34:127  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务基于用户需求生成关于高等数学复习的有效建议的结果
+19:38:34:127  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.commons.client.ResultCilent        : 从resultMap中获取任务将生成的复习建议翻译为英文并优化表达的结果
+19:38:50:683  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:39:05:478  INFO 95824 --- [smartcampus] [http-nio-127.0.0.1-8104-exec-2] c.a.s.m.i.impl.StudentIntentHandler      : 用户意图 [我高等数学要挂科了，给我复习建议，将生成的结果用英文展示给我 ] 处理完成，处理结果: [以下是基于您提供的中英文高等数学复习建议的总结与优化，旨在帮助用户更高效地掌握知识点并备考：
+
+---
+
+### **1. 制定清晰的学习计划**
+- **分阶段学习**：将复习分为三个阶段：基础知识回顾、重点难点突破、综合练习与模拟测试。
+- **时间管理**：每天固定时间复习（1-2小时），避免疲劳学习，合理安排休息。
+- **目标设定**：每阶段设定具体目标，例如“本周掌握极限与连续性”或“下周完成导数相关题目”。
+
+---
+
+### **2. 夯实基础概念**
+- **理解优先**：注重逻辑推理和公式推导，避免死记硬背。
+- **熟记核心公式**：如导数、积分、泰勒展开等常用公式，结合推导过程记忆。
+- **知识框架**：通过思维导图梳理知识点，分类整理：
+  - 极限与连续
+  - 导数与微分
+  - 不定积分与定积分
+  - 微分方程
+  - 多元函数微积分
+
+---
+
+### **3. 强化重点与难点**
+- **高频考点**：
+  - 极限计算（洛必达法则、夹逼准则）
+  - 导数应用（单调性、极值、凹凸性）
+  - 定积分几何应用（面积、体积等）
+  - 常微分方程求解
+- **针对性训练**：针对薄弱环节多做题，尤其是考试常见题型。
+- **难点突破**：借助视频讲解、参考书或请教老师解决复杂内容（如多元函数、场论）。
+
+---
+
+### **4. 注重例题与习题训练**
+- **精选习题**：选择经典教材（如同济《高等数学》）中的例题和课后习题。
+- **归纳解题方法**：总结通用解法，例如：
+  - 极限题：判断类型，选择合适方法（因式分解、等价无穷小、洛必达法则）。
+  - 积分题：熟练掌握换元法、分部积分法。
+- **错题本**：记录易错题与难题，定期回顾分析错误原因。
+
+---
+
+### **5. 善用多种学习资源**
+- **教材与辅导书**：
+  - 主教材：同济大学《高等数学》、清华大学《微积分》。
+  - 辅导书：李永乐《考研数学复习全书》、张宇《高等数学18讲》。
+- **在线资源**：
+  - B站、YouTube上的高数讲解视频。
+  - 数学工具网站（如Wolfram Alpha、Mathway）用于验证计算结果。
+- **辅助工具**：
+  - 使用图形计算器或软件（如Matlab、GeoGebra）辅助理解几何意义。
+
+---
+
+### **6. 培养解题思维与习惯**
+- **多角度思考**：尝试不同方法解决问题，提升灵活性。
+- **注重细节**：保持符号书写规范，避免粗心丢分。
+- **限时训练**：模拟考试环境，锻炼快速解题能力。
+
+---
+
+### **7. 定期检测与调整**
+- **自测与模拟考试**：每周进行一次自测，检验复习效果。
+- **查漏补缺**：根据测试结果调整计划，集中攻克薄弱点。
+- **心态平稳**：遇到困难时保持耐心，逐步解决问题。
+
+---
+
+### **8. 团队学习与讨论**
+- **组建学习小组**：与同学讨论疑难问题，互相启发。
+- **请教老师**：及时解决疑问，避免积累困惑。
+
+---
+
+### **总结**
+通过以上方法，结合个人实际情况灵活调整，用户可以高效复习高等数学并取得理想成绩。无论是中文还是英文版本，这些建议都强调了计划性、基础性、重点突破、多样化学习资源以及良好的学习习惯，确保复习过程系统化、科学化，最终实现知识的全面掌握与应试能力的提升。]
+19:40:50:682  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:41:50:683  INFO 95824 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 2/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:42:50:681  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:44:50:692  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:46:50:691  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:46:50:692  INFO 95824 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 2/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:48:50:687  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:50:50:685  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:51:50:694  INFO 95824 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 2/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:52:50:694  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:54:50:692  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:56:50:696  INFO 95824 --- [smartcampus] [scheduling-1] c.a.smartcampus.model.store.LocalStore   : 强制写回0条脏数据到Redis
+19:56:50:696  INFO 95824 --- [smartcampus] [scheduling-1] c.a.s.model.store.MemoryStoreScheduler   : 缓存统计 - 大小: 2/1000, Redis状态: true, 脏数据: 0, 过期数据: 0
+19:58:23:115  INFO 95824 --- [smartcampus] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+19:58:23:118  INFO 95824 --- [smartcampus] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
