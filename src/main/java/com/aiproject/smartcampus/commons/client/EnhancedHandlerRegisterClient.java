@@ -1,9 +1,7 @@
 package com.aiproject.smartcampus.commons.client;
 
-import com.aiproject.smartcampus.model.intent.handler.Handler;
-import com.aiproject.smartcampus.model.prompts.SystemPrompts;
+import com.aiproject.smartcampus.model.handler.Handler;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
-import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.response.ChatResponse;

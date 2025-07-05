@@ -1,7 +1,7 @@
 package com.aiproject.smartcampus.commons.easyuse;
 
 import com.aiproject.smartcampus.commons.client.EnhancedHandlerRegisterClient;
-import com.aiproject.smartcampus.model.intent.handler.Handler;
+import com.aiproject.smartcampus.model.handler.Handler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

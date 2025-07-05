@@ -1,9 +1,6 @@
 package com.aiproject.smartcampus.mapper;
 
-import com.aiproject.smartcampus.pojo.dto.ChapterMaterialStats;
-import com.aiproject.smartcampus.pojo.dto.CourseMaterialStats;
 import com.aiproject.smartcampus.pojo.po.ChapterKnowledgePoint;
-import com.aiproject.smartcampus.pojo.po.CourseMaterial;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

@@ -6,7 +6,6 @@ import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 
 import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import dev.langchain4j.agent.tool.P;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

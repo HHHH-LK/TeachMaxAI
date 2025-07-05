@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 class AgentTest {
 
     @Autowired
-    private Agent agent;
+    private ChatAgent chatAgent;
 
     @Test
     void start() {
@@ -20,7 +20,7 @@ class AgentTest {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now);
         System.out.println(l);
-        String answer = agent.start("帮我生成一份基于解三角形的变换公式生成一套题目便于学生掌握知识点，并以每道每道题的方式以json的形式输出，");
+        String answer = chatAgent.start("请你基于刚刚生成的方案为我出一些函数与极限练习题，帮我快速掌握重点任务" );
         System.out.println(answer);
         LocalDateTime now2 = LocalDateTime.now();
         long l1 = System.currentTimeMillis();

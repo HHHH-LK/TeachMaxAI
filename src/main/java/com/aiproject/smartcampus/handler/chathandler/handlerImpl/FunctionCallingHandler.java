@@ -5,13 +5,12 @@ import com.aiproject.smartcampus.commons.utils.PromptUtils;
 import com.aiproject.smartcampus.exception.MemoryExpection;
 import com.aiproject.smartcampus.exception.RagExpection;
 import com.aiproject.smartcampus.handler.chathandler.ChatHandler;
-import com.aiproject.smartcampus.pojo.bo.ToolList;
+import com.aiproject.smartcampus.model.toollist.ChatAgentToolList;
 import com.aiproject.smartcampus.pojo.bo.handlerentity.ChatHandlerResponse;
 import com.aiproject.smartcampus.pojo.bo.handlerentity.ChatHandlerquery;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
-import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -47,7 +46,7 @@ import static com.aiproject.smartcampus.contest.CommonContest.TOOL_SCAN_NAME;
 @RequiredArgsConstructor
 public class FunctionCallingHandler extends ChatHandler {
 
-    private final ToolList toolList;
+    private final ChatAgentToolList chatAgentToolList;
     private final ChatLanguageModel chatLanguageModel;
     private final SearchApiWebSearchEngine searchEngine;
 
@@ -81,7 +80,7 @@ public class FunctionCallingHandler extends ChatHandler {
             ChatResponse chatResponse = chatLanguageModel.doChat(ChatRequest.builder()
                     .messages(SystemMessage.systemMessage(buildSystemPrompt()), UserMessage.from(userMessage))
                     .parameters(ChatRequestParameters.builder()
-                            .toolSpecifications(toolList.getTools())
+                            .toolSpecifications(chatAgentToolList.getTools())
                             .build())
                     .build()
             );

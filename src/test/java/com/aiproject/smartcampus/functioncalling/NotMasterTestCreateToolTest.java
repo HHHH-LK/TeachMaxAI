@@ -1,7 +1,6 @@
 package com.aiproject.smartcampus.functioncalling;
 
-import com.aiproject.smartcampus.functioncalling.toolutils.NotMasterTestCreatetoolUtils;
-import com.aiproject.smartcampus.mapper.QuestionBankMapper;
+import com.aiproject.smartcampus.model.functioncalling.NotMasterTestCreateTool;
 import com.aiproject.smartcampus.mapper.StudentKnowledgeMasteryMapper;
 import com.aiproject.smartcampus.pojo.bo.KnowledgepointBO;
 import com.aiproject.smartcampus.pojo.bo.TestTaskBO;
@@ -11,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

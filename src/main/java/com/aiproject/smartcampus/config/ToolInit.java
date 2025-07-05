@@ -1,6 +1,6 @@
 package com.aiproject.smartcampus.config;
 
-import com.aiproject.smartcampus.pojo.bo.ToolList;
+import com.aiproject.smartcampus.model.toollist.ChatAgentToolList;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import dev.langchain4j.web.search.searchapi.SearchApiWebSearchEngine;
@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import java.util.Map;
 @Slf4j
 public class ToolInit {
 
-    private final ToolList toolList;
+    private final ChatAgentToolList chatAgentToolList;
 
     //工具声明
     @Bean
@@ -39,7 +38,7 @@ public class ToolInit {
                         .build())
                 .build();
         //将声明的tool存入list种
-        List<ToolSpecification> tools = toolList.getTools();
+        List<ToolSpecification> tools = chatAgentToolList.getTools();
         //判断是否已经存在
         boolean exists = tools.stream().anyMatch(tool -> "WeatherTool".equals(tool.name()));
         if (!exists) {
@@ -80,7 +79,7 @@ public class ToolInit {
                         .build())
                 .build();
         //将声明的tool存入list种
-        List<ToolSpecification> tools = toolList.getTools();
+        List<ToolSpecification> tools = chatAgentToolList.getTools();
         //判断是否已经存在
         boolean exists = tools.stream().anyMatch(tool -> "SearchEngine".equals(tool.name()));
         if (!exists) {
@@ -90,8 +89,8 @@ public class ToolInit {
         return searchEngine;
     }
 
-    //编写ppt工具
 
+  //
 
 
 

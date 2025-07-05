@@ -103,18 +103,24 @@ public class CreateDiagram {
 
     //(基于拓扑)获取就绪列表 - 修复逻辑错误
     public List<String> getReadyList() {
-        readWriteLock.readLock().lock(); // 改为读锁，因为只是读取数据
+        readWriteLock.readLock().lock();
         try {
             List<String> currentReadyList = new ArrayList<>();
 
-            //寻找所有入度为0的任务
+            // 寻找所有入度为0的任务
             for (Map.Entry<String, AtomicInteger> entry : intentMap.entrySet()) {
                 String intent = entry.getKey();
                 String status = taskStatusChange.getStatus(intent);
 
-                // 修复：正确的逻辑判断，添加括号
-                if (entry.getValue().get() == 0 && (status.equals("UNDO") || status.equals("ERROR"))) {
+                // 修复：扩展可执行状态的范围
+                boolean isExecutableStatus = status.equals("UNDO") ||
+                        status.equals("ERROR") ||
+                        status.equals("DELAYED_READY") ||
+                        status.equals("WAITING_RETRY");
+
+                if (entry.getValue().get() == 0 && isExecutableStatus) {
                     currentReadyList.add(intent);
+                    log.debug("添加就绪任务: {} (状态: {})", intent, status);
                 }
             }
 
@@ -269,7 +275,18 @@ public class CreateDiagram {
         try {
             for (String task : adjList.keySet()) {
                 String status = taskStatusChange.getStatus(task);
-                if ("UNDO".equals(status) || "RUNNING".equals(status) || "ERROR".equals(status)) {
+
+                // 扩展未完成状态的定义
+                boolean isUnfinished = "UNDO".equals(status) ||
+                        "RUNNING".equals(status) ||
+                        "ERROR".equals(status) ||
+                        "DELAYED_PROCESSING".equals(status) ||
+                        "WAITING_DEPENDENCIES".equals(status) ||
+                        "WAITING_RETRY".equals(status) ||
+                        "RATE_LIMITED".equals(status);
+
+                if (isUnfinished) {
+                    log.debug("发现未完成任务: {} (状态: {})", task, status);
                     return true;
                 }
             }

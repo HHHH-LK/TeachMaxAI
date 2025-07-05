@@ -4,7 +4,7 @@ import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.exception.StudentExpection;
 import com.aiproject.smartcampus.exception.UserExpection;
-import com.aiproject.smartcampus.functioncalling.NotMasterTestCreateTool;
+import com.aiproject.smartcampus.model.functioncalling.NotMasterTestCreateTool;
 import com.aiproject.smartcampus.mapper.KnowledgePointMapper;
 import com.aiproject.smartcampus.mapper.StudentKnowledgeMasteryMapper;
 import com.aiproject.smartcampus.mapper.UserMapper;

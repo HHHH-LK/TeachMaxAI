@@ -22,6 +22,8 @@ public class   UserLocalThreadUtils {
     public static void setUserInfo(User user){threadLocal.set(user);}
     public static void removeUserInfo(){threadLocal.remove();}
 
-
+    public static String test(){
+        return "1";
+    }
 
 }

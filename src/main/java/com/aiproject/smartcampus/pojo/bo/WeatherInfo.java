@@ -1,7 +1,7 @@
 package com.aiproject.smartcampus.pojo.bo;
 
 
-import com.aiproject.smartcampus.functioncalling.toolutils.WeatherToolUtils;
+import com.aiproject.smartcampus.model.functioncalling.toolutils.WeatherToolUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

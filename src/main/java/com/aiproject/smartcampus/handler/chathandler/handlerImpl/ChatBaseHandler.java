@@ -7,7 +7,7 @@ import com.aiproject.smartcampus.exception.MemoryExpection;
 import com.aiproject.smartcampus.handler.chathandler.ChatHandler;
 import com.aiproject.smartcampus.pojo.bo.handlerentity.ChatHandlerResponse;
 import com.aiproject.smartcampus.pojo.bo.handlerentity.ChatHandlerquery;
-import com.aiproject.smartcampus.store.LocalStore;
+import com.aiproject.smartcampus.model.store.LocalStore;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;

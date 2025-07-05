@@ -1,11 +1,10 @@
 package com.aiproject.smartcampus.model.intent.handler.impl;
 
 import com.aiproject.smartcampus.SmartCampusApplication;
+import com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(classes = SmartCampusApplication.class)

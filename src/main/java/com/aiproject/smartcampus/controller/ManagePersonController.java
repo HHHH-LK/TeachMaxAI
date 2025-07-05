@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
  * @author: lk
  * @create: 2025-05-20 09:49
  **/
-//todo service 待创建
 
 @RequiredArgsConstructor
 @RestController
@@ -72,7 +71,6 @@ public class ManagePersonController {
      * */
     @PostMapping("/updateuserstatus")
     public Result updateUserStatus(String userId,String status){
-
 
         return adminService.updateUserStatus(userId,status);
     }

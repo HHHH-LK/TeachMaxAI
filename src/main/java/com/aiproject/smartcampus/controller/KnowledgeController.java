@@ -46,6 +46,9 @@ public class KnowledgeController {
 
     }
 
+    //生成相关知识点
+
+
     //智能选取知识点进行生成
     @PostMapping("/ai/createTest")
     public Result createListTestByAgent(List<String> pointIds){
