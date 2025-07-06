@@ -14,7 +14,27 @@ import java.util.List;
 @Repository
 @Mapper
 public interface StudentMapper extends BaseMapper<Student> {
-    
+
+    /**
+     * 根据userid查询学生
+     */
+    @Select("SELECT s.*, u.* FROM students s LEFT JOIN users u ON s.user_id = u.user_id WHERE u.user_id = #{userId}")
+    @Results({
+            @Result(property = "studentId", column = "student_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "studentNumber", column = "student_number"),
+            @Result(property = "grade", column = "grade"),
+            @Result(property = "className", column = "class_name"),
+            @Result(property = "user.userId", column = "user_id"),
+            @Result(property = "user.username", column = "username"),
+            @Result(property = "user.realName", column = "real_name"),
+            @Result(property = "user.email", column = "email"),
+            @Result(property = "user.phone", column = "phone"),
+            @Result(property = "user.status", column = "status"),
+            @Result(property = "user.createdAt", column = "created_at"),
+    })
+    Student findByUserId(@Param("userId") Integer userId);
+
     /**
      * 根据学号查询学生
      */

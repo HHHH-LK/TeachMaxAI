@@ -9,5 +9,4 @@ public class LoginDTO {
     private String email; // 邮箱
     private String username; // 用户名
     private String password; // 密码
-    private String userType; // 用户类型，学生、教师、管理员等
 }

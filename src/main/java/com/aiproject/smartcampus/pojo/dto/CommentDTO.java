@@ -11,7 +11,6 @@ public class CommentDTO {
     private String content; // 评论内容
     private Integer userId; // 用户ID
     private String userName; // 用户名
-    private String userAvatar; // 用户头像
     private Integer parentId; // 父评论Id
     private Integer likeCount; // 点赞数
     private LocalDateTime createTime; // 评论创建时间

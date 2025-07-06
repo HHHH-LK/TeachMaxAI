@@ -1,10 +1,10 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
-import com.aiproject.smartcampus.pojo.dto.LoginDTO;
-import com.aiproject.smartcampus.pojo.dto.PasswordResetDTO;
-import com.aiproject.smartcampus.pojo.dto.PasswordResetVerificationDTO;
-import com.aiproject.smartcampus.pojo.dto.RegisterDTO;
+import com.aiproject.smartcampus.pojo.dto.*;
+import com.aiproject.smartcampus.pojo.po.Student;
+import com.aiproject.smartcampus.pojo.po.Teacher;
+import com.aiproject.smartcampus.pojo.po.User;
 import com.aiproject.smartcampus.service.CommonService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -47,4 +47,18 @@ public class CommonController {
     public Result resetPassword(@RequestBody PasswordResetDTO dto) {
         return commonService.resetPassword(dto);
     }
+
+    @PostMapping("/completeStudentInfo/{userId}")
+    @Operation(summary = "完善学生信息", description = "用户注册后完善个人信息")
+    public Result completeStudentInfo(@PathVariable Integer userId, @RequestBody CompleteStudentDTO studentInfo) {
+        return commonService.completeStudentInfo(userId, studentInfo);
+    }
+
+    @PostMapping("/completeTeacherInfo/{userId}")
+    @Operation(summary = "完善老师信息", description = "用户注册后完善个人信息")
+    public Result completeTeacherInfo(@PathVariable Integer userId, @RequestBody CompleteTeacherDTO teacherInfo) {
+        return commonService.completeTeacherInfo(userId, teacherInfo);
+    }
+
+
 }

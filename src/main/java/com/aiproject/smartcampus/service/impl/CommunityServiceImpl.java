@@ -6,10 +6,13 @@ import com.aiproject.smartcampus.pojo.dto.*;
 import com.aiproject.smartcampus.pojo.po.Comment;
 import com.aiproject.smartcampus.pojo.po.Post;
 import com.aiproject.smartcampus.service.CommunityService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.aiproject.smartcampus.commons.client.Result;
 
 import java.util.List;
 
@@ -22,69 +25,101 @@ public class CommunityServiceImpl implements CommunityService {
 
     //新增帖子
     @Override
-    public PostDTO createPost(PostDTO postDTO) {
+    public Result createPost(PostDTO postDTO) {
 
         Post post = new Post();
-        post.setCategory(postDTO.getCategory());
+//        post.setCategory(postDTO.getCategory());
         post.setContent(postDTO.getContent());
         post.setUserId(postDTO.getUserId());
         post.setTitle(postDTO.getTitle());
 
         // 插入数据库
         postMapper.insertPost(post);
+        postDTO.setId(post.getId());
 
-        // 返回包含ID的DTO
-        return postMapper.getPostById(postDTO.getId());
+        // 返回包含贴子ID
+        return Result.success(postDTO.getId());
     }
 
     //获取所有
     @Override
-    public List<PostDTO> gerAllPosts() {
-        return postMapper.findPostListWithUser();
+    public Result<IPage<PostGetDTO>> getPostsByPage(Integer pageNum, Integer pageSize) {
+        // 创建分页对象 (页号从1开始)
+        Page<PostGetDTO> page = new Page<>(pageNum, pageSize);
+
+        // 执行分页查询
+        IPage<PostGetDTO> resultPage = postMapper.findPostPageWithUser(page);
+
+        return Result.success(resultPage);
     }
 
+    //获取帖子评论
     @Override
-    public List<Comment> getCommentsByPostId(Integer postId) {
-        return commentMapper.findCommentTreeByPostId(postId);
+    public Result<IPage<CommentDTO>> getCommentsByPostId(Integer postId, Integer pageNum, Integer pageSize) {
+        Page<CommentDTO> page = new Page<>(pageNum, pageSize);
+        IPage<CommentDTO> commentsPage = commentMapper.findCommentsByPostId(page, postId);
+        return Result.success(commentsPage);
     }
 
     //获取单个帖子
     @Override
-    public PostDTO getPostWithComments(Integer postId) {
-        PostDTO postDTO = postMapper.getPostById(postId);
+    public Result<PostGetDTO> getPostWithComments(Integer postId) {
+        PostGetDTO postGetDTO = postMapper.getPostById(postId);
+        if (postGetDTO == null) {
+            throw new IllegalArgumentException("Post not found");
+        }
         postMapper.incrementViewCount(postId);
-        postDTO.setViewCount(postDTO.getViewCount()+1);
+        postGetDTO.setViewCount(postGetDTO.getViewCount()+1);
 
-        return postDTO;
+        Integer view = postMapper.getViewCountById(postId);
+        postGetDTO.setViewCount(view);
+        return Result.success(postGetDTO);
     }
 
     //添加评论
     @Override
     @Transactional
-    public CommentDTO addCommentToPost(Integer postId, CommentDTO commentDTO) {
-        if (postMapper.getPostById(postId) == null) {
-            throw new IllegalArgumentException("Post not found");
-        }
+    public Result addCommentToPost(CommentDTO commentDTO) {
+//        if (postMapper.getPostById(commentDTO.getPostId()) == null) {
+//            throw new IllegalArgumentException("Post not found");
+//        }
         Comment comment = new Comment();
-        comment.setPostId(postId);
+        comment.setPostId(commentDTO.getPostId());
         comment.setContent(commentDTO.getContent());
         comment.setUserId(commentDTO.getUserId());
-        comment.setParentId(commentDTO.getParentId());
+        if (commentDTO.getParentId() == null) {
+            comment.setParentId(null); // 如果没有父评论
+        } else {
+            comment.setParentId(commentDTO.getParentId());
+        }
 
         commentMapper.insert(comment);
-        postMapper.incrementViewCount(postId);
+        postMapper.incrementViewCount(commentDTO.getPostId());
 
-        return commentMapper.getCommentById(commentDTO.getCommentId());
+        return Result.success("Comment added successfully");
     }
 
+    //点赞帖子
     @Override
-    public void likePost(Long postId) {
+    public Result likePost(Integer postId) {
         postMapper.incrementLikeCount(postId);
+        Integer postCount = postMapper.getLikeCountById(postId);
+        if ( postCount == null) {
+            return Result.error("Post not found or already liked");
+        }
+        return Result.success("Post liked successfully:" + postCount);
     }
 
+    //点赞评论
     @Override
-    public void likeComment(Long commentId) {
+    public Result likeComment(Integer commentId) {
         commentMapper.incrementLikeCount(commentId);
+        Integer commentCount = commentMapper.getLikeCountById(commentId);
+        if (commentCount == null) {
+            return Result.error("Comment not found or already liked");
+        }
+        return Result.success("Comment liked successfully:" + commentCount);
     }
+
 
 }

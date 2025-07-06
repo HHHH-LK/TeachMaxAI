@@ -5,10 +5,7 @@ import com.aiproject.smartcampus.commons.utils.JwtUtils;
 import com.aiproject.smartcampus.exception.UserExpection;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.NotificationMessage;
-import com.aiproject.smartcampus.pojo.dto.LoginDTO;
-import com.aiproject.smartcampus.pojo.dto.PasswordResetDTO;
-import com.aiproject.smartcampus.pojo.dto.PasswordResetVerificationDTO;
-import com.aiproject.smartcampus.pojo.dto.RegisterDTO;
+import com.aiproject.smartcampus.pojo.dto.*;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.aiproject.smartcampus.pojo.po.Teacher;
 import com.aiproject.smartcampus.pojo.po.User;
@@ -51,9 +48,10 @@ public class CommonServiceImpl implements CommonService {
     private final UserMapper userMapper;
     private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final PasswordEncoder passwordEncoder;
 //    private final EmailService emailService;
+    private final String tokenKey="token:"+"TOKEN_";
 
     @Override
     @Transactional
@@ -78,7 +76,7 @@ public class CommonServiceImpl implements CommonService {
                 user = userMapper.findByUsername(loginAccount);
             } else if ("phone".equals(loginDTO.getPrincipal())) {
                 user = userMapper.findByUserPhone(loginAccount);
-            } else if ("email".equals(loginDTO.getPrincipal())) {
+            } else {
                 user = userMapper.findByUserEmail(loginAccount);
             }
 
@@ -91,22 +89,14 @@ public class CommonServiceImpl implements CommonService {
                 return Result.error("密码错误");
             }
 
-            // 3. 检查角色是否符合
-            if (!loginDTO.getUserType().equals(user.getUserType().name())) {
-                System.out.println(loginDTO.getUserType()+":"+user.getUserType());
-                return Result.error("该账号不是" + loginDTO.getUserType() + "身份");
-            }
-
             // 4. 生成令牌
             String token = JwtUtils.generateToken(user.getUserId(), user.getUserType());
-            System.out.println(token);
+            log.info("用户 {} 登录成功，生成令牌: {}", user.getUsername(), token);
+            String key = tokenKey + token;
+            stringRedisTemplate.opsForValue().set(key, user.toString(),7,TimeUnit.DAYS);
 
-            // 5. 返回 token 和用户身份信息
-//            return Result.success("登录成功")
-//                    .put("token", token);
-//                    .put("userType", user.getUserType().name());
-
-            return Result.success(user.getUserType().name() + ":" + token);
+            System.out.println(user.getUserType());
+            return Result.success(user.getUserType().getValue() + ":" + token);
 
 
     }
@@ -127,7 +117,7 @@ public class CommonServiceImpl implements CommonService {
             user.setUsername(registerDTO.getUsername());
             user.setPasswordHash(passwordEncoder.encode(registerDTO.getPassword()));
             user.setRealName("张三");
-            user.setUserType(User.UserType.valueOf(registerDTO.getUserType()));
+            user.setUserType(User.UserType.fromValue(registerDTO.getUserType()));
             userMapper.insert(user);
 
             // 创建对应实体
@@ -161,6 +151,22 @@ public class CommonServiceImpl implements CommonService {
 
         return Result.success("密码重置成功");
     }
+
+    @Override
+    public Result completeStudentInfo(Integer userId, CompleteStudentDTO studentInfo) {
+        if (studentMapper.findByUserId(userId) != null) {
+            return Result.error("不存在该学生");
+        }
+        Student student = new Student();
+        return null;
+    }
+
+    @Override
+    public Result completeTeacherInfo(Integer userId, CompleteTeacherDTO teacherInfo) {
+        return null;
+    }
+
+
 //
 //    @Override
 //    public Result sendPasswordResetCode(PasswordResetVerificationDTO dto) {
