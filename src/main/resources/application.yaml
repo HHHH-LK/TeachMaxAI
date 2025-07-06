@@ -105,3 +105,10 @@
       region: cn-beijing
       accessKeyId: LTAI5tHAaGZDfWRA5jTmiHsn
       accessKeySecret: COEDRVsbvau1b0WdQHyU8kwsS9J9kl
+
+  smart-campus:
+    memory:
+      max-memory-rounds: 10
+      memory-prefix: "smart_campus_summary_memory:"
+      enable-memory-recovery: true
+      enable-memory-stats: true

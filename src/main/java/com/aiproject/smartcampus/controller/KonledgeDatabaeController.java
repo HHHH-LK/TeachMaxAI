@@ -17,7 +17,7 @@ public class KonledgeDatabaeController {
 
     @GetMapping("/load")
     public String load() {
-        fileloadFunction.documentsloade();
+        fileloadFunction.documentsloade(null);
         return "加载成功";
     }
 

@@ -60,6 +60,16 @@ public class StudentController {
             return Result.success();
     }
 
+    /**
+     * 学生学情分析
+     * */
+    @ApiOperation(value = "ai智能生成学情分析",notes = "学情情况分析")
+    @GetMapping("/academicanalysis")
+    public Result<String> findAcademicAnalysis() {
+
+
+        return Result.success("<UNK>");
+    }
 
 
 

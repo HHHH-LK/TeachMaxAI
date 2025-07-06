@@ -1,6 +1,5 @@
 package com.aiproject.smartcampus.mapper;
 
-import com.aiproject.smartcampus.pojo.bo.classprase.Course;
 import com.aiproject.smartcampus.pojo.po.Exam;
 import com.aiproject.smartcampus.pojo.po.ExamScore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

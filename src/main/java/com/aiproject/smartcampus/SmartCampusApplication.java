@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,10 +17,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @MapperScan("com.aiproject.smartcampus.mapper")
 @EnableTransactionManagement
+@Slf4j
 public class SmartCampusApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SmartCampusApplication.class, args);
+        log.info("程序已经启动");
     }
 
 
