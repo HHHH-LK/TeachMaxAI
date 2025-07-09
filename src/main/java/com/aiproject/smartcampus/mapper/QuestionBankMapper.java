@@ -17,7 +17,14 @@ import java.util.Map;
 @Repository
 @Mapper
 public interface QuestionBankMapper extends BaseMapper<QuestionBank> {
-    
+
+    /**
+     * 查询指定创建者的最大题目ID
+     */
+    @Select("SELECT MAX(question_id) FROM question_bank WHERE created_by = #{createdBy}")
+    Integer selectMaxQuestionIdByCreator(@Param("createdBy") Integer createdBy);
+
+
     /**
      * 根据课程查询题目
      */

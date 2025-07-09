@@ -2,10 +2,12 @@ package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
+import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
 import com.aiproject.smartcampus.mapper.CourseMapper;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.po.User;
+import com.aiproject.smartcampus.pojo.vo.CourseVO;
 import com.aiproject.smartcampus.service.CourseService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,6 +26,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     private final CourseMapper courseMapper;
     private final CourseEnrollmentMapper courseEnrollmentMapper;
+    private final UserToTypeUtils userToTypeUtils;
 
     /**
      * 查询所有课程信息
@@ -88,5 +91,23 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         courseMapper.insert(course);
         return Result.success(SUCCESS_UPDATE_COURSE);
     }
+
+    @Override
+    public Result<List<CourseVO>> findAllCoursesByDate(String date) {
+
+        String studentId = userToTypeUtils.change();
+
+        List<CourseVO> allCourseByDate = courseMapper.findAllCourseByDate(date, studentId);
+        for(CourseVO course : allCourseByDate){
+            //添加课程描述
+            String courseDescription = CourseVO.getCourseDescription(course.getCourseName());
+            log.info("获取课程{}描述{}",course.getCourseName(),courseDescription);
+            course.setCourseDescription(courseDescription);
+        }
+
+        return Result.success(allCourseByDate);
+    }
+
+
 }
 

@@ -49,7 +49,7 @@ class KnoledgeServiceImplTest {
         objects.add("10");
         objects.add("11");
 
-        Result listTestByagent = knoledgeService.createListTestByagent(objects);
+        Result listTestByagent = knoledgeService.createListTestByagent(objects,"1","1","帮我生成5道题");
         System.out.println(listTestByagent.getData());
 
     }
@@ -73,7 +73,7 @@ class KnoledgeServiceImplTest {
 
         );
 
-        Result<String> result = knoledgeService.createListTestUsingTByAgent(userWeights);
+        Result<String> result = knoledgeService.createListTestUsingTByAgent(userWeights,"1","1",null);
 
         System.out.println(result.getData());
 

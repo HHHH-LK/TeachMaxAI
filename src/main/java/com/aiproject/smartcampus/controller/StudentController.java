@@ -1,6 +1,9 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.dto.StudentAnswerDTO;
+import com.aiproject.smartcampus.pojo.dto.StudentExamAnswerDTO;
+import com.aiproject.smartcampus.pojo.po.Exam;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.aiproject.smartcampus.pojo.vo.StudentSelectAllVO;
 import com.aiproject.smartcampus.service.StudentService;
@@ -61,15 +64,30 @@ public class StudentController {
     }
 
     /**
-     * 学生学情分析
+     * 学生学情分析//todo 基于课程的所有错误知识进行学情分析
      * */
     @ApiOperation(value = "ai智能生成学情分析",notes = "学情情况分析")
     @GetMapping("/academicanalysis")
-    public Result<String> findAcademicAnalysis() {
+    public Result<String> academicAnalysis(@RequestParam(value = "courseId") String courseId) {
 
+        String result = studentService.academicAnalysis(courseId);
 
-        return Result.success("<UNK>");
+        return Result.success(result);
     }
+
+    /**
+     * 学生提交试卷
+     * */
+    @ApiOperation(value = "学生试卷答题功能",notes = "学生试卷答题")
+    @PostMapping("/finsh/exam")
+    public Result finshExam(@RequestBody StudentExamAnswerDTO studentExamAnswerDTO) {
+
+        studentService.finshExam(studentExamAnswerDTO);
+
+        return Result.success();
+    }
+
+
 
 
 

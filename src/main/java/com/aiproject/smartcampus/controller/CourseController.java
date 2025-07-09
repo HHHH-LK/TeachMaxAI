@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.vo.CourseVO;
 import com.aiproject.smartcampus.service.CourseEnrollmentService;
 import com.aiproject.smartcampus.service.CourseService;
 import io.swagger.annotations.Api;
@@ -77,6 +78,16 @@ public class CourseController {
        return courseEnrollmentService.addCourseEnrollment(courseId);
     }
 
+
+    /**
+     * 根据年份学生查询课程信息
+     * */
+    @GetMapping("/getAllCourse")
+    public Result<List<CourseVO>> getAllCourse(@RequestParam(value = "date")String date ){
+
+        return courseService.findAllCoursesByDate(date);
+
+    }
 
 
 }

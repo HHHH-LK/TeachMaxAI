@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.service;
 
+import com.aiproject.smartcampus.pojo.dto.StudentExamAnswerDTO;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.aiproject.smartcampus.pojo.vo.StudentSelectAllVO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,4 +24,7 @@ public interface StudentService extends IService<Student>{
 
      void updateStudent(Student student);
 
+    String academicAnalysis(String courseId);
+
+    void finshExam(StudentExamAnswerDTO studentExamAnswerDTO);
 }

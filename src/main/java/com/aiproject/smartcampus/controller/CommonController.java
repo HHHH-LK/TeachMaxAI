@@ -47,4 +47,6 @@ public class CommonController {
     public Result resetPassword(@RequestBody PasswordResetDTO dto) {
         return commonService.resetPassword(dto);
     }
+
+
 }

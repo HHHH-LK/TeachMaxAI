@@ -17,4 +17,14 @@
         DELETE FROM chapter_questions WHERE chapter_id = #{chapterId}
     </delete>
 
+    <!-- 批量插入章节题目关联 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO chapter_questions
+        (chapter_id, question_id, question_type, created_at)
+        VALUES
+        <foreach collection="list" item="chapterQuestion" separator=",">
+            (#{chapterQuestion.chapterId}, #{chapterQuestion.questionId}, #{chapterQuestion.questionType}, #{chapterQuestion.createdAt})
+        </foreach>
+    </insert>
+
 </mapper>

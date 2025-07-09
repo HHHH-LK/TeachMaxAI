@@ -5,10 +5,12 @@ import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 
 import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
+import com.aiproject.smartcampus.pojo.vo.StudentKnowledgePointVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.checkerframework.checker.optional.qual.Present;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -87,5 +89,61 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
 
 
     List<SimpleKnowledgeAnalysisBO> getSimpleKnowledgeAnalysis(@Param(value = "pointIds") List<String> pointIds, @Param(value = "studentId") String studentId);
+
+
+
+    @Select("SELECT\n" +
+            "    kp.point_id,\n" +
+            "    kp.point_name,\n" +
+            "    kp.description,\n" +
+            "    kp.difficulty_level,\n" +
+            "    kp.keywords,\n" +
+            "    c.course_id,\n" +
+            "    c.course_name,\n" +
+            "    -- 学生掌握情况\n" +
+            "    COALESCE(skm.mastery_level, 'not_learned') AS mastery_level,\n" +
+            "    COALESCE(skm.practice_score, 0) AS practice_score,\n" +
+            "    COALESCE(skm.practice_count, 0) AS practice_count,\n" +
+            "    skm.last_updated AS mastery_last_updated,\n" +
+            "    -- 父级知识点信息\n" +
+            "    parent_kp.point_name AS parent_point_name,\n" +
+            "    parent_kp.point_id AS parent_point_id,\n" +
+            "    -- 章节信息\n" +
+            "    ch.chapter_id,\n" +
+            "    ch.chapter_name,\n" +
+            "    ch.chapter_order,\n" +
+            "    ch.difficulty_level AS chapter_difficulty,\n" +
+            "    ckp.point_order AS point_order_in_chapter,\n" +
+            "    ckp.is_core AS is_core_point,\n" +
+            "    -- 章节学习进度\n" +
+            "    scp.progress_rate AS chapter_progress_rate,\n" +
+            "    scp.mastery_level AS chapter_mastery_level,\n" +
+            "    scp.study_time AS chapter_study_time,\n" +
+            "    scp.last_study_at AS chapter_last_study_at\n" +
+            "FROM knowledge_points kp\n" +
+            "JOIN courses c ON kp.course_id = c.course_id\n" +
+            "-- 学生选课信息\n" +
+            "JOIN course_enrollments ce ON c.course_id = ce.course_id\n" +
+            "-- 左连接学生知识掌握表\n" +
+            "LEFT JOIN student_knowledge_mastery skm ON (kp.point_id = skm.point_id AND ce.student_id = skm.student_id)\n" +
+            "-- 左连接父级知识点\n" +
+            "LEFT JOIN knowledge_points parent_kp ON kp.parent_point_id = parent_kp.point_id\n" +
+            "-- 左连接章节知识点关系\n" +
+            "LEFT JOIN chapter_knowledge_points ckp ON kp.point_id = ckp.point_id\n" +
+            "-- 左连接章节信息\n" +
+            "LEFT JOIN chapters ch ON ckp.chapter_id = ch.chapter_id\n" +
+            "-- 左连接学生章节进度\n" +
+            "LEFT JOIN student_chapter_progress scp ON (ch.chapter_id = scp.chapter_id AND ce.student_id = scp.student_id)\n" +
+            "WHERE ce.student_id = #{studentId}\n" +
+            "ORDER BY c.course_id, ch.chapter_order, ckp.point_order, kp.point_id;")
+    List<StudentKnowledgePointVO> selectAllKnowledgePointByStudentId(@Param(value = "studentId") String studentId);
+
+
+    /**
+     * 获取当前学生的所有知识点情况
+     * */
+
+
+
 
 }

@@ -20,10 +20,10 @@ public interface KnoledgeService {
     /**
      * agent多知识点生成错误练习
      * */
-    Result createListTestByagent(List<String> pointIds);
+    Result createListTestByagent(List<String> pointIds,String courseId,String chapter,String decprection);
 
     /**
      * 根据带权知识点进行自定义生成
      * */
-    Result createListTestUsingTByAgent(List<HavingTPointDTO> pointIds);
+    Result createListTestUsingTByAgent(List<HavingTPointDTO> pointIds,String courseId,String chapter,String decprection);
 }

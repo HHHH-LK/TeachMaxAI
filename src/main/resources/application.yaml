@@ -1,5 +1,5 @@
   server:
-    port: 8104
+    port: 8106
     address: localhost
 
   spring:
@@ -9,7 +9,7 @@
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       username: root
-      password: root
+      password: 10280017
     data:
       redis:
         host: localhost
@@ -67,10 +67,10 @@
     community:
       dashscope:
         chat-model:
-          api-key: sk-555410695a424051bcab7b09354790a9
+          api-key: ${OTHER_DASHSCOPE_API_KEY}
           model-name: qwen-max-latest
         embedding-model:
-          api-key: sk-555410695a424051bcab7b09354790a9
+          api-key: ${OTHER_DASHSCOPE_API_KEY}
           model-name: text-embedding-v3
 
 

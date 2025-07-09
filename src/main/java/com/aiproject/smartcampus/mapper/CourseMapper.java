@@ -2,7 +2,9 @@ package com.aiproject.smartcampus.mapper;
 
 
 import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.vo.CourseVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -72,4 +74,14 @@ public interface CourseMapper extends BaseMapper<Course> {
     })
     List<Course> findAllCourse();
 
+
+    @Select("SELECT DISTINCT\n" +
+            "    c.course_name\n" +
+            "FROM courses c\n" +
+            "INNER JOIN course_enrollments ce ON c.course_id = ce.course_id\n" +
+            "WHERE c.semester = #{date}     -- 学期参数\n" +
+            "  AND ce.student_id = #{studentId} -- 学生ID参数\n" +
+            "  AND c.status = 'active'\n" +
+            "ORDER BY c.course_name;")
+    List<CourseVO> findAllCourseByDate(@Param(value = "date")String date,@Param(value = "studentId")String studentId);
 }

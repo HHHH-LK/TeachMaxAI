@@ -46,24 +46,23 @@ public class KnowledgeController {
 
     }
 
-    //生成相关知识点
-
-
     //智能选取知识点进行生成
     @PostMapping("/ai/createTest")
-    public Result createListTestByAgent(@RequestBody List<String> pointIds){
+    public Result createListTestByAgent(@RequestBody List<String> pointIds,@RequestParam("courseId")  String courseId,
+                                        @RequestParam("chapterId")   String chapterId,@RequestParam("decprection") String decprection){
 
-        log.info("pointIds:{}",pointIds);
-        return knoledgeService.createListTestByagent(pointIds);
+        log.info("pointIds:{} courseId{},chapter{},decprection{}",pointIds,courseId,chapterId,decprection);
+        return knoledgeService.createListTestByagent(pointIds,courseId,chapterId,decprection);
 
     }
 
     //根据所设定权重进行知识点题目的生成
     @PostMapping("/ai/t/createTest")
-    public Result createListTestUsingTByAgent(@RequestBody List<HavingTPointDTO> pointIds){
+    public Result createListTestUsingTByAgent(@RequestBody List<HavingTPointDTO> pointIds,@RequestParam("courseId")  String courseId,
+                                              @RequestParam("chapterId")   String chapterId,@RequestParam("decprection") String decprection){
 
-        log.info("pointIds:{}",pointIds);
-        return knoledgeService.createListTestUsingTByAgent(pointIds);
+        log.info("pointIds:{} courseId{},chapter{},decprection{}",pointIds,courseId,chapterId,decprection);
+        return knoledgeService.createListTestUsingTByAgent(pointIds,courseId,chapterId,decprection);
     }
 
 }

@@ -22,4 +22,11 @@ class UserMapperTest {
 
     }
 
+    @Test
+    void test1(){
+
+
+
+    }
+
 }

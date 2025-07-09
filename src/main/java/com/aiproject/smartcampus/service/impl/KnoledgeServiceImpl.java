@@ -125,10 +125,10 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     }
 
     @Override
-    public Result<String> createListTestByagent(List<String> pointIds) {
+    public Result<String> createListTestByagent(List<String> pointIds,String courseId,String chapter,String content) {
 
-        //String studentId = getUserToTypeUtils.change();
-        //todo进行测试
+        /*String studentId = getUserToTypeUtils.change();*/
+
         String studentId = "1";
 
         if (studentId == null) {
@@ -141,7 +141,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         List<SimpleKnowledgeAnalysisBO> agentCreatepoint = randomChancepoint(simpleKnowledgeAnalysisBOList);
 
         //进行智能生成
-        notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), null));
+        notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), Integer.valueOf(courseId),Integer.valueOf(chapter),content));
         notMasterTestCreateTool.setSimpleKnowledgeAnalysisBOList(agentCreatepoint);
         notMasterTestCreateTool.run();
         String result = notMasterTestCreateTool.getResult();
@@ -150,7 +150,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     }
 
     @Override
-    public Result<String> createListTestUsingTByAgent(List<HavingTPointDTO> pointIds) {
+    public Result<String> createListTestUsingTByAgent(List<HavingTPointDTO> pointIds,String courseId,String chapterId,String content) {
 
         Integer defaultT=3;
 
@@ -196,7 +196,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
             log.info("基于用户权重选择的知识点：{}", selectedNames);
 
             // 进行智能生成
-            notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), null));
+            notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), Integer.valueOf(courseId),Integer.valueOf(chapterId),content));
             notMasterTestCreateTool.setSimpleKnowledgeAnalysisBOList(selectedKnowledgePoints);
             notMasterTestCreateTool.run();
             String result = notMasterTestCreateTool.getResult();

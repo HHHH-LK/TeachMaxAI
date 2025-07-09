@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
+import jodd.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
@@ -28,6 +29,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
+
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -108,7 +110,8 @@ public class NotMasterTestCreatetoolUtils {
 
     /**
      * 新增方法 - 基于知识点分析数据生成测试题
-     * @param testTaskBO 测试任务信息
+     *
+     * @param testTaskBO       测试任务信息
      * @param analysisDataList 知识点分析数据列表
      * @return 生成的题目内容（JSON格式）
      */
@@ -128,7 +131,7 @@ public class NotMasterTestCreatetoolUtils {
             String aiResponse = generateQuestions(finalPrompt);
 
             // 异步保存到数据库
-            final Integer courseId = testTaskBO.getCcourseId() != null ? testTaskBO.getCcourseId() : DEFAULT_COURSE_ID;
+            final Integer courseId = testTaskBO.getCourseId() != null ? testTaskBO.getCourseId() : DEFAULT_COURSE_ID;
             CompletableFuture.runAsync(() -> saveToDatabase(aiResponse, courseId), executor)
                     .exceptionally(throwable -> {
                         log.error("异步保存题目到数据库失败", throwable);
@@ -176,7 +179,7 @@ public class NotMasterTestCreatetoolUtils {
         appendKnowledgeAnalysisInfo(prompt, analysisDataList);
 
         // 数据库结构要求
-        appendDatabaseStructureRequirements(prompt, testTaskBO.getCcourseId());
+        appendDatabaseStructureRequirements(prompt, testTaskBO.getCourseId());
 
         // 题目类型详细说明
         appendQuestionTypeDetails(prompt);
@@ -191,7 +194,12 @@ public class NotMasterTestCreatetoolUtils {
         appendAnalysisBasedQualityRequirements(prompt);
 
         // 最终提示
-        prompt.append("🔥 请严格按照上述要求，基于学生的知识点掌握情况生成个性化题目，直接返回JSON对象（不要使用代码块格式）：");
+        String content = testTaskBO.getContent();
+        if (StringUtil.isBlank(content)) {
+            prompt.append("🔥 请严格按照上述要求，基于学生的知识点掌握情况生成个性化题目，直接返回JSON对象（不要使用代码块格式）：");
+        } else {
+            prompt.append("🔥 请严格按照上述要求，并结合学生的需求+" + content + "+基于学生的知识点掌握情况生成个性化题目，直接返回JSON对象（不要使用代码块格式）：");
+        }
 
         return prompt.toString();
     }
@@ -218,8 +226,8 @@ public class NotMasterTestCreatetoolUtils {
         prompt.append("## 👤 学生信息\n")
                 .append(String.format("- 学生ID: %d\n", testTaskBO.getStudentId()));
 
-        if (testTaskBO.getCcourseId() != null) {
-            prompt.append(String.format("- 课程ID: %d\n", testTaskBO.getCcourseId()));
+        if (testTaskBO.getCourseId() != null) {
+            prompt.append(String.format("- 课程ID: %d\n", testTaskBO.getCourseId()));
         }
         prompt.append("\n");
     }

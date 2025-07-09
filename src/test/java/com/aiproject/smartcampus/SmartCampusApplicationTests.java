@@ -185,6 +185,14 @@ class SmartCampusApplicationTests {
 
     }
 
+    @Test
+    void test6() throws IOException {
+
+        ChatResponse chat = chatLanguageModel.chat(UserMessage.from("帮我为java程序设计这门课程添加一个课程描述"));
+        System.out.println(chat.aiMessage().text());
+
+    }
+
 
 
 

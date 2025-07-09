@@ -63,4 +63,6 @@ public interface ChapterQuestionMapper extends BaseMapper<ChapterQuestion> {
             "INNER JOIN chapters c ON cq.chapter_id = c.chapter_id " +
             "WHERE c.course_id = #{courseId} ORDER BY c.chapter_order, cq.created_at")
     List<ChapterQuestion> getQuestionsByCourseId(@Param("courseId") Integer courseId);
+
+    int batchInsert(List<ChapterQuestion> chapterQuestions);
 }

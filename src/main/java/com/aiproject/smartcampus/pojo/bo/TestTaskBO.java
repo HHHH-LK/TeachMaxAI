@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 public class TestTaskBO {
 
     private Integer studentId;
-    private Integer ccourseId;
+    private Integer courseId;
+    private Integer chapterId;
+    private String content;
+
 
 }

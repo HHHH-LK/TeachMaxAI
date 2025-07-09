@@ -108,6 +108,18 @@
             <version>4.0.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.0.Final</version> <!-- 或其他合适的版本 -->
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
+
+
         <!-- LangChain4j & RAG -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
