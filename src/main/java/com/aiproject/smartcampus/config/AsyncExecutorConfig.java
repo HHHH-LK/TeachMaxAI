@@ -3,10 +3,12 @@ package com.aiproject.smartcampus.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 public class AsyncExecutorConfig {
@@ -60,4 +62,26 @@ public class AsyncExecutorConfig {
             };
         }
     }
+
+    /**
+     * 异步配置（新增，用于异步推送）
+     */
+    @Configuration
+    @EnableAsync
+    public class AsyncConfig {
+
+        @Bean("sseThreadPool")
+        public ThreadPoolTaskExecutor sseThreadPool() {
+            ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+            executor.setCorePoolSize(5);
+            executor.setMaxPoolSize(10);
+            executor.setQueueCapacity(100);
+            executor.setKeepAliveSeconds(60);
+            executor.setThreadNamePrefix("sse-push-");
+            executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+            executor.initialize();
+            return executor;
+        }
+    }
+
 }

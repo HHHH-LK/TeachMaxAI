@@ -48,5 +48,11 @@ public class CommonController {
         return commonService.resetPassword(dto);
     }
 
+    @PostMapping("/logout")
+    public Result logout() {
+
+        return Result.success("功能还未完成");
+    }
+
 
 }
