@@ -18,6 +18,7 @@ public class ExamCreationResult {
     /**
      * 创建是否成功
      */
+
     private Boolean success;
 
     /**
