@@ -15,13 +15,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class QuestionGeneratorAgent  {
 
-
-
-
     public String start(String userMessage){
 
-       return null;
 
+       return null;
     }
 
 }

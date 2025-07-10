@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.mapper;
 
 import com.aiproject.smartcampus.pojo.po.Teacher;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import dev.langchain4j.agent.tool.P;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -43,4 +44,10 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
 
     @Select("SELECT t.*, u.real_name FROM teachers t LEFT JOIN users u ON t.user_id = u.user_id WHERE t.user_id = #{user_id}")
     Teacher findByUserID(@Param("user_id") Long userId);
+
+    @Select("SELECT DISTINCT ce.student_id\n" +
+            "FROM courses c\n" +
+            "INNER JOIN course_enrollments ce ON c.course_id = ce.course_id\n" +
+            "WHERE c.teacher_id = #{teacherId} AND c.course_id = #{courseId}; -- 替换为具体的老师ID和课程ID")
+    List<Integer> selectAllClassStudentInfo(@Param("teacherId")String teacherId, @Param("courseId")String courseId);
 }

@@ -3,7 +3,6 @@ package com.aiproject.smartcampus.controller;
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.dto.SendMessageRequestDTO;
 import com.aiproject.smartcampus.service.StudentTeacherChatService;
-import dev.langchain4j.agent.tool.P;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,7 +74,7 @@ public class StudentTeacherChatController {
     /**
      * 获取老师老师信息
      * */
-    @PostMapping("getAllTeacherInfo")
+    @PostMapping("/getAllTeacherInfo")
     public Result getAllTeacherInfo(@RequestBody List<String> courseIds) {
 
         return studentTeacherChatService.getAllTeacherInfo(courseIds);
@@ -85,7 +84,7 @@ public class StudentTeacherChatController {
     /**
      * 发送对话
      * */
-    @PostMapping("sentChatMemory")
+    @PostMapping("/sentChatMemory")
     public Result sentChatMemory(@RequestBody SendMessageRequestDTO sendMessageRequestDTO) {
 
         return studentTeacherChatService.sendMessage(sendMessageRequestDTO);

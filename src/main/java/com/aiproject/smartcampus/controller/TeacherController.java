@@ -40,11 +40,26 @@ public class TeacherController {
         return teacherService.updateTeacherInfo(updateDTO);
     }
 
+    /**
+     * 查询指定班级课程对应的学生整体知识点掌握情况
+     * */
 
-//    @PutMapping("/status")
-//    @Operation(summary = "更新教师状态", description = "修改教师的在职状态（如：在职、离职等）")
-//    public Result updateTeacherStatus(@RequestBody TeacherStatusDTO statusDTO) {
-//        return teacherService.updateTeacherStatus(statusDTO);
-//    }
+    @GetMapping("/getAllClassNotCorrectInfo")
+    public Result getAllClassInfo(@RequestParam("couresId")  String couresId) {
+
+        return teacherService.getAllClassInfo(couresId);
+    }
+
+    /**
+     * 查询特定班级的知识点的高频错误知识点信息
+     * */
+
+    @GetMapping("/getTheMaxUncorrectPoint")
+    public Result getTheMaxUncorrectPoint(@RequestParam("couresId")  String couresId) {
+
+        return teacherService.getTheMaxUncorrectPoint(couresId);
+    }
+
+
 
 }

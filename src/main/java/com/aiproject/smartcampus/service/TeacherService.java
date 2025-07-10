@@ -11,6 +11,10 @@ public interface TeacherService extends IService<Teacher> {
 
     Result updateTeacherInfo(TeacherUpdateDTO updateDTO);
 
+    Result getAllClassInfo( String couresId);
+
+    Result getTheMaxUncorrectPoint(String couresId);
+
 //    Result updateTeacherStatus(TeacherStatusDTO statusDTO);
 
 }

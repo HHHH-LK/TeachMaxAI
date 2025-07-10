@@ -42,6 +42,7 @@ public class CommunityController {
         return postService.getPostWithComments(postId);
     }
 
+    //
     @PostMapping("/posts/{postId}/comments")
     public CommentDTO addCommentToPost(
             @PathVariable Integer postId, @Valid @RequestBody CommentDTO commentDTO) {
