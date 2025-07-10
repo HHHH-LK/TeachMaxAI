@@ -40,4 +40,35 @@
         ORDER BY accuracyRate ASC
     </select>
 
+    <!-- 更新或插入学生知识掌握情况 -->
+    <insert id="updateStudentKnowledgeMastery">
+        INSERT INTO student_knowledge_mastery (
+        student_id,
+        point_id,
+        mastery_level,
+        practice_score,
+        practice_count,
+        last_updated
+        ) VALUES (
+        #{studentId},
+        #{pointId},
+        #{masteryLevel},
+        #{practiceScore},
+        #{practiceCount},
+        NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+        mastery_level = CASE
+        -- 如果新的准确率更高，更新掌握程度
+        WHEN #{practiceScore} >= 0.8 THEN 'mastered'
+        WHEN #{practiceScore} >= 0.6 THEN 'learning'
+        ELSE 'not_learned'
+        END,
+        -- 更新最低准确率（记录最差表现）
+        practice_score = LEAST(COALESCE(practice_score, #{practiceScore}), #{practiceScore}),
+        -- 累加练习次数
+        practice_count = COALESCE(practice_count, 0) + #{practiceCount},
+        last_updated = NOW()
+    </insert>
+
 </mapper>

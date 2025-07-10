@@ -14,7 +14,7 @@ public class ExamDTO {
     //考核名称
     private String title;
     private String exam_date;
-    private Integer duration;
+    private Integer duration_minutes;
     private BigDecimal maxScore;
     private String status;
     private LocalDateTime createTime;

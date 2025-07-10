@@ -1,21 +1,24 @@
+// ==================== 修复ExamMapper中的SQL查询 ====================
+
 package com.aiproject.smartcampus.mapper;
 
 import com.aiproject.smartcampus.pojo.po.Exam;
 import com.aiproject.smartcampus.pojo.vo.ExamQuestionVO;
+import com.aiproject.smartcampus.pojo.vo.ExamScoreVO;
+import com.aiproject.smartcampus.pojo.vo.StudentExamAnswerVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import dev.langchain4j.agent.tool.P;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-
 
 /**
  * @author lk_hhh
- */ // 8. 考试Mapper
+ */
 @Repository
 @Mapper
 public interface ExamMapper extends BaseMapper<Exam> {
@@ -44,47 +47,214 @@ public interface ExamMapper extends BaseMapper<Exam> {
             "AND e.status = 'scheduled'")
     List<Exam> findUpcomingExams();
 
+    /**
+     * 根据考试id查询查询出所有的考试题目，按照题目顺序顺序进行展示
+     */
+    @Select("SELECT\n" +
+            "    pq.paper_question_id,\n" +
+            "    pq.paper_id,\n" +
+            "    pq.question_id,\n" +
+            "    pq.question_order,\n" +
+            "    pq.custom_score,\n" +
+            "    -- 题目基本信息\n" +
+            "    qb.question_content,\n" +
+            "    qb.question_type,\n" +
+            "    qb.question_options,\n" +
+            "    qb.correct_answer,\n" +
+            "    qb.explanation,\n" +
+            "    qb.difficulty_level,\n" +
+            "    qb.score_points,\n" +
+            "    qb.point_id,\n" +
+            "    -- 试卷信息\n" +
+            "    ep.paper_title,\n" +
+            "    ep.total_score AS paper_total_score,\n" +
+            "    -- 考试信息\n" +
+            "    e.exam_id,\n" +
+            "    e.title AS exam_title,\n" +
+            "    e.exam_date,\n" +
+            "    e.duration_minutes,\n" +
+            "    e.max_score AS exam_max_score,\n" +
+            "    -- 知识点信息\n" +
+            "    kp.point_name,\n" +
+            "    kp.description AS point_description\n" +
+            "FROM exams e\n" +
+            "JOIN exam_papers ep ON e.exam_id = ep.exam_id\n" +
+            "JOIN paper_questions pq ON ep.paper_id = pq.paper_id\n" +
+            "JOIN question_bank qb ON pq.question_id = qb.question_id\n" +
+            "LEFT JOIN knowledge_points kp ON qb.point_id = kp.point_id\n" +
+            "WHERE e.exam_id = #{examId}\n" +
+            "ORDER BY pq.question_order ASC;")
+    List<ExamQuestionVO> getAllExamQuestions(@Param("examId") String examId);
 
-   /**
-    * 根据考试id查询查询出所有的考试题目，按照题目顺序顺序进行展示
-    * */
+    /**
+     * 查询课程考试中所有的错误知识点
+     */
+    @Select("SELECT DISTINCT qb.point_id\n" +
+            "FROM courses c\n" +
+            "INNER JOIN exams e ON c.course_id = e.course_id\n" +
+            "INNER JOIN exam_papers ep ON e.exam_id = ep.exam_id\n" +
+            "INNER JOIN paper_questions pq ON ep.paper_id = pq.paper_id\n" +
+            "INNER JOIN question_bank qb ON pq.question_id = qb.question_id\n" +
+            "INNER JOIN student_answers sa ON qb.question_id = sa.question_id AND e.exam_id = sa.exam_id\n" +
+            "WHERE c.course_id = #{courseId}\n" +
+            "  AND sa.is_correct = 0\n" +
+            "  AND qb.point_id IS NOT NULL\n" +
+            "ORDER BY qb.point_id;")
+    List<Integer> getAllPointIdByExamCourseId(@Param("courseId") String courseId);
 
-   @Select("SELECT\n" +
-           "    pq.paper_question_id,\n" +
-           "    pq.paper_id,\n" +
-           "    pq.question_id,\n" +
-           "    pq.question_order,\n" +
-           "    pq.custom_score,\n" +
-           "    -- 题目基本信息\n" +
-           "    qb.question_content,\n" +
-           "    qb.question_type,\n" +
-           "    qb.question_options,\n" +
-           "    qb.correct_answer,\n" +
-           "    qb.explanation,\n" +
-           "    qb.difficulty_level,\n" +
-           "    qb.score_points,\n" +
-           "    qb.point_id,\n" +
-           "    -- 试卷信息\n" +
-           "    ep.paper_title,\n" +
-           "    ep.total_score AS paper_total_score,\n" +
-           "    -- 考试信息\n" +
-           "    e.exam_id,\n" +
-           "    e.title AS exam_title,\n" +
-           "    e.exam_date,\n" +
-           "    e.duration_minutes,\n" +
-           "    e.max_score AS exam_max_score,\n" +
-           "    -- 知识点信息\n" +
-           "    kp.point_name,\n" +
-           "    kp.description AS point_description\n" +
-           "FROM exams e\n" +
-           "JOIN exam_papers ep ON e.exam_id = ep.exam_id\n" +
-           "JOIN paper_questions pq ON ep.paper_id = pq.paper_id\n" +
-           "JOIN question_bank qb ON pq.question_id = qb.question_id\n" +
-           "LEFT JOIN knowledge_points kp ON qb.point_id = kp.point_id\n" +
-           "WHERE e.exam_id =#{examId}\n" +
-           "ORDER BY pq.question_order ASC;")
-   List<ExamQuestionVO> getAllExamQuestions(@Param(value = "examId") String examId);
+    /**
+     * 查询学生考试作答情况 - 修复硬编码问题
+     */
+    @Select("SELECT\n" +
+            "    sa.answer_id,\n" +
+            "    pq.question_order,\n" +
+            "    qb.question_id,\n" +
+            "    qb.question_type,\n" +
+            "    qb.question_content,\n" +
+            "    qb.question_options,\n" +
+            "    qb.correct_answer,\n" +
+            "    sa.student_answer,\n" +
+            "    sa.is_correct,\n" +
+            "    sa.score_earned,\n" +
+            "    COALESCE(pq.custom_score, qb.score_points) as max_score,\n" +
+            "    qb.explanation,\n" +
+            "    qb.difficulty_level,\n" +
+            "    kp.point_name as knowledge_point_name\n" +
+            "FROM student_answers sa\n" +
+            "INNER JOIN question_bank qb ON sa.question_id = qb.question_id\n" +
+            "INNER JOIN paper_questions pq ON qb.question_id = pq.question_id\n" +
+            "INNER JOIN exam_papers ep ON pq.paper_id = ep.paper_id\n" +
+            "LEFT JOIN knowledge_points kp ON qb.point_id = kp.point_id\n" +
+            "WHERE sa.exam_id = #{examId}\n" +  // 修复：使用参数而不是硬编码1
+            "  AND sa.student_id = #{studentId}\n" +  // 修复：使用参数而不是硬编码1
+            "  AND ep.exam_id = sa.exam_id\n" +
+            "ORDER BY pq.question_order;")
+    List<StudentExamAnswerVO> getAllStudentAnwer(@Param("examId") String examId, @Param("studentId") String studentId);
+
+    /**
+     * 更新学生答案的评分结果
+     *
+     * @param examId      考试ID
+     * @param studentId   学生ID
+     * @param questionId  题目ID
+     * @param isCorrect   是否正确 (true: 正确, false: 错误)
+     * @param scoreEarned 获得分数
+     * @return 更新的记录数
+     */
+    int updateStudentAnswer(@Param("examId") Integer examId,
+                            @Param("studentId") Integer studentId,
+                            @Param("questionId") Integer questionId,
+                            @Param("isCorrect") Boolean isCorrect,
+                            @Param("scoreEarned") BigDecimal scoreEarned);
+
+    /**
+     * 更新考试总成绩
+     *
+     * @param examId      考试ID
+     * @param studentId   学生ID
+     * @param score       总得分
+     * @param submittedAt 提交/评卷完成时间
+     * @return 更新的记录数
+     */
+    int updateExamScore(@Param("examId") Integer examId,
+                        @Param("studentId") Integer studentId,
+                        @Param("score") BigDecimal score,
+                        @Param("submittedAt") LocalDateTime submittedAt);
+
+    /**
+     * 获取考试的所有学生ID（用于批量评卷）
+     */
+    @Select("SELECT DISTINCT es.student_id\n" +
+            "FROM exam_scores es\n" +
+            "WHERE es.exam_id = #{examId}\n" +
+            "ORDER BY es.student_id")
+    List<Integer> getExamStudents(@Param("examId") String examId);
+
+    /**
+     * 查询考试成绩是否存在
+     */
+    @Select("SELECT COUNT(*) > 0\n" +
+            "FROM exam_scores\n" +
+            "WHERE exam_id = #{examId} AND student_id = #{studentId}")
+    boolean existsExamScore(@Param("examId") Integer examId,
+                            @Param("studentId") Integer studentId);
+
+    /**
+     * 插入考试成绩记录
+     */
+    int insertExamScore(@Param("examId") Integer examId,
+                        @Param("studentId") Integer studentId,
+                        @Param("score") BigDecimal score,
+                        @Param("submittedAt") LocalDateTime submittedAt);
+
+    /**
+     * 插入或更新考试成绩
+     */
+    int insertOrUpdateExamScore(@Param("examId") Integer examId,
+                                @Param("studentId") Integer studentId,
+                                @Param("score") BigDecimal score,
+                                @Param("submittedAt") LocalDateTime submittedAt);
+
+    /**
+     * 插入未作答题目记录
+     *
+     * @param examId        考试ID
+     * @param studentId     学生ID
+     * @param questionId    题目ID
+     * @param studentAnswer 学生答案（空字符串）
+     * @param isCorrect     是否正确（false）
+     * @param scoreEarned   获得分数（0）
+     * @return 插入的记录数
+     */
+    int insertUnansweredQuestion(@Param("examId") Integer examId,
+                                 @Param("studentId") Integer studentId,
+                                 @Param("questionId") Integer questionId,
+                                 @Param("studentAnswer") String studentAnswer,
+                                 @Param("isCorrect") Boolean isCorrect,
+                                 @Param("scoreEarned") BigDecimal scoreEarned);
+
+    /**
+     * 批量插入未作答题目记录
+     */
+    int batchInsertUnansweredQuestions(@Param("examId") Integer examId,
+                                       @Param("studentId") Integer studentId,
+                                       @Param("questionIds") List<Integer> questionIds);
 
 
+    /**
+     * 更新学生课程最终成绩到course_enrollments表
+     * @param courseId 课程ID
+     * @param studentId 学生ID
+     * @param finalGrade 最终成绩
+     * @return 更新的记录数
+     */
+    int updateStudentFinalGrade(@Param("courseId") Integer courseId,
+                                @Param("studentId") Integer studentId,
+                                @Param("finalGrade") BigDecimal finalGrade);
+
+    /**
+     * 根据考试ID获取课程ID
+     * @param examId 考试ID
+     * @return 课程ID
+     */
+    Integer getCourseIdByExamId(@Param("examId") Integer examId);
+
+    /**
+     * 计算学生在某课程的平均考试成绩
+     * @param courseId 课程ID
+     * @param studentId 学生ID
+     * @return 平均成绩
+     */
+    BigDecimal calculateStudentAverageScore(@Param("courseId") Integer courseId,
+                                            @Param("studentId") Integer studentId);
+
+    /**
+     * 获取学生在某课程的所有考试成绩
+     * @param courseId 课程ID
+     * @param studentId 学生ID
+     * @return 考试成绩列表
+     */
+    List<ExamScoreVO> getStudentExamScores(@Param("courseId") Integer courseId,
+                                           @Param("studentId") Integer studentId);
 
 }

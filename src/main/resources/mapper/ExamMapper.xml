@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiproject.smartcampus.mapper.ExamMapper" >
+
+    <!-- 更新学生答案的评分结果 -->
+    <update id="updateStudentAnswer">
+        UPDATE student_answers
+        SET is_correct = #{isCorrect},
+        score_earned = #{scoreEarned}
+        WHERE exam_id = #{examId}
+        AND student_id = #{studentId}
+        AND question_id = #{questionId}
+    </update>
+
+    <!-- 更新考试总成绩 -->
+    <update id="updateExamScore">
+        UPDATE exam_scores
+        SET score = #{score},
+        submitted_at = #{submittedAt}
+        WHERE exam_id = #{examId}
+        AND student_id = #{studentId}
+    </update>
+
+    <!-- 插入考试成绩记录 -->
+    <insert id="insertExamScore">
+        INSERT INTO exam_scores (
+        exam_id, student_id, score, submitted_at
+        ) VALUES (
+        #{examId}, #{studentId}, #{score}, #{submittedAt}
+        )
+    </insert>
+
+    <!-- 插入或更新考试成绩 -->
+    <insert id="insertOrUpdateExamScore">
+        INSERT INTO exam_scores (
+        exam_id, student_id, score, submitted_at
+        ) VALUES (
+        #{examId}, #{studentId}, #{score}, #{submittedAt}
+        )
+        ON DUPLICATE KEY UPDATE
+        score = #{score},
+        submitted_at = #{submittedAt}
+    </insert>
+
+    <!-- 在ExamMapper.xml中添加以下SQL -->
+
+    <!-- 插入未作答题目记录 -->
+    <insert id="insertUnansweredQuestion">
+        INSERT INTO student_answers (
+        exam_id, student_id, question_id, student_answer, is_correct, score_earned
+        ) VALUES (
+        #{examId}, #{studentId}, #{questionId}, #{studentAnswer}, #{isCorrect}, #{scoreEarned}
+        )
+    </insert>
+
+    <!-- 批量插入未作答题目记录 -->
+    <insert id="batchInsertUnansweredQuestions">
+        INSERT INTO student_answers (
+        exam_id, student_id, question_id, student_answer, is_correct, score_earned
+        ) VALUES
+        <foreach collection="questionIds" item="questionId" separator=",">
+            (#{examId}, #{studentId}, #{questionId}, '', false, 0)
+        </foreach>
+    </insert>
+
+    <!-- 更新学生课程最终成绩 -->
+    <update id="updateStudentFinalGrade">
+        UPDATE course_enrollments
+        SET final_grade = #{finalGrade}
+        WHERE course_id = #{courseId}
+        AND student_id = #{studentId}
+    </update>
+
+    <!-- 根据考试ID获取课程ID -->
+    <select id="getCourseIdByExamId" resultType="java.lang.Integer">
+        SELECT course_id
+        FROM exams
+        WHERE exam_id = #{examId}
+    </select>
+
+    <!-- 计算学生课程平均考试成绩 -->
+    <select id="calculateStudentAverageScore" resultType="java.math.BigDecimal">
+        SELECT ROUND(AVG(es.score), 2) as average_score
+        FROM exam_scores es
+        INNER JOIN exams e ON es.exam_id = e.exam_id
+        WHERE e.course_id = #{courseId}
+        AND es.student_id = #{studentId}
+        AND es.score IS NOT NULL
+    </select>
+
+    <!-- 获取学生在某课程的所有考试成绩 -->
+    <select id="getStudentExamScores" resultType="com.aiproject.smartcampus.pojo.vo.ExamScoreVO">
+        SELECT
+        e.exam_id,
+        e.title as exam_title,
+        es.score,
+        e.max_score,
+        ROUND((es.score / e.max_score) * 100, 2) as percentage,
+        es.submitted_at
+        FROM exam_scores es
+        INNER JOIN exams e ON es.exam_id = e.exam_id
+        WHERE e.course_id = #{courseId}
+        AND es.student_id = #{studentId}
+        ORDER BY e.exam_date DESC
+    </select>
+
+</mapper>

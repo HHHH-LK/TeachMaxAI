@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import org.checkerframework.checker.optional.qual.Present;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -91,7 +92,6 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
     List<SimpleKnowledgeAnalysisBO> getSimpleKnowledgeAnalysis(@Param(value = "pointIds") List<String> pointIds, @Param(value = "studentId") String studentId);
 
 
-
     @Select("SELECT\n" +
             "    kp.point_id,\n" +
             "    kp.point_name,\n" +
@@ -140,10 +140,17 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
 
 
     /**
-     * 获取当前学生的所有知识点情况
-     * */
-
-
-
-
+     * 更新学生知识掌握情况
+     *
+     * @param studentId     学生ID
+     * @param pointId       知识点ID
+     * @param masteryLevel  掌握程度 (not_learned: 未学习, learning: 学习中, mastered: 已掌握)
+     * @param practiceScore 练习得分/准确率
+     * @param practiceCount 练习次数增量
+     */
+    void updateStudentKnowledgeMastery(@Param("studentId") int studentId,
+                                       @Param("pointId") Integer pointId,
+                                       @Param("masteryLevel") String masteryLevel,
+                                       @Param("practiceScore") BigDecimal practiceScore,
+                                       @Param("practiceCount") int practiceCount);
 }

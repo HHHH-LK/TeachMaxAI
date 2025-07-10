@@ -15,7 +15,6 @@ public class TeacherQueryDTO {
     private String username;
     private String real_name;
     private String department; // 所属院系
-    private String status; // 状态（在职、离职等）
     private String email; // 教师邮箱
     private String phone; // 教师联系电话
 //    private String profilePicure; // 教师头像URL

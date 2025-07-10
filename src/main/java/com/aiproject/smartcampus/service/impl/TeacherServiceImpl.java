@@ -2,17 +2,18 @@ package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
-import com.aiproject.smartcampus.mapper.*;
+import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
+import com.aiproject.smartcampus.mapper.CourseMapper;
+import com.aiproject.smartcampus.mapper.KnowledgePointMapper;
+import com.aiproject.smartcampus.mapper.TeacherMapper;
 import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
-import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.po.Teacher;
 import com.aiproject.smartcampus.service.TeacherService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.jsonwebtoken.lang.Classes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,12 +40,12 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     private final CourseEnrollmentMapper courseEnrollmentMapper;
 
     @Override
-    public Result<Teacher> queryTeachersById(TeacherQueryDTO queryDTO) {
+    public Result<TeacherQueryDTO> queryTeachersById(Integer userId) {
 
         try {
-            Teacher teacher = teacherMapper.findByUserID(queryDTO.getUserId());
+            TeacherQueryDTO teacher = teacherMapper.findByUserID(userId);
             if (teacher == null) {
-                return Result.error("找不到ID为 " + queryDTO.getUserId() + " 的用户");
+                return Result.error("找不到ID为 " + userId + " 的用户");
             } else {
                 return Result.success(teacher);
             }
@@ -61,7 +62,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 //    }
 
     @Override
-    public Result updateTeacherInfo(TeacherUpdateDTO updateDTO) {
+    public Result updateTeacherInfo(Integer userId, TeacherQueryDTO updateDTO) {
         try {
             // 1. 参数校验
             if (updateDTO.getTeacherId() == null) {
@@ -69,13 +70,10 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             }
 
             // 2. 检查教师是否存在
-            Teacher teacher = teacherMapper.findByUserID(updateDTO.getUserId());
-            if (!teacher.getUserId().equals(updateDTO.getTeacherId())) {
-                return Result.error("找不到ID为 " + updateDTO.getTeacherId() + " 的教师");
-            } else {
-                teacherMapper.updateById(teacher); // 使用MapStruct更新字段
-                return Result.success("教师信息更新成功");
-            }
+            TeacherQueryDTO teacher = teacherMapper.findByUserID(userId);
+
+            teacherMapper.updateTeacherProfile(updateDTO); // 使用MapStruct更新字段
+            return Result.success("教师信息更新成功");
 
         } catch (Exception e) {
             log.error("更新教师信息失败", e);
@@ -281,9 +279,20 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             } else {
                 return Result.success(studentInfoList);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("获取学生信息失败", e);
             return Result.error("获取学生信息失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Result getPaper(Integer teacherId) {
+        try {
+
+        }catch (Exception e){
+            log.error("获取试卷信息失败", e);
+            return Result.error("获取试卷信息失败: " + e.getMessage());
+        }
+        return null;
     }
 }

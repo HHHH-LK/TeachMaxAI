@@ -5,17 +5,14 @@ import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 
-import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
+//import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @program: SmartCampus
@@ -33,14 +30,14 @@ public class TeacherController {
 
     @GetMapping("/query/{userId}")
     @Operation(summary = "查询教师", description = "查询教师信息")
-    public Result queryTeachers(@RequestBody TeacherQueryDTO queryDTO) throws Exception {
-        return teacherService.queryTeachersById(queryDTO);
+    public Result<TeacherQueryDTO> queryTeachers(@PathVariable Integer userId) throws Exception {
+        return teacherService.queryTeachersById(userId);
     }
 
-    @PutMapping("/update")
-    @Operation(summary = "更新教师信息", description = "修改教师的基本信息）")
-    public Result updateTeacherInfo(@RequestBody TeacherUpdateDTO updateDTO) {
-        return teacherService.updateTeacherInfo(updateDTO);
+    @PutMapping("/update/{userId}")
+    @Operation(summary = "更新教师信息", description = "修改教师的基本信息")
+    public Result updateTeacherInfo(@PathVariable Integer userId, @RequestBody TeacherQueryDTO updateDTO) {
+        return teacherService.updateTeacherInfo(userId, updateDTO);
     }
 
     /**
@@ -82,4 +79,12 @@ public class TeacherController {
     public Result<List<TeacherGetStudentDTO>> getStudentInfo(@PathVariable Integer courseId) {
         return teacherService.getStudentInfo(courseId);
     }
+
+    //查询试卷
+    @GetMapping("/addPaper")
+    @Operation(summary = "查询试卷", description = "根据教师ID查询试卷信息")
+    public Result getPaper(@RequestParam("teacherId") Integer teacherId) {
+        return teacherService.getPaper(teacherId);
+    }
+
 }

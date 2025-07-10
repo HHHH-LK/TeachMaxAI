@@ -4,7 +4,7 @@ import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
-import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
+//import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.po.Teacher;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -12,9 +12,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 public interface TeacherService extends IService<Teacher> {
-    Result<Teacher> queryTeachersById(TeacherQueryDTO queryDTO);
+    Result<TeacherQueryDTO> queryTeachersById(Integer userId);
 
-    Result updateTeacherInfo(TeacherUpdateDTO updateDTO);
+    Result updateTeacherInfo(Integer userId, TeacherQueryDTO updateDTO);
 
     Result getAllClassInfo( String couresId);
 
@@ -26,6 +26,8 @@ public interface TeacherService extends IService<Teacher> {
 
     Result<List<TeacherGetStudentDTO>> getStudentInfo(Integer courseId);
 
-//    Result updateTeacherStatus(TeacherStatusDTO statusDTO);
+    Result getPaper(Integer teacherId);
+
+
 
 }
