@@ -3,13 +3,13 @@
 package com.aiproject.smartcampus.mapper;
 
 import com.aiproject.smartcampus.pojo.po.Exam;
+import com.aiproject.smartcampus.pojo.po.ExamPaper;
+import com.aiproject.smartcampus.pojo.po.PaperQuestion;
 import com.aiproject.smartcampus.pojo.vo.ExamQuestionVO;
 import com.aiproject.smartcampus.pojo.vo.ExamScoreVO;
 import com.aiproject.smartcampus.pojo.vo.StudentExamAnswerVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -256,5 +256,33 @@ public interface ExamMapper extends BaseMapper<Exam> {
      */
     List<ExamScoreVO> getStudentExamScores(@Param("courseId") Integer courseId,
                                            @Param("studentId") Integer studentId);
+
+    /**
+     * 插入试卷记录
+     */
+    @Insert("INSERT INTO exam_papers (exam_id, paper_title, total_score, question_count) " +
+            "VALUES (#{examId}, #{paperTitle}, #{totalScore}, #{questionCount})")
+    @Options(useGeneratedKeys = true, keyProperty = "paperId")
+    int insertExamPaper(ExamPaper examPaper);
+
+    /**
+     * 插入试卷题目关联
+     */
+    @Insert("INSERT INTO paper_questions (paper_id, question_id, question_order, custom_score) " +
+            "VALUES (#{paperId}, #{questionId}, #{questionOrder}, #{customScore})")
+    @Options(useGeneratedKeys = true, keyProperty = "paperQuestionId")
+    int insertPaperQuestion(PaperQuestion paperQuestion);
+
+    /**
+     * 批量插入试卷题目关联
+     */
+    int batchInsertPaperQuestions(@Param("paperId") Integer paperId,
+                                  @Param("questionList") List<PaperQuestion> questionList);
+
+    /**
+     * 获取课程的所有学生ID（用于批量操作）
+     */
+    @Select("SELECT DISTINCT student_id FROM course_enrollments WHERE course_id = #{courseId}")
+    List<Integer> getCourseStudents(@Param("courseId") Integer courseId);
 
 }

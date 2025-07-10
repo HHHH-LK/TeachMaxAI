@@ -5,11 +5,10 @@ import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 
 import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
+import com.aiproject.smartcampus.pojo.vo.KnowledgePointVO;
 import com.aiproject.smartcampus.pojo.vo.StudentKnowledgePointVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.checkerframework.checker.optional.qual.Present;
 import org.springframework.stereotype.Repository;
 
@@ -153,4 +152,31 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
                                        @Param("masteryLevel") String masteryLevel,
                                        @Param("practiceScore") BigDecimal practiceScore,
                                        @Param("practiceCount") int practiceCount);
+
+
+    /**
+     * 获取课程知识点列表（用于智能试卷创建）
+     */
+    @Select("SELECT point_id, point_name, description, difficulty_level, keywords " +
+            "FROM knowledge_points WHERE course_id = #{courseId} ORDER BY point_id")
+    List<KnowledgePointVO> getCourseKnowledgePoints(@Param("courseId") Integer courseId);
+
+    /**
+     * 根据名称和课程查找知识点
+     */
+    @Select("SELECT point_id FROM knowledge_points " +
+            "WHERE point_name = #{pointName} AND course_id = #{courseId} LIMIT 1")
+    Integer findByNameAndCourse(@Param("pointName") String pointName,
+                                @Param("courseId") Integer courseId);
+
+    /**
+     * 创建新知识点（AI生成题目时可能需要）
+     */
+    @Insert("INSERT INTO knowledge_points (course_id, point_name, description, difficulty_level, keywords) " +
+            "VALUES (#{courseId}, #{pointName}, #{description}, 'medium', #{keywords})")
+    @Options(useGeneratedKeys = true, keyProperty = "pointId")
+    int createKnowledgePoint(@Param("pointName") String pointName,
+                             @Param("courseId") Integer courseId,
+                             @Param("description") String description,
+                             @Param("keywords") String keywords);
 }

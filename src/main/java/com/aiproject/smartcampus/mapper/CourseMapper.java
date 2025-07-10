@@ -94,4 +94,8 @@ public interface CourseMapper extends BaseMapper<Course> {
     List<CourseVO> findAllCourseByDate(@Param(value = "date")String date,@Param(value = "studentId")String studentId);
 
 
+    @Select("select courses.course_name\n" +
+            "from courses\n" +
+            "where course_id=#{courseId}")
+    String getCourseByid(@Param(value = "courseId") Integer courseId);
 }

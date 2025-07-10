@@ -54,7 +54,8 @@ public class Exam implements Serializable {
      */
     public enum ExamStatus {
         SCHEDULED("scheduled", "已安排"),
-        COMPLETED("completed", "已完成");
+        COMPLETED("completed", "已完成"),
+        DRAFT("draft", "草稿");
 
         @EnumValue  // 告诉MyBatis-Plus使用这个字段的值与数据库交互
         @JsonValue  // JSON序列化时返回这个值

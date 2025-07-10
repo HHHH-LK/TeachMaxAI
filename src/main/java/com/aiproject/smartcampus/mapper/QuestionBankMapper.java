@@ -3,6 +3,7 @@ package com.aiproject.smartcampus.mapper;
 import com.aiproject.smartcampus.pojo.po.Exam;
 import com.aiproject.smartcampus.pojo.po.ExamScore;
 import com.aiproject.smartcampus.pojo.po.QuestionBank;
+import com.aiproject.smartcampus.pojo.vo.QuestionBankStatisticsVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
@@ -61,4 +62,40 @@ public interface QuestionBankMapper extends BaseMapper<QuestionBank> {
     @Select("SELECT question_type, difficulty_level, COUNT(*) as count FROM question_bank " +
             "WHERE course_id = #{courseId} GROUP BY question_type, difficulty_level")
     List<Map<String, Object>> getQuestionStatistics(@Param("courseId") Integer courseId);
+
+    /**
+     * 获取题库详细统计信息（用于智能试卷创建）
+     */
+    @Select("SELECT " +
+            "COUNT(*) as total_questions, " +
+            "COUNT(CASE WHEN question_type = 'single_choice' THEN 1 END) as single_choice_count, " +
+            "COUNT(CASE WHEN question_type = 'multiple_choice' THEN 1 END) as multiple_choice_count, " +
+            "COUNT(CASE WHEN question_type = 'true_false' THEN 1 END) as true_false_count, " +
+            "COUNT(CASE WHEN question_type = 'fill_blank' THEN 1 END) as fill_blank_count, " +
+            "COUNT(CASE WHEN question_type = 'short_answer' THEN 1 END) as short_answer_count, " +
+            "COUNT(CASE WHEN difficulty_level = 'easy' THEN 1 END) as easy_count, " +
+            "COUNT(CASE WHEN difficulty_level = 'medium' THEN 1 END) as medium_count, " +
+            "COUNT(CASE WHEN difficulty_level = 'hard' THEN 1 END) as hard_count " +
+            "FROM question_bank WHERE course_id = #{courseId}")
+    QuestionBankStatisticsVO getQuestionBankStatistics(@Param("courseId") Integer courseId);
+
+    /**
+     * 根据多个条件查询题目（用于智能选题）
+     */
+    List<QuestionBank> findQuestionsByCondition(@Param("courseId") Integer courseId,
+                                                @Param("questionType") String questionType,
+                                                @Param("difficultyLevel") String difficultyLevel,
+                                                @Param("pointIds") List<Integer> pointIds,
+                                                @Param("limit") Integer limit);
+
+    /**
+     * 智能选择题目（综合考虑难度分布和知识点覆盖）
+     */
+    List<QuestionBank> selectSmartQuestions(@Param("courseId") Integer courseId,
+                                            @Param("questionType") String questionType,
+                                            @Param("count") Integer count,
+                                            @Param("easyRatio") Double easyRatio,
+                                            @Param("mediumRatio") Double mediumRatio,
+                                            @Param("hardRatio") Double hardRatio);
+
 }

@@ -1,13 +1,8 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
-import com.aiproject.smartcampus.mapper.StudentMapper;
-import com.aiproject.smartcampus.mapper.TeacherMapper;
 import com.aiproject.smartcampus.pojo.po.Student;
-import com.aiproject.smartcampus.pojo.vo.StudentsImformationVO;
 import com.aiproject.smartcampus.service.AdminService;
-import com.aiproject.smartcampus.service.StudentService;
-import com.aiproject.smartcampus.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

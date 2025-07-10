@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiproject.smartcampus.mapper.QuestionBankMapper">
+
+    <!-- 根据多个条件查询题目 -->
+    <select id="findQuestionsByCondition" resultType="com.aiproject.smartcampus.pojo.po.QuestionBank">
+        SELECT * FROM question_bank
+        WHERE course_id = #{courseId}
+        <if test="questionType != null">
+            AND question_type = #{questionType}
+        </if>
+        <if test="difficultyLevel != null">
+            AND difficulty_level = #{difficultyLevel}
+        </if>
+        <if test="pointIds != null and pointIds.size() > 0">
+            AND point_id IN
+            <foreach collection="pointIds" item="pointId" open="(" separator="," close=")">
+                #{pointId}
+            </foreach>
+        </if>
+        ORDER BY created_at DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 智能选择题目 -->
+    <select id="selectSmartQuestions" resultType="com.aiproject.smartcampus.pojo.po.QuestionBank">
+        (
+            SELECT * FROM question_bank
+            WHERE course_id = #{courseId}
+              AND question_type = #{questionType}
+              AND difficulty_level = 'easy'
+            ORDER BY RAND()
+                LIMIT #{easyCount}
+        )
+        UNION ALL
+        (
+            SELECT * FROM question_bank
+            WHERE course_id = #{courseId}
+              AND question_type = #{questionType}
+              AND difficulty_level = 'medium'
+            ORDER BY RAND()
+                LIMIT #{mediumCount}
+        )
+        UNION ALL
+        (
+            SELECT * FROM question_bank
+            WHERE course_id = #{courseId}
+              AND question_type = #{questionType}
+              AND difficulty_level = 'hard'
+            ORDER BY RAND()
+                LIMIT #{hardCount}
+        )
+    </select>
+
+    <!-- 批量插入试卷题目关联 -->
+    <insert id="batchInsertPaperQuestions">
+        INSERT INTO paper_questions (paper_id, question_id, question_order, custom_score)
+        VALUES
+        <foreach collection="questionList" item="item" separator=",">
+            (#{paperId}, #{item.questionId}, #{item.questionOrder}, #{item.customScore})
+        </foreach>
+    </insert>
+</mapper>
