@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.mapper;
 
+import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.po.CourseEnrollment;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -37,4 +38,30 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
             "LEFT JOIN users u ON t.user_id = u.user_id " +
             "WHERE ce.student_id = #{studentId}")
     List<CourseEnrollment> getStudentTranscript(@Param("studentId") Integer studentId);
+
+    /**
+     * 仅查询成绩
+     */
+    @Select("SELECT ce.final_grade FROM course_enrollments ce " +
+            "WHERE ce.course_id = #{courseId}")
+    List<Double> getStudentScores(@Param("courseId") Integer courseId);
+
+    /**
+     * 查询学生全部信息
+     */
+    @Select("SELECT " +
+            "ce.course_id AS courseId, " +
+            "c.course_name AS courseName, " + // 课程名称需要从其他表获取，暂时设为空字符串
+            "u.real_name AS realName, " +
+            "s.student_number AS studentNumber, " +
+            "u.email AS Email, " +
+            "u.phone AS Phone, " +
+            "s.class_name AS className, " +
+            "ce.final_grade AS score " +
+            "FROM course_enrollments ce " +
+            "JOIN students s ON ce.student_id = s.student_id " +
+            "JOIN users u ON s.user_id = u.user_id " +
+            "JOIN courses c ON ce.course_id = c.course_id " +
+            "WHERE ce.course_id = #{courseId}")
+    List<TeacherGetStudentDTO> getStudentInfo(@Param("courseId") Integer courseId);
 }

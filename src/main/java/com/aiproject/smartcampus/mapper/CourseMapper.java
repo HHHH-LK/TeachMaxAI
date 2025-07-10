@@ -26,7 +26,15 @@ public interface CourseMapper extends BaseMapper<Course> {
             "LEFT JOIN users u ON t.user_id = u.user_id " +
             "WHERE c.teacher_id = #{teacherId} AND c.status = 'active'")
     List<Course> findByTeacherId(@Param("teacherId") Integer teacherId);
-    
+
+
+    /**
+     * 查询教师的课程列表2
+     */
+    @Select("SELECT c.* FROM courses c " +  // 移除了无效的别名
+            "WHERE c.teacher_id = #{teacherId} AND c.status = 'active'")
+    List<Course> findCourseByTeacherId(@Param("teacherId") Integer teacherId);
+
     /**
      * 查询学生选修的课程列表
      */
@@ -84,4 +92,6 @@ public interface CourseMapper extends BaseMapper<Course> {
             "  AND c.status = 'active'\n" +
             "ORDER BY c.course_name;")
     List<CourseVO> findAllCourseByDate(@Param(value = "date")String date,@Param(value = "studentId")String studentId);
+
+
 }

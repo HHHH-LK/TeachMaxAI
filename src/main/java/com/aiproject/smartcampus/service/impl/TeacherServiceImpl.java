@@ -2,24 +2,23 @@ package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
-import com.aiproject.smartcampus.mapper.KnowledgePointMapper;
-import com.aiproject.smartcampus.mapper.StudentMapper;
-import com.aiproject.smartcampus.mapper.TeacherMapper;
+import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
+import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
+import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
+import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.po.Teacher;
-import com.aiproject.smartcampus.pojo.vo.StudentKnowledgePointVO;
 import com.aiproject.smartcampus.service.TeacherService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.jsonwebtoken.lang.Classes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * @program: SmartCampus
@@ -36,6 +35,8 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     private final TeacherMapper teacherMapper;
     private final KnowledgePointMapper knowledgePointMapper;
     private final UserToTypeUtils userToTypeUtils;
+    private final CourseMapper courseMapper;
+    private final CourseEnrollmentMapper courseEnrollmentMapper;
 
     @Override
     public Result<Teacher> queryTeachersById(TeacherQueryDTO queryDTO) {
@@ -140,10 +141,10 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     @Override
     public Result getTheMaxUncorrectPoint(String couresId) {
 
-        Integer pointSize = 124000;
+        int pointSize = 124000;
         Map<Integer, Long> pointMap = new ConcurrentHashMap<>(pointSize);
         Map<Integer, StudentWrongKnowledgeBO> studentWrongKnowledgeBOMap = new ConcurrentHashMap<>();
-        for (int i = 0; i <pointSize ; i++) {
+        for (int i = 0; i < pointSize; i++) {
             pointMap.put(i, 0L);
         }
 
@@ -182,5 +183,107 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         return Result.success(list);
     }
 
+    /**
+     * 获取教师所教授的课程
+     *
+     * @param teacherId 教师ID
+     * @return 课程列表
+     */
 
+    @Override
+    public Result<List<Course>> GetAllCourse(Integer teacherId) {
+        try {
+            // 1. 参数校验
+            if (teacherId == null) {
+                return Result.error("教师ID不能为空");
+            }
+
+            // 2. 查询教师所教授的课程
+            List<Course> courses = courseMapper.findCourseByTeacherId(teacherId);
+            if (courses == null || courses.isEmpty()) {
+                return Result.error("找不到ID为 " + teacherId + " 的教师所教授的课程");
+            } else {
+                return Result.success(courses);
+            }
+        } catch (Exception e) {
+            log.error("获取教师所教授的课程失败", e);
+            return Result.error("获取教师所教授的课程失败: " + e.getMessage());
+        }
+    }
+
+    // 获取课程整体情况
+    @Override
+    public Result<TeacherGetSituationDTO> GetAllSituation(Integer courseId) {
+        try {
+            List<Double> scoreList = courseEnrollmentMapper.getStudentScores(courseId);
+            if (scoreList == null || scoreList.isEmpty()) {
+                return Result.error("课程ID为 " + courseId + " 的成绩信息为空");
+            }
+            // 计算平均分
+            int totalStudents = scoreList.size();
+            double averageScore = scoreList.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+
+            // 初始化各分数段计数器
+            int failCount = 0;      // <60
+            int passCount = 0;      // 60-69
+            int normalCount = 0;    // 70-79
+            int goodCount = 0;      // 80-89
+            int excellentCount = 0; // 90-100
+
+            // 手动遍历计算分数分布
+            for (Double score : scoreList) {
+                if (score >= 90) excellentCount++;
+                else if (score >= 80) goodCount++;
+                else if (score >= 70) normalCount++;
+                else if (score >= 60) passCount++;
+                else failCount++;
+            }
+
+            // 计算比率
+            double passRate = totalStudents > 0 ?
+                    (100.0 * (totalStudents - failCount) / totalStudents) : 0.0;
+            double excellentRate = totalStudents > 0 ?
+                    (100.0 * excellentCount / totalStudents) : 0.0;
+
+            // 填充DTO对象
+            TeacherGetSituationDTO situationDTO = new TeacherGetSituationDTO();
+            situationDTO.setCourseId(courseId);
+            situationDTO.setCourseName(""); // 需要补充课程名称查询逻辑
+            situationDTO.setAverageScore(averageScore);
+            situationDTO.setPassRate(passRate);
+            situationDTO.setExcellentRate(excellentRate);
+            situationDTO.setFailNumber(failCount);
+            situationDTO.setPassNumber(passCount);
+            situationDTO.setNormalNumber(normalCount);
+            situationDTO.setGoodNumber(goodCount);
+            situationDTO.setExcellentNumber(excellentCount);
+
+            return Result.success(situationDTO);
+
+        } catch (Exception e) {
+            log.error("获取成绩信息失败", e);
+            return Result.error("获取信息失败" + e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<List<TeacherGetStudentDTO>> getStudentInfo(Integer courseId) {
+        try {
+            // 1. 参数校验
+            if (courseId == null) {
+                return Result.error("课程ID不能为空");
+            }
+
+            // 2. 查询学生信息
+            List<TeacherGetStudentDTO> studentInfoList = courseEnrollmentMapper.getStudentInfo(courseId);
+            if (studentInfoList == null || studentInfoList.isEmpty()) {
+                return Result.error("找不到课程ID为 " + courseId + " 的学生信息");
+            } else {
+                return Result.success(studentInfoList);
+            }
+        }catch (Exception e) {
+            log.error("获取学生信息失败", e);
+            return Result.error("获取学生信息失败: " + e.getMessage());
+        }
+    }
 }

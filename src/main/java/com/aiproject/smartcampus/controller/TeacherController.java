@@ -1,9 +1,12 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
+import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 
 import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
+import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +33,7 @@ public class TeacherController {
 
     @GetMapping("/query/{userId}")
     @Operation(summary = "查询教师", description = "查询教师信息")
-    public Result queryTeachers(@RequestBody TeacherQueryDTO queryDTO) throws Exception{
+    public Result queryTeachers(@RequestBody TeacherQueryDTO queryDTO) throws Exception {
         return teacherService.queryTeachersById(queryDTO);
     }
 
@@ -42,24 +45,41 @@ public class TeacherController {
 
     /**
      * 查询指定班级课程对应的学生整体知识点掌握情况
-     * */
+     */
 
     @GetMapping("/getAllClassNotCorrectInfo")
-    public Result getAllClassInfo(@RequestParam("couresId")  String couresId) {
+    public Result getAllClassInfo(@RequestParam("couresId") String couresId) {
 
         return teacherService.getAllClassInfo(couresId);
     }
 
     /**
      * 查询特定班级的知识点的高频错误知识点信息
-     * */
+     */
 
     @GetMapping("/getTheMaxUncorrectPoint")
-    public Result getTheMaxUncorrectPoint(@RequestParam("couresId")  String couresId) {
+    public Result getTheMaxUncorrectPoint(@RequestParam("couresId") String couresId) {
 
         return teacherService.getTheMaxUncorrectPoint(couresId);
     }
 
+    @GetMapping("/getClass/{teacherId}")
+    @Operation(summary = "获取教师所教授的课程", description = "根据教师ID获取其所教授的课程列表")
+    public Result<List<Course>> GetAllCourse(@PathVariable Integer teacherId) {
+        return teacherService.GetAllCourse(teacherId);
+    }
 
+    //获取对应课程的整体成绩情况
+    @GetMapping("/getAllSituation/{courseId}")
+    @Operation(summary = "获取课程整体情况", description = "根据课程ID获取该课程的整体情况")
+    public Result<TeacherGetSituationDTO> GetAllSituation(@PathVariable Integer courseId) {
+        return teacherService.GetAllSituation(courseId);
+    }
 
+    //获取对应学生信息
+    @GetMapping("/getStudentInfo/{courseId}")
+    @Operation(summary = "获取课程学生信息", description = "根据课程ID获取该课程的学生信息")
+    public Result<List<TeacherGetStudentDTO>> getStudentInfo(@PathVariable Integer courseId) {
+        return teacherService.getStudentInfo(courseId);
+    }
 }
