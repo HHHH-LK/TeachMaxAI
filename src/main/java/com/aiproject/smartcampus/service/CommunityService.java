@@ -2,25 +2,29 @@ package com.aiproject.smartcampus.service;
 
 import com.aiproject.smartcampus.pojo.dto.CommentDTO;
 import com.aiproject.smartcampus.pojo.dto.PostDTO;
+import com.aiproject.smartcampus.pojo.dto.PostGetDTO;
 import com.aiproject.smartcampus.pojo.po.Comment;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.validation.Valid;
-
-import java.util.List;
+import com.aiproject.smartcampus.commons.client.Result;
 
 public interface CommunityService {
-    PostDTO createPost(@Valid PostDTO postDTO);
+    Result createPost(@Valid PostDTO postDTO);
 
-    List<PostDTO> gerAllPosts();
+    Result<IPage<PostGetDTO>> getPostsByPage(Integer pageNum, Integer pageSize);;
 
-    List<Comment> getCommentsByPostId(Integer postId);
+    Result<IPage<CommentDTO>> getCommentsByPostId(Integer postId, Integer pageNum, Integer pageSize);
 
-    PostDTO getPostWithComments(Integer postId);
+    Result<PostGetDTO> getPostWithComments(Integer postId);
 
-    CommentDTO addCommentToPost(Integer postId, @Valid CommentDTO commentDTO);
+    Result<Comment> addCommentToPost( @Valid CommentDTO commentDTO);
+
+
 
     // 帖子点赞
-    void likePost(Long postId);
+    Result likePost(Integer postId);
 
-    // 评论点赞
-    void likeComment(Long commentId);
+    Result likeComment(Integer commentId);
+
+    Result<IPage<PostGetDTO>> getOwnPost(int pageNum, int pageSize, Integer userId);
 }
