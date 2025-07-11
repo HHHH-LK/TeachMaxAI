@@ -215,5 +215,16 @@ class SmartCampusApplicationTests {
     }
 
 
+        @Test
+        void test9() throws IOException {
+
+            Result<String> result = teacherAIservice.teacherCreateTest("帮我针对整个班级进行定制化的生成章节测试题", "1", "1");
+
+            log.info(result.getData());
+
+
+        }
+
+
 
 }

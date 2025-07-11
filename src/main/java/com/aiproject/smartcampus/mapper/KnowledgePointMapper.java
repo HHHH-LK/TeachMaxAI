@@ -55,6 +55,9 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
             "    c.course_name,\n" +
             "    c.semester,\n" +
             "\n" +
+            "    -- 章节ID\n" +
+            "    ckp.chapter_id,\n" +
+            "\n" +
             "    -- 学生掌握情况\n" +
             "    COALESCE(skm.mastery_level, 'not_learned') as mastery_level,\n" +
             "    COALESCE(skm.practice_score, 0.0) as practice_score,\n" +
@@ -69,6 +72,7 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
             "\n" +
             "FROM knowledge_points kp\n" +
             "INNER JOIN courses c ON kp.course_id = c.course_id\n" +
+            "LEFT JOIN chapter_knowledge_points ckp ON kp.point_id = ckp.point_id\n" +
             "LEFT JOIN student_knowledge_mastery skm ON kp.point_id = skm.point_id\n" +
             "    AND skm.student_id = #{studentId}\n" +
             "LEFT JOIN (\n" +
@@ -80,13 +84,12 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
             "        ROUND(AVG(CASE WHEN sa.is_correct = 1 THEN 1 ELSE 0 END) * 100, 2) as accuracy_rate\n" +
             "    FROM student_answers sa\n" +
             "    INNER JOIN question_bank qb ON sa.question_id = qb.question_id\n" +
-            "    WHERE sa.student_id =  #{studentId}\n" +
+            "    WHERE sa.student_id = #{studentId}\n" +
             "    GROUP BY qb.point_id\n" +
             ") answer_stats ON kp.point_id = answer_stats.point_id\n" +
             "\n" +
-            "WHERE kp.point_id =#{pointId}")
+            "WHERE kp.point_id = #{pointId}")
     KnowledgePointSimpleVO getKnowledgeInformationByPointId(@Param(value = "pointId") String pointId, @Param(value = "studentId") String studentId);
-
 
     List<SimpleKnowledgeAnalysisBO> getSimpleKnowledgeAnalysis(@Param(value = "pointIds") List<String> pointIds, @Param(value = "studentId") String studentId);
 

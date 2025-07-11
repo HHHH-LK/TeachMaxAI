@@ -25,6 +25,9 @@ class NotMasterTestCreateToolTest {
 
         TestTaskBO testTaskBO = new TestTaskBO();
         testTaskBO.setStudentId(1);
+        testTaskBO.setContent("请帮我生成更加适合我的");
+        testTaskBO.setChapterId(1);
+        testTaskBO.setCourseId(1);
         notMasterTestCreateTool.setTestTaskBO(testTaskBO);
         notMasterTestCreateTool.setSimpleKnowledgeAnalysisBOList(new ArrayList<>());
         notMasterTestCreateTool.run();

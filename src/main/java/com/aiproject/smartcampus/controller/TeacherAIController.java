@@ -69,6 +69,15 @@ public class TeacherAIController {
         return teacherAIservice.TeacherTextCreate(content,courseId,chapterId);
     }
 
+    /**
+     * 智能生成章节测试题
+     * */
+    @PostMapping("teacher/createPractice")
+    public Result<String> teacherCreateTest(@RequestParam String content, @RequestParam String courseId,@RequestParam String chapterId) {
+
+        return teacherAIservice.teacherCreateTest(content,courseId,chapterId);
+    }
+
 
 
 }

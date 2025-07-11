@@ -3,10 +3,8 @@ package com.aiproject.smartcampus.service.impl;
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.mapper.*;
-import com.aiproject.smartcampus.model.functioncalling.toolutils.ClassInfoAsicToolUtils;
-import com.aiproject.smartcampus.model.functioncalling.toolutils.ExamCreaterToolUtils;
-import com.aiproject.smartcampus.model.functioncalling.toolutils.ExamMarkingToolUtils;
-import com.aiproject.smartcampus.model.functioncalling.toolutils.LessonPlanCreateToolUtils;
+import com.aiproject.smartcampus.model.functioncalling.NotMasterTestCreateTool;
+import com.aiproject.smartcampus.model.functioncalling.toolutils.*;
 import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.dto.ChapterKnowledgePointDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
@@ -47,6 +45,7 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
     private final ChapterMapper chapterMapper;
     private final UserToTypeUtils userToTypeUtils;
     private final LessonPlanMapper lessonPlanMapper;
+    private final TeacherTestCreateToolUtils teacherTestCreateToolUtils;
 
     @Override
     public Result aiMarkingExam(String studentId, String examId) {
@@ -170,13 +169,51 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
         lessonPlanInfo.setPlanTitle(planTitle);
         lessonPlanInfo.setPlanContent(lessonPlan);
         int insert = lessonPlanMapper.insert(lessonPlanInfo);
-        if(insert<1){
+        if (insert < 1) {
             log.error("教案存入失败");
             throw new RuntimeException("教案存入失败");
         }
 
         return Result.success(lessonPlan);
     }
+
+    @Override
+    public Result<String> teacherCreateTest(String content, String courseId, String chapterId) {
+
+        // 查询课程章节重要知识点
+        List<ChapterKnowledgePointDTO> chapterKnowledgePointDTOS = chapterMapper.getallChapterKnowleageByIscore(courseId, chapterId);
+        //基于courseId 查询对应点课程名字
+        String courseNameByid = courseMapper.findCourseNameByid(courseId);
+        //基于章节id查询对应的章节name
+        String chapterNameById = chapterMapper.getChapterNameById(chapterId);
+        String teacherId = userToTypeUtils.change();
+
+        //汇总信息
+        StringBuffer sb = new StringBuffer("课程" + courseNameByid + "对应章节" + chapterNameById + "下有以下知识点");
+        for (ChapterKnowledgePointDTO chapterKnowledgePointDTO : chapterKnowledgePointDTOS) {
+            sb.append(chapterKnowledgePointDTO.toString());
+            sb.append("\n");
+        }
+        String classAndChapterInfo = sb.toString();
+
+        //获取班级高频错误知识点分布
+        StringBuffer sb1 = new StringBuffer();
+        List<StudentWrongKnowledgeBO> wrongKnowledgeList = teacherService.getTheMaxUncorrectPoint(courseId).getData();
+        sb1.append("接下来是班级高频错误知识点\n");
+        for (int i = 1; i < wrongKnowledgeList.size(); i++) {
+            sb1.append("班级出错率第" + i + "高的知识点:");
+            sb1.append(wrongKnowledgeList.get(i - 1).toString());
+            sb1.append("\n");
+        }
+        String wrongKnowledgeInfo = sb1.toString();
+
+        //智能生成章节测试题
+        String chapterTest = teacherTestCreateToolUtils.createChapterTestWithSave(content, classAndChapterInfo, wrongKnowledgeInfo, Integer.valueOf(courseId), Integer.valueOf(chapterId), Integer.valueOf(teacherId));
+
+        //返回json格式
+        return Result.success(chapterTest);
+    }
+
 
     /**
      * 获取试卷JSON内容

@@ -2,7 +2,7 @@ package com.aiproject.smartcampus.model.functioncalling;
 
 import com.aiproject.smartcampus.mapper.ChapterQuestionMapper;
 import com.aiproject.smartcampus.mapper.QuestionBankMapper;
-import com.aiproject.smartcampus.model.functioncalling.toolutils.NotMasterTestCreatetoolUtils;
+import com.aiproject.smartcampus.model.functioncalling.toolutils.CreateQuestionByKnowledgeIdtoolUtils;
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
 import com.aiproject.smartcampus.pojo.bo.TestTaskBO;
 import com.aiproject.smartcampus.pojo.po.ChapterQuestion;
@@ -30,7 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotMasterTestCreateTool implements Tool {
 
-    private final NotMasterTestCreatetoolUtils notMasterTestCreatetoolUtils;
+    private final CreateQuestionByKnowledgeIdtoolUtils createQuestionByKnowledgeIdtoolUtils;
 
     private final Integer DEFOURT_AI_CREATE_ID = 0;
     // 测试任务基本信息
@@ -63,7 +63,7 @@ public class NotMasterTestCreateTool implements Tool {
                 // 查询全局最大ID，不限制created_by
                 Integer beforeMax = questionBankMapper.selectMaxQuestionIdByCreator(DEFOURT_AI_CREATE_ID); // 改为查询全局最大ID
 
-                String test = notMasterTestCreatetoolUtils.createTest(testTaskBO, simpleKnowledgeAnalysisBOList);
+                String test = createQuestionByKnowledgeIdtoolUtils.createTest(testTaskBO, simpleKnowledgeAnalysisBOList);
                 result = test;
 
                 // 等待一段时间确保数据保存完成
@@ -109,7 +109,7 @@ public class NotMasterTestCreateTool implements Tool {
         // 批量构建数据
         for (int i = beforeMax + 1; i <= afterMax; i++) {
             ChapterQuestion chapterQuestion = new ChapterQuestion();
-            chapterQuestion.setQuestionType(ChapterQuestion.QuestionType.TEST);
+            chapterQuestion.setQuestionType(ChapterQuestion.QuestionType.PRACTICE);
             chapterQuestion.setChapterId(testTaskBO.getChapterId());
             chapterQuestion.setQuestionId(i);
             chapterQuestion.setCreatedAt(now);

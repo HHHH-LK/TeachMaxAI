@@ -52,6 +52,11 @@ public class KnowledgePointSimpleVO {
     @JsonProperty("semester")
     private String semester;
 
+    // ========== 章节信息 ==========
+    @ApiModelProperty(value = "章节ID", example = "3")
+    @JsonProperty("chapterId")
+    private Integer chapterId;
+
     // ========== 学生掌握情况 ==========
     @ApiModelProperty(value = "掌握程度", example = "learning", allowableValues = "not_learned,learning,mastered")
     @JsonProperty("masteryLevel")
@@ -86,7 +91,6 @@ public class KnowledgePointSimpleVO {
     @JsonProperty("accuracyRate")
     private Double accuracyRate;
 
-
     @Override
     public String toString() {
         return "KnowledgePointSimpleVO{" +
@@ -95,6 +99,7 @@ public class KnowledgePointSimpleVO {
                 ", description='" + description + '\'' +
                 ", difficultyLevel='" + difficultyLevel + '\'' +
                 ", courseName='" + courseName + '\'' +
+                ", chapterId=" + chapterId +
                 ", masteryLevel='" + masteryLevel + '\'' +
                 ", practiceScore=" + practiceScore +
                 ", totalAnswered=" + totalAnswered +

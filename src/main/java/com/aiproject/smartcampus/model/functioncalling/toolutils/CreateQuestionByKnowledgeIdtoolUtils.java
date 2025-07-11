@@ -30,16 +30,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
-import org.springframework.util.StringUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -53,7 +43,7 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NotMasterTestCreatetoolUtils {
+public class CreateQuestionByKnowledgeIdtoolUtils {
 
     private final ChatLanguageModel chatLanguageModel;
     private final StudentKnowledgeMasteryMapper studentKnowledgeMasteryMapper;
@@ -688,9 +678,6 @@ public class NotMasterTestCreatetoolUtils {
         return questionBank;
     }
 
-    /**
-     * 安全获取整数值
-     */
 
     /**
      * 安全获取整数值
@@ -706,17 +693,10 @@ public class NotMasterTestCreatetoolUtils {
     /**
      * 安全获取字符串值
      */
-
-    /**
-     * 安全获取字符串值
-     */
     private String getStringValue(JsonNode node, String fieldName) {
         return getStringValue(node, fieldName, null);
     }
 
-    /**
-     * 安全获取字符串值（带默认值）
-     */
 
     /**
      * 安全获取字符串值（带默认值）

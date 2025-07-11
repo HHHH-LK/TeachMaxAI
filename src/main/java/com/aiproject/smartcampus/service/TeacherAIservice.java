@@ -18,4 +18,6 @@ public interface TeacherAIservice {
     Result<String> aiclassAiayaisc(String courseId);
 
     Result<String> TeacherTextCreate(String content, String courseId, String chapterId);
+
+    Result<String> teacherCreateTest(String content, String courseId, String chapterId);
 }
