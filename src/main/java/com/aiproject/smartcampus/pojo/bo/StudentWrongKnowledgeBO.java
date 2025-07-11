@@ -50,15 +50,14 @@ public class StudentWrongKnowledgeBO {
 
     @Override
     public String toString() {
-        return "StudentWrongKnowledgeVO{" +
-                "pointId=" + pointId +
-                ", pointName='" + pointName + '\'' +
-                ", description='" + description + '\'' +
-                ", difficultyLevel='" + difficultyLevel + '\'' +
-                ", keywords='" + keywords + '\'' +
-                ", courseName='" + courseName + '\'' +
-                ", wrongAnswerCount=" + wrongAnswerCount +
-                ", accuracyRate=" + accuracyRate +
-                '}';
+        return "学生错误知识点统计：\n" +
+                "知识点ID：" + pointId + "\n" +
+                "知识点名称：" + pointName + "\n" +
+                "知识点描述：" + description + "\n" +
+                "难度等级：" + difficultyLevel + "\n" +
+                "关键词：" + keywords + "\n" +
+                "课程名称：" + courseName + "\n" +
+                "错误答题次数：" + wrongAnswerCount + "次\n" +
+                "正确率：" + accuracyRate + "%";
     }
 }

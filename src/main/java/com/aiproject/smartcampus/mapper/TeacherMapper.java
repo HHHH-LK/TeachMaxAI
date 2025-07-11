@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.mapper;
 
+import com.aiproject.smartcampus.pojo.dto.TeacherInfoDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 import com.aiproject.smartcampus.pojo.po.Teacher;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -25,6 +26,23 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
 
     @Select("SELECT t.*, u.real_name FROM teachers t LEFT JOIN users u ON t.user_id = u.user_id WHERE t.teacher_id = #{teacher_id}")
     Teacher findByTeacherID(@Param("teacher_id") Integer teacherId);
+
+    /**
+     * 查询老师的所有信息
+     * */
+    @Select("SELECT \n" +
+            "    t.teacher_id,\n" +
+            "    t.employee_number,\n" +
+            "    t.department,\n" +
+            "    u.real_name,\n" +
+            "    u.email,\n" +
+            "    u.phone\n" +
+            "FROM teachers t\n" +
+            "INNER JOIN users u ON t.user_id = u.user_id\n" +
+            "WHERE t.teacher_id = #{teacherId};")
+    TeacherInfoDTO findTeacherInfoById(String teacherId);
+
+
 
     @Select("SELECT t.*, u.* FROM teachers t LEFT JOIN users u ON t.user_id = u.user_id WHERE u.user_id = #{userId}")
     @Results({

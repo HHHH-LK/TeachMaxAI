@@ -10,7 +10,12 @@ import com.aiproject.smartcampus.pojo.vo.ExamCreationResult;
  * @create: 2025-07-11 04:22
  **/
 public interface TeacherAIservice {
+
     Result aiMarkingExam(String studentId, String examId);
 
-    ExamCreationResult createIntelligentExam(String content, String courseId);
+    ExamCreationResult createIntelligentExam(String chapter, String courseId);
+
+    Result<String> aiclassAiayaisc(String courseId);
+
+    Result<String> TeacherTextCreate(String content, String courseId, String chapterId);
 }

@@ -17,7 +17,7 @@ import java.util.Map;
 @Repository
 @Mapper
 public interface CourseMapper extends BaseMapper<Course> {
-    
+
     /**
      * 查询教师的课程列表
      */
@@ -44,13 +44,13 @@ public interface CourseMapper extends BaseMapper<Course> {
             "LEFT JOIN course_enrollments ce ON c.course_id = ce.course_id " +
             "WHERE ce.student_id = #{studentId}")
     List<Course> findByStudentId(@Param("studentId") Integer studentId);
-    
+
     /**
      * 根据学期查询课程
      */
     @Select("SELECT * FROM courses WHERE semester = #{semester} AND status = 'active'")
     List<Course> findBySemester(@Param("semester") String semester);
-    
+
     /**
      * 课程统计信息
      */
@@ -91,11 +91,40 @@ public interface CourseMapper extends BaseMapper<Course> {
             "  AND ce.student_id = #{studentId} -- 学生ID参数\n" +
             "  AND c.status = 'active'\n" +
             "ORDER BY c.course_name;")
-    List<CourseVO> findAllCourseByDate(@Param(value = "date")String date,@Param(value = "studentId")String studentId);
+    List<CourseVO> findAllCourseByDate(@Param(value = "date") String date, @Param(value = "studentId") String studentId);
+
+
+    @Select("SELECT DISTINCT\n" +
+            "    c.course_name\n" +
+            "FROM courses c\n" +
+            "INNER JOIN course_enrollments ce ON c.course_id = ce.course_id\n" +
+            "WHERE " +
+            " ce.student_id = #{studentId} -- 学生ID参数\n" +
+            "  AND c.status = 'active'\n" +
+            "ORDER BY c.course_name;")
+    List<CourseVO> findAllCourseByByStudent(@Param(value = "studentId") String studentId);
 
 
     @Select("select courses.course_name\n" +
             "from courses\n" +
             "where course_id=#{courseId}")
     String getCourseByid(@Param(value = "courseId") Integer courseId);
+
+
+    /**
+     * 基于学生ID查询所有学期（去重）
+     */
+    @Select("SELECT DISTINCT c.semester " +
+            "FROM course_enrollments ce " +
+            "INNER JOIN courses c ON ce.course_id = c.course_id " +
+            "WHERE ce.student_id = #{studentId} " +
+            "AND c.semester IS NOT NULL " +
+            "ORDER BY c.semester")
+    List<String> getStudentSemesters(@Param("studentId") Integer studentId);
+
+
+    @Select("select courses.course_name\n" +
+            "from courses\n" +
+            "where course_id=#{courseId}")
+    String findCourseNameByid(String courseId);
 }

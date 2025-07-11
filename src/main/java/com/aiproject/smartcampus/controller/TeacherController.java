@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
@@ -55,7 +56,7 @@ public class TeacherController {
      */
 
     @GetMapping("/getTheMaxUncorrectPoint")
-    public Result getTheMaxUncorrectPoint(@RequestParam("couresId") String couresId) {
+    public Result<List<StudentWrongKnowledgeBO>> getTheMaxUncorrectPoint(@RequestParam("couresId") String couresId) {
 
         return teacherService.getTheMaxUncorrectPoint(couresId);
     }

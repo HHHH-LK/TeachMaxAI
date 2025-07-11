@@ -18,4 +18,8 @@ public interface CourseService extends IService<Course> {
     Result<String> addCourse(Course course);
 
     Result<List<CourseVO>> findAllCoursesByDate(String date);
+
+    Result<List<CourseVO>> getAllStudentHaveCourse();
+
+    Result<List<String>> getAllLearnDate();
 }

@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.service;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
@@ -18,7 +19,7 @@ public interface TeacherService extends IService<Teacher> {
 
     Result getAllClassInfo( String couresId);
 
-    Result getTheMaxUncorrectPoint(String couresId);
+    Result<List<StudentWrongKnowledgeBO>> getTheMaxUncorrectPoint(String couresId);
 
     Result<TeacherGetSituationDTO> GetAllSituation(Integer courseId);
 

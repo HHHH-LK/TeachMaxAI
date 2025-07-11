@@ -89,5 +89,22 @@ public class CourseController {
 
     }
 
+    /**
+     * 查询学生选课的所有记录
+     * */
+    @GetMapping("/getAllStudentHaveCourse")
+    public Result<List<CourseVO>> getAllStudentHaveCourse(){
+
+        return courseService.getAllStudentHaveCourse();
+    }
+
+    /**
+     * 查询所有已有的学年
+     * */
+    @GetMapping("/getAllLearnDate")
+    public Result<List<String>> getAllLearnDate(){
+
+        return courseService.getAllLearnDate();
+    }
 
 }

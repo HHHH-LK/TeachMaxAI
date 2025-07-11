@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: ss
@@ -39,7 +36,6 @@ public class TeacherAIController {
      * 智能创建试卷
      */
     @PostMapping("/createExamByai")
-
     public Result<ExamCreationResult> createIntelligentExam(@RequestParam String content, @RequestParam String courseId) {
 
 
@@ -53,6 +49,26 @@ public class TeacherAIController {
 
 
     }
+
+    /**
+     * 班级智能学情分析报告
+     * */
+    @PostMapping("/aiclassAiayaisc")
+    public Result<String> aiclassAiayaisc(String courseId){
+        return teacherAIservice.aiclassAiayaisc(courseId);
+
+    }
+
+
+    /**
+     * 智能教案的生成
+     * */
+    @GetMapping("TeacherTextCreate")
+    public Result<String> TeacherTextCreate(@RequestParam String content, @RequestParam String courseId,@RequestParam String chapterId) {
+
+        return teacherAIservice.TeacherTextCreate(content,courseId,chapterId);
+    }
+
 
 
 }

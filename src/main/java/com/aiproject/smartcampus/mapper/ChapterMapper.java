@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.mapper;
 
+import com.aiproject.smartcampus.pojo.dto.ChapterKnowledgePointDTO;
 import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.*;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -332,4 +333,33 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
     List<ChapterQuestionDetailVO> selectTestByType(@Param("chapterId") String chapterId
             , @Param("courseId") String courseId
             , @Param("type") String type);
+
+
+    @Select("     SELECT\n" +
+            "        c.course_id,\n" +
+            "        c.chapter_id,\n" +
+            "         c.chapter_name,\n" +
+            "         c.chapter_order,\n" +
+            "         c.difficulty_level as chapter_difficulty,\n" +
+            "         kp.point_id,\n" +
+            "         kp.point_name,\n" +
+            "         kp.description as point_description,\n" +
+            "         kp.difficulty_level as point_difficulty,\n" +
+            "         kp.keywords,\n" +
+            "         ckp.point_order,\n" +
+            "         ckp.is_core,\n" +
+            "         CASE WHEN ckp.is_core = 1 THEN '重点' ELSE '一般' END as point_importance,\n" +
+            "         ckp.created_at as relation_created_at\n" +
+            "     FROM chapters c\n" +
+            "     INNER JOIN chapter_knowledge_points ckp ON c.chapter_id = ckp.chapter_id\n" +
+            "     INNER JOIN knowledge_points kp ON ckp.point_id = kp.point_id\n" +
+            "     WHERE c.course_id = #{courseId}\n" +
+            "       AND c.chapter_id = #{chapterId}\n" +
+            "     ORDER BY ckp.is_core DESC, ckp.point_order ASC, kp.point_name ASC;")
+    List<ChapterKnowledgePointDTO> getallChapterKnowleageByIscore(@Param("courseId") String courseId, @Param("chapterId") String chapterId);
+
+    @Select("select chapter_name\n" +
+            "from chapters\n" +
+            "where chapter_id=#{chapterId}")
+    String getChapterNameById(String chapterId);
 }

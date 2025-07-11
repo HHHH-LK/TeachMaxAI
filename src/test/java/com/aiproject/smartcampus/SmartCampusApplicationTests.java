@@ -1,7 +1,9 @@
 package com.aiproject.smartcampus;
 
+import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.PromptUtils;
 
+import com.aiproject.smartcampus.service.TeacherAIservice;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
 import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
@@ -193,6 +195,24 @@ class SmartCampusApplicationTests {
 
     }
 
+
+    @Autowired
+    private TeacherAIservice teacherAIservice;
+
+    @Test
+    void test7() throws IOException {
+
+        Result<String> stringResult = teacherAIservice.aiclassAiayaisc("1");
+        log.info(stringResult.getData());
+    }
+
+    @Test
+    void test8() throws IOException {
+
+        Result<String> stringResult = teacherAIservice.TeacherTextCreate("生成一份高质量的教案，我要用来进行教学任务", "1", "1");
+        log.info(stringResult.getData());
+
+    }
 
 
 

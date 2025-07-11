@@ -93,7 +93,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             pointMap.put(i, 0.0);
         }
 
-        // 查询当前老师 ID（暂用写死）
+        // 查询当前老师 ID
         String teacherId = userToTypeUtils.change();
 
         // 查询该课程下所有学生 ID
@@ -137,7 +137,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     }
 
     @Override
-    public Result getTheMaxUncorrectPoint(String couresId) {
+    public Result<List<StudentWrongKnowledgeBO>> getTheMaxUncorrectPoint(String couresId) {
 
         int pointSize = 124000;
         Map<Integer, Long> pointMap = new ConcurrentHashMap<>(pointSize);
@@ -217,9 +217,17 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             if (scoreList == null || scoreList.isEmpty()) {
                 return Result.error("课程ID为 " + courseId + " 的成绩信息为空");
             }
+
+            List<Double> list = scoreList.stream().map(a -> {
+                {
+                    return a == null ? 0.0 : a;
+                }
+            }).toList();
+
+
             // 计算平均分
-            int totalStudents = scoreList.size();
-            double averageScore = scoreList.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+            int totalStudents = list.size();
+            double averageScore = list.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
 
             // 初始化各分数段计数器
             int failCount = 0;      // <60
@@ -229,12 +237,18 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             int excellentCount = 0; // 90-100
 
             // 手动遍历计算分数分布
-            for (Double score : scoreList) {
-                if (score >= 90) excellentCount++;
-                else if (score >= 80) goodCount++;
-                else if (score >= 70) normalCount++;
-                else if (score >= 60) passCount++;
-                else failCount++;
+            for (Double score : list) {
+                if (score >= 90) {
+                    excellentCount++;
+                } else if (score >= 80) {
+                    goodCount++;
+                } else if (score >= 70) {
+                    normalCount++;
+                } else if (score >= 60) {
+                    passCount++;
+                } else {
+                    failCount++;
+                }
             }
 
             // 计算比率
@@ -289,7 +303,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     public Result getPaper(Integer teacherId) {
         try {
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("获取试卷信息失败", e);
             return Result.error("获取试卷信息失败: " + e.getMessage());
         }
