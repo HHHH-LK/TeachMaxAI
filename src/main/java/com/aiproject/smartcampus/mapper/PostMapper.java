@@ -37,6 +37,26 @@ public interface PostMapper extends BaseMapper<Post> {
     })
     IPage<PostGetDTO> findPostPageWithUser(Page<PostGetDTO> page);
 
+    @Select("SELECT p.*, u.username " +
+            "FROM post p " +
+            "LEFT JOIN users u ON p.user_id = u.user_id " +
+            "WHERE u.userid = #{id}" +
+            "ORDER BY p.create_time DESC")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "content", column = "content"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "viewCount", column = "view_count"),
+            @Result(property = "likeCount", column = "like_count"),
+            @Result(property = "commentCount", column = "comment_count"),
+            @Result(property = "category", column = "category"),
+            @Result(property = "createTime", column = "create_time"),
+            @Result(property = "updateTime", column = "update_time"),
+            @Result(property = "userName", column = "username")
+    })
+    IPage<PostGetDTO> findPostPageByUser(Page<PostGetDTO> page, @Param("id") Integer id);
+
     @Insert("INSERT INTO post (title, content, user_id, category) " +
             "VALUES (#{title}, #{content}, #{userId}, #{category})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")

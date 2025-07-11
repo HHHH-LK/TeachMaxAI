@@ -53,6 +53,7 @@ public class CommonServiceImpl implements CommonService {
 //    private final EmailService emailService;
     private final String tokenKey="token:"+"TOKEN_";
 
+    //登录
     @Override
     @Transactional
     public Result login(LoginDTO loginDTO) {
@@ -101,6 +102,7 @@ public class CommonServiceImpl implements CommonService {
 
     }
 
+    //注册
     @Override
     public Result register(RegisterDTO registerDTO) {
             //校验用户名
@@ -200,7 +202,7 @@ public class CommonServiceImpl implements CommonService {
 //                System.out.println("发送短信验证码到: " + dto.getValue() + ", 验证码: " + verificationCode);
 //            } else if ("email".equals(dto.getCredential())) {
 //
-////            emailService.sendPasswordResetEmail(dto.getValue(), verificationCode);
+//            emailService.sendPasswordResetEmail(dto.getValue(), verificationCode);
 //                System.out.println("发送邮件验证码到: " + dto.getValue() + ", 验证码: " + verificationCode);
 //            }
 //

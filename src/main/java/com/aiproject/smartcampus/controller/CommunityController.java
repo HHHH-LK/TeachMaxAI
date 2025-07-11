@@ -18,7 +18,7 @@ public class CommunityController {
     private final CommunityService postService;
 
     //创建帖子
-    @PostMapping
+    @PostMapping("/post")
     public Result createPost(@Valid @RequestBody PostDTO postDTO) {
         return postService.createPost(postDTO);
     }
@@ -40,11 +40,18 @@ public class CommunityController {
         return communityService.getPostsByPage(pageNum, pageSize);
     }
 
-    //获取帖子
-    @GetMapping("/{postId}")
-    public Result<PostGetDTO> getPostWithComments(@PathVariable Integer postId) {
-        return postService.getPostWithComments(postId);
+    @GetMapping("/all/{userId}")
+    public Result<IPage<PostGetDTO>> getOwnPost(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @PathVariable Integer userId){
+        return communityService.getOwnPost(pageNum, pageSize, userId);
     }
+//    //获取帖子
+//    @GetMapping("/{postId}")
+//    public Result<PostGetDTO> getPostWithComments(@PathVariable Integer postId) {
+//        return postService.getPostWithComments(postId);
+//    }
 
     //添加评论到帖子
     @PostMapping("/add/comments")

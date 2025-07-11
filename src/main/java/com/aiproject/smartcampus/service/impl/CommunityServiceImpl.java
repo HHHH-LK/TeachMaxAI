@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.aiproject.smartcampus.commons.client.Result;
 
-import java.util.List;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -52,6 +50,18 @@ public class CommunityServiceImpl implements CommunityService {
 
         return Result.success(resultPage);
     }
+
+    //获取某个用户
+    @Override
+    public Result<IPage<PostGetDTO>> getOwnPost(int pageNum, int pageSize, Integer userId) {
+        Page<PostGetDTO> page = new Page<>(pageNum, pageSize);
+
+        // 执行分页查询
+        IPage<PostGetDTO> resultPage = postMapper.findPostPageByUser(page, userId);
+        return Result.success(resultPage);
+
+    }
+
 
     //获取帖子评论
     @Override
@@ -120,6 +130,7 @@ public class CommunityServiceImpl implements CommunityService {
         }
         return Result.success("Comment liked successfully:" + commentCount);
     }
+
 
 
 }

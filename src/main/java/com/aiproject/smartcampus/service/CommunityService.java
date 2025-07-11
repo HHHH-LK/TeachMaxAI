@@ -8,8 +8,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.validation.Valid;
 import com.aiproject.smartcampus.commons.client.Result;
 
-import java.util.List;
-
 public interface CommunityService {
     Result createPost(@Valid PostDTO postDTO);
 
@@ -21,8 +19,12 @@ public interface CommunityService {
 
     Result<Comment> addCommentToPost( @Valid CommentDTO commentDTO);
 
+
+
     // 帖子点赞
     Result likePost(Integer postId);
 
     Result likeComment(Integer commentId);
+
+    Result<IPage<PostGetDTO>> getOwnPost(int pageNum, int pageSize, Integer userId);
 }
