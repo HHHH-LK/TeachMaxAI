@@ -65,4 +65,14 @@ public class KnowledgeController {
         return knoledgeService.createListTestUsingTByAgent(pointIds,courseId,chapterId,decprection);
     }
 
+    /**
+     * 查询学生平均知识点错误率
+     * */
+    @GetMapping("getAver")
+    public Result<Double> getAver(){
+
+        return knoledgeService.getAver();
+    }
+
+
 }

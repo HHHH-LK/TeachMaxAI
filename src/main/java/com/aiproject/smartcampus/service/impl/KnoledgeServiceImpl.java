@@ -125,7 +125,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     }
 
     @Override
-    public Result<String> createListTestByagent(List<String> pointIds,String courseId,String chapter,String content) {
+    public Result<String> createListTestByagent(List<String> pointIds, String courseId, String chapter, String content) {
 
         /*String studentId = getUserToTypeUtils.change();*/
 
@@ -141,7 +141,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         List<SimpleKnowledgeAnalysisBO> agentCreatepoint = randomChancepoint(simpleKnowledgeAnalysisBOList);
 
         //进行智能生成
-        notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), Integer.valueOf(courseId),Integer.valueOf(chapter),content));
+        notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), Integer.valueOf(courseId), Integer.valueOf(chapter), content));
         notMasterTestCreateTool.setSimpleKnowledgeAnalysisBOList(agentCreatepoint);
         notMasterTestCreateTool.run();
         String result = notMasterTestCreateTool.getResult();
@@ -150,9 +150,9 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     }
 
     @Override
-    public Result<String> createListTestUsingTByAgent(List<HavingTPointDTO> pointIds,String courseId,String chapterId,String content) {
+    public Result<String> createListTestUsingTByAgent(List<HavingTPointDTO> pointIds, String courseId, String chapterId, String content) {
 
-        Integer defaultT=3;
+        Integer defaultT = 3;
 
         String studentId = getUserToTypeUtils.change();
 
@@ -194,7 +194,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
             log.info("基于用户权重选择的知识点：{}", selectedNames);
 
             // 进行智能生成
-            notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), Integer.valueOf(courseId),Integer.valueOf(chapterId),content));
+            notMasterTestCreateTool.setTestTaskBO(new TestTaskBO(Integer.valueOf(studentId), Integer.valueOf(courseId), Integer.valueOf(chapterId), content));
             notMasterTestCreateTool.setSimpleKnowledgeAnalysisBOList(selectedKnowledgePoints);
             notMasterTestCreateTool.run();
             String result = notMasterTestCreateTool.getResult();
@@ -206,6 +206,23 @@ public class KnoledgeServiceImpl implements KnoledgeService {
             log.error("基于用户自定义权重生成测试题失败", e);
             return Result.error("生成测试题失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Result<Double> getAver() {
+
+        /*String studentId = userToTypeUtils.change();*/
+        String studentId = "1";
+        //查询学生的平均错误率
+        List<StudentWrongKnowledgeBO> studentWrongKnowledgeByStudentId = knowledgePointMapper.getStudentWrongKnowledgeByStudentId(studentId);
+
+        double sum = 0.0;
+        for (StudentWrongKnowledgeBO studentWrongKnowledgeBO : studentWrongKnowledgeByStudentId) {
+            sum += studentWrongKnowledgeBO.getAccuracyRate();
+        }
+        sum =100.00- (sum / studentWrongKnowledgeByStudentId.size());
+
+        return Result.success(sum);
     }
 
     // TODO:智能进行获取错误知识点信息 后续改成策略模式 - 修复死循环版本（利用对数压缩进行修改处理）

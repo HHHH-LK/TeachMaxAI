@@ -30,6 +30,17 @@ class AgentTest {
 
     }
 
+    @Test
+    void setChatAgent(){
+
+        String ss = chatAgent.start("你好我叫李康");
+        System.out.println(ss);
+
+
+    }
+
+
+
 
 
 

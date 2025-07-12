@@ -440,8 +440,6 @@ public class LocalStore implements ChatMemoryStore {
                 }
             }
 
-            log.info("强制写回{}条脏数据到Redis", dirtyCount);
-
         } catch (Exception e) {
             log.error("强制写回脏数据失败", e);
         } finally {

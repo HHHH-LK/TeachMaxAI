@@ -745,10 +745,6 @@ public class CreateQuestionByKnowledgeIdtoolUtils {
     /**
      * 优雅关闭线程池
      */
-
-    /**
-     * 优雅关闭线程池
-     */
     public void shutdown() {
         if (executor instanceof ExecutorService) {
             ((ExecutorService) executor).shutdown();

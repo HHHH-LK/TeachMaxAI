@@ -26,4 +26,9 @@ public interface KnoledgeService {
      * 根据带权知识点进行自定义生成
      * */
     Result createListTestUsingTByAgent(List<HavingTPointDTO> pointIds,String courseId,String chapter,String decprection);
+
+    /**
+     * 获取平均错误率
+     * */
+    Result<Double> getAver();
 }

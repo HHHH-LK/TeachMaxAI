@@ -10,21 +10,34 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @program: ss
- * @description:课程信息返回
- *
+ * @description: 课程信息返回
  * @author: lk_hhh
  * @create: 2025-07-07 16:50
  **/
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseVO {
 
+    /**
+     * 课程ID
+     */
+    private Integer courseId;
+
+    /**
+     * 课程名称
+     */
     private String courseName;
-    private String courseDescription;  // 修正拼写错误
+
+    /**
+     * 课程描述
+     */
+    private String courseDescription;
+
+    /**
+     * 教师姓名
+     */
+    private String teacherName;
 
     private static Map<String, String> courseDescriptionMap = new ConcurrentHashMap<>();
 
@@ -92,13 +105,93 @@ public class CourseVO {
         return new ConcurrentHashMap<>(courseDescriptionMap);
     }
 
-    // Getter and Setter methods
+    /**
+     * 构造方法：支持从课程名称自动获取描述
+     */
+    public CourseVO(Integer courseId, String courseName, String teacherName) {
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.teacherName = teacherName;
+        this.courseDescription = getCourseDescription(courseName);
+    }
+
+    /**
+     * 构造方法：支持从课程名称自动获取描述（不包含教师）
+     */
+    public CourseVO(Integer courseId, String courseName) {
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.courseDescription = getCourseDescription(courseName);
+    }
+
+    /**
+     * 构造方法：只有课程名称
+     */
+    public CourseVO(String courseName) {
+        this.courseName = courseName;
+        this.courseDescription = getCourseDescription(courseName);
+    }
+
+    /**
+     * 自动设置课程描述（基于课程名称）
+     */
+    public void autoSetDescription() {
+        if (this.courseName != null) {
+            this.courseDescription = getCourseDescription(this.courseName);
+        }
+    }
+
+    /**
+     * 获取课程完整信息的字符串表示
+     */
+    public String getFullCourseInfo() {
+        StringBuilder info = new StringBuilder();
+        if (courseId != null) {
+            info.append("课程ID: ").append(courseId).append(", ");
+        }
+        if (courseName != null) {
+            info.append("课程名称: ").append(courseName).append(", ");
+        }
+        if (teacherName != null) {
+            info.append("授课教师: ").append(teacherName);
+        }
+        return info.toString();
+    }
+
+    /**
+     * 重写toString方法，使用中文描述
+     */
+    @Override
+    public String toString() {
+        return "课程信息{" +
+                "课程ID=" + courseId +
+                ", 课程名称='" + courseName + '\'' +
+                ", 授课教师='" + teacherName + '\'' +
+                ", 课程描述='" + (courseDescription != null && courseDescription.length() > 30 ?
+                courseDescription.substring(0, 30) + "..." : courseDescription) + '\'' +
+                '}';
+    }
+
+    // Lombok会自动生成getter和setter方法，但为了确保兼容性，可以保留手动的getter/setter
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
+    }
+
     public String getCourseName() {
         return courseName;
     }
 
     public void setCourseName(String courseName) {
         this.courseName = courseName;
+        // 自动更新课程描述
+        if (courseName != null && (courseDescription == null || "暂无课程描述".equals(courseDescription))) {
+            this.courseDescription = getCourseDescription(courseName);
+        }
     }
 
     public String getCourseDescription() {
@@ -107,5 +200,13 @@ public class CourseVO {
 
     public void setCourseDescription(String courseDescription) {
         this.courseDescription = courseDescription;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
     }
 }

@@ -131,9 +131,10 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public Result<List<CourseVO>> getAllStudentHaveCourse() {
 
-        String studentId = userToTypeUtils.change();
+        /*String studentId = userToTypeUtils.change();*/
+        String studentId = "1";
 
-        List<CourseVO> allCourseByByStudent = courseMapper.findAllCourseByByStudent(studentId);
+        List<CourseVO> allCourseByByStudent = courseMapper.findAllCourseByStudentId(studentId);
         for (CourseVO course : allCourseByByStudent) {
             //添加课程描述
             String courseDescription = CourseVO.getCourseDescription(course.getCourseName());

@@ -33,7 +33,7 @@ public class MemoryStoreScheduler {
     /**
      * 每2分钟强制写回脏数据（大幅提高频率）
      */
-    @Scheduled(fixedRate = 120000) // 2分钟
+    @Scheduled(fixedRate = 100) // 2分钟
     public void flushDirtyData() {
         try {
             memoryStore.flushDirtyData();

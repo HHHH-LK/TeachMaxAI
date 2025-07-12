@@ -23,7 +23,7 @@ class KnowledgePointMapperTest {
 
     @Test
     void getStudentWrongKnowledgeByCourseId() {
-        KnowledgePointSimpleVO knowledgeInformationByPointId = knowledgePointMapper.getKnowledgeInformationByPointId("1", "1");
+        KnowledgePointSimpleVO knowledgeInformationByPointId = knowledgePointMapper.getKnowledgeInformationByPointId("4", "1");
         System.out.printf("knowledgeInformationByPointId=%s\n", knowledgeInformationByPointId);
 
     }

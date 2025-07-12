@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.controller.KnowledgeController;
 import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
 import com.aiproject.smartcampus.service.KnoledgeService;
 import org.junit.jupiter.api.Test;
@@ -78,5 +79,26 @@ class KnoledgeServiceImplTest {
         System.out.println(result.getData());
 
     }
+
+    @Autowired
+    private KnowledgeController knoledgeController;
+
+    @Test
+    void getKnoledgeInformationById4() {
+
+        Result knowlegeById = knoledgeController.getKnowlegeById("7");
+        System.out.println(knowlegeById.getData());
+
+    }
+
+    @Test
+    void getKnoledgeInformationById5() {
+
+        Result<Double> aver = knoledgeController.getAver();
+
+        System.out.println(aver.getData());
+
+    }
+
 
 }

@@ -117,8 +117,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public String academicAnalysis(String courseId) {
 
         try {
-//            String studentId = userToTypeUtils.change();
-            String studentId = UserLocalThreadUtils.test();
+            String studentId = userToTypeUtils.change();
 
             //根据学生考试情况以及答题记录
             log.info("开始检索学生{}错误题目信息", studentId);

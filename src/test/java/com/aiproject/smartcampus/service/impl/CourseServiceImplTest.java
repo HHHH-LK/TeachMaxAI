@@ -30,4 +30,16 @@ class CourseServiceImplTest {
     }
 
 
+
+    @Test
+    void getCourseById2() {
+
+        Result<List<CourseVO>> allStudentHaveCourse = courseService.getAllStudentHaveCourse();
+        List<CourseVO> data = allStudentHaveCourse.getData();
+        log.info(data.toString());
+
+
+    }
+
+
 }
