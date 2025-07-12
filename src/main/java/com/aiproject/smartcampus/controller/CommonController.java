@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class CommonController {
 
     private final CommonService commonService;
+
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "支持用户名/邮箱/手机号登录")
     public Result login(@RequestBody LoginDTO loginDTO) {
@@ -49,10 +50,13 @@ public class CommonController {
     }
 
     @PostMapping("/logout")
-    public Result logout() {
+    public Result logout(@RequestParam String userId) {
 
-        return Result.success("功能还未完成");
+        return commonService.logOut(userId);
     }
+
+
+
 
 
 }

@@ -8,12 +8,11 @@ import org.springframework.stereotype.Component;
  * @author: lk
  * @create: 2025-06-04 17:22
  **/
-
-
+@Component
 public class UserPrompts {
 
-    public static final String RAG_PROMPT = ""+
-    "你是一个任务链式执行助手，专门负责将前置任务的输出结果与当前任务需求相结合，生成新的可执行任务。\n" +
+    public static final String RAG_PROMPT = "" +
+            "你是一个任务链式执行助手，专门负责将前置任务的输出结果与当前任务需求相结合，生成新的可执行任务。\n" +
             "\n" +
             "## 执行流程\n" +
             "\n" +
@@ -25,6 +24,7 @@ public class UserPrompts {
             "- 关键信息：从前置任务中提取核心信息和关键数据\n" +
             "- 可用资源：识别可供后续任务使用的数据、结论、素材等\n" +
             "- 完成状态：确认前置任务的完成程度和输出质量\n" +
+            "- **上下文关联**：请注意前置任务输出与当前任务的上下文关系，确保信息的连续性和一致性。\n" +
             "\n" +
             "### 2. 当前任务需求定义\n" +
             "**任务目标：**\n" +
@@ -45,7 +45,7 @@ public class UserPrompts {
             "基于前置任务的输出结果，现在需要执行以下整合任务：\n" +
             "\n" +
             "**执行步骤：**\n" +
-            "1. **继承处理**：充分利用前置任务的成果和数据\n" +
+            "1. **继承处理**：充分利用前置任务的成果和数据，确保在当前任务中正确引用和使用。\n" +
             "2. **需求对接**：将前置结果与当前任务需求进行精准对接\n" +
             "3. **核心执行**：执行当前任务的核心操作和处理逻辑\n" +
             "4. **结果优化**：整合优化最终输出，确保质量和连贯性\n" +
@@ -70,13 +70,11 @@ public class UserPrompts {
             "\n" +
             "请严格按照上述流程执行，确保任务链的连续性和高质量输出。";
 
-
-    public static String chainUserPrompts(String intent,String result){
-        return RAG_PROMPT.replace("{current_task_goal}",intent).replace("{previous_task_output}",result);
+    public static String chainUserPrompts(String intent, String result) {
+        return RAG_PROMPT.replace("{current_task_goal}", intent).replace("{previous_task_output}", result);
     }
 
     public static String getTaskPrompt(String intent, String result) {
-
         return String.format(
                 "请注意：以下的意图（intent）是基于已有结果（result）生成的。  \n" +
                         "—— 已有结果（result）：%s  \n" +
@@ -88,8 +86,6 @@ public class UserPrompts {
                 result,
                 intent
         );
-
-
     }
 
     public static String getHandlerPrompts(String intent) {
@@ -98,17 +94,6 @@ public class UserPrompts {
                 你是一个智能任务分析器，需要根据用户意图选择最合适的处理器。请按照以下优先级分析用户意图：
                 
                 用户意图：%s
-                
-                **分析流程（按优先级顺序）：**
-                
-                **第一优先级：自身能力评估**
-                首先判断该意图是否可以通过LLM自身的知识和推理能力直接解决：
-                - 一般性对话、问答
-                - 创意写作、建议、分析
-                - 基础知识解答
-                - 逻辑推理、总结归纳
-                - 情感支持、聊天互动
-                - 语言翻译、文本处理
                 
                 **分析流程（按优先级顺序）：**
                 
@@ -157,5 +142,4 @@ public class UserPrompts {
                 intent
         );
     }
-
 }

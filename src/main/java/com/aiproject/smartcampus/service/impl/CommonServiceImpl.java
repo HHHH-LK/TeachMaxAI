@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.JwtUtils;
+import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
 import com.aiproject.smartcampus.exception.UserExpection;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.NotificationMessage;
@@ -29,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +55,7 @@ public class CommonServiceImpl implements CommonService {
     private final StringRedisTemplate stringRedisTemplate;
     private final PasswordEncoder passwordEncoder;
     //    private final EmailService emailService;
-    private final String tokenKey="token:"+"TOKEN_";
+    private final String tokenKey = "token:" + "TOKEN_";
 
     //登录
     @Override
@@ -67,9 +69,9 @@ public class CommonServiceImpl implements CommonService {
             loginAccount = loginDTO.getUsername();
         } else if ("phone".equals(loginDTO.getPrincipal())) {
             loginAccount = loginDTO.getPhone();
-        } else if("email".equals(loginDTO.getPrincipal())) {
+        } else if ("email".equals(loginDTO.getPrincipal())) {
             loginAccount = loginDTO.getEmail();
-        }else {
+        } else {
             return Result.error("不支持的登录类型");
         }
 
@@ -95,8 +97,13 @@ public class CommonServiceImpl implements CommonService {
         // 4. 生成令牌
         String token = JwtUtils.generateToken(user.getUserId(), user.getUserType());
         log.info("用户 {} 登录成功，生成令牌: {}", user.getUsername(), token);
+
+        //存入线程变量中
+        UserLocalThreadUtils.setUserInfo(user);
+        UserLocalThreadUtils.setToken(token);
+
         String key = tokenKey + token;
-        stringRedisTemplate.opsForValue().set(key, user.toString(),7,TimeUnit.DAYS);
+        stringRedisTemplate.opsForValue().set(key, user.toString(), 7, TimeUnit.DAYS);
 
         System.out.println(user.getUserType());
         return Result.success(user.getUserType().getValue() + ":" + token);
@@ -111,7 +118,7 @@ public class CommonServiceImpl implements CommonService {
         if (userMapper.findByUsername(registerDTO.getUsername()) != null) {
             return Result.error("用户名已被注册");
         }
-        if (!registerDTO.getPassword().equals(registerDTO.getRepassword())){
+        if (!registerDTO.getPassword().equals(registerDTO.getRepassword())) {
             return Result.error("两次输入的密码不一致");
         }
 
@@ -120,7 +127,7 @@ public class CommonServiceImpl implements CommonService {
         User user = new User();
         user.setUsername(registerDTO.getUsername());
         user.setPasswordHash(passwordEncoder.encode(registerDTO.getPassword()));
-        user.setRealName("张三");
+        user.setRealName("默认用户名");
         user.setUserType(User.UserType.fromValue(registerDTO.getUserType()));
         userMapper.insert(user);
 
@@ -141,11 +148,11 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public Result resetPassword(PasswordResetDTO dto) {
-        if (userMapper.findByUsername(dto.getUsername()) == null ){
+        if (userMapper.findByUsername(dto.getUsername()) == null) {
             return Result.error("用户未注册");
         }
 
-        if (!dto.getNewPassword().equals(dto.getReNewPassword())){
+        if (!dto.getNewPassword().equals(dto.getReNewPassword())) {
             return Result.error("两次密码输入不一致");
         }
 
@@ -154,6 +161,22 @@ public class CommonServiceImpl implements CommonService {
         userMapper.updateById(user);
 
         return Result.success("密码重置成功");
+    }
+
+
+    @Override
+    public Result logOut(String userId) {
+
+        String token = UserLocalThreadUtils.getToken();
+        UserLocalThreadUtils.removeUserInfo();
+        String key = tokenKey + token;
+        Boolean delete = stringRedisTemplate.delete(key);
+        if (delete) {
+            return Result.success();
+        }
+
+        return Result.error("退出失败");
+
     }
 
 //

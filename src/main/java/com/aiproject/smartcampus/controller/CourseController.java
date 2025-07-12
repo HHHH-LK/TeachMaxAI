@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 课程（选课）相关接口
- */
+
 @RestController
 @Slf4j
 @RequestMapping("/course")

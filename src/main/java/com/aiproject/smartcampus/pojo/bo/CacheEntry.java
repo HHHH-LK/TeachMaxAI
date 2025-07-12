@@ -1,7 +1,9 @@
 package com.aiproject.smartcampus.pojo.bo;
 
 import dev.langchain4j.data.message.ChatMessage;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -15,13 +17,15 @@ import java.util.List;
  **/
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CacheEntry {
 
     private static final Duration CACHE_TTL = Duration.ofHours(5);
 
-    private final List<ChatMessage> messages;
+    private  List<ChatMessage> messages=new ArrayList<>();
     //持久时间
-    public long timestamp;
+    private long timestamp;
     /**
      * 标记脏数据
      */

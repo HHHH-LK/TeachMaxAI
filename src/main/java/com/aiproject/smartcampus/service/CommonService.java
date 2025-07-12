@@ -16,4 +16,6 @@ public interface CommonService {
 //    Result sendPasswordResetCode(PasswordResetVerificationDTO dto);
 
     Result resetPassword(PasswordResetDTO dto);
+
+    Result logOut(String userId);
 }

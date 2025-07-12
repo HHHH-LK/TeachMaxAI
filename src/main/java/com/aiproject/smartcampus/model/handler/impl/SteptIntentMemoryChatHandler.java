@@ -26,6 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * 完整的记忆对话处理器 - 使用统一记忆管理，支持用户隔离
+ * 修复版本：正确使用线程上下文中的记忆信息
  *
  * @author: lk
  * @description: 基于记忆增强的智能对话处理器，支持依赖任务管理和用户级记忆隔离
@@ -41,7 +42,7 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
     private final CreateDiagram createDiagram;
     private final ChatLanguageModel chatLanguageModel;
-    private final UnifiedMemoryManager memoryManager; // 使用统一记忆管理器
+    private final UnifiedMemoryManager memoryManager;
     private final IntentDelayedQueueClien intentDelayedQueueClien;
     private final ResultCilent resultCilent;
 
@@ -50,16 +51,20 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
     // =============================================================================
 
     private static final String MEMORY_SYSTEM_PROMPT =
-            "你是一个智能助手，能够基于之前的对话记忆为用户提供准确的回答。请根据历史对话上下文和当前问题，给出恰当的回复。";
+            "你是一个具备记忆能力的智能助手。你能够：\n" +
+                    "1. 记住之前的对话内容和用户偏好\n" +
+                    "2. 基于历史上下文提供连贯的回复\n" +
+                    "3. 识别用户问题的关联性和发展趋势\n" +
+                    "请基于对话历史为用户提供个性化和连贯的回复。";
 
     private static final String FALLBACK_SYSTEM_PROMPT =
             "你是一个智能助手，请根据用户的问题直接给出准确、有用的回答。";
 
     private static final int DEPENDENCY_TIMEOUT_SECONDS = 10;
-    private static final int STATUS_CHECK_TIMEOUT_SECONDS = 1;
     private static final int MAX_RETRIES = 5;
     private static final long SLEEP_INTERVAL_MS = 500;
     private static final long DELAYED_QUEUE_DELAY_MS = 1000;
+    private static final int MAX_HISTORY_MESSAGES = 10; // 最多保留5轮对话
 
     // =============================================================================
     // 主要业务逻辑入口
@@ -67,17 +72,44 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
     @Override
     protected String executeBusinessLogic(String intent, List<CompletableFuture<String>> result) {
-        log.info("基于记忆的对话处理器执行[{}]中", intent);
+        log.info("记忆对话处理器执行[{}]中", intent);
+
+        // **关键修复1：从线程上下文获取记忆和用户ID**
+        List<ChatMessage> threadMemoryMessages = UserLocalThreadUtils.getChatMemory();
+        String threadUserId = UserLocalThreadUtils.getCurrentUserId();
+
+        log.info("从线程上下文获取 - 记忆: {}条, 用户ID: {}",
+                threadMemoryMessages != null ? threadMemoryMessages.size() : 0, threadUserId);
+
+        // **关键修复2：如果线程上下文没有记忆，尝试直接从记忆管理器获取**
+        List<ChatMessage> memoryMessages = threadMemoryMessages;
+        String userId = threadUserId;
+
+        if ((memoryMessages == null || memoryMessages.isEmpty()) && userId != null) {
+            log.info("线程上下文无记忆，尝试从记忆管理器获取，userId: {}", userId);
+            memoryMessages = memoryManager.getMemoryMessages(userId);
+            log.info("从记忆管理器获取到{}条记忆", memoryMessages.size());
+        }
+
+        // 如果还是没有用户ID，使用默认值
+        if (userId == null) {
+            userId = getCurrentUserId();
+            log.info("使用默认用户ID: {}", userId);
+            if (memoryMessages == null || memoryMessages.isEmpty()) {
+                memoryMessages = memoryManager.getMemoryMessages(userId);
+                log.info("使用默认用户ID获取到{}条记忆", memoryMessages.size());
+            }
+        }
 
         // 获取任务的入度（依赖数量）
         int inDegree = createDiagram.getInDegree(intent);
 
         if (inDegree == 0) {
             // 无依赖任务，直接执行
-            return executeDirectMemoryTask(intent);
+            return executeDirectMemoryTask(intent, memoryMessages, userId);
         } else {
             // 有依赖任务，需要等待依赖完成
-            return executeMemoryWithDependencies(intent, result);
+            return executeMemoryWithDependencies(intent, result, memoryMessages, userId);
         }
     }
 
@@ -86,32 +118,29 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
     // =============================================================================
 
     /**
-     * 执行无依赖的记忆任务
+     * 执行无依赖的记忆任务（修复版）
      */
-    private String executeDirectMemoryTask(String intent) {
+    private String executeDirectMemoryTask(String intent, List<ChatMessage> memoryMessages, String userId) {
         try {
-            log.info("开始执行直接记忆任务: {}", intent);
-
-            // 获取当前用户的记忆
-            String userId = getCurrentUserId();
-            List<ChatMessage> memoryMessages = memoryManager.getMemoryMessages(userId);
+            log.info("开始执行直接记忆任务: {}, 用户ID: {}", intent, userId);
 
             String result;
-            if (memoryMessages.isEmpty()) {
-                log.info("未找到历史记忆，降级使用基础LLM处理任务: {}", intent);
+            if (memoryMessages == null || memoryMessages.isEmpty()) {
+                log.info("未找到历史记忆，使用基础LLM处理任务: {}", intent);
                 result = executeWithBasicLLM(intent);
             } else {
                 log.info("找到{}条历史记忆，使用记忆增强对话", memoryMessages.size());
                 result = executeWithMemoryEnhanced(intent, memoryMessages);
             }
 
-            // 注意：不在这里存储记忆，由ChatAgent统一处理，避免重复存储
             log.info("记忆对话执行[{}]成功,结果长度: {}", intent, result.length());
             return result;
 
         } catch (Exception e) {
             log.error("执行直接记忆任务失败: {}", intent, e);
-            throw new RuntimeException("记忆对话执行失败: " + intent, e);
+            // 降级到基础LLM，不抛异常
+            log.warn("降级使用基础LLM处理");
+            return executeWithBasicLLM(intent);
         }
     }
 
@@ -132,25 +161,52 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
         } catch (Exception e) {
             log.error("基础LLM处理失败: {}", e.getMessage(), e);
-            throw new RuntimeException("基础LLM处理失败", e);
+            return "抱歉，处理失败，请稍后重试。";
         }
     }
 
     /**
-     * 使用记忆增强的LLM处理
+     * 使用记忆增强的LLM处理（关键修复）
      */
     private String executeWithMemoryEnhanced(String intent, List<ChatMessage> memoryMessages) {
         try {
-            // 构建包含记忆的消息序列
+            // **关键修复3：正确构建包含记忆的对话上下文**
             List<ChatMessage> messages = new ArrayList<>();
-            messages.add(SystemMessage.from(MEMORY_SYSTEM_PROMPT));
-            messages.addAll(memoryMessages);
-            messages.add(UserMessage.from(buildEnhancedPrompt(intent, "")));
 
+            // 添加系统消息
+            messages.add(SystemMessage.from(MEMORY_SYSTEM_PROMPT));
+
+            // **重要：添加历史记忆到对话上下文**
+            if (memoryMessages != null && !memoryMessages.isEmpty()) {
+                // 限制历史记忆长度，避免token过多
+                List<ChatMessage> limitedHistory = memoryMessages.size() > MAX_HISTORY_MESSAGES
+                        ? memoryMessages.subList(memoryMessages.size() - MAX_HISTORY_MESSAGES, memoryMessages.size())
+                        : memoryMessages;
+
+                messages.addAll(limitedHistory);
+                log.info("已添加{}条历史记忆到对话上下文，原始记忆{}条",
+                        limitedHistory.size(), memoryMessages.size());
+
+                // 调试：打印部分记忆内容
+                if (log.isDebugEnabled()) {
+                    for (int i = 0; i < Math.min(4, limitedHistory.size()); i++) {
+                        ChatMessage msg = limitedHistory.get(i);
+                        log.debug("记忆[{}]: {} - {}", i, msg.type(),
+                                msg.text().length() > 50 ? msg.text().substring(0, 50) + "..." : msg.text());
+                    }
+                }
+            }
+
+            // 添加当前用户消息
+            messages.add(UserMessage.from(intent));
+
+            // 调用LLM
             ChatResponse chatResponse = chatLanguageModel.chat(messages);
             String result = chatResponse.aiMessage().text();
 
-            log.info("记忆增强对话处理完成，结果长度: {}", result.length());
+            log.info("记忆增强对话处理完成，输入消息数: {}, 结果长度: {}",
+                    messages.size(), result.length());
+
             return result != null && !result.trim().isEmpty() ? result : "任务已完成";
 
         } catch (Exception e) {
@@ -164,48 +220,48 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
     // =============================================================================
 
     /**
-     * 执行有依赖的记忆任务
+     * 执行有依赖的记忆任务（修复版）
      */
-    private String executeMemoryWithDependencies(String intent, List<CompletableFuture<String>> result) {
+    private String executeMemoryWithDependencies(String intent, List<CompletableFuture<String>> result,
+                                                 List<ChatMessage> memoryMessages, String userId) {
         List<String> parentTasks = createDiagram.getParetents(intent);
         int expectedSize = parentTasks.size();
 
         if (result != null && result.size() == expectedSize && isAllTasksCompleted(result)) {
             log.info("所有依赖任务已完成，开始执行记忆任务: {}", intent);
-            return executeMemoryTaskWithResults(intent, result);
+            return executeMemoryTaskWithResults(intent, result, memoryMessages, userId);
         } else {
             return handleMissingDependenciesWithoutException(intent, expectedSize);
         }
     }
 
     /**
-     * 执行有依赖结果的记忆任务
+     * 执行有依赖结果的记忆任务（修复版）
      */
-    private String executeMemoryTaskWithResults(String intent, List<CompletableFuture<String>> futures) {
+    private String executeMemoryTaskWithResults(String intent, List<CompletableFuture<String>> futures,
+                                                List<ChatMessage> memoryMessages, String userId) {
         try {
-            log.info("开始执行带依赖的记忆任务: {}", intent);
+            log.info("开始执行带依赖的记忆任务: {}, 用户ID: {}", intent, userId);
 
             // 收集所有依赖任务的结果
             List<String> dependencyResults = collectDependencyResults(intent, futures);
 
             // 构建上下文信息
             StringBuilder contextBuilder = new StringBuilder();
+            contextBuilder.append("【前置任务结果】\n");
             for (int i = 0; i < dependencyResults.size(); i++) {
-                contextBuilder.append("相关信息").append(i + 1).append(": ")
+                contextBuilder.append("任务").append(i + 1).append(": ")
                         .append(dependencyResults.get(i)).append("\n");
             }
-
-            // 获取用户记忆并执行任务
-            String userId = getCurrentUserId();
-            List<ChatMessage> memoryMessages = memoryManager.getMemoryMessages(userId);
+            contextBuilder.append("\n【当前任务】\n").append(intent);
 
             String result;
-            if (memoryMessages.isEmpty()) {
+            if (memoryMessages == null || memoryMessages.isEmpty()) {
                 log.info("未找到历史记忆，使用基础LLM处理带依赖的任务: {}", intent);
-                result = executeWithBasicLLMAndContext(intent, contextBuilder.toString());
+                result = executeWithBasicLLMAndContext(contextBuilder.toString());
             } else {
                 log.info("找到{}条历史记忆，使用记忆增强处理带依赖的任务", memoryMessages.size());
-                result = executeWithMemoryAndContext(intent, contextBuilder.toString(), memoryMessages);
+                result = executeWithMemoryAndContext(contextBuilder.toString(), memoryMessages);
             }
 
             log.info("带依赖的记忆对话执行[{}]成功,结果长度: {}", intent, result.length());
@@ -213,7 +269,8 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
         } catch (Exception e) {
             log.error("执行带依赖的记忆任务失败: {}", intent, e);
-            throw new RuntimeException("带依赖的记忆任务执行失败: " + intent, e);
+            // 降级处理
+            return executeDirectMemoryTask(intent, memoryMessages, userId);
         }
     }
 
@@ -249,13 +306,11 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
     /**
      * 使用基础LLM处理带上下文的任务
      */
-    private String executeWithBasicLLMAndContext(String intent, String contextInfo) {
+    private String executeWithBasicLLMAndContext(String contextInfo) {
         try {
-            String enhancedPrompt = buildEnhancedPrompt(intent, contextInfo);
-
             ChatResponse chatResponse = chatLanguageModel.chat(
                     SystemMessage.from(FALLBACK_SYSTEM_PROMPT),
-                    UserMessage.from(enhancedPrompt)
+                    UserMessage.from(contextInfo)
             );
 
             String result = chatResponse.aiMessage().text();
@@ -265,21 +320,28 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
         } catch (Exception e) {
             log.error("基础LLM处理带上下文任务失败: {}", e.getMessage(), e);
-            throw new RuntimeException("基础LLM处理失败", e);
+            return "处理失败，请稍后重试。";
         }
     }
 
     /**
-     * 使用记忆增强处理带上下文的任务
+     * 使用记忆增强处理带上下文的任务（修复版）
      */
-    private String executeWithMemoryAndContext(String intent, String contextInfo, List<ChatMessage> memoryMessages) {
+    private String executeWithMemoryAndContext(String contextInfo, List<ChatMessage> memoryMessages) {
         try {
-            String enhancedPrompt = buildEnhancedPrompt(intent, contextInfo);
-
             List<ChatMessage> messages = new ArrayList<>();
             messages.add(SystemMessage.from(MEMORY_SYSTEM_PROMPT));
-            messages.addAll(memoryMessages);
-            messages.add(UserMessage.from(enhancedPrompt));
+
+            // **重要：添加历史记忆**
+            if (memoryMessages != null && !memoryMessages.isEmpty()) {
+                List<ChatMessage> limitedHistory = memoryMessages.size() > MAX_HISTORY_MESSAGES
+                        ? memoryMessages.subList(memoryMessages.size() - MAX_HISTORY_MESSAGES, memoryMessages.size())
+                        : memoryMessages;
+                messages.addAll(limitedHistory);
+                log.info("带依赖任务已添加{}条历史记忆", limitedHistory.size());
+            }
+
+            messages.add(UserMessage.from(contextInfo));
 
             ChatResponse chatResponse = chatLanguageModel.chat(messages);
             String result = chatResponse.aiMessage().text();
@@ -289,7 +351,7 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
         } catch (Exception e) {
             log.warn("记忆增强带上下文处理失败，降级使用基础LLM: {}", e.getMessage());
-            return executeWithBasicLLMAndContext(intent, contextInfo);
+            return executeWithBasicLLMAndContext(contextInfo);
         }
     }
 
@@ -313,7 +375,7 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
             // 检查是否有异常完成
             try {
-                future.get(STATUS_CHECK_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                future.get(1, TimeUnit.SECONDS);
             } catch (Exception e) {
                 log.debug("依赖任务异常完成: {}", e.getMessage());
                 return false;
@@ -333,7 +395,10 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
 
         if (dependencyResults != null && !dependencyResults.isEmpty() && isAllTasksCompleted(dependencyResults)) {
             log.info("等待后依赖已完成，直接执行任务: {}", intent);
-            return executeMemoryTaskWithResults(intent, dependencyResults);
+            // 获取记忆信息
+            List<ChatMessage> memoryMessages = UserLocalThreadUtils.getChatMemory();
+            String userId = UserLocalThreadUtils.getCurrentUserId();
+            return executeMemoryTaskWithResults(intent, dependencyResults, memoryMessages, userId);
         } else {
             // 检查是否已在队列中，避免重复加入
             if (!isTaskInDelayedQueue(intent)) {
@@ -405,86 +470,6 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
     }
 
     // =============================================================================
-    // 提示词构建方法
-    // =============================================================================
-
-    /**
-     * 构建增强的提示词
-     */
-    private String buildEnhancedPrompt(String originalIntent, String contextInfo) {
-        StringBuilder promptBuilder = new StringBuilder();
-
-        // 系统角色和能力声明
-        promptBuilder.append("你是一个具备高级记忆能力的智能助手，能够：\n");
-        promptBuilder.append("- 从历史对话中学习用户偏好和行为模式\n");
-        promptBuilder.append("- 识别问题间的关联性和演进趋势\n");
-        promptBuilder.append("- 提供基于个人历史的个性化建议\n\n");
-
-        // 当前问题分析
-        promptBuilder.append("【当前问题分析】\n");
-        promptBuilder.append("用户问题：").append(originalIntent).append("\n");
-        promptBuilder.append("问题类型：请首先分析这是什么类型的问题（咨询、操作、学习等）\n");
-        promptBuilder.append("关键词提取：请识别问题中的核心关键词\n\n");
-
-        // 记忆检索和分析
-        if (contextInfo != null && !contextInfo.trim().isEmpty()) {
-            promptBuilder.append("【记忆分析】\n");
-            promptBuilder.append("历史记忆信息：\n").append(contextInfo).append("\n\n");
-            promptBuilder.append("记忆检索任务：\n");
-            promptBuilder.append("1. 从上述历史信息中搜索与当前问题相关的内容\n");
-            promptBuilder.append("2. 识别用户的提问模式和偏好\n");
-            promptBuilder.append("3. 分析问题的关联性和发展脉络\n");
-            promptBuilder.append("4. 提取有助于当前回答的关键信息\n\n");
-
-            promptBuilder.append("【信息融合要求】\n");
-            promptBuilder.append("- 深度分析历史记忆中的关键信息\n");
-            promptBuilder.append("- 识别信息间的关联性和一致性\n");
-            promptBuilder.append("- 构建完整的知识图谱来回答问题\n\n");
-        } else {
-            promptBuilder.append("【记忆状态】\n");
-            promptBuilder.append("当前暂无相关历史记忆，这将是建立用户记忆档案的起点。\n\n");
-        }
-
-        // 个性化回答策略
-        promptBuilder.append("【个性化回答策略】\n");
-        promptBuilder.append("1. 记忆驱动回答：\n");
-        promptBuilder.append("   - 如果历史中有相似问题，说明：\"根据我们之前的讨论...\"\n");
-        promptBuilder.append("   - 如果发现新需求，说明：\"这是一个新的需求，让我为你...\"\n");
-        promptBuilder.append("   - 如果问题有演进，说明：\"我注意到你的需求在深化...\"\n\n");
-
-        promptBuilder.append("2. 连贯性保持：\n");
-        promptBuilder.append("   - 保持与之前回答风格的一致性\n");
-        promptBuilder.append("   - 体现对用户学习/工作进度的了解\n");
-        promptBuilder.append("   - 提供符合用户认知水平的解答\n\n");
-
-        promptBuilder.append("3. 主动关怀：\n");
-        promptBuilder.append("   - 基于历史互动主动提供相关建议\n");
-        promptBuilder.append("   - 预测用户可能的后续需求\n");
-        promptBuilder.append("   - 体现长期陪伴的智能助手价值\n\n");
-
-        // 输出格式要求
-        promptBuilder.append("【回答格式】\n");
-        promptBuilder.append("请按以下结构组织你的回答：\n\n");
-        promptBuilder.append("**直接回答**\n");
-        promptBuilder.append("[对用户问题的直接、准确回答]\n\n");
-
-        if (contextInfo != null && !contextInfo.trim().isEmpty()) {
-            promptBuilder.append("**记忆关联**\n");
-            promptBuilder.append("[基于历史记忆的补充信息或个性化见解]\n\n");
-
-            promptBuilder.append("**深度分析**（如适用）\n");
-            promptBuilder.append("[结合历史上下文的深入分析]\n\n");
-        }
-
-        promptBuilder.append("**个性化建议**\n");
-        promptBuilder.append("[基于用户历史的后续建议或指导]\n\n");
-
-        promptBuilder.append("现在请开始回答：");
-
-        return promptBuilder.toString();
-    }
-
-    // =============================================================================
     // 工具方法
     // =============================================================================
 
@@ -553,5 +538,30 @@ public class SteptIntentMemoryChatHandler extends BaseEnhancedHandler {
         String userId = getCurrentUserId();
         List<ChatMessage> memories = memoryManager.getMemoryMessages(userId);
         return memories != null ? memories.size() : 0;
+    }
+
+    /**
+     * 调试方法：打印当前记忆状态
+     */
+    public void debugMemoryStatus() {
+        String userId = getCurrentUserId();
+        List<ChatMessage> threadMemory = UserLocalThreadUtils.getChatMemory();
+        List<ChatMessage> managerMemory = memoryManager.getMemoryMessages(userId);
+
+        log.info("=== 记忆状态调试 ===");
+        log.info("用户ID: {}", userId);
+        log.info("线程上下文记忆: {}条", threadMemory != null ? threadMemory.size() : 0);
+        log.info("记忆管理器记忆: {}条", managerMemory != null ? managerMemory.size() : 0);
+
+        if (threadMemory != null && !threadMemory.isEmpty()) {
+            log.info("线程记忆示例: {}", threadMemory.get(0).text().substring(0,
+                    Math.min(50, threadMemory.get(0).text().length())));
+        }
+
+        if (managerMemory != null && !managerMemory.isEmpty()) {
+            log.info("管理器记忆示例: {}", managerMemory.get(0).text().substring(0,
+                    Math.min(50, managerMemory.get(0).text().length())));
+        }
+        log.info("=== 调试结束 ===");
     }
 }

@@ -24,7 +24,6 @@ public class ClassInfoAsicToolUtils {
     public String createClassInfoAsic(String content) {
 
 
-
         try {
             log.info("开始生成班级学情分析报告，内容长度: {}", content.length());
 
