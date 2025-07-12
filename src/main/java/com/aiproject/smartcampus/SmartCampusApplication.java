@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Slf4j
 public class SmartCampusApplication {
 
+    //加载中
     public static void main(String[] args) {
         SpringApplication.run(SmartCampusApplication.class, args);
         log.info("程序已经启动");

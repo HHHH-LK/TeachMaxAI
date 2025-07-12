@@ -20,7 +20,6 @@ public class ManagePersonController {
 
     private final AdminService adminService;
 
-    //学生相关管理
 
     /**
      * 根据学号查询学生信息

@@ -20,8 +20,8 @@ public class ModelClient {
     public static ModelClient builder(String api_key,String modle_name){
 
         ModelClient modelClient = new ModelClient();
-        modelClient.api_key = api_key;
-        modelClient.modle_name = modle_name;
+        ModelClient.api_key = api_key;
+        ModelClient.modle_name = modle_name;
         return modelClient;
     }
 

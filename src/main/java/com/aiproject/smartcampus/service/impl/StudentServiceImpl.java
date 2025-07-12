@@ -117,7 +117,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public String academicAnalysis(String courseId) {
 
         try {
-            String studentId = userToTypeUtils.change();
+            /*String studentId = userToTypeUtils.change();*/
+            String studentId = "1";
 
             //根据学生考试情况以及答题记录
             log.info("开始检索学生{}错误题目信息", studentId);
@@ -132,7 +133,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             //查询当前学生的知识点掌握情况
             log.info("开始检索学生{}知识点信息", studentId);
             StringBuffer knowledgePointStringBuffer = new StringBuffer();
-            List<StudentKnowledgePointVO> studentKnowledgePointVOS = knowledgePointMapper.selectAllKnowledgePointByStudentId(studentId);
+            List<StudentKnowledgePointVO> studentKnowledgePointVOS = knowledgePointMapper.selectKnowledgePointByStudentIdOptionalCourseId(studentId, courseId);
             log.info("检索数据成功,数据条数{}", studentWrongQuestionVOS.size());
             for (StudentKnowledgePointVO studentKnowledgePointVO : studentKnowledgePointVOS) {
                 knowledgePointStringBuffer.append(studentKnowledgePointVO.toString() + "\n");
