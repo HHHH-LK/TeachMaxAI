@@ -47,100 +47,95 @@ import static org.apache.poi.hslf.model.textproperties.TextPropCollection.TextPr
 @Slf4j
 @RequiredArgsConstructor
 public class CommonServiceImpl implements CommonService {
-
     private final UserMapper userMapper;
     private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final PasswordEncoder passwordEncoder;
-//    private final EmailService emailService;
+    //    private final EmailService emailService;
+    private final String tokenKey="token:"+"TOKEN_";
 
+    //登录
     @Override
     @Transactional
     public Result login(LoginDTO loginDTO) {
 
-            String loginAccount = null;
+        String loginAccount = null;
 
-            // 根据登录类型确定登录账号
-            if ("account".equals(loginDTO.getPrincipal())) {
-                loginAccount = loginDTO.getUsername();
-            } else if ("phone".equals(loginDTO.getPrincipal())) {
-                loginAccount = loginDTO.getPhone();
-            } else if("email".equals(loginDTO.getPrincipal())) {
-                loginAccount = loginDTO.getEmail();
-            }else {
-                return Result.error("不支持的登录类型");
-            }
+        // 根据登录类型确定登录账号
+        if ("account".equals(loginDTO.getPrincipal())) {
+            loginAccount = loginDTO.getUsername();
+        } else if ("phone".equals(loginDTO.getPrincipal())) {
+            loginAccount = loginDTO.getPhone();
+        } else if("email".equals(loginDTO.getPrincipal())) {
+            loginAccount = loginDTO.getEmail();
+        }else {
+            return Result.error("不支持的登录类型");
+        }
 
-            // 1. 查询用户
-            User user = null;
-            if ("account".equals(loginDTO.getPrincipal())) {
-                user = userMapper.findByUsername(loginAccount);
-            } else if ("phone".equals(loginDTO.getPrincipal())) {
-                user = userMapper.findByUserPhone(loginAccount);
-            } else if ("email".equals(loginDTO.getPrincipal())) {
-                user = userMapper.findByUserEmail(loginAccount);
-            }
+        // 1. 查询用户
+        User user = null;
+        if ("account".equals(loginDTO.getPrincipal())) {
+            user = userMapper.findByUsername(loginAccount);
+        } else if ("phone".equals(loginDTO.getPrincipal())) {
+            user = userMapper.findByUserPhone(loginAccount);
+        } else {
+            user = userMapper.findByUserEmail(loginAccount);
+        }
 
-            // 2. 验证用户
-            if (user == null) {
-                return Result.error("用户不存在");
-            }
-            if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
-                System.out.println(passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash()));
-                return Result.error("密码错误");
-            }
+        // 2. 验证用户
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
+            System.out.println(passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash()));
+            return Result.error("密码错误");
+        }
 
-            // 3. 检查角色是否符合
-            if (!loginDTO.getUserType().equals(user.getUserType().name())) {
-                System.out.println(loginDTO.getUserType()+":"+user.getUserType());
-                return Result.error("该账号不是" + loginDTO.getUserType() + "身份");
-            }
+        // 4. 生成令牌
+        String token = JwtUtils.generateToken(user.getUserId(), user.getUserType());
+        log.info("用户 {} 登录成功，生成令牌: {}", user.getUsername(), token);
+        String key = tokenKey + token;
+        stringRedisTemplate.opsForValue().set(key, user.toString(),7,TimeUnit.DAYS);
 
-            // 4. 生成令牌
-            String token = JwtUtils.generateToken(user.getUserId(), user.getUserType());
-            System.out.println(token);
-
-            // 5. 返回 token 和用户身份信息
-//            return Result.success("登录成功")
-//                    .put("token", token);
-//                    .put("userType", user.getUserType().name());
-
-            return Result.success(user.getUserType().name() + ":" + token);
+        System.out.println(user.getUserType());
+        return Result.success(user.getUserType().getValue() + ":" + token);
 
 
     }
 
+    //注册
     @Override
     public Result register(RegisterDTO registerDTO) {
-            //校验用户名
-            if (userMapper.findByUsername(registerDTO.getUsername()) != null) {
-                return Result.error("用户名已被注册");
-            }
-            if (!registerDTO.getPassword().equals(registerDTO.getRepassword())){
-                return Result.error("两次输入的密码不一致");
-            }
+        //校验用户名
+        if (userMapper.findByUsername(registerDTO.getUsername()) != null) {
+            return Result.error("用户名已被注册");
+        }
+        if (!registerDTO.getPassword().equals(registerDTO.getRepassword())){
+            return Result.error("两次输入的密码不一致");
+        }
 
-            // 创建用户
-            User user = new User();
-            user.setUsername(registerDTO.getUsername());
-            user.setPasswordHash(passwordEncoder.encode(registerDTO.getPassword()));
-            user.setRealName("张三");
-            user.setUserType(User.UserType.valueOf(registerDTO.getUserType()));
-            userMapper.insert(user);
 
-            // 创建对应实体
-            if ("teacher".equals(registerDTO.getUserType())) {
-                Teacher teacher = new Teacher();
-                teacher.setUserId(user.getUserId());
-                teacherMapper.insert(teacher);
-            } else if ("student".equals(registerDTO.getUserType())) {
-                Student student = new Student();
-                student.setUserId(user.getUserId());
-                studentMapper.insert(student);
-            }
+        // 创建用户
+        User user = new User();
+        user.setUsername(registerDTO.getUsername());
+        user.setPasswordHash(passwordEncoder.encode(registerDTO.getPassword()));
+        user.setRealName("张三");
+        user.setUserType(User.UserType.fromValue(registerDTO.getUserType()));
+        userMapper.insert(user);
 
-            return Result.success("注册成功");
+        // 创建对应实体
+        if ("teacher".equals(registerDTO.getUserType())) {
+            Teacher teacher = new Teacher();
+            teacher.setUserId(user.getUserId());
+            teacherMapper.insert(teacher);
+        } else if ("student".equals(registerDTO.getUserType())) {
+            Student student = new Student();
+            student.setUserId(user.getUserId());
+            studentMapper.insert(student);
+        }
+
+        return Result.success("注册成功");
 
     }
 
@@ -160,6 +155,7 @@ public class CommonServiceImpl implements CommonService {
 
         return Result.success("密码重置成功");
     }
+
 //
 //    @Override
 //    public Result sendPasswordResetCode(PasswordResetVerificationDTO dto) {
