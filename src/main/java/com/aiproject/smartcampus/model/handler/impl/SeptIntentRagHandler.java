@@ -141,10 +141,14 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
 
     private String buildDependencyResultString(List<String> dependencyResults) {
         StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.append("以下是前置任务的执行结果（系统内部处理结果）：\n\n");
+
         for (int i = 0; i < dependencyResults.size(); i++) {
-            resultBuilder.append("前置任务").append(i + 1).append("的结果为：")
-                    .append(dependencyResults.get(i)).append("\n");
+            resultBuilder.append("步骤").append(i + 1).append("执行结果：\n")
+                    .append(dependencyResults.get(i)).append("\n\n");
         }
+
+        resultBuilder.append("请基于以上前置步骤的执行结果完成当前任务。");
         return resultBuilder.toString();
     }
 

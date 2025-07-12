@@ -35,7 +35,6 @@ public class ChatController {
         log.info("用户问题：{}", chatDTO.getQuestion());
         String start = chatAgent.start(chatDTO.getQuestion());
         String trim = start.trim();
-        System.out.printf(trim);
         return Result.success(trim);
     }
 

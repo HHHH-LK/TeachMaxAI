@@ -43,7 +43,7 @@ public class ChatAgent {
 
             // 2. **关键修复：正确设置线程上下文**
             UserLocalThreadUtils.setUserId(userId);
-            UserLocalThreadUtils.setUserMemory(memoryMessages);  // 传递记忆列表而不是字符串
+            UserLocalThreadUtils.setUserMemory(memoryMessages);
 
             // 3. 处理用户意图
             String answer = processIntentWithMemory(userMessage, memoryMessages);

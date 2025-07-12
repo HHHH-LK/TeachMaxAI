@@ -225,6 +225,18 @@ class SmartCampusApplicationTests {
 
         }
 
+        @Test
+    void test10() throws IOException {
+
+            File pdfFile = new File("/Users/lk_hhh/Desktop/Thinking+in+Java+4th+Edition（JAVA编程思想 第四版 英文版）.pdf");
+
+            System.out.println("exists? " + pdfFile.exists());   // 应该打印 true
+            System.out.println("canRead? " + pdfFile.canRead()); // 应该打印 true
+
+
+
+        }
+
 
 
 }
