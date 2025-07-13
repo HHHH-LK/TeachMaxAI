@@ -70,9 +70,9 @@ public class ChapterController {
      * 根据章节获取相关测试题
      */
     @GetMapping("/selectAllTextByChapterId")
-    public Result<List<ChapterQuestionDetailVO>> selectAllTextByChaperId(@RequestParam(value = "chapterId") String chapterId) {
+    public Result<List<ChapterQuestionDetailVO>> selectAllTextByChaperId(@RequestParam(value = "chapterId") String chapterId, @RequestParam(value = "courseId") String courseId) {
 
-        return chapterService.getAllTextByChapterId(chapterId);
+        return chapterService.getAllTextByChapterId(chapterId,courseId);
     }
 
 

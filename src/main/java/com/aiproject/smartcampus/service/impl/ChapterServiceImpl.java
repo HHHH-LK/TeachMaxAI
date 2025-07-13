@@ -179,30 +179,53 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public Result<List<ChapterQuestionDetailVO>> getAllTextByChapterId(String chapterId) {
+    public Result<List<ChapterQuestionDetailVO>> getAllTextByChapterId(String chapterId, String courseId) {
 
-        String studentId = userToTypeUtils.change();
+        String studentId = "1";
 
-        List<ChapterQuestionDetailVO> allTextByChapterId = chapterMapper.getAllTextByChapterId(chapterId, studentId);
+        try {
+            List<ChapterQuestionDetailVO> allTextByChapterId = chapterMapper.getChapterTestQuestions(
+                    Integer.valueOf(chapterId),
+                    Integer.valueOf(studentId),
+                    Integer.valueOf(courseId)
+            );
 
-        if (allTextByChapterId == null || allTextByChapterId.isEmpty()) {
-            log.info("测试题为空");
-            return Result.success(new ArrayList<>());
+            // 🔧 添加调试日志，验证数据是否正确读取
+            log.info("查询到 {} 道题目", allTextByChapterId != null ? allTextByChapterId.size() : 0);
+
+            if (allTextByChapterId != null && !allTextByChapterId.isEmpty()) {
+                // 🔧 检查第一道题的内容是否正确读取
+                ChapterQuestionDetailVO firstQuestion = allTextByChapterId.get(0);
+                log.info("第一道题目内容: {}",
+                        firstQuestion.getQuestionContent() != null ?
+                                firstQuestion.getQuestionContent().substring(0, Math.min(50, firstQuestion.getQuestionContent().length())) + "..." :
+                                "null");
+            }
+
+            if (allTextByChapterId == null || allTextByChapterId.isEmpty()) {
+                log.info("测试题为空");
+                return Result.success(new ArrayList<>());
+            }
+
+            // 获取对应的测试题
+            List<ChapterQuestionDetailVO> theExamTest = getTheExamTest(allTextByChapterId);
+            log.info("筛选后的测试题数量: {}", theExamTest.size());
+
+            // 为每道题目设计权重
+            List<ChapterQuestionDetailVO> chapterQuestionDetailVOSWithT = setTToAllQuestion(theExamTest);
+
+            // 进行排序
+            List<ChapterQuestionDetailVO> theCorrectTextList = chapterQuestionDetailVOSWithT.stream()
+                    .sorted((s, q) -> s.getT() - q.getT())
+                    .toList();
+
+            log.info("最终返回题目数量: {}", theCorrectTextList.size());
+            return Result.success(theCorrectTextList);
+
+        } catch (Exception e) {
+            log.error("获取章节测试题失败", e);
+            return Result.error("获取章节测试题失败: " + e.getMessage());
         }
-
-        //获取对应的测试题
-        List<ChapterQuestionDetailVO> theExamTest = getTheExamTest(allTextByChapterId);
-
-        //为每道题目设计权重
-        List<ChapterQuestionDetailVO> chapterQuestionDetailVOSWithT = setTToAllQuestion(theExamTest);
-
-        //进行排序
-        List<ChapterQuestionDetailVO> theCorrrectTextList = chapterQuestionDetailVOSWithT.stream()
-                .sorted((s, q) ->
-                        s.getT() - q.getT()
-                ).toList();
-
-        return Result.success(theCorrrectTextList);
     }
 
     @Override
@@ -437,7 +460,6 @@ public class ChapterServiceImpl implements ChapterService {
         // 计算统计信息
         testResult.calculateStatistics();
 
-
         return Result.success(testResult);
     }
 
@@ -447,10 +469,12 @@ public class ChapterServiceImpl implements ChapterService {
      */
     private List<ChapterQuestionDetailVO> getTheExamTest(List<ChapterQuestionDetailVO> chapterQuestionDetailVOS) {
 
-        return chapterQuestionDetailVOS.stream().filter(a -> {
-            return "测试题".equals(a.getChapterQuestionTypeCn());
-        }).toList();
+        List<ChapterQuestionDetailVO> result = chapterQuestionDetailVOS.stream()
+                .filter(a -> "测试题".equals(a.getChapterQuestionTypeCn()))
+                .toList();
 
+        log.debug("筛选测试题: 原始数量={}, 筛选后数量={}", chapterQuestionDetailVOS.size(), result.size());
+        return result;
     }
 
     /**
@@ -459,12 +483,13 @@ public class ChapterServiceImpl implements ChapterService {
     private List<ChapterQuestionDetailVO> setTToAllQuestion(List<ChapterQuestionDetailVO> allTextByChapterId) {
 
         for (ChapterQuestionDetailVO vo : allTextByChapterId) {
-            int t = vo.getQuestionTypeWeight() * 10 + vo.getDifficultyWeight();
+            int weight = vo.getQuestionTypeWeight() * 10 + vo.getDifficultyWeight();
+            vo.setT(weight);
 
-            vo.setT(t);
+            log.debug("题目ID: {}, 类型权重: {}, 难度权重: {}, 最终权重: {}",
+                    vo.getQuestionId(), vo.getQuestionTypeWeight(), vo.getDifficultyWeight(), weight);
         }
         return allTextByChapterId;
-
     }
 
 

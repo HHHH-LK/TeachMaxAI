@@ -1,18 +1,20 @@
 package com.aiproject.smartcampus.mapper;
 
+import com.aiproject.smartcampus.commons.utils.TextTypeHandler;
 import com.aiproject.smartcampus.pojo.dto.ChapterKnowledgePointDTO;
 import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.*;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import dev.langchain4j.agent.tool.P;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.type.JdbcType;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-// 1. 章节表Mapper
+/**
+ * @author lk_hhh
+ */ // 1. 章节表Mapper
 @Mapper
 @Repository
 public interface ChapterMapper extends BaseMapper<Chapter> {
@@ -178,8 +180,69 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
             "  AND cm.status = 'active';")
     MaterialDetailRawVO selectChapterMaterialById(@Param(value = "materialId") String materialId, @Param(value = "studentId") String studentId);
 
-    @Select("")
-    List<ChapterQuestionDetailVO> getAllTextByChapterId(@Param(value = "chapterId") String chapterId, @Param(value = "studentId") String studentId);
+    @Select("SELECT " +
+            "qb.question_id, " +
+            "qb.question_type, " +
+            "qb.question_content, " +
+            "qb.question_options, " +
+            "qb.correct_answer, " +
+            "qb.explanation, " +
+            "qb.difficulty_level, " +
+            "qb.score_points, " +
+            "kp.point_name, " +
+            "ch.chapter_name, " +
+            "ch.chapter_id, " +
+            "sa.student_answer, " +
+            "sa.is_correct, " +
+            "sa.score_earned, " +
+            "sa.answer_id, " +
+            "qb.created_at, " +
+            "cq.question_type AS chapter_question_type " +
+            "FROM question_bank qb " +
+            "INNER JOIN chapter_questions cq ON qb.question_id = cq.question_id " +
+            "INNER JOIN chapters ch ON cq.chapter_id = ch.chapter_id " +
+            "INNER JOIN courses c ON qb.course_id = c.course_id " +
+            "INNER JOIN course_enrollments ce ON c.course_id = ce.course_id " +
+            "LEFT JOIN knowledge_points kp ON qb.point_id = kp.point_id " +
+            "LEFT JOIN student_answers sa ON qb.question_id = sa.question_id " +
+            "                              AND sa.student_id = #{studentId} " +
+            "WHERE ch.chapter_id = #{chapterId} " +
+            "  AND c.course_id = #{courseId} " +
+            "  AND ce.student_id = #{studentId} " +
+            "  AND cq.question_type = 'test' " +
+            "  AND c.status = 'active' " +
+            "ORDER BY qb.difficulty_level ASC, " +
+            "         qb.question_id ASC")
+    @Results({
+            @Result(column = "question_id", property = "questionId"),
+            @Result(column = "question_type", property = "questionType"),
+            @Result(column = "question_content", property = "questionContent",
+                    typeHandler = TextTypeHandler.class),
+            @Result(column = "question_options", property = "questionOptions",
+                    typeHandler = TextTypeHandler.class),
+            @Result(column = "correct_answer", property = "correctAnswer",
+                    typeHandler = TextTypeHandler.class),
+            @Result(column = "explanation", property = "explanation",
+                    typeHandler = TextTypeHandler.class),
+            @Result(column = "difficulty_level", property = "difficultyLevel"),
+            @Result(column = "score_points", property = "scorePoints"),
+            @Result(column = "point_name", property = "pointName"),
+            @Result(column = "chapter_name", property = "chapterName"),
+            @Result(column = "chapter_id", property = "chapterId"),
+            @Result(column = "student_answer", property = "studentAnswer",
+                    typeHandler = TextTypeHandler.class),
+            @Result(column = "is_correct", property = "isCorrect"),
+            @Result(column = "score_earned", property = "scoreEarned"),
+            @Result(column = "answer_id", property = "answerId"),
+            @Result(column = "created_at", property = "createdAt"),
+            @Result(column = "chapter_question_type", property = "chapterQuestionType")
+    })
+    List<ChapterQuestionDetailVO> getChapterTestQuestions(
+            @Param("chapterId") Integer chapterId,
+            @Param("studentId") Integer studentId,
+            @Param("courseId") Integer courseId
+    );
+
 
     @Select("-- 1. 基础查询：获取学生对应章节的所有课程资源\n" +
             "SELECT\n" +
@@ -258,7 +321,7 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
     Double getChapterProgressRateAsDouble(@Param("chapterId") String chapterId, @Param("studentId") String studentId, @Param("courseId") String courseId);
 
 
-    @Select("-- 简化版错题查询 - 只返回核心信息\n" +
+    @Select("-- 增强版错题查询 - 包含章节ID和题目类型\n" +
             "SELECT\n" +
             "    sa.student_answer,                    -- 用户答案\n" +
             "    qb.question_content,                  -- 题目内容\n" +
@@ -267,7 +330,10 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
             "    kp.point_name,                        -- 知识点名称\n" +
             "    ch.chapter_name,                      -- 章节名称\n" +
             "    qb.difficulty_level,                  -- 题目难度\n" +
-            "    sa.answer_id                          -- 用于排序的答题ID\n" +
+            "    sa.answer_id,                         -- 用于排序的答题ID\n" +
+            "    ch.chapter_id,                        -- 章节ID\n" +
+            "    qb.question_type,                     -- 题目类型\n" +
+            "    sa.exam_id                            -- 考试ID（可用于关联获取考试时间等信息）\n" +
             "FROM student_answers sa\n" +
             "INNER JOIN question_bank qb ON sa.question_id = qb.question_id\n" +
             "INNER JOIN courses c ON qb.course_id = c.course_id\n" +
@@ -278,7 +344,7 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
             "WHERE c.course_id = #{courseId}        -- 课程ID参数\n" +
             "  AND sa.student_id = #{studentId}      -- 学生ID参数\n" +
             "  AND sa.is_correct = 0      -- 只查询错误的题目\n" +
-            "ORDER BY sa.answer_id DESC;  -- 按答题时间倒序")
+            "ORDER BY sa.answer_id DESC;  -- 按答题ID倒序")
     List<WrongQuestionVO> getAllNuCorrectTest(@Param(value = "courseId") String courseId, @Param(value = "studentId") String studentId);
 
 
@@ -362,4 +428,11 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
             "from chapters\n" +
             "where chapter_id=#{chapterId}")
     String getChapterNameById(String chapterId);
+
+
+    @Select("SELECT question_content FROM question_bank WHERE question_id = #{id}")
+    @Result(column = "question_content", property = "content", typeHandler = TextTypeHandler.class)
+    String getQuestionContent(@Param("id") Integer id);
+
 }
+

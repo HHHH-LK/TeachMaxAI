@@ -24,7 +24,7 @@ public interface ChapterService {
 
     Result<MaterialDetailSeparatedVO> selectMaterialByMaterialId(String materialId);
 
-    Result<List<ChapterQuestionDetailVO>> getAllTextByChapterId(String chapterId);
+    Result<List<ChapterQuestionDetailVO>> getAllTextByChapterId(String chapterId,String courseId);
 
     Result startStudy(StudentStudyDTO studentStudyDTO);
 
