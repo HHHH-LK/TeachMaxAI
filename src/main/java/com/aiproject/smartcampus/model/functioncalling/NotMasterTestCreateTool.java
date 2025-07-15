@@ -71,6 +71,8 @@ public class NotMasterTestCreateTool implements Tool {
 
                 Integer afterMax = questionBankMapper.selectMaxQuestionIdByCreator(DEFOURT_AI_CREATE_ID);
 
+                result=result+"ids:min:"+beforeMax+",max:"+afterMax;
+
                 log.info("生成前最大ID: {}, 生成后最大ID: {}", beforeMax, afterMax);
 
                 if (afterMax > beforeMax) {
