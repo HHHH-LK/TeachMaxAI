@@ -2,9 +2,12 @@ package com.aiproject.smartcampus.commons.utils;
 
 import com.aiproject.smartcampus.pojo.po.User;
 import dev.langchain4j.data.message.ChatMessage;
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 
 @Data
 @Slf4j
+@Component
 public class UserLocalThreadUtils {
 
     // =============================================================================
@@ -35,20 +39,34 @@ public class UserLocalThreadUtils {
     private static ThreadLocal<List<ChatMessage>> chatMemoryLocal = new ThreadLocal<>();
     private static ThreadLocal<String> userIdLocal = new ThreadLocal<>();
 
+    private static RedisTemplate<String, User> userRedisTemplate = new RedisTemplate<>();
+
+    private final RedisTemplate<String, User> redisTemplate;
+
     // =============================================================================
     // 现有方法保持不变
     // =============================================================================
 
-    public static String getToken(){
+
+    @PostConstruct
+    public void init() {
+        userRedisTemplate = redisTemplate;
+    }
+
+    public static String getToken() {
         return userLoginToken.get();
     }
 
-    public static void setToken(String token){
+    public static void setToken(String token) {
         userLoginToken.set(token);
     }
 
     public static User getUserInfo() {
-        return threadLocal.get();
+        //首先获取token
+        String token = getToken();
+        User user = userRedisTemplate.opsForValue().get("token:" + "TOKEN_" + token);
+
+        return user;
     }
 
     public static void setUserInfo(User user) {
@@ -81,6 +99,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 设置聊天记忆消息列表
+     *
      * @param chatMemory 聊天记忆消息列表
      */
     public static void setChatMemory(List<ChatMessage> chatMemory) {
@@ -95,6 +114,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 获取聊天记忆消息列表
+     *
      * @return 聊天记忆消息列表，如果没有则返回空列表
      */
     public static List<ChatMessage> getChatMemory() {
@@ -109,6 +129,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 添加单条聊天记忆消息
+     *
      * @param chatMessage 聊天消息
      */
     public static void addChatMemory(ChatMessage chatMessage) {
@@ -136,6 +157,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 检查是否有聊天记忆
+     *
      * @return true如果有记忆，false如果没有
      */
     public static boolean hasChatMemory() {
@@ -147,6 +169,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 获取聊天记忆数量
+     *
      * @return 记忆消息数量
      */
     public static int getChatMemorySize() {
@@ -159,6 +182,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 设置当前用户ID
+     *
      * @param userId 用户ID
      */
     public static void setCurrentUserId(String userId) {
@@ -168,6 +192,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 获取当前用户ID
+     *
      * @return 用户ID，优先从userIdLocal获取，如果没有则尝试从User对象获取
      */
     public static String getCurrentUserId() {
@@ -203,7 +228,8 @@ public class UserLocalThreadUtils {
 
     /**
      * 同时设置用户ID和聊天记忆
-     * @param userId 用户ID
+     *
+     * @param userId     用户ID
      * @param chatMemory 聊天记忆
      */
     public static void setUserContext(String userId, List<ChatMessage> chatMemory) {
@@ -236,6 +262,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 获取当前线程上下文状态信息
+     *
      * @return 状态信息字符串
      */
     public static String getContextStatus() {
@@ -264,6 +291,7 @@ public class UserLocalThreadUtils {
 
     /**
      * 验证线程上下文是否正确设置
+     *
      * @return true如果上下文设置正确，false否则
      */
     public static boolean isContextValid() {

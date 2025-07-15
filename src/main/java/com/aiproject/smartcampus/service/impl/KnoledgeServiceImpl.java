@@ -58,9 +58,8 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     @Override
     public Result getALlOKKnowlegePoint() {
 
-        //String studentId = getUserToTypeUtils.change();
-        //todo进行测试
-        String studentId = "1";
+        String studentId = getUserToTypeUtils.change();
+
 
         if (studentId == null) {
             log.error("该用户未登录[{}]", studentId);

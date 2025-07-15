@@ -57,7 +57,7 @@ public class ModelSummer {
                     .toList();
             String summaryInput = String.join("\n", completedResults);
             String userMemory = UserLocalThreadUtils.getUserMemory();
-            String QUEST_PROMPT="请严格基于用户的需求进行生成\""+"用户的需求为"+userMemory;
+            String QUEST_PROMPT="请严格基于用户的需求进行生成\""+"用户的需求为"+userMemory+"输出要求为只输出纯文本，不需要其他任何的特殊符号，请返回符合流式输出的结果进行格式化处理。";
             ChatResponse chatResponse = chatLanguageModel.chat(
                     SystemMessage.from(INITENT_SUMMER_PROMPT+QUEST_PROMPT),
                     UserMessage.from(summaryInput)

@@ -52,7 +52,7 @@ public class CommonServiceImpl implements CommonService {
     private final UserMapper userMapper;
     private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
-    private final StringRedisTemplate stringRedisTemplate;
+    private final RedisTemplate<String,User> userRedisTemplate;
     private final PasswordEncoder passwordEncoder;
     //    private final EmailService emailService;
     private final String tokenKey = "token:" + "TOKEN_";
@@ -98,12 +98,8 @@ public class CommonServiceImpl implements CommonService {
         String token = JwtUtils.generateToken(user.getUserId(), user.getUserType());
         log.info("用户 {} 登录成功，生成令牌: {}", user.getUsername(), token);
 
-        //存入线程变量中
-        UserLocalThreadUtils.setUserInfo(user);
-        UserLocalThreadUtils.setToken(token);
-
         String key = tokenKey + token;
-        stringRedisTemplate.opsForValue().set(key, user.toString(), 7, TimeUnit.DAYS);
+        userRedisTemplate.opsForValue().set(key, user, 7, TimeUnit.DAYS);
 
         System.out.println(user.getUserType());
         return Result.success(user.getUserType().getValue() + ":" + token);
@@ -170,7 +166,7 @@ public class CommonServiceImpl implements CommonService {
         String token = UserLocalThreadUtils.getToken();
         UserLocalThreadUtils.removeUserInfo();
         String key = tokenKey + token;
-        Boolean delete = stringRedisTemplate.delete(key);
+        Boolean delete = userRedisTemplate.delete(key);
         if (delete) {
             return Result.success();
         }

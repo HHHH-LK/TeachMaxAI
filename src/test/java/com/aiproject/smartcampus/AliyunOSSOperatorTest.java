@@ -4,6 +4,7 @@ import com.aiproject.smartcampus.commons.utils.aliyunossutils.AliyunOSSOperator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,6 +15,8 @@ public class AliyunOSSOperatorTest {
 
     @Autowired
     private AliyunOSSOperator aliyunOSSOperator;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Test
     public void testUpload() throws Exception {
@@ -28,5 +31,12 @@ public class AliyunOSSOperatorTest {
 
         // 你也可以断言URL是否符合预期格式
         assert url != null && url.startsWith("http");
+    }
+
+    @Test
+    public void testDeleteFile() {
+
+
+
     }
 }

@@ -1,10 +1,7 @@
 package com.aiproject.smartcampus.config;
 
 import com.aiproject.smartcampus.pojo.bo.CacheEntry;
-import com.aiproject.smartcampus.pojo.po.Admin;
-import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
-import com.aiproject.smartcampus.pojo.po.Student;
-import com.aiproject.smartcampus.pojo.po.Teacher;
+import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -149,5 +146,20 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    public RedisTemplate<String, User> userRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, User> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        // 使用配置了JavaTimeModule的序列化器
+        Jackson2JsonRedisSerializer<User> serializer = createJsonSerializer(User.class);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
 
 }

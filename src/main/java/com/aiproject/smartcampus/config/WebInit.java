@@ -33,7 +33,6 @@ public class WebInit implements WebMvcConfigurer {
             "/swagger-resources/**",
             "/v2/api-docs",
             "/webjars/**",
-            "/common/preliminaryregister",
             "/common/register",
             "/common/login",
             "/error"
@@ -42,14 +41,14 @@ public class WebInit implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //todo 取消拦截器做测试
-      /*  registry.addInterceptor(loginInterceptor)
+        registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(excludePathPatternList)
                 .order(0);
         registry.addInterceptor(refreashInterceptor)
                 .addPathPatterns("/**")
+                .excludePathPatterns(excludePathPatternList)
                 .order(1);
-*/
     }
 
 

@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 public class UserToTypeUtils {
 
     private final UserMapper userMapper;
+
     private final TeacherMapper teacherMapper;
     private final StudentMapper studentMapper;
     private final AdminMapper adminMapper;

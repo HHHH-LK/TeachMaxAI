@@ -43,7 +43,7 @@ public class ChatController {
      */
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamChat(@RequestBody ChatDTO chatDTO) {
-        SseEmitter emitter = new SseEmitter(30000L); // 30秒超时
+        SseEmitter emitter = new SseEmitter(600000L); // 600秒超时
 
         log.info("开始流式处理用户问题：{}", chatDTO.getQuestion());
 

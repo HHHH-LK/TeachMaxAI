@@ -29,14 +29,21 @@ public class RefreashInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        String token = request.getHeader("token");
+        // ✅ 预检请求直接放行
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return true;
+        }
 
+        String token = request.getHeader("token");
+        UserLocalThreadUtils.setToken(token);
         if(!StrUtil.isBlank(token)){
             //避免对于未登录的用户访问公共资源带来的null问题
             if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(token))) {
                 stringRedisTemplate.expire(token, REFRESH_TIEM, TimeUnit.DAYS);
             }
         }
+
         return true;
 
     }
