@@ -425,7 +425,7 @@ public class LocalStore implements ChatMemoryStore {
      */
     public void flushDirtyData() {
         if (!isRedisAvailable()) {
-            log.warn("Redis不可用，跳过脏数据写回");
+           /* log.warn("Redis不可用，跳过脏数据写回");*/
             return;
         }
 

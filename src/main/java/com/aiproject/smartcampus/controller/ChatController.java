@@ -41,7 +41,7 @@ public class ChatController {
     }
 
     /**
-     * SSE流式聊天接口 - 按词汇分组输出
+     * SSE流式聊天接口 - 最终工作版本
      */
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamChat(@RequestBody ChatDTO chatDTO) {
@@ -64,8 +64,15 @@ public class ChatController {
                 // 调用ChatAgent获取完整回答
                 String fullAnswer = chatAgent.start(chatDTO.getQuestion());
 
-                // 按词汇分组流式输出
-                streamAnswerByWords(emitter, fullAnswer);
+                // 关键修改：先格式化内容，再按词汇分组流式输出
+                String formattedAnswer = formatContentForStreaming(fullAnswer);
+
+                log.info("原始内容长度: {}", fullAnswer.length());
+                log.info("格式化后长度: {}", formattedAnswer.length());
+                log.info("格式化后内容预览: {}", formattedAnswer.substring(0, Math.min(200, formattedAnswer.length())));
+
+                // 按词汇分组流式输出格式化后的内容
+                streamAnswerByWords(emitter, formattedAnswer);
 
                 // 发送完成消息
                 sendStreamMessage(emitter, "completed", "回答完成");
@@ -94,7 +101,184 @@ public class ChatController {
     }
 
     /**
-     * 按词汇分组的流式输出
+     * 格式化内容以适配流式输出 - 增强版本
+     */
+    private String formatContentForStreaming(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            return "暂时没有找到相关信息。";
+        }
+
+        log.debug("开始格式化，原始内容: {}", content.substring(0, Math.min(100, content.length())));
+
+        // 1. 基础清理
+        String formatted = content.trim();
+
+        // 2. 在关键位置添加换行 - 这是解决问题的核心
+        formatted = addLogicalLineBreaks(formatted);
+
+        // 3. 清理多余空白
+        formatted = cleanupWhitespace(formatted);
+
+        // 4. 最终检查 - 确保有足够的换行
+        formatted = ensureProperLineBreaks(formatted);
+
+        log.debug("格式化完成，段落数量: {}", formatted.split("\\n\\n").length);
+
+        return formatted;
+    }
+
+    /**
+     * 在逻辑位置添加换行 - 增强版本
+     */
+    private String addLogicalLineBreaks(String text) {
+        log.debug("添加逻辑换行前: {}", text.substring(0, Math.min(100, text.length())));
+
+        // 1. 在句号后添加换行（如果后面直接跟中文或字母）
+        text = text.replaceAll("([。！？])([\\u4e00-\\u9fff\\w])", "$1\n\n$2");
+
+        // 2. 在逻辑连接词前强制换行
+        text = text.replaceAll("([。！？，])\\s*(首先|其次|另外|此外|然后|接下来|最后|总之|综上)", "$1\n\n$2");
+        text = text.replaceAll("([。！？，])\\s*(但是|然而|不过|另一方面|与此同时)", "$1\n\n$2");
+        text = text.replaceAll("([。！？，])\\s*(因此|所以|由此可见|综合来看|总的来说)", "$1\n\n$2");
+
+        // 3. 在"根据"、"关于"等开头词前换行
+        text = text.replaceAll("([。！？])\\s*(根据|关于|对于|在|为了)", "$1\n\n$2");
+
+        // 4. 在建议词前换行
+        text = text.replaceAll("([。！？])\\s*(建议|推荐|可以|应该|需要)", "$1\n\n$2");
+
+        // 5. 在举例词前换行
+        text = text.replaceAll("([。！？，])\\s*(比如|例如|譬如)", "$1\n\n$2");
+
+        // 6. 在数字序号前换行
+        text = text.replaceAll("([。！？])\\s*([一二三四五六七八九十1-9][\\.、])", "$1\n\n$2");
+
+        // 7. 处理长句子 - 在逗号+连接词处换行
+        text = text.replaceAll("，(同时|此外|另外|特别是|尤其是)", "，\n\n$1");
+
+        // 8. 在问题后换行
+        text = text.replaceAll("([？])([\\u4e00-\\u9fff])", "$1\n\n$2");
+
+        // 9. 新增：强制在每个句号后换行（保证基本的句子分隔）
+        text = text.replaceAll("([。])([^\\n])", "$1\n\n$2");
+
+        // 10. 强制分割超长句子（超过150字的句子）
+        text = breakLongSentences(text);
+
+        log.debug("添加逻辑换行后: {}", text.substring(0, Math.min(200, text.length())));
+
+        return text;
+    }
+
+    /**
+     * 确保适当的换行
+     */
+    private String ensureProperLineBreaks(String text) {
+        // 如果整个文本中换行太少，强制每80个字符后在句号处换行
+        if (text.split("\\n\\n").length < 3 && text.length() > 200) {
+            StringBuilder result = new StringBuilder();
+            int currentLength = 0;
+            String[] sentences = text.split("([。！？])");
+
+            for (int i = 0; i < sentences.length; i++) {
+                String sentence = sentences[i];
+                if (sentence.trim().isEmpty()) {
+                    continue;
+                }
+
+                result.append(sentence);
+                if (i < sentences.length - 1) {
+                    result.append("。");
+                    currentLength += sentence.length() + 1;
+
+                    // 如果累计长度超过80字符，添加换行
+                    if (currentLength > 80) {
+                        result.append("\n\n");
+                        currentLength = 0;
+                    }
+                }
+            }
+
+            return result.toString();
+        }
+
+        return text;
+    }
+
+    /**
+     * 分割超长句子
+     */
+    private String breakLongSentences(String text) {
+        String[] sentences = text.split("\\n\\n");
+        StringBuilder result = new StringBuilder();
+
+        for (String sentence : sentences) {
+            if (sentence.length() > 150) {
+                // 尝试在逗号处分割
+                String broken = breakAtCommas(sentence);
+                result.append(broken);
+            } else {
+                result.append(sentence);
+            }
+            result.append("\n\n");
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * 在逗号处分割长句子
+     */
+    private String breakAtCommas(String sentence) {
+        String[] parts = sentence.split("，");
+        if (parts.length <= 1) {
+            return sentence;
+        }
+
+        StringBuilder result = new StringBuilder();
+        StringBuilder currentPart = new StringBuilder();
+
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+
+            if (currentPart.length() + part.length() > 100 && currentPart.length() > 0) {
+                // 当前部分已经够长，输出并开始新的部分
+                result.append(currentPart.toString()).append("，\n\n");
+                currentPart = new StringBuilder(part);
+            } else {
+                if (currentPart.length() > 0) {
+                    currentPart.append("，");
+                }
+                currentPart.append(part);
+            }
+        }
+
+        // 添加最后一部分
+        if (currentPart.length() > 0) {
+            result.append(currentPart.toString());
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * 清理多余空白
+     */
+    private String cleanupWhitespace(String text) {
+        // 移除多余的空行
+        text = text.replaceAll("\\n{3,}", "\n\n");
+
+        // 移除行首行尾空白
+        text = text.replaceAll("(?m)^\\s+|\\s+$", "");
+
+        // 规范化空格
+        text = text.replaceAll(" +", " ");
+
+        return text.trim();
+    }
+
+    /**
+     * 按词汇分组的流式输出（加速版本）
      */
     private void streamAnswerByWords(SseEmitter emitter, String fullAnswer) {
         try {
@@ -110,7 +294,7 @@ public class ChatController {
 
             log.debug("分割为 {} 个词汇", words.size());
 
-            // 2. 逐词发送
+            // 2. 逐词发送 - 使用加速版本
             for (int i = 0; i < words.size(); i++) {
                 String word = words.get(i);
 
@@ -118,8 +302,8 @@ public class ChatController {
                     // 发送词汇
                     sendStreamMessage(emitter, "content", word);
 
-                    // 根据词汇类型计算延迟
-                    int delay = calculateWordDelay(word);
+                    // 使用加速版本的延迟计算
+                    int delay = calculateWordDelayFast(word);
 
                     log.debug("发送第{}个词：'{}', 延迟：{}ms", i + 1, word.replace("\n", "\\n"), delay);
 
@@ -142,7 +326,69 @@ public class ChatController {
     }
 
     /**
-     * 将文本分割为词汇单元
+     * 计算词汇延迟时间（加速版本）
+     */
+    private int calculateWordDelayFast(String word) {
+        // 基础延迟 - 大幅减少
+        int baseDelay = 25; // 从80ms减少到25ms
+
+        // 句子结束标点 - 减少停顿时间
+        if (word.matches(".*[。！？.!?]$")) {
+            return 120; // 从400ms减少到120ms
+        }
+
+        // 逗号、分号等 - 减少停顿
+        if (word.matches(".*[，、；,;]$")) {
+            return 60; // 从200ms减少到60ms
+        }
+
+        // 冒号 - 短停顿
+        if (word.matches(".*[：:]$")) {
+            return 40; // 从150ms减少到40ms
+        }
+
+        // 引号、括号等 - 很短停顿
+        if (word.matches(".*[\"\"''\"'()（）\\[\\]【】]$")) {
+            return 30; // 从100ms减少到30ms
+        }
+
+        // 换行符 - 段落停顿（重要：保持足够停顿以区分段落）
+        if ("\n".equals(word)) {
+            return 200; // 从300ms减少到200ms，但仍保持明显的段落分隔
+        }
+
+        // 空格 - 极短停顿
+        if (" ".equals(word) || "\t".equals(word)) {
+            return 10; // 从40ms减少到10ms
+        }
+
+        // 单个中文字符 - 快速
+        if (word.length() == 1 && isChinese(word.charAt(0))) {
+            return baseDelay; // 25ms
+        }
+
+        // 英文单词 - 根据长度调整，但整体加快
+        if (word.matches("[a-zA-Z0-9]+")) {
+            if (word.length() <= 3) {
+                return 15;  // 从60ms减少到15ms
+            } else if (word.length() <= 6) {
+                return baseDelay;  // 25ms
+            } else {
+                return baseDelay + 10;  // 从110ms减少到35ms
+            }
+        }
+
+        // 数字 - 快速
+        if (word.matches("\\d+")) {
+            return 20; // 从70ms减少到20ms
+        }
+
+        // 其他情况
+        return baseDelay; // 25ms
+    }
+
+    /**
+     * 将文本分割为词汇单元（保持原有逻辑）
      */
     private List<String> splitIntoWords(String text) {
         List<String> words = new ArrayList<>();
@@ -202,7 +448,7 @@ public class ChatController {
     }
 
     /**
-     * 判断是否为中文字符
+     * 判断是否为中文字符（保持原有逻辑）
      */
     private boolean isChinese(char c) {
         return (c >= 0x4e00 && c <= 0x9fff) ||          // 基本汉字
@@ -216,7 +462,7 @@ public class ChatController {
     }
 
     /**
-     * 判断是否为标点符号
+     * 判断是否为标点符号（保持原有逻辑）
      */
     private boolean isPunctuation(char c) {
         // 中文标点
@@ -229,138 +475,6 @@ public class ChatController {
         return chinesePunctuation.indexOf(c) != -1 ||
                 englishPunctuation.indexOf(c) != -1 ||
                 otherSymbols.indexOf(c) != -1;
-    }
-
-    /**
-     * 计算词汇延迟时间
-     */
-    private int calculateWordDelay(String word) {
-        // 基础延迟
-        int baseDelay = 80;
-
-        // 句子结束标点 - 长停顿
-        if (word.matches(".*[。！？.!?]$")) {
-            return 400;
-        }
-
-        // 逗号、分号等 - 中等停顿
-        if (word.matches(".*[，、；,;]$")) {
-            return 200;
-        }
-
-        // 冒号 - 短停顿
-        if (word.matches(".*[：:]$")) {
-            return 150;
-        }
-
-        // 引号、括号等 - 短停顿
-        if (word.matches(".*[\"\"''\"'()（）\\[\\]【】]$")) {
-            return 100;
-        }
-
-        // 换行符 - 段落停顿
-        if ("\n".equals(word)) {
-            return 250;
-        }
-
-        // 空格 - 很短停顿
-        if (" ".equals(word) || "\t".equals(word)) {
-            return 40;
-        }
-
-        // 单个中文字符
-        if (word.length() == 1 && isChinese(word.charAt(0))) {
-            return baseDelay;
-        }
-
-        // 英文单词 - 根据长度调整
-        if (word.matches("[a-zA-Z0-9]+")) {
-            // 短单词快一些，长单词慢一些
-            if (word.length() <= 3) {
-                return baseDelay - 20;  // 60ms
-            } else if (word.length() <= 6) {
-                return baseDelay;       // 80ms
-            } else {
-                return baseDelay + 30;  // 110ms
-            }
-        }
-
-        // 数字
-        if (word.matches("\\d+")) {
-            return baseDelay - 10;
-        }
-
-        // 代码相关（包含特殊字符的词汇）
-        if (word.matches(".*[{}\\[\\]<>/\\\\=+\\-*%&|^~`].*")) {
-            return baseDelay + 20;
-        }
-
-        // 其他情况
-        return baseDelay;
-    }
-
-    /**
-     * 词汇类型检测（用于调试和优化）
-     */
-    private String getWordType(String word) {
-        if ("\n".equals(word)) {
-            return "换行";
-        }
-        if (" ".equals(word)) {
-            return "空格";
-        }
-        if (word.length() == 1 && isChinese(word.charAt(0))) {
-            return "中文";
-        }
-        if (word.matches("[a-zA-Z0-9]+")) {
-            return "英文词";
-        }
-        if (word.matches("\\d+")) {
-            return "数字";
-        }
-        if (isPunctuation(word.charAt(word.length() - 1))) {
-            return "标点";
-        }
-        return "其他";
-    }
-
-// ============= 可选的优化方法 =============
-
-    /**
-     * 获取当前环境的打字速度配置
-     * 可以根据用户偏好或系统负载动态调整
-     */
-    private double getTypingSpeedMultiplier() {
-        // 可以从配置文件读取，或根据用户设置调整
-        // 1.0 = 正常速度，0.5 = 两倍速度，2.0 = 半速
-        return 1.0;
-    }
-
-    /**
-     * 应用速度倍率的延迟计算
-     */
-    private int calculateAdjustedDelay(String word) {
-        int baseDelay = calculateWordDelay(word);
-        double multiplier = getTypingSpeedMultiplier();
-        return (int) (baseDelay * multiplier);
-    }
-
-    /**
-     * 检测内容类型，用于调整整体节奏
-     */
-    private boolean isCodeContent(String content) {
-        return content.contains("```") ||
-                content.contains("function") ||
-                content.contains("class") ||
-                content.matches(".*\\{[\\s\\S]*\\}.*");
-    }
-
-    /**
-     * 检测是否为列表内容
-     */
-    private boolean isListContent(String content) {
-        return content.matches(".*^\\s*[-*+]\\s+.*") ||
-                content.matches(".*^\\s*\\d+\\.\\s+.*");
     }
 
     /**
@@ -428,7 +542,7 @@ public class ChatController {
         for (int i = 0; i < words.length; i++) {
             try {
                 // 模拟打字效果的延迟
-                Thread.sleep(50); // 50ms延迟
+                Thread.sleep(20); // 20ms延迟
 
                 sendStreamMessage(emitter, "chunk", words[i]);
 
@@ -455,7 +569,7 @@ public class ChatController {
         for (String word : words) {
             try {
                 // 模拟打字效果的延迟
-                Thread.sleep(50);
+                Thread.sleep(10);
 
                 ChatStreamMessage chunkMsg = new ChatStreamMessage();
                 chunkMsg.setMessageType("chunk");
