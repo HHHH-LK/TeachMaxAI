@@ -196,11 +196,11 @@ public class ModelSummer {
         }
 
         // 内容质量检查
-        if (trimmed.matches(".*[。！？].*")) { // 包含完整句子
+        if (trimmed.matches(".*[。！？].*")) {
             return true;
         }
 
-        if (trimmed.length() > 50 && !trimmed.equals(trimmed.toUpperCase())) { // 不是全大写
+        if (trimmed.length() > 50 && !trimmed.equals(trimmed.toUpperCase())) {
             return true;
         }
 
