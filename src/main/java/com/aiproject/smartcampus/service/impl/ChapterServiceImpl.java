@@ -343,6 +343,7 @@ public class ChapterServiceImpl implements ChapterService {
     @Override
     public Result setStudentAwser(StudentTextAnswerDTO studentTextAnswerDTO) {
 
+        // 参数校验
         List<StudentAnswerDTO> studentAnswerDTOList = studentTextAnswerDTO.getStudentAnswerDTOList();
         if (studentAnswerDTOList == null || studentAnswerDTOList.isEmpty()) {
             log.warn("学生未作答");
@@ -350,30 +351,97 @@ public class ChapterServiceImpl implements ChapterService {
         }
 
         String studentId = userToTypeUtils.change();
+        String chapterId = studentTextAnswerDTO.getChapterId();
+        String courseId = studentTextAnswerDTO.getCourseId();
+        String type = studentTextAnswerDTO.getType();
 
-        //进行处理
-        for (StudentAnswerDTO studentAnswerDTO : studentAnswerDTOList) {
+        // 一次性转换为Map，提高查询效率
+        Map<Integer, StudentAnswerDTO> dtoMap = studentAnswerDTOList.stream()
+                .collect(Collectors.toMap(StudentAnswerDTO::getQuestionId, dto -> dto));
 
-            Integer questionId = studentAnswerDTO.getQuestionId();
-            //查询正确题目信息进行校验
+        // 查询出试题
+        List<ChapterQuestionDetailVO> chapterQuestionDetailVOS = chapterMapper.selectTestByType(chapterId, courseId, type);
+
+        // 对试卷进行排版
+        List<ChapterQuestionDetailVO> sortedQuestions = setTToAllQuestion(chapterQuestionDetailVOS).stream()
+                .sorted((a, b) -> a.getT() - b.getT())
+                .toList();
+
+        // 创建答题结果列表
+        List<StudentAnswerResultVO> questionResults = new ArrayList<>();
+
+        int questionIndex = 0;
+
+        // 遍历题目列表处理学生答题
+        for (ChapterQuestionDetailVO chapterQuestionDetailVO : sortedQuestions) {
+
+            Integer questionId = chapterQuestionDetailVO.getQuestionId();
+            String correctAnswer = chapterQuestionDetailVO.getCorrectAnswer();
+
+            // 校验题目是否存在
             QuestionBank questionBank = questionBankMapper.selectById(questionId);
             if (questionBank == null) {
                 log.error("题目{}不存在", questionId);
                 throw new StudentExpection("考试题目不存在");
             }
-            int i = 0;
 
-            log.info("提取出学生的第{}题目信息", i++);
+            log.info("提取出学生的第{}题目信息", questionIndex++);
 
-            StudentAnswer studentAnswer = new StudentAnswer();
-            studentAnswer.setStudentId(Integer.valueOf(studentId));
-            studentAnswer.setQuestionId(questionId);
-            studentAnswer.setStudentAnswer(studentAnswerDTO.getFormattedAnswer());
+            // 创建单题结果VO
+            StudentAnswerResultVO studentAnswerResultVO = new StudentAnswerResultVO();
+            BeanUtils.copyProperties(chapterQuestionDetailVO, studentAnswerResultVO);
 
-            studentAnswerMapper.insert(studentAnswer);
+            // 获取学生答案
+            StudentAnswerDTO studentAnswerDTO = dtoMap.get(questionId);
+
+            if (studentAnswerDTO != null) {
+                String studentAnswer = studentAnswerDTO.getFormattedAnswer();
+
+                // 判断答案是否正确
+                boolean isCorrect = studentAnswer != null && studentAnswer.equals(correctAnswer);
+
+                // 设置结果信息
+                studentAnswerResultVO.setStudentAnswer(studentAnswer);
+                studentAnswerResultVO.setAnsweredAt(LocalDateTime.now());
+                studentAnswerResultVO.setIsCorrect(isCorrect);
+                studentAnswerResultVO.setScoreEarned(studentAnswerResultVO.calculateScoreEarned());
+
+                // 保存学生答题记录
+                StudentAnswer studentAnswers = new StudentAnswer();
+                studentAnswers.setStudentId(Integer.valueOf(studentId));
+                studentAnswers.setQuestionId(questionId);
+                studentAnswers.setStudentAnswer(studentAnswerDTO.getFormattedAnswer());
+                studentAnswers.setIsCorrect(isCorrect);
+                studentAnswers.setScoreEarned(studentAnswerResultVO.getScoreEarned());
+
+                studentAnswerMapper.insert(studentAnswers);
+
+            } else {
+                // 学生未答题
+                studentAnswerResultVO.setStudentAnswer(null);
+                studentAnswerResultVO.setIsCorrect(false);
+                studentAnswerResultVO.setScoreEarned(BigDecimal.ZERO);
+            }
+
+            // 设置答题状态
+            studentAnswerResultVO.setAnswerStatusByCorrectness();
+            questionResults.add(studentAnswerResultVO);
         }
 
-        return Result.success();
+        // 创建整体测试结果
+        ChapterTestResultVO testResult = ChapterTestResultVO.builder()
+                .studentId(studentId)
+                .chapterId(chapterId)
+                .courseId(courseId)
+                .type(type)
+                .questionResults(questionResults)
+                .testEndTime(LocalDateTime.now())
+                .build();
+
+        // 计算统计信息
+        testResult.calculateStatistics();
+
+        return Result.success(testResult);
     }
 
     @Override

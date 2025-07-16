@@ -138,7 +138,7 @@ public class ChapterController {
     /**
      * 章节测试题评判
      */
-    @GetMapping("/ju/test")
+    @PostMapping("/ju/test")
     public Result juTest(@RequestBody StudentTextAnswerDTO studentTextAnswerDTO) {
 
         return chapterService.juTest(studentTextAnswerDTO);
