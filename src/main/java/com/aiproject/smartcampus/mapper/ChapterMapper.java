@@ -180,6 +180,56 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
             "  AND cm.status = 'active';")
     MaterialDetailRawVO selectChapterMaterialById(@Param(value = "materialId") String materialId, @Param(value = "studentId") String studentId);
 
+
+
+    @Select("SELECT " +
+            "qb.question_id AS questionId, " +
+            "qb.question_type AS questionType, " +
+            "qb.question_content AS questionContent, " +
+            "qb.question_options AS questionOptions, " +
+            "qb.correct_answer AS correctAnswer, " +
+            "qb.explanation AS explanation, " +
+            "qb.difficulty_level AS difficultyLevel, " +
+            "qb.score_points AS scorePoints, " +
+            "kp.point_name AS pointName, " +
+            "ch.chapter_name AS chapterName, " +
+            "ch.chapter_id AS chapterId, " +
+            "qb.created_at AS createdAt, " +
+            "cq.question_type AS chapterQuestionType " + // 移除逗号
+            "FROM question_bank qb " +
+            "INNER JOIN chapter_questions cq ON qb.question_id = cq.question_id " +
+            "INNER JOIN chapters ch ON cq.chapter_id = ch.chapter_id " +
+            "INNER JOIN courses c ON qb.course_id = c.course_id " +
+            "LEFT JOIN knowledge_points kp ON qb.point_id = kp.point_id " +
+            "WHERE ch.chapter_id = #{chapterId} " +
+            "  AND c.course_id = #{courseId} " +
+            "  AND cq.question_type = 'test' " +
+            "  AND c.status = 'active' " +
+            "ORDER BY qb.difficulty_level ASC, " +
+            "         qb.question_id ASC")
+    @Results({
+            @Result(column = "questionId", property = "questionId"),
+            @Result(column = "questionType", property = "questionType"),
+            @Result(column = "questionContent", property = "questionContent", typeHandler = TextTypeHandler.class),
+            @Result(column = "questionOptions", property = "questionOptions", typeHandler = TextTypeHandler.class),
+            @Result(column = "correctAnswer", property = "correctAnswer", typeHandler = TextTypeHandler.class),
+            @Result(column = "explanation", property = "explanation", typeHandler = TextTypeHandler.class),
+            @Result(column = "difficultyLevel", property = "difficultyLevel"),
+            @Result(column = "scorePoints", property = "scorePoints"),
+            @Result(column = "pointName", property = "pointName"),
+            @Result(column = "chapterName", property = "chapterName"),
+            @Result(column = "chapterId", property = "chapterId"),
+            @Result(column = "createdAt", property = "createdAt"),
+            @Result(column = "chapterQuestionType", property = "chapterQuestionType")
+    })
+    List<ChapterQuestionDetailTeacherVO> getChapterTestQuestionsForTeacher(
+            @Param("chapterId") Integer chapterId,
+            @Param("courseId") Integer courseId
+    );
+
+
+
+
     @Select("SELECT " +
             "qb.question_id, " +
             "qb.question_type, " +
@@ -434,5 +484,36 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
     @Result(column = "question_content", property = "content", typeHandler = TextTypeHandler.class)
     String getQuestionContent(@Param("id") Integer id);
 
+    @Select("SELECT\n" +
+            "    ch.chapter_id AS chapterId,\n" +
+            "    ch.course_id AS courseId,\n" +
+            "    ch.chapter_name AS chapterName,\n" +
+            "    ch.chapter_order AS chapterOrder,\n" +
+            "    ch.description AS description,\n" +
+            "    ch.difficulty_level AS difficultyLevel,\n" +
+            "    ch.created_at AS createdAt,\n" +
+            "    ch.updated_at AS updatedAt,\n" +
+            "    -- 课程信息\n" +
+            "    c.course_name AS courseName,\n" +
+            "    c.semester AS semester,\n" +
+            "    -- 学习进度相关字段（教师视图设置为NULL）\n" +
+            "    NULL AS studentMasteryLevel,\n" +
+            "    NULL AS studentStudyTime,\n" +
+            "    NULL AS currentMaterialId,\n" +
+            "    NULL AS completedMaterials,\n" +
+            "    -- 章节统计信息\n" +
+            "    COUNT(DISTINCT ckp.point_id) AS totalKnowledgePoints,\n" +
+            "    COUNT(DISTINCT cm.material_id) AS totalMaterials,\n" +
+            "    COUNT(DISTINCT CASE WHEN ckp.is_core = 1 THEN ckp.point_id END) AS coreKnowledgePoints\n" +
+            "FROM chapters ch\n" +
+            "JOIN courses c ON ch.course_id = c.course_id\n" +
+            "LEFT JOIN chapter_knowledge_points ckp ON ch.chapter_id = ckp.chapter_id\n" +
+            "LEFT JOIN course_materials cm ON ch.chapter_id = cm.chapter_id\n" +
+            "WHERE ch.course_id = #{courseId}\n" +
+            "GROUP BY ch.chapter_id, ch.course_id, ch.chapter_name, ch.chapter_order,\n" +
+            "         ch.description, ch.difficulty_level, ch.created_at, ch.updated_at,\n" +
+            "         c.course_name, c.semester\n" +
+            "ORDER BY ch.chapter_order ASC;")
+    List<ChapterTeacherVO> getChapterByCourseId(@Param("courseId") String courseId);
 }
 

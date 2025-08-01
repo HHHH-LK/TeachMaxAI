@@ -1,8 +1,6 @@
 package com.aiproject.smartcampus.service;
 
 import com.aiproject.smartcampus.commons.client.Result;
-import com.aiproject.smartcampus.pojo.dto.ChapterTestCreateDTO;
-import com.aiproject.smartcampus.pojo.dto.StudentAnswerDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentStudyDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentTextAnswerDTO;
 import com.aiproject.smartcampus.pojo.vo.*;
@@ -40,4 +38,5 @@ public interface ChapterService {
 
     Result setStudentAwser(StudentTextAnswerDTO studentTextAnswerDTO);
 
+    Result<List<ChapterTeacherVO>> getChapterByCourseId(String courseId);
 }

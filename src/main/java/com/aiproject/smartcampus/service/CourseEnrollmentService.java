@@ -7,4 +7,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 
     Result<String> addCourseEnrollment(Integer courseId);
+
+    Result<String> exitCourse(Integer courseId);
 }

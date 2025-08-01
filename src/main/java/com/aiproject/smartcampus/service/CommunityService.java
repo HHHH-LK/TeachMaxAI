@@ -27,4 +27,6 @@ public interface CommunityService {
     Result likeComment(Integer commentId);
 
     Result<IPage<PostGetDTO>> getOwnPost(int pageNum, int pageSize, Integer userId);
+
+    Result unlikePost(Integer postId);
 }

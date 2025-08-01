@@ -6,9 +6,12 @@ import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.exception.StudentExpection;
 import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
 import com.aiproject.smartcampus.mapper.CourseMapper;
+import com.aiproject.smartcampus.mapper.ExamPaperMapper;
 import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.po.ExamPaper;
 import com.aiproject.smartcampus.pojo.po.User;
 import com.aiproject.smartcampus.pojo.vo.CourseVO;
+import com.aiproject.smartcampus.pojo.vo.ExamQuestionDetailVO;
 import com.aiproject.smartcampus.service.CourseService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,7 +19,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.aiproject.smartcampus.contest.CourseContest.*;
 
@@ -28,6 +34,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final CourseMapper courseMapper;
     private final CourseEnrollmentMapper courseEnrollmentMapper;
     private final UserToTypeUtils userToTypeUtils;
+    private final ExamPaperMapper examPaperMapper;
 
     /**
      * 查询所有课程信息
@@ -159,6 +166,102 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         }
 
         return Result.success(studentSemesters);
+    }
+
+    @Override
+    public Result<List<ExamQuestionDetailVO>> getCourseExamInfo(String examId) {
+
+//        String studentId = userToTypeUtils.change();
+        String studentId = "1";
+
+        List<ExamPaper> papers = examPaperMapper.findByExamId(Integer.parseInt(examId));
+        ExamPaper examPaper = papers.get(0);
+        int paperId = examPaper.getPaperId();
+
+
+        try {
+            // 根据paperId获取试卷题目关联数据
+            List<ExamQuestionDetailVO> questionList = examPaperMapper.getExamTestQuestions(
+                    paperId,
+                    Integer.valueOf(studentId),
+                    Integer.valueOf(examId)
+            );
+
+            // 添加调试日志
+            log.info("查询到 {} 道考试题目", questionList != null ? questionList.size() : 0);
+
+            if (questionList != null && !questionList.isEmpty()) {
+                ExamQuestionDetailVO firstQuestion = questionList.get(0);
+                log.info("第一道题目内容: {}",
+                        firstQuestion.getQuestionContent() != null ?
+                                firstQuestion.getQuestionContent().substring(0, Math.min(50, firstQuestion.getQuestionContent().length())) + "..." :
+                                "null"
+                );
+            }
+
+            if (questionList == null || questionList.isEmpty()) {
+                log.info("试卷题目为空");
+                return Result.success(new ArrayList<>());
+            }
+
+            // 按试卷设置的题目顺序排序
+            List<ExamQuestionDetailVO> sortedList = questionList.stream()
+                    .sorted(Comparator.comparingInt(ExamQuestionDetailVO::getQuestionOrder))
+                    .collect(Collectors.toList());
+
+            log.info("最终返回考试题目数量: {}", sortedList.size());
+            return Result.success(sortedList);
+
+        } catch (Exception e) {
+            log.error("获取考试题目失败", e);
+            return Result.error("获取考试题目失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<List<ExamQuestionDetailVO>> getCourseExamStudent(String examId, String studentId) {
+        List<ExamPaper> papers = examPaperMapper.findByExamId(Integer.parseInt(examId));
+        ExamPaper examPaper = papers.get(0);
+        int paperId = examPaper.getPaperId();
+
+
+        try {
+            // 根据paperId获取试卷题目关联数据
+            List<ExamQuestionDetailVO> questionList = examPaperMapper.getExamTestQuestions(
+                    paperId,
+                    Integer.valueOf(studentId),
+                    Integer.valueOf(examId)
+            );
+
+            // 添加调试日志
+            log.info("查询到 {} 道考试题目", questionList != null ? questionList.size() : 0);
+
+            if (questionList != null && !questionList.isEmpty()) {
+                ExamQuestionDetailVO firstQuestion = questionList.get(0);
+                log.info("第一道题目内容: {}",
+                        firstQuestion.getQuestionContent() != null ?
+                                firstQuestion.getQuestionContent().substring(0, Math.min(50, firstQuestion.getQuestionContent().length())) + "..." :
+                                "null"
+                );
+            }
+
+            if (questionList == null || questionList.isEmpty()) {
+                log.info("试卷题目为空");
+                return Result.success(new ArrayList<>());
+            }
+
+            // 按试卷设置的题目顺序排序
+            List<ExamQuestionDetailVO> sortedList = questionList.stream()
+                    .sorted(Comparator.comparingInt(ExamQuestionDetailVO::getQuestionOrder))
+                    .collect(Collectors.toList());
+
+            log.info("最终返回考试题目数量: {}", sortedList.size());
+            return Result.success(sortedList);
+
+        } catch (Exception e) {
+            log.error("获取考试题目失败", e);
+            return Result.error("获取考试题目失败: " + e.getMessage());
+        }
     }
 
 

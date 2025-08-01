@@ -62,6 +62,16 @@ public class CommunityServiceImpl implements CommunityService {
 
     }
 
+    @Override
+    public Result unlikePost(Integer postId) {
+        postMapper.decrementLikeCount(postId);
+        Integer postCount = postMapper.getLikeCountById(postId);
+        if (postCount == null) {
+            return Result.error("Post not found or already unliked");
+        }
+        return Result.success("Post unliked successfully: " + postCount);
+    }
+
 
     //获取帖子评论
     @Override

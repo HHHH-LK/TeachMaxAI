@@ -3,6 +3,7 @@ package com.aiproject.smartcampus.service;
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.vo.CourseVO;
+import com.aiproject.smartcampus.pojo.vo.ExamQuestionDetailVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -22,4 +23,8 @@ public interface CourseService extends IService<Course> {
     Result<List<CourseVO>> getAllStudentHaveCourse();
 
     Result<List<String>> getAllLearnDate();
+
+    Result<List<ExamQuestionDetailVO>> getCourseExamInfo(String examId);
+
+    Result<List<ExamQuestionDetailVO>> getCourseExamStudent(String examId, String studentId);
 }

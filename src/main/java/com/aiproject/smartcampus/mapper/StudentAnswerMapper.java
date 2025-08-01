@@ -42,4 +42,7 @@ public interface StudentAnswerMapper extends BaseMapper<StudentAnswer> {
             "LEFT JOIN question_bank qb ON sa.question_id = qb.question_id " +
             "WHERE sa.student_id = #{studentId} AND sa.is_correct = 0")
     List<StudentAnswer> findWrongAnswers(@Param("studentId") Integer studentId);
+
+    @Delete("DELETE FROM student_answers WHERE exam_id = #{examId}")
+    int deleteByExamId(@Param("examId") int examId);
 }

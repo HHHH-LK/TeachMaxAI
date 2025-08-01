@@ -8,6 +8,9 @@ import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 
 //import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
 import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.vo.ChapterQuestionDetailTeacherVO;
+import com.aiproject.smartcampus.pojo.vo.ChapterQuestionDetailVO;
+import com.aiproject.smartcampus.pojo.vo.ExamStudentVO;
 import com.aiproject.smartcampus.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -83,13 +86,63 @@ public class TeacherController {
 
     //查询试卷
     @GetMapping("/addPaper")
-    @Operation(summary = "查询试卷", description = "根据教师ID查询试卷信息")
-    public Result getPaper(@RequestParam("teacherId") Integer teacherId) {
-        return teacherService.getPaper(teacherId);
+    @Operation(summary = "查询试卷", description = "根据课程ID查询试卷信息")
+    public Result getPaper(@RequestParam("courseId") Integer courseId) {
+        return teacherService.getPaper(courseId);
     }
 
-    //查询作业提交率
+    /**
+     * 查询作业
+     */
+    @GetMapping("/getHomework")
+    @Operation(summary = "查询作业", description = "根据课程ID查询作业信息")
+    public Result<List<ChapterQuestionDetailTeacherVO>> getHomework(@RequestParam("courseId") String courseId, @RequestParam("chapterId")String chapterId){
+        return teacherService.getHomework(courseId, chapterId);
+    }
 
+    /**
+     * 根据学生获取所有作业信息
+     */
+    @GetMapping("/getHomeworkByStudent")
+    @Operation(summary = "根据学生获取所有作业信息", description = "根据学生ID查询其所有作业信息")
+    public Result<List<ChapterQuestionDetailVO>> getHomeworkByStudent(@RequestParam("studentId") String studentId, @RequestParam("courseId") String courseId, @RequestParam("chapterId")String chapterId) {
+        return teacherService.getHomeworkByStudent(studentId, courseId, chapterId);
+    }
 
+    /**
+     * 获取教师所教授的考试的学生情况
+     */
+    @GetMapping("/getExamStudentInfo/{examId}")
+    @Operation(summary = "获取考试学生信息", description = "根据考试ID获取该考试的学生信息")
+    public Result<List<ExamStudentVO>> getExamStudentInfo(@PathVariable String examId) {
+        return teacherService.getExamStudentInfo(examId);
+    }
 
+    /**
+     * 教师发布试卷
+     */
+    @PostMapping("/releasePaper")
+    @Operation(summary = "发布试卷", description = "教师发布试卷")
+    public Result releasePaper(@RequestParam("examId")String examId) {
+        return teacherService.releasePaper(examId);
+    }
+
+    /**
+     * 考试状态更新
+     */
+    @PostMapping("/updateExamStatus")
+    @Operation(summary = "更新考试状态", description = "教师更新考试状态")
+    public Result updateExamStatus(@RequestParam("examId") String examId) {
+        return teacherService.updateExamStatusById(examId);
+    }
+
+    /**
+     * 删除考试
+     */
+    @DeleteMapping("/deleteExam/{examId}")
+    @Operation(summary = "删除考试", description = "教师删除考试")
+    public Result deleteExamById(@PathVariable String examId) {
+
+        return  teacherService.deleteExamById(examId);
+    }
 }

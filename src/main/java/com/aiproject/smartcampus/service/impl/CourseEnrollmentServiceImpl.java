@@ -124,4 +124,43 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
         }
         return Result.success("选课成功");
     }
+
+    @Override
+    public Result<String> exitCourse(Integer courseId) {
+//        String studentId = userToTypeUtils.change();
+        String studentId = "1"; // TODO: 替换为实际的学生ID获取方式
+        // 校验课程是否存在
+        Course course = courseMapper.selectById(courseId);
+        if (course == null) {
+            return Result.error("课程不存在");
+        }
+
+        // 直接查询学生是否选了这门课
+        LambdaQueryWrapper<CourseEnrollment> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(CourseEnrollment::getStudentId, studentId)
+                .eq(CourseEnrollment::getCourseId, courseId);
+        CourseEnrollment enrollment = courseEnrollmentMapper.selectOne(wrapper);
+
+        // 没有选课记录
+        if (enrollment == null) {
+            return Result.error("您未选择该课程，无法退选");
+        }
+
+        try {
+            // 直接删除选课记录
+            int result = courseEnrollmentMapper.deleteById(courseId);
+            if (result > 0) {
+                // 异步记录成功日志
+                ADD_COURSEENROLLMENTS_EXECUTOR.submit(() -> {
+                    log.info("退课成功，学生ID：{}, 课程ID：{}", studentId, courseId);
+                });
+                return Result.success("退课成功");
+            } else {
+                return Result.error("退课操作失败，请稍后重试");
+            }
+        } catch (Exception e) {
+            log.error("退课发生异常, 学生ID: {}, 课程ID: {}", studentId, courseId, e);
+            return Result.error("系统错误，退课失败");
+        }
+    }
 }

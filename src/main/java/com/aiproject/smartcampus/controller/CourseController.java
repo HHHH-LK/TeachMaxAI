@@ -2,7 +2,9 @@ package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.vo.ChapterQuestionDetailVO;
 import com.aiproject.smartcampus.pojo.vo.CourseVO;
+import com.aiproject.smartcampus.pojo.vo.ExamQuestionDetailVO;
 import com.aiproject.smartcampus.service.CourseEnrollmentService;
 import com.aiproject.smartcampus.service.CourseService;
 import io.swagger.annotations.Api;
@@ -76,6 +78,35 @@ public class CourseController {
        return courseEnrollmentService.addCourseEnrollment(courseId);
     }
 
+    /**
+     * 退选课程
+     * */
+    @PostMapping("/exit/{courseId}")
+    @Operation(summary = "退选课程")
+    public Result<String> exitCourse(@PathVariable("courseId") Integer courseId){
+        return courseEnrollmentService.exitCourse(courseId);
+    }
+
+
+    /**
+     * 查询课程考试信息
+     * */
+    @GetMapping("/getCourseExamInfo")
+    @Operation(summary = "查询课程考试信息题目")
+    public Result<List<ExamQuestionDetailVO>> getCourseExamInfo(
+            @RequestParam(value = "examId") String examId){
+        return courseService.getCourseExamInfo(examId);
+    }
+
+    /**
+     * 查询学生考试信息
+     * */
+    @GetMapping("/getCourseExamStudent")
+    @Operation(summary = "查询学生考试信息")
+    public Result<List<ExamQuestionDetailVO>> getCourseExamInfo(
+            @RequestParam(value = "examId") String examId, @RequestParam(value = "studentId") String studentId){
+        return courseService.getCourseExamStudent(examId, studentId);
+    }
 
     /**
      * 根据年份学生查询课程信息

@@ -70,4 +70,12 @@ public class CommunityController {
     public Result likeComment(@PathVariable Integer commentId) {
         return postService.likeComment(commentId);
     }
+
+    /**
+     * 帖子取消点赞
+     */
+    @PostMapping("/{postId}/unlike")
+    public Result unlikePost(@PathVariable Integer postId) {
+        return postService.unlikePost(postId);
+    }
 }

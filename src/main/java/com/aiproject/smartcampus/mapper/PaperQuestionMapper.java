@@ -38,4 +38,11 @@ public interface PaperQuestionMapper extends BaseMapper<PaperQuestion> {
             "</foreach>" +
             "</script>")
     int batchInsert(@Param("paperQuestions") List<PaperQuestion> paperQuestions);
+
+    @Delete("DELETE paper_questions " +
+            "FROM paper_questions " +
+            "JOIN exam_papers ON paper_questions.paper_id = exam_papers.paper_id " +
+            "WHERE exam_papers.exam_id = #{examId}")
+    int deleteByExamId(@Param("examId") int examId);
+
 }

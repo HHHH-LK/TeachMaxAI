@@ -5,6 +5,7 @@ import com.aiproject.smartcampus.pojo.dto.*;
 import com.aiproject.smartcampus.pojo.vo.*;
 import com.aiproject.smartcampus.service.ChapterService;
 import dev.langchain4j.agent.tool.P;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,16 @@ import java.util.List;
 public class ChapterController {
 
     private final ChapterService chapterService;
+
+    /**
+     * 根据课程id查询章节查询章节信息
+     */
+    @GetMapping("/getChapter")
+    @Operation(summary = "根据课程ID获取章节信息", description = "查询指定课程的所有章节信息")
+    public Result<List<ChapterTeacherVO>> getChapterByCourseId(@RequestParam(value = "courseId") String courseId) {
+
+        return chapterService.getChapterByCourseId(courseId);
+    }
 
 
     /**

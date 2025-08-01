@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TeacherGetStudentDTO {
+    private String examId; // 考试ID
     private Integer courseId; // 课程ID
     private String courseName; // 课程名称
     private String realName; // 学生姓名

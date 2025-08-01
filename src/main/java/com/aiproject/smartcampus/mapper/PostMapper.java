@@ -108,4 +108,8 @@ public interface PostMapper extends BaseMapper<Post> {
 
     @Update("UPDATE post SET comment_count = comment_count + 1 WHERE id = #{postId}")
     void incrementCommentCount(Long postId);
+
+
+    @Update("UPDATE post SET like_count = like_count - 1 WHERE id = #{postId}")
+    void decrementLikeCount(Integer postId);
 }

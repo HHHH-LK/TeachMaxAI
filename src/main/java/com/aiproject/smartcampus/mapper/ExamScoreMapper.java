@@ -3,6 +3,7 @@ package com.aiproject.smartcampus.mapper;
 import com.aiproject.smartcampus.pojo.po.Exam;
 import com.aiproject.smartcampus.pojo.po.ExamScore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -50,4 +51,8 @@ public interface ExamScoreMapper extends BaseMapper<ExamScore> {
             "COUNT(CASE WHEN score >= #{passScore} THEN 1 END) as pass_count " +
             "FROM exam_scores WHERE exam_id = #{examId}")
     Map<String, Object> getExamStatistics(@Param("examId") Integer examId, @Param("passScore") BigDecimal passScore);
+
+
+    @Delete("DELETE FROM exam_scores WHERE exam_id = #{examId}")
+    int deleteByExamId(@Param("examId") int examId);
 }

@@ -5,7 +5,6 @@ import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.exception.StudentExpection;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
-import com.aiproject.smartcampus.pojo.dto.ChapterTestCreateDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentAnswerDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentStudyDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentTextAnswerDTO;
@@ -442,6 +441,13 @@ public class ChapterServiceImpl implements ChapterService {
         testResult.calculateStatistics();
 
         return Result.success(testResult);
+    }
+
+    @Override
+    public Result<List<ChapterTeacherVO>> getChapterByCourseId(String courseId) {
+        List<ChapterTeacherVO> allChapterByCourseId = chapterMapper.getChapterByCourseId(courseId);
+
+        return Result.success(allChapterByCourseId);
     }
 
     @Override

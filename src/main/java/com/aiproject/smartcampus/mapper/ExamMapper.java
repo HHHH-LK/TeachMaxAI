@@ -7,6 +7,7 @@ import com.aiproject.smartcampus.pojo.po.ExamPaper;
 import com.aiproject.smartcampus.pojo.po.PaperQuestion;
 import com.aiproject.smartcampus.pojo.vo.ExamQuestionVO;
 import com.aiproject.smartcampus.pojo.vo.ExamScoreVO;
+import com.aiproject.smartcampus.pojo.vo.ExamStudentVO;
 import com.aiproject.smartcampus.pojo.vo.StudentExamAnswerVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.*;
@@ -285,4 +286,26 @@ public interface ExamMapper extends BaseMapper<Exam> {
     @Select("SELECT DISTINCT student_id FROM course_enrollments WHERE course_id = #{courseId}")
     List<Integer> getCourseStudents(@Param("courseId") Integer courseId);
 
+
+    @Select("SELECT " +
+            "e.exam_id AS examId, " +
+            "e.title AS examName, " +  
+            "c.course_id AS courseId, " +
+            "c.course_name AS courseName, " +
+            "s.student_id AS studentId, " +
+            "u.real_name AS studentName, " +
+            "s.student_number AS studentNumber, " +
+            "es.score AS score " +
+            "FROM exams e " +
+            "JOIN courses c ON e.course_id = c.course_id " +
+            "JOIN course_enrollments ce ON c.course_id = ce.course_id " +
+            "JOIN students s ON ce.student_id = s.student_id " +
+            "JOIN users u ON s.user_id = u.user_id " +
+            "LEFT JOIN exam_scores es ON e.exam_id = es.exam_id AND s.student_id = es.student_id " +
+            "WHERE e.exam_id = #{examId} " +
+            "AND c.teacher_id = #{teacherId} " +
+            "ORDER BY s.class_name, s.student_number")
+    List<ExamStudentVO> getExamStudentInfo(
+            @Param("examId") String examId,
+            @Param("teacherId") String teacherId);
 }
