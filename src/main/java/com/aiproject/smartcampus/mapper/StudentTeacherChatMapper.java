@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.mapper;
 
 
+import com.aiproject.smartcampus.pojo.po.TeacherStudentConversation;
 import com.aiproject.smartcampus.pojo.po.TeacherStudentMessage;
 import com.aiproject.smartcampus.pojo.vo.ChatQueryVO;
 import com.aiproject.smartcampus.pojo.vo.ConversationUnreadCountVO;
@@ -176,5 +177,12 @@ public interface StudentTeacherChatMapper {
                     @Param("fileUrl") String fileUrl);
 
 
-
+    @Insert("INSERT INTO teacher_student_conversations(STUDENT_ID, TEACHER_ID)\n" +
+            "VALUES(#{studentId},#{teacherId});")
+    @Options(
+            useGeneratedKeys = true,
+            keyProperty = "id",       // 生成的主键值要赋值给实体类的哪个属性（需与实体类属性名一致）
+            keyColumn = "conversation_id"          // 数据库表中的主键字段名（需与表结构一致，可省略如果和属性名相同）
+    )
+    int setConnection(TeacherStudentConversation conversation);
 }

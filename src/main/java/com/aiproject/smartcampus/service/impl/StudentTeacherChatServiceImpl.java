@@ -6,6 +6,7 @@ import com.aiproject.smartcampus.controller.ChatSSEController;
 import com.aiproject.smartcampus.mapper.StudentTeacherChatMapper;
 import com.aiproject.smartcampus.pojo.dto.ChatMessagePushDto;
 import com.aiproject.smartcampus.pojo.dto.SendMessageRequestDTO;
+import com.aiproject.smartcampus.pojo.po.TeacherStudentConversation;
 import com.aiproject.smartcampus.pojo.po.TeacherStudentMessage;
 import com.aiproject.smartcampus.pojo.vo.ChatQueryVO;
 import com.aiproject.smartcampus.pojo.vo.ConversationUnreadCountVO;
@@ -156,6 +157,25 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
         return Result.success("发送信息成功");
     }
 
+    @Override
+    public Result<Long> setConnection(String studentId, String teacherId) {
+
+        if(studentId == null || teacherId == null){
+            throw new RuntimeException("参数错误");
+        }
+
+        TeacherStudentConversation conversation = new TeacherStudentConversation();
+        conversation.setStudentId(Long.getLong(studentId));  // 学生ID
+        conversation.setTeacherId(Long.getLong(teacherId));  // 教师ID
+
+        studentTeacherChatMapper.setConnection(conversation);
+
+       // 获取生成的ID
+        Long generatedId = conversation.getId();
+
+        return Result.success(generatedId);
+    }
+
     /**
      * 异步推送消息 - 修复异步注解
      */
@@ -193,7 +213,5 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
         return Result.success(allUnreadMessageCountForStudent);
 
     }
-
-
 }
 

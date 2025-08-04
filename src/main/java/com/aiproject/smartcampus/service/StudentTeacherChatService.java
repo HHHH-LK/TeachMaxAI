@@ -21,4 +21,6 @@ public interface StudentTeacherChatService {
     Result getAllTeacherInfo(List<String> courseIds);
 
     Result sendMessage(SendMessageRequestDTO sendMessageRequestDTO);
+
+    Result<Long> setConnection(String studentId, String teacherId);
 }
