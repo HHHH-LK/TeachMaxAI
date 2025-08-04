@@ -1,8 +1,10 @@
 package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.controller.ChatSSEController;
+import com.aiproject.smartcampus.mapper.StudentMapper;
 import com.aiproject.smartcampus.mapper.StudentTeacherChatMapper;
 import com.aiproject.smartcampus.pojo.dto.ChatMessagePushDto;
 import com.aiproject.smartcampus.pojo.dto.SendMessageRequestDTO;
@@ -24,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils.getUserId;
+
 /**
  * @program: ss
  * @description:
@@ -39,6 +43,7 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
     private final StudentTeacherChatMapper studentTeacherChatMapper;
     private final UserToTypeUtils userToTypeUtils;
     private final ChatSSEController chatSSEController;
+    private final StudentMapper studentMapper;
 
     @Override
     public Result getChatByTeacherId(String teacherId) {
@@ -122,7 +127,7 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
     @Override
     public Result sendMessage(SendMessageRequestDTO sendMessageRequestDTO) {
         //判断是否有权限进行会话
-        String sendUserId = userToTypeUtils.change();
+        String sendUserId = studentMapper.selectUserIdByStudentIdString(userToTypeUtils.change());
         Integer reciveUserId = sendMessageRequestDTO.getUseId();
         if (reciveUserId == null) {
             return Result.error("你无权进行信息的发送");

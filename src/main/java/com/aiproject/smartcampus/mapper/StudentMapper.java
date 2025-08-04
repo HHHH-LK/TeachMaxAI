@@ -116,6 +116,8 @@ public interface StudentMapper extends BaseMapper<Student> {
     List<StudentWrongQuestionVO> selectWrongQuestion(@Param("studentId") String studentId, @Param("courseId") String courseId);
 
 
+    @Select("select students.user_id from students where student_id=#{studentId}")
+    String selectUserIdByStudentIdString(@Param("studentId") String studentId);
 
 
 }
