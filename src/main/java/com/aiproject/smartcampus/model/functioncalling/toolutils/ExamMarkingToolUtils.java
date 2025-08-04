@@ -204,6 +204,7 @@ public class ExamMarkingToolUtils {
      * 更新所有学生答案（包括未作答的）
      */
     private void updateAllStudentAnswers(List<QuestionMarkingResult> results, String examId, String studentId) {
+
         int successCount = 0;
         int failCount = 0;
 

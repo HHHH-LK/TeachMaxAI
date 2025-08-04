@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.ArrayList;
@@ -158,22 +159,30 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<Long> setConnection(String studentId, String teacherId) {
 
-        if(studentId == null || teacherId == null){
+        if (studentId == null || teacherId == null) {
             throw new RuntimeException("参数错误");
         }
 
-        TeacherStudentConversation conversation = new TeacherStudentConversation();
-        conversation.setStudentId(Long.getLong(studentId));  // 学生ID
-        conversation.setTeacherId(Long.getLong(teacherId));  // 教师ID
+        try {
 
-        studentTeacherChatMapper.setConnection(conversation);
+            TeacherStudentConversation conversation = new TeacherStudentConversation();
+            conversation.setStudentId(Long.parseLong(studentId));
+            conversation.setTeacherId(Long.parseLong(teacherId));
+            studentTeacherChatMapper.setConnection(conversation);
 
-       // 获取生成的ID
-        Long generatedId = conversation.getId();
+            // 获取生成的ID
+            Long generatedId = conversation.getId();
+            return Result.success(generatedId);
 
-        return Result.success(generatedId);
+        } catch (Exception e) {
+
+            throw new RuntimeException("建立会话异常");
+
+        }
+
     }
 
     /**

@@ -25,7 +25,7 @@ class AgentTest {
     void setChatAgent(){
 
         UserLocalThreadUtils.setUserId("1");
-        String ss = chatAgent.start("你好我叫什么");
+        String ss = chatAgent.start("我叫什么");
         System.out.println(ss);
 
     }

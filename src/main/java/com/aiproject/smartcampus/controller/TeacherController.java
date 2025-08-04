@@ -66,14 +66,14 @@ public class TeacherController {
 
     @GetMapping("/getClass/{teacherId}")
     @Operation(summary = "获取教师所教授的课程", description = "根据教师ID获取其所教授的课程列表")
-    public Result<List<Course>> GetAllCourse(@PathVariable Integer teacherId) {
+    public Result<List<Course>> getAllCourse(@PathVariable Integer teacherId) {
         return teacherService.GetAllCourse(teacherId);
     }
 
     //获取对应课程的整体成绩情况
     @GetMapping("/getAllSituation/{courseId}")
     @Operation(summary = "获取课程整体情况", description = "根据课程ID获取该课程的整体情况")
-    public Result<TeacherGetSituationDTO> GetAllSituation(@PathVariable Integer courseId) {
+    public Result<TeacherGetSituationDTO> getAllSituation(@PathVariable Integer courseId) {
         return teacherService.GetAllSituation(courseId);
     }
 
@@ -96,7 +96,7 @@ public class TeacherController {
      */
     @GetMapping("/getHomework")
     @Operation(summary = "查询作业", description = "根据课程ID查询作业信息")
-    public Result<List<ChapterQuestionDetailTeacherVO>> getHomework(@RequestParam("courseId") String courseId, @RequestParam("chapterId")String chapterId){
+    public Result<List<ChapterQuestionDetailTeacherVO>> getHomework(@RequestParam("courseId") String courseId, @RequestParam("chapterId") String chapterId) {
         return teacherService.getHomework(courseId, chapterId);
     }
 
@@ -105,7 +105,7 @@ public class TeacherController {
      */
     @GetMapping("/getHomeworkByStudent")
     @Operation(summary = "根据学生获取所有作业信息", description = "根据学生ID查询其所有作业信息")
-    public Result<List<ChapterQuestionDetailVO>> getHomeworkByStudent(@RequestParam("studentId") String studentId, @RequestParam("courseId") String courseId, @RequestParam("chapterId")String chapterId) {
+    public Result<List<ChapterQuestionDetailVO>> getHomeworkByStudent(@RequestParam("studentId") String studentId, @RequestParam("courseId") String courseId, @RequestParam("chapterId") String chapterId) {
         return teacherService.getHomeworkByStudent(studentId, courseId, chapterId);
     }
 
@@ -123,7 +123,7 @@ public class TeacherController {
      */
     @PostMapping("/releasePaper")
     @Operation(summary = "发布试卷", description = "教师发布试卷")
-    public Result releasePaper(@RequestParam("examId")String examId) {
+    public Result releasePaper(@RequestParam("examId") String examId) {
         return teacherService.releasePaper(examId);
     }
 
@@ -143,6 +143,6 @@ public class TeacherController {
     @Operation(summary = "删除考试", description = "教师删除考试")
     public Result deleteExamById(@PathVariable String examId) {
 
-        return  teacherService.deleteExamById(examId);
+        return teacherService.deleteExamById(examId);
     }
 }

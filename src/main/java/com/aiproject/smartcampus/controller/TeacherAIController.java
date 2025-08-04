@@ -64,7 +64,7 @@ public class TeacherAIController {
      * 智能教案的生成
      * */
     @GetMapping("TeacherTextCreate")
-    public Result<String> TeacherTextCreate(@RequestParam String content, @RequestParam String courseId,@RequestParam String chapterId) {
+    public Result<String> teacherTextCreate(@RequestParam String content, @RequestParam String courseId, @RequestParam String chapterId) {
 
         return teacherAIservice.TeacherTextCreate(content,courseId,chapterId);
     }

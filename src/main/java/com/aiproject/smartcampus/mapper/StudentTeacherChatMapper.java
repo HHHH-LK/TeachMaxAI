@@ -177,7 +177,7 @@ public interface StudentTeacherChatMapper {
                     @Param("fileUrl") String fileUrl);
 
 
-    @Insert("INSERT INTO teacher_student_conversations(STUDENT_ID, TEACHER_ID)\n" +
+    @Insert("INSERT INTO teacher_student_conversations(student_id, teacher_id)\n" +
             "VALUES(#{studentId},#{teacherId});")
     @Options(
             useGeneratedKeys = true,

@@ -398,6 +398,7 @@ public class ChapterServiceImpl implements ChapterService {
 
                 // 判断答案是否正确
                 boolean isCorrect = studentAnswer != null && studentAnswer.equals(correctAnswer);
+                String correct = isCorrect?"1":"0";
 
                 // 设置结果信息
                 studentAnswerResultVO.setStudentAnswer(studentAnswer);
@@ -410,7 +411,7 @@ public class ChapterServiceImpl implements ChapterService {
                 studentAnswers.setStudentId(Integer.valueOf(studentId));
                 studentAnswers.setQuestionId(questionId);
                 studentAnswers.setStudentAnswer(studentAnswerDTO.getFormattedAnswer());
-                studentAnswers.setIsCorrect(isCorrect);
+                studentAnswers.setIsCorrect(correct);
                 studentAnswers.setScoreEarned(studentAnswerResultVO.getScoreEarned());
 
                 studentAnswerMapper.insert(studentAnswers);
@@ -449,6 +450,7 @@ public class ChapterServiceImpl implements ChapterService {
 
         return Result.success(allChapterByCourseId);
     }
+
 
     @Override
     public Result juTest(StudentTextAnswerDTO studentTextAnswerDTO) {

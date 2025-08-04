@@ -70,4 +70,13 @@ class ChapterServiceImplTest {
 
     }
 
+    @Test
+    void getChapterByCourseId3(){
+
+
+
+    }
+
+
+
 }
