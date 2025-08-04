@@ -92,5 +92,12 @@ public class StudentTeacherChatController {
     }
 
 
+    @PostMapping("/setConnection")
+    public Result<Long> setConnection(@RequestParam String studentId, @RequestParam String teacherId) {
+
+        return studentTeacherChatService.setConnection(studentId, teacherId);
+
+    }
+
 
 }
