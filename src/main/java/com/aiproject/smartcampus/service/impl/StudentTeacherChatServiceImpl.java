@@ -10,6 +10,7 @@ import com.aiproject.smartcampus.pojo.dto.ChatMessagePushDto;
 import com.aiproject.smartcampus.pojo.dto.SendMessageRequestDTO;
 import com.aiproject.smartcampus.pojo.po.TeacherStudentConversation;
 import com.aiproject.smartcampus.pojo.po.TeacherStudentMessage;
+import com.aiproject.smartcampus.pojo.po.User;
 import com.aiproject.smartcampus.pojo.vo.ChatQueryVO;
 import com.aiproject.smartcampus.pojo.vo.ConversationUnreadCountVO;
 import com.aiproject.smartcampus.pojo.vo.TeacherInfoVO;
@@ -127,7 +128,8 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
     @Override
     public Result sendMessage(SendMessageRequestDTO sendMessageRequestDTO) {
         //判断是否有权限进行会话
-        String sendUserId = studentMapper.selectUserIdByStudentIdString(userToTypeUtils.change());
+        User userInfo = UserLocalThreadUtils.getUserInfo();
+        String sendUserId = String.valueOf(userInfo.getUserId());
         Integer reciveUserId = sendMessageRequestDTO.getUseId();
         if (reciveUserId == null) {
             return Result.error("你无权进行信息的发送");

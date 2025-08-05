@@ -1,8 +1,10 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.commons.utils.UserOnlineClients;
 import com.aiproject.smartcampus.pojo.dto.ChatStreamMessage;
 import com.aiproject.smartcampus.pojo.dto.ChatMessagePushDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestController
 @RequestMapping("/api/chat")
 @Slf4j
+@RequiredArgsConstructor
 public class ChatSSEController {
 
     // 存储用户的SSE连接
-    private static final Map<String, SseEmitter> USER_EMITTERS = new ConcurrentHashMap<>();
+    private final UserOnlineClients userOnlineClients;
 
     /**
      * 建立SSE连接
@@ -30,20 +33,20 @@ public class ChatSSEController {
     public SseEmitter streamEvents(@PathVariable String userId) {
         SseEmitter emitter = new SseEmitter(0L); // 永不超时
 
-        USER_EMITTERS.put(userId, emitter);
+        UserOnlineClients.addUserEmitter(userId, emitter);
 
         emitter.onCompletion(() -> {
-            USER_EMITTERS.remove(userId);
+            UserOnlineClients.removeUserEmitter(userId);
             log.info("用户 {} SSE连接关闭", userId);
         });
 
         emitter.onTimeout(() -> {
-            USER_EMITTERS.remove(userId);
+            UserOnlineClients.removeUserEmitter(userId);
             log.info("用户 {} SSE连接超时", userId);
         });
 
         emitter.onError((e) -> {
-            USER_EMITTERS.remove(userId);
+            UserOnlineClients.removeUserEmitter(userId);
             log.error("用户 {} SSE连接异常", userId, e);
         });
 
@@ -56,7 +59,7 @@ public class ChatSSEController {
                     .data("连接成功"));
         } catch (IOException e) {
             log.error("发送连接确认失败", e);
-            USER_EMITTERS.remove(userId);
+            UserOnlineClients.removeUserEmitter(userId);
         }
 
         return emitter;
@@ -66,7 +69,7 @@ public class ChatSSEController {
      * 推送AI流式消息给指定用户（用于AI聊天流式输出）
      */
     public void pushStreamMessageToUser(String userId, ChatStreamMessage message) {
-        SseEmitter emitter = USER_EMITTERS.get(userId);
+        SseEmitter emitter =UserOnlineClients.getUserEmitter(userId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
@@ -75,7 +78,7 @@ public class ChatSSEController {
                 log.info("SSE推送AI流式消息成功 - 用户: {}", userId);
             } catch (IOException e) {
                 log.error("SSE推送AI流式消息失败 - 用户: {}", userId, e);
-                USER_EMITTERS.remove(userId);
+                UserOnlineClients.removeUserEmitter(userId);
             }
         } else {
             log.debug("用户 {} 不在线，无法推送AI流式消息", userId);
@@ -85,7 +88,7 @@ public class ChatSSEController {
     // 师生聊天不需要离线消息队列，因为：
 
     public void pushMessageToUser(String userId, ChatMessagePushDto message) {
-        SseEmitter emitter = USER_EMITTERS.get(userId);
+        SseEmitter emitter =UserOnlineClients.getUserEmitter(userId);
         if (emitter != null) {
             // 在线用户：实时推送
             try {
@@ -95,7 +98,7 @@ public class ChatSSEController {
                 log.info("实时推送成功 - 用户: {}", userId);
             } catch (IOException e) {
                 log.error("实时推送失败 - 用户: {}", userId, e);
-                USER_EMITTERS.remove(userId);
+                UserOnlineClients.removeUserEmitter(userId);
             }
         } else {
             // 离线用户：不做处理，因为消息已在数据库中
@@ -108,15 +111,16 @@ public class ChatSSEController {
      */
     @GetMapping("/online-count")
     public Result<Integer> getOnlineCount() {
-        return Result.success(USER_EMITTERS.size());
+        return Result.success(UserOnlineClients.getUserEmitterCount());
     }
 
     /**
      * 检查用户是否在线
      */
     @GetMapping("/is-online/{userId}")
-    public Result<Boolean> isUserOnline(@PathVariable String userId) {
-        boolean isOnline = USER_EMITTERS.containsKey(userId);
+        public Result<Boolean> isUserOnline(@PathVariable String userId) {
+
+        boolean isOnline = UserOnlineClients.isContainsUserId(userId);
         return Result.success(isOnline);
     }
 }

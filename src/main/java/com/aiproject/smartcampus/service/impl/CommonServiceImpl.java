@@ -3,6 +3,7 @@ package com.aiproject.smartcampus.service.impl;
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.JwtUtils;
 import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
+import com.aiproject.smartcampus.commons.utils.UserOnlineClients;
 import com.aiproject.smartcampus.exception.UserExpection;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.NotificationMessage;
@@ -30,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
@@ -101,7 +103,10 @@ public class CommonServiceImpl implements CommonService {
         String key = tokenKey + token;
         userRedisTemplate.opsForValue().set(key, user, 7, TimeUnit.DAYS);
 
-        System.out.println(user.getUserType());
+        //设置登陆状态
+        UserOnlineClients.addUserEmitter(String.valueOf(user.getUserId()),new SseEmitter(0l));
+
+
         return Result.success(user.getUserType().getValue() + ":" + token);
 
 
@@ -170,6 +175,9 @@ public class CommonServiceImpl implements CommonService {
         if (delete) {
             return Result.success();
         }
+
+        //推出登录状态
+        UserOnlineClients.removeUserEmitter(userId);
 
         return Result.error("退出失败");
 
