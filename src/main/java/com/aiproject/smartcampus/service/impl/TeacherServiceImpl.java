@@ -156,8 +156,8 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             pointMap.put(i, 0L);
         }
 
-        /*String teacherId = userToTypeUtils.change();*/
-        String teacherId = "1";
+        String teacherId = userToTypeUtils.change();
+//        String teacherId = "1";
         // 查询该课程下所有学生 ID
         List<Integer> studentIdList = teacherMapper.selectAllClassStudentInfo(teacherId, couresId);
 
@@ -179,13 +179,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
         }
 
-        List<StudentWrongKnowledgeBO> list = pointMap.entrySet().stream().sorted(
-                        (e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-                .limit(6)
-                .map(a -> {
-                            return studentWrongKnowledgeBOMap.get(a.getKey());
-                        }
-                ).toList();
+        List<StudentWrongKnowledgeBO> list = pointMap.entrySet().stream().sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())).limit(6).map(a -> {
+            return studentWrongKnowledgeBOMap.get(a.getKey());
+        }).toList();
 
 
         return Result.success(list);
@@ -262,10 +258,8 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             }
 
             // 计算比率
-            double passRate = totalStudents > 0 ?
-                    (100.0 * (totalStudents - failCount) / totalStudents) : 0.0;
-            double excellentRate = totalStudents > 0 ?
-                    (100.0 * excellentCount / totalStudents) : 0.0;
+            double passRate = totalStudents > 0 ? (100.0 * (totalStudents - failCount) / totalStudents) : 0.0;
+            double excellentRate = totalStudents > 0 ? (100.0 * excellentCount / totalStudents) : 0.0;
 
             // 填充DTO对象
             TeacherGetSituationDTO situationDTO = new TeacherGetSituationDTO();
@@ -336,13 +330,10 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             int chapterIdInt = Integer.parseInt(chapterId);
 
             // 1. 查询章节题目
-            List<ChapterQuestionDetailTeacherVO> questionList = chapterMapper.getChapterTestQuestionsForTeacher(
-                    chapterIdInt, courseIdInt
-            );
+            List<ChapterQuestionDetailTeacherVO> questionList = chapterMapper.getChapterTestQuestionsForTeacher(chapterIdInt, courseIdInt);
 
             // 2. 添加日志
-            log.info("教师查询 - 课程ID={} 章节ID={} 查询到 {} 道测试题",
-                    courseId, chapterId, questionList.size());
+            log.info("教师查询 - 课程ID={} 章节ID={} 查询到 {} 道测试题", courseId, chapterId, questionList.size());
 
             if (questionList.isEmpty()) {
                 log.info("章节测试题为空");
@@ -351,9 +342,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
             // 3. 处理第一题预览
             ChapterQuestionDetailTeacherVO firstQuestion = questionList.get(0);
-            String preview = firstQuestion.getQuestionContent() != null && firstQuestion.getQuestionContent().length() > 50
-                    ? firstQuestion.getQuestionContent().substring(0, 50) + "..."
-                    : (firstQuestion.getQuestionContent() != null ? firstQuestion.getQuestionContent() : "null");
+            String preview = firstQuestion.getQuestionContent() != null && firstQuestion.getQuestionContent().length() > 50 ? firstQuestion.getQuestionContent().substring(0, 50) + "..." : (firstQuestion.getQuestionContent() != null ? firstQuestion.getQuestionContent() : "null");
             log.info("第一道题目内容: {}", preview);
 
             // 4. 设置默认权重（如果为空）
@@ -377,15 +366,12 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                         default:
                             question.setT(1);
                     }
-                    log.debug("题目ID={} 权重为空，设置默认权重为 {}",
-                            question.getQuestionId(), question.getT());
+                    log.debug("题目ID={} 权重为空，设置默认权重为 {}", question.getQuestionId(), question.getT());
                 }
             });
 
             // 5. 按权重排序
-            List<ChapterQuestionDetailTeacherVO> sortedList = questionList.stream()
-                    .sorted(Comparator.comparingInt(ChapterQuestionDetailTeacherVO::getT))
-                    .collect(Collectors.toList());
+            List<ChapterQuestionDetailTeacherVO> sortedList = questionList.stream().sorted(Comparator.comparingInt(ChapterQuestionDetailTeacherVO::getT)).collect(Collectors.toList());
 
             log.info("最终返回测试题数量: {}", sortedList.size());
             return Result.success(sortedList);
@@ -408,13 +394,10 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             int courseIdInt = Integer.parseInt(courseId);
 
             // 2. 查询章节题目
-            List<ChapterQuestionDetailVO> questions = chapterMapper.getChapterTestQuestions(
-                    chapterIdInt, studentIdInt, courseIdInt
-            );
+            List<ChapterQuestionDetailVO> questions = chapterMapper.getChapterTestQuestions(chapterIdInt, studentIdInt, courseIdInt);
 
             // 3. 添加日志
-            log.info("学生ID={} 课程ID={} 章节ID={} 查询到 {} 道题目",
-                    studentId, courseId, chapterId, questions.size());
+            log.info("学生ID={} 课程ID={} 章节ID={} 查询到 {} 道题目", studentId, courseId, chapterId, questions.size());
 
             if (questions.isEmpty()) {
                 log.info("章节测试题为空");
@@ -423,10 +406,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
             // 4. 记录第一题预览
             ChapterQuestionDetailVO firstQuestion = questions.get(0);
-            String preview = firstQuestion.getQuestionContent() != null &&
-                    firstQuestion.getQuestionContent().length() > 50
-                    ? firstQuestion.getQuestionContent().substring(0, 50) + "..."
-                    : firstQuestion.getQuestionContent();
+            String preview = firstQuestion.getQuestionContent() != null && firstQuestion.getQuestionContent().length() > 50 ? firstQuestion.getQuestionContent().substring(0, 50) + "..." : firstQuestion.getQuestionContent();
             log.debug("第一题预览: {}", preview);
 
             // 5. 筛选测试题
@@ -437,16 +417,13 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             List<ChapterQuestionDetailVO> weightedQuestions = setQuestionWeights(testQuestions);
 
             // 7. 按权重排序
-            List<ChapterQuestionDetailVO> sortedQuestions = weightedQuestions.stream()
-                    .sorted(Comparator.comparingInt(ChapterQuestionDetailVO::getT))
-                    .collect(Collectors.toList());
+            List<ChapterQuestionDetailVO> sortedQuestions = weightedQuestions.stream().sorted(Comparator.comparingInt(ChapterQuestionDetailVO::getT)).collect(Collectors.toList());
 
             log.info("最终返回题目数量: {}", sortedQuestions.size());
             return Result.success(sortedQuestions);
 
         } catch (NumberFormatException e) {
-            log.error("参数格式错误: studentId={}, courseId={}, chapterId={}",
-                    studentId, courseId, chapterId, e);
+            log.error("参数格式错误: studentId={}, courseId={}, chapterId={}", studentId, courseId, chapterId, e);
             return Result.error("参数格式错误");
         } catch (Exception e) {
             log.error("获取章节测试题失败", e);
@@ -608,12 +585,19 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         }
     }
 
+    @Override
+    public Result<Integer> getUserIdByteacher(Integer teacherId) {
+
+        Integer userIdByTeacherId = teacherMapper.getUserIdByTeacherId(teacherId);
+
+        return Result.success(userIdByTeacherId);
+
+    }
+
 
     // 辅助方法：筛选测试题
     private List<ChapterQuestionDetailVO> filterTestQuestions(List<ChapterQuestionDetailVO> questions) {
-        return questions.stream()
-                .filter(q -> "test".equals(q.getChapterQuestionType()))
-                .collect(Collectors.toList());
+        return questions.stream().filter(q -> "test".equals(q.getChapterQuestionType())).collect(Collectors.toList());
     }
 
     // 辅助方法：设置题目权重
