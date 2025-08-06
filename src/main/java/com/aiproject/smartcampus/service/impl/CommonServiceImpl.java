@@ -53,6 +53,7 @@ import static org.apache.poi.hslf.model.textproperties.TextPropCollection.TextPr
 public class CommonServiceImpl implements CommonService {
     private final UserMapper userMapper;
     private final StudentMapper studentMapper;
+    private final UserOnlineClients userOnlineClients;
     private final TeacherMapper teacherMapper;
     private final RedisTemplate<String,User> userRedisTemplate;
     private final PasswordEncoder passwordEncoder;
@@ -104,7 +105,9 @@ public class CommonServiceImpl implements CommonService {
         userRedisTemplate.opsForValue().set(key, user, 7, TimeUnit.DAYS);
 
         //设置登陆状态
-        UserOnlineClients.addUserEmitter(String.valueOf(user.getUserId()),new SseEmitter(0l));
+        String userId = String.valueOf(user.getUserId());
+        userOnlineClients.addUserOnlineToRedis(userId);
+        UserOnlineClients.addUserEmitter(userId,new SseEmitter(0L));
 
 
         return Result.success(user.getUserType().getValue() + ":" + token);
@@ -177,6 +180,7 @@ public class CommonServiceImpl implements CommonService {
         }
 
         //推出登录状态
+        userOnlineClients.removeUserOnlineFromRedis(userId);
         UserOnlineClients.removeUserEmitter(userId);
 
         return Result.error("退出失败");

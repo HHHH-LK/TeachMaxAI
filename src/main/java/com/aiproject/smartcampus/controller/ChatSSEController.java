@@ -6,6 +6,7 @@ import com.aiproject.smartcampus.pojo.dto.ChatStreamMessage;
 import com.aiproject.smartcampus.pojo.dto.ChatMessagePushDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ public class ChatSSEController {
 
     // 存储用户的SSE连接
     private final UserOnlineClients userOnlineClients;
+    private final StringRedisTemplate stringRedisTemplate;
 
     /**
      * 建立SSE连接
@@ -120,7 +122,7 @@ public class ChatSSEController {
     @GetMapping("/is-online/{userId}")
         public Result<Boolean> isUserOnline(@PathVariable String userId) {
 
-        boolean isOnline = UserOnlineClients.isContainsUserId(userId);
+        boolean isOnline = UserOnlineClients.isContainsUserId(stringRedisTemplate,userId);
         return Result.success(isOnline);
     }
 }

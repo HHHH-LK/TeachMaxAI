@@ -158,27 +158,15 @@ public class ExamCreaterToolUtils {
         try {
             return QuestionBank.DifficultyLevel.valueOf(aiDifficultyLevel.toUpperCase());
         } catch (IllegalArgumentException e) {
-            switch (aiDifficultyLevel.toLowerCase()) {
-                case "easy":
-                case "简单":
-                case "低":
-                    return QuestionBank.DifficultyLevel.EASY;
-
-                case "medium":
-                case "中等":
-                case "中":
-                    return QuestionBank.DifficultyLevel.MEDIUM;
-
-                case "hard":
-                case "difficult":
-                case "困难":
-                case "高":
-                    return QuestionBank.DifficultyLevel.HARD;
-
-                default:
+            return switch (aiDifficultyLevel.toLowerCase()) {
+                case "easy", "简单", "低" -> QuestionBank.DifficultyLevel.EASY;
+                case "medium", "中等", "中" -> QuestionBank.DifficultyLevel.MEDIUM;
+                case "hard", "difficult", "困难", "高" -> QuestionBank.DifficultyLevel.HARD;
+                default -> {
                     log.warn("未知的难度级别: {}, 使用默认难度: MEDIUM", aiDifficultyLevel);
-                    return QuestionBank.DifficultyLevel.MEDIUM;
-            }
+                    yield QuestionBank.DifficultyLevel.MEDIUM;
+                }
+            };
         }
     }
 

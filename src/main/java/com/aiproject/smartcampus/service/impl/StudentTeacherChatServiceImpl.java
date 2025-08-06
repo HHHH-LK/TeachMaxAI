@@ -174,7 +174,6 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
         }
 
         try {
-
             TeacherStudentConversation conversation = new TeacherStudentConversation();
             conversation.setStudentId(Long.parseLong(studentId));
             conversation.setTeacherId(Long.parseLong(teacherId));
