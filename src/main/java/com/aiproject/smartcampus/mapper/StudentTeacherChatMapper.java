@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.mapper;
 
 
 import com.aiproject.smartcampus.pojo.po.TeacherStudentConversation;
+import com.aiproject.smartcampus.pojo.po.TeacherStudentConversations;
 import com.aiproject.smartcampus.pojo.po.TeacherStudentMessage;
 import com.aiproject.smartcampus.pojo.vo.ChatQueryVO;
 import com.aiproject.smartcampus.pojo.vo.ConversationUnreadCountVO;
@@ -169,7 +170,6 @@ public interface StudentTeacherChatMapper {
     @Insert("INSERT INTO teacher_student_messages " +
             "(conversation_id, sender_user_id, content, message_type, file_url, is_read, created_at) " +
             "VALUES (#{conversationId}, #{senderUserId}, #{content}, #{messageType}, #{fileUrl}, FALSE, NOW())")
-    @Options(useGeneratedKeys = true, keyProperty = "messageId", keyColumn = "message_id")
     int sendMessage(@Param("conversationId") Long conversationId,
                     @Param("senderUserId") Integer senderUserId,
                     @Param("content") String content,
@@ -185,4 +185,7 @@ public interface StudentTeacherChatMapper {
             keyColumn = "conversation_id"          // 数据库表中的主键字段名（需与表结构一致，可省略如果和属性名相同）
     )
     int setConnection(TeacherStudentConversation conversation);
+
+    @Select("SELECT conversation_id FROM teacher_student_conversations WHERE student_id = #{studentId} AND teacher_id = #{teacherId}")
+    Long getConnection(TeacherStudentConversation conversation);
 }

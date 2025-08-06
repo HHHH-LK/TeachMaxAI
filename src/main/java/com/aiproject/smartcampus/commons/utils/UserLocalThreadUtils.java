@@ -5,7 +5,6 @@ import dev.langchain4j.data.message.ChatMessage;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +63,7 @@ public class UserLocalThreadUtils {
     public static User getUserInfo() {
         //首先获取token
         String token = getToken();
-        User user = userRedisTemplate.opsForValue().get("token:" + "TOKEN_" + token);
+         User user = userRedisTemplate.opsForValue().get("token:" + "TOKEN_" + token);
 
         return user;
     }
@@ -80,6 +79,11 @@ public class UserLocalThreadUtils {
     public static String getUserMemory() {
         return userMemoryLocal.get();
     }
+
+    public static String getUserIds() {
+        return String.valueOf(threadLocal.get().getUserId());
+    }
+
 
     public static void setUserMemory(String userMemory) {
         userMemoryLocal.set(userMemory);

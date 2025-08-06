@@ -38,7 +38,8 @@ public class UserOnlineClients {
     }
 
     public static boolean isContainsUserId(StringRedisTemplate stringRedisTemplate, String userId) {
-        return stringRedisTemplate.hasKey(userId);
+
+        return Boolean.TRUE.equals(stringRedisTemplate.hasKey("user:online:" + userId));
     }
 
     public void addUserOnlineToRedis(String userId) {

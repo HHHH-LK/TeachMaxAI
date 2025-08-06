@@ -193,7 +193,7 @@ public class ChatController {
 
                     // 如果累计长度超过80字符，添加换行
                     if (currentLength > 80) {
-                        result.append("\n\n");
+                        result.append("\n");
                         currentLength = 0;
                     }
                 }
@@ -220,7 +220,7 @@ public class ChatController {
             } else {
                 result.append(sentence);
             }
-            result.append("\n\n");
+            result.append("\n");
         }
 
         return result.toString();
@@ -243,7 +243,7 @@ public class ChatController {
 
             if (currentPart.length() + part.length() > 100 && currentPart.length() > 0) {
                 // 当前部分已经够长，输出并开始新的部分
-                result.append(currentPart.toString()).append("，\n\n");
+                result.append(currentPart.toString()).append("，\n");
                 currentPart = new StringBuilder(part);
             } else {
                 if (currentPart.length() > 0) {
@@ -521,7 +521,11 @@ public class ChatController {
                 errorMsg.setContent("抱歉，我遇到了一些问题，请稍后再试。");
                 errorMsg.setUserId(userId);
                 errorMsg.setTimestamp(System.currentTimeMillis());
-                chatSSEController.pushStreamMessageToUser(userId, errorMsg);
+                try {
+                    chatSSEController.pushStreamMessageToUser(userId, errorMsg);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }, executor);
 

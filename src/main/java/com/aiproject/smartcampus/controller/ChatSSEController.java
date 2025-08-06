@@ -71,7 +71,7 @@ public class ChatSSEController {
      * 推送AI流式消息给指定用户（用于AI聊天流式输出）
      */
     public void pushStreamMessageToUser(String userId, ChatStreamMessage message) {
-        SseEmitter emitter =UserOnlineClients.getUserEmitter(userId);
+        SseEmitter emitter = UserOnlineClients.getUserEmitter(userId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
@@ -90,7 +90,7 @@ public class ChatSSEController {
     // 师生聊天不需要离线消息队列，因为：
 
     public void pushMessageToUser(String userId, ChatMessagePushDto message) {
-        SseEmitter emitter =UserOnlineClients.getUserEmitter(userId);
+        SseEmitter emitter = UserOnlineClients.getUserEmitter(userId);
         if (emitter != null) {
             // 在线用户：实时推送
             try {
@@ -120,9 +120,10 @@ public class ChatSSEController {
      * 检查用户是否在线
      */
     @GetMapping("/is-online/{userId}")
-        public Result<Boolean> isUserOnline(@PathVariable String userId) {
+    public Result<Boolean> isUserOnline(@PathVariable String userId) {
 
-        boolean isOnline = UserOnlineClients.isContainsUserId(stringRedisTemplate,userId);
+        boolean isOnline = UserOnlineClients.isContainsUserId(stringRedisTemplate, userId);
+        log.error("用户" + userId + "{}在线：", isOnline ? "是" : "否");
         return Result.success(isOnline);
     }
 }

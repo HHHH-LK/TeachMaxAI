@@ -145,4 +145,13 @@ public class TeacherController {
 
         return teacherService.deleteExamById(examId);
     }
+
+
+    /**
+     * 根据teacherId获取userId
+     * */
+    @GetMapping("/getUserIdByteacher")
+    public Result<Integer> getUserIdByteacher(@RequestParam("teacherId") Integer teacherId) {
+        return teacherService.getUserIdByteacher(teacherId);
+    }
 }

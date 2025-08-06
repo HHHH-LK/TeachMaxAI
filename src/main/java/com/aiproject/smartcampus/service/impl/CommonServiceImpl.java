@@ -55,7 +55,7 @@ public class CommonServiceImpl implements CommonService {
     private final StudentMapper studentMapper;
     private final UserOnlineClients userOnlineClients;
     private final TeacherMapper teacherMapper;
-    private final RedisTemplate<String,User> userRedisTemplate;
+    private final RedisTemplate<String, User> userRedisTemplate;
     private final PasswordEncoder passwordEncoder;
     //    private final EmailService emailService;
     private final String tokenKey = "token:" + "TOKEN_";
@@ -107,7 +107,7 @@ public class CommonServiceImpl implements CommonService {
         //设置登陆状态
         String userId = String.valueOf(user.getUserId());
         userOnlineClients.addUserOnlineToRedis(userId);
-        UserOnlineClients.addUserEmitter(userId,new SseEmitter(0L));
+        UserOnlineClients.addUserEmitter(userId, new SseEmitter(0L));
 
 
         return Result.success(user.getUserType().getValue() + ":" + token);
@@ -176,12 +176,19 @@ public class CommonServiceImpl implements CommonService {
         String key = tokenKey + token;
         Boolean delete = userRedisTemplate.delete(key);
         if (delete) {
+
+            try {
+                //推出登录状态
+                userOnlineClients.removeUserOnlineFromRedis(userId);
+                UserOnlineClients.removeUserEmitter(userId);
+            } catch (Exception e) {
+                log.error("退出登录失败", e);
+                throw new RuntimeException("退出登录失败");
+            }
+
             return Result.success();
         }
 
-        //推出登录状态
-        userOnlineClients.removeUserOnlineFromRedis(userId);
-        UserOnlineClients.removeUserEmitter(userId);
 
         return Result.error("退出失败");
 

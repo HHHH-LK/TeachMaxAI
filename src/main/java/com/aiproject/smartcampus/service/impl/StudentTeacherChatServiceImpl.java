@@ -177,6 +177,12 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
             TeacherStudentConversation conversation = new TeacherStudentConversation();
             conversation.setStudentId(Long.parseLong(studentId));
             conversation.setTeacherId(Long.parseLong(teacherId));
+
+            Long connection = studentTeacherChatMapper.getConnection(conversation);
+            if (connection != null && connection > 0) {
+                return Result.success(connection);
+            }
+
             studentTeacherChatMapper.setConnection(conversation);
 
             // 获取生成的ID
@@ -210,7 +216,7 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
             // 推送给接收者
             chatSSEController.pushMessageToUser(request.getUseId().toString(), pushMessage);
 
-            log.info("SSE推送成功 - 发送者: {}, 接收者: {}", senderUserId, request.getUseId());
+            log.error("SSE推送成功 - 发送者: {}, 接收者: {}", senderUserId, request.getUseId());
 
         } catch (Exception e) {
             log.error("异步推送失败", e);

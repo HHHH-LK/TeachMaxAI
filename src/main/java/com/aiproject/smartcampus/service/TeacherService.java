@@ -43,4 +43,7 @@ public interface TeacherService extends IService<Teacher> {
     Result updateExamStatusById(String examId);
 
     Result deleteExamById(String examId);
+
+    Result<Integer> getUserIdByteacher(Integer teacherId);
+
 }
