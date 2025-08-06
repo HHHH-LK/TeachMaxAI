@@ -126,40 +126,67 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result sendMessage(SendMessageRequestDTO sendMessageRequestDTO) {
-        //判断是否有权限进行会话
+        // 判断是否有权限进行会话
         User userInfo = UserLocalThreadUtils.getUserInfo();
         String sendUserId = String.valueOf(userInfo.getUserId());
-        Integer reciveUserId = sendMessageRequestDTO.getUseId();
-        if (reciveUserId == null) {
+        Integer receiveUserId = sendMessageRequestDTO.getUseId();
+
+        if (receiveUserId == null) {
             return Result.error("你无权进行信息的发送");
         }
-        if (sendUserId.equals(reciveUserId.toString())) {
+        if (sendUserId.equals(receiveUserId.toString())) {
             return Result.error("你无权进行信息的发送");
         }
 
-        //进行发送信息
+        // 进行发送信息
         Long conversationId = sendMessageRequestDTO.getConversationId();
         String messageType = sendMessageRequestDTO.getMessageType();
         String fileUrl = sendMessageRequestDTO.getFileUrl();
         String content = sendMessageRequestDTO.getContent();
 
-        int i = studentTeacherChatMapper.sendMessage(conversationId, Integer.valueOf(sendUserId), content, messageType, fileUrl);
+        // 📝 添加发送前的日志
+        log.info("开始发送消息 - 发送者: {}, 接收者: {}, 会话: {}, 内容: {}",
+                sendUserId, receiveUserId, conversationId, content);
 
-        if (i <= 0) {
-            log.error("发送信息失败");
+        int result = studentTeacherChatMapper.sendMessage(conversationId, Integer.valueOf(sendUserId), content, messageType, fileUrl);
+
+        if (result <= 0) {
+            log.error("发送信息失败 - 数据库操作返回: {}", result);
             return Result.error("发送信息失败");
         }
 
-        // 新增：发送成功后，通过SSE推送给接收者
+        log.info("✅ 消息保存到数据库成功");
+
+        // 🔧 关键修复：同步推送消息给接收者
         try {
-            if (chatSSEController != null) {
-                // 异步推送，不影响主业务流程
-                pushMessageAsync(sendMessageRequestDTO, sendUserId);
-            }
+            // 构建推送消息
+            ChatMessagePushDto pushMessage = ChatMessagePushDto.builder()
+                    .conversationId(conversationId)
+                    .senderId(sendUserId)
+                    .senderUserId(Integer.valueOf(sendUserId))
+                    .receiverId(receiveUserId.toString())
+                    .receiverUserId(receiveUserId)
+                    .content(content)
+                    .messageType(messageType != null ? messageType : "text")
+                    .fileUrl(fileUrl)
+                    .sendTime(java.time.LocalDateTime.now())
+                    .isRead(false)
+                    .timestamp(System.currentTimeMillis())
+                    .build();
+
+            log.info("📦 构建推送消息完成，准备推送给用户: {}", receiveUserId);
+
+            // 🚀 推送消息给接收者
+            chatSSEController.pushMessageToUser(receiveUserId.toString(), pushMessage);
+
+            log.info("✅ SSE推送完成 - 发送者: {}, 接收者: {}", sendUserId, receiveUserId);
+
         } catch (Exception e) {
-            // 推送失败不影响主业务，只记录日志
-            log.warn("SSE推送失败，但消息发送成功 - 接收者: {}, 错误: {}", reciveUserId, e.getMessage());
+            // 推送失败不影响主业务，但要记录详细错误
+            log.error("❌ SSE推送失败 - 发送者: {}, 接收者: {}, 错误: ",
+                    sendUserId, receiveUserId, e);
         }
 
         return Result.success("发送信息成功");
@@ -197,9 +224,9 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
 
     }
 
-    /**
+   /* *//**
      * 异步推送消息 - 修复异步注解
-     */
+     *//*
     @Async("sseThreadPool") // 指定线程池
     public void pushMessageAsync(SendMessageRequestDTO request, String senderUserId) {
         try {
@@ -221,7 +248,7 @@ public class StudentTeacherChatServiceImpl implements StudentTeacherChatService 
         } catch (Exception e) {
             log.error("异步推送失败", e);
         }
-    }
+    }*/
 
 
     @Override

@@ -89,25 +89,36 @@ public class ChatSSEController {
 
     // 师生聊天不需要离线消息队列，因为：
 
+    /**
+     * 推送师生聊天消息给指定用户
+     */
     public void pushMessageToUser(String userId, ChatMessagePushDto message) {
+        // 📝 添加详细日志
+        log.info("🔄 尝试推送消息给用户: {}", userId);
+
+        // 检查用户是否有SSE连接
         SseEmitter emitter = UserOnlineClients.getUserEmitter(userId);
+
+        log.info("📡 用户 {} SSE连接状态: {}", userId, emitter != null ? "在线" : "离线");
+
         if (emitter != null) {
             // 在线用户：实时推送
             try {
                 emitter.send(SseEmitter.event()
                         .name("chat_message")
                         .data(message));
-                log.info("实时推送成功 - 用户: {}", userId);
+                log.info("✅ 实时推送成功 - 用户: {}, 消息内容: {}", userId, message.getContent());
             } catch (IOException e) {
-                log.error("实时推送失败 - 用户: {}", userId, e);
+                log.error("❌ 实时推送失败 - 用户: {}, 错误: ", userId, e);
+                // 连接异常时清理
                 UserOnlineClients.removeUserEmitter(userId);
+                userOnlineClients.removeUserOnlineFromRedis(userId);
             }
         } else {
-            // 离线用户：不做处理，因为消息已在数据库中
-            log.debug("用户 {} 离线，消息已存储在数据库中，等待用户上线时主动拉取", userId);
+            // 离线用户：消息已在数据库中，等待用户上线时拉取
+            log.debug("📴 用户 {} 离线，消息已存储在数据库中", userId);
         }
     }
-
     /**
      * 获取在线用户数
      */

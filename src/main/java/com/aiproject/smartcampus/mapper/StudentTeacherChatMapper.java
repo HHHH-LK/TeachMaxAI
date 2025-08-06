@@ -2,7 +2,6 @@ package com.aiproject.smartcampus.mapper;
 
 
 import com.aiproject.smartcampus.pojo.po.TeacherStudentConversation;
-import com.aiproject.smartcampus.pojo.po.TeacherStudentConversations;
 import com.aiproject.smartcampus.pojo.po.TeacherStudentMessage;
 import com.aiproject.smartcampus.pojo.vo.ChatQueryVO;
 import com.aiproject.smartcampus.pojo.vo.ConversationUnreadCountVO;
