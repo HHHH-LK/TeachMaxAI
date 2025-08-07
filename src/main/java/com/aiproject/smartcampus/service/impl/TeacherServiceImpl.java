@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
+import com.aiproject.smartcampus.commons.utils.math.RoundingUtils;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.dto.TeacherGetSituationDTO;
@@ -230,7 +231,6 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 }
             }).toList();
 
-
             // 计算平均分
             int totalStudents = list.size();
             double averageScore = list.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
@@ -265,9 +265,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             TeacherGetSituationDTO situationDTO = new TeacherGetSituationDTO();
             situationDTO.setCourseId(courseId);
             situationDTO.setCourseName(""); // 需要补充课程名称查询逻辑
-            situationDTO.setAverageScore(averageScore);
-            situationDTO.setPassRate(passRate);
-            situationDTO.setExcellentRate(excellentRate);
+            situationDTO.setAverageScore(RoundingUtils.round(averageScore));
+            situationDTO.setPassRate(RoundingUtils.round(passRate));
+            situationDTO.setExcellentRate(RoundingUtils.round(excellentRate));
             situationDTO.setFailNumber(failCount);
             situationDTO.setPassNumber(passCount);
             situationDTO.setNormalNumber(normalCount);
