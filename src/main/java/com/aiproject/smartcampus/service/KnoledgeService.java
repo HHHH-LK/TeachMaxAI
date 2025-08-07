@@ -31,4 +31,6 @@ public interface KnoledgeService {
      * 获取平均错误率
      * */
     Result<Double> getAver();
+
+    Result<String> getKonwledgeNameById(String pointId);
 }
