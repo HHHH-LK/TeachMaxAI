@@ -92,7 +92,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     }
 
     @Override
-    public Result getAllClassInfo(String courseId) {
+    public Result<Map<Integer, Double>> getAllClassInfo(String courseId) {
         int pointSize = 124000;
 
         // 初始化准确率累加 Map 和计数 List

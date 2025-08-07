@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: SmartCampus
@@ -47,9 +48,8 @@ public class TeacherController {
     /**
      * 查询指定班级课程对应的学生整体知识点掌握情况
      */
-
     @GetMapping("/getAllClassNotCorrectInfo")
-    public Result getAllClassInfo(@RequestParam("couresId") String couresId) {
+    public Result<Map<Integer, Double>> getAllClassInfo(@RequestParam("couresId") String couresId) {
 
         return teacherService.getAllClassInfo(couresId);
     }
@@ -57,7 +57,6 @@ public class TeacherController {
     /**
      * 查询特定班级的知识点的高频错误知识点信息
      */
-
     @GetMapping("/getTheMaxUncorrectPoint")
     public Result<List<StudentWrongKnowledgeBO>> getTheMaxUncorrectPoint(@RequestParam("couresId") String couresId) {
 
