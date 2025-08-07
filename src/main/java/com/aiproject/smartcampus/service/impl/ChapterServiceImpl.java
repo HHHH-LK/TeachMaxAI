@@ -398,6 +398,7 @@ public class ChapterServiceImpl implements ChapterService {
 
                 // 判断答案是否正确
                 boolean isCorrect = studentAnswer != null && studentAnswer.equals(correctAnswer);
+                String correct = isCorrect?"1":"0";
 
                 // 设置结果信息
                 studentAnswerResultVO.setStudentAnswer(studentAnswer);
@@ -410,7 +411,7 @@ public class ChapterServiceImpl implements ChapterService {
                 studentAnswers.setStudentId(Integer.valueOf(studentId));
                 studentAnswers.setQuestionId(questionId);
                 studentAnswers.setStudentAnswer(studentAnswerDTO.getFormattedAnswer());
-                studentAnswers.setIsCorrect(isCorrect);
+                studentAnswers.setIsCorrect(correct);
                 studentAnswers.setScoreEarned(studentAnswerResultVO.getScoreEarned());
 
                 studentAnswerMapper.insert(studentAnswers);
@@ -449,6 +450,7 @@ public class ChapterServiceImpl implements ChapterService {
 
         return Result.success(allChapterByCourseId);
     }
+
 
     @Override
     public Result juTest(StudentTextAnswerDTO studentTextAnswerDTO) {
@@ -709,7 +711,7 @@ public class ChapterServiceImpl implements ChapterService {
             double completionWeight = 0.4;   // 资源完成率权重40%
             double timeWeight = 0.2;         // 时间效率权重20%
 
-            // ========== 1. 计算知识点平均通过率 ==========
+            //  计算知识点平均通过率
             List<StudentWrongKnowledgeBO> studentWrongKnowledgeByStudentId =
                     knowledgePointMapper.getStudentWrongKnowledgeByStudentId(studentId);
 
@@ -743,7 +745,7 @@ public class ChapterServiceImpl implements ChapterService {
                 log.info("学生{}暂无知识点数据，使用默认准确率85%，调整权重配置", studentId);
             }
 
-            // ========== 2. 计算资源完成情况 ==========
+            //计算资源完成情况
             List<KnowledgePointMaterialSimpleVO> allMaterials =
                     chapterMapper.selectMaterialsByChapterStudentCourse(chapterId, studentId, courseId);
             List<StudentChapterResourceVO> finishedMaterials =
@@ -761,7 +763,7 @@ public class ChapterServiceImpl implements ChapterService {
             log.info("学生{}资源完成情况: {}/{}，完成率: {}%",
                     studentId, finishedMaterialCount, totalMaterialCount, completionRate);
 
-            // ========== 3. 计算预估学习时长和时间效率 ==========
+            // 计算预估学习时长和时间效率
             double estimatedHours = 0.0;
             if (allMaterials != null) {
                 estimatedHours = finishedMaterials.stream()
@@ -776,7 +778,7 @@ public class ChapterServiceImpl implements ChapterService {
             log.info("学生{}时间效率: 实际{}小时, 预估{}小时, 效率得分: {}",
                     studentId, hours, estimatedHours, timeScore);
 
-            // ========== 4. 综合计算学习进度 ==========
+            // 综合计算学习进度
             double learningProgress =
                     aveAccuracyRate * knowledgeWeight +
                             completionRate * completionWeight +
@@ -785,7 +787,7 @@ public class ChapterServiceImpl implements ChapterService {
             // 确保结果在0-100范围内
             learningProgress = Math.max(0, Math.min(100, learningProgress));
 
-            // ========== 5. 输出详细信息（便于调试和监控） ==========
+            // 输出详细信息（便于调试和监控）
             String progressLevel = getProgressLevel(learningProgress);
 
             log.info("学生{}学习进度计算完成:", studentId);
@@ -808,7 +810,7 @@ public class ChapterServiceImpl implements ChapterService {
      * 计算时间效率得分的辅助方法
      */
     private double calculateTimeEfficiencyScore(double actualHours, double estimatedHours) {
-        // ========== 时间效率评分标准（可调整） ==========
+        // 时间效率评分标准（可调整）
 
         if (estimatedHours > 0) {
             // 有预估时长的情况：基于时间比例评分
@@ -856,7 +858,7 @@ public class ChapterServiceImpl implements ChapterService {
      * 根据进度分数获取等级的辅助方法
      */
     private String getProgressLevel(double progress) {
-        // ========== 进度等级标准（可调整） ==========
+        // 进度等级标准（可调整）
         if (progress >= 90) {
             return "优秀";
         }
@@ -879,7 +881,7 @@ public class ChapterServiceImpl implements ChapterService {
                                            double timeScore, double overallProgress) {
         List<String> advice = new ArrayList<>();
 
-        // ========== 学习建议逻辑（可调整） ==========
+        //学习建议逻辑（可调整）
 
         if (knowledgeAccuracy < 70) {
             advice.add("建议加强知识点练习，多做相关题目提高准确率");

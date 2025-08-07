@@ -14,15 +14,15 @@ import java.util.List;
  * @create: 2025-05-20 08:37
  **/
 
-public interface StudentService extends IService<Student>{
+public interface StudentService extends IService<Student> {
 
-     List<StudentSelectAllVO> selectAllStudents();
+    List<StudentSelectAllVO> selectAllStudents();
 
-     Student findByStudentNumber( String studentNumber);
+    Student findByStudentNumber(String studentNumber);
 
-     List<Student> findByClassName(String className);
+    List<Student> findByClassName(String className);
 
-     void updateStudent(Student student);
+    void updateStudent(Student student);
 
     String academicAnalysis(String courseId);
 

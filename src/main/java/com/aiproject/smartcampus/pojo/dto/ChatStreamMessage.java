@@ -45,4 +45,6 @@ public class ChatStreamMessage {
      * 额外的元数据（可选）
      */
     private Object metadata;
+
+
 }

@@ -17,11 +17,14 @@ import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
 import com.aiproject.smartcampus.pojo.vo.StudentWrongKnowledgeVO;
 import com.aiproject.smartcampus.service.KnoledgeService;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.Duration;
 import java.util.*;
@@ -59,7 +62,6 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     public Result getALlOKKnowlegePoint() {
 
         String studentId = getUserToTypeUtils.change();
-
 
         if (studentId == null) {
             log.error("该用户未登录[{}]", studentId);
@@ -126,9 +128,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     @Override
     public Result<String> createListTestByagent(List<String> pointIds, String courseId, String chapter, String content) {
 
-        /*String studentId = getUserToTypeUtils.change();*/
-
-        String studentId = "1";
+        String studentId = getUserToTypeUtils.change();
 
         if (studentId == null) {
             log.error("该用户未登录[{}]", studentId);
@@ -210,8 +210,8 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     @Override
     public Result<Double> getAver() {
 
-        /*String studentId = userToTypeUtils.change();*/
-        String studentId = "1";
+        String studentId = userToTypeUtils.change();
+
         //查询学生的平均错误率
         List<StudentWrongKnowledgeBO> studentWrongKnowledgeByStudentId = knowledgePointMapper.getStudentWrongKnowledgeByStudentId(studentId);
 
@@ -222,6 +222,15 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         sum =100.00- (sum / studentWrongKnowledgeByStudentId.size());
 
         return Result.success(sum);
+    }
+
+    @Override
+    public Result<String> getKonwledgeNameById(String pointId) {
+
+        String ponintNameById = knowledgePointMapper.getPonintNameById(pointId);
+
+
+        return Result.success(ponintNameById);
     }
 
     // TODO:智能进行获取错误知识点信息 后续改成策略模式 - 修复死循环版本（利用对数压缩进行修改处理）
@@ -407,9 +416,9 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         List<SimpleKnowledgeAnalysisBO> allKnowledgeAnalysis;
         try {
             // TODO: 从上下文获取真实学生ID
-            String studentId = "1";
-            //String studentId = userToTypeUtils.change();
+            String studentId = userToTypeUtils.change();
             allKnowledgeAnalysis = knowledgePointMapper.getSimpleKnowledgeAnalysis(pointIds, studentId);
+
         } catch (Exception e) {
             log.error("查询知识点分析数据失败", e);
             return resultList;
@@ -447,7 +456,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
 
             // 处理用户权重
             if (userWeight == null || userWeight <= 0) {
-                userWeight = 3; // 默认权重为3
+                userWeight = 3;
                 log.debug("知识点[{}]权重为空或负数，设置为默认权重3", pointId);
             }
 
@@ -547,6 +556,10 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         log.info("完成用户自定义权重抽取，共抽取 {} 个知识点，总尝试次数：{}", resultList.size(), attemptCount);
         return resultList;
     }
+
+
+
+
 
 
 }

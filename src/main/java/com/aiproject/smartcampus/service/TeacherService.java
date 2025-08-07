@@ -14,13 +14,14 @@ import com.aiproject.smartcampus.pojo.vo.ExamStudentVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TeacherService extends IService<Teacher> {
     Result<TeacherQueryDTO> queryTeachersById(Integer userId);
 
     Result updateTeacherInfo(Integer userId, TeacherQueryDTO updateDTO);
 
-    Result getAllClassInfo( String couresId);
+    Result<Map<Integer, Double>> getAllClassInfo(String couresId);
 
     Result<List<StudentWrongKnowledgeBO>> getTheMaxUncorrectPoint(String couresId);
 
@@ -43,4 +44,7 @@ public interface TeacherService extends IService<Teacher> {
     Result updateExamStatusById(String examId);
 
     Result deleteExamById(String examId);
+
+    Result<Integer> getUserIdByteacher(Integer teacherId);
+
 }

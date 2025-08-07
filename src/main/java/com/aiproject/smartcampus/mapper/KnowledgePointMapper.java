@@ -257,4 +257,8 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
                              @Param("courseId") Integer courseId,
                              @Param("description") String description,
                              @Param("keywords") String keywords);
+
+
+    @Select("select knowledge_points.point_name from knowledge_points where point_id =#{pointId}")
+    String getPonintNameById(String pointId);
 }

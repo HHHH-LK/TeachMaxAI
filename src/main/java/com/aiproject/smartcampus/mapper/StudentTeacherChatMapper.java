@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.mapper;
 
 
+import com.aiproject.smartcampus.pojo.po.TeacherStudentConversation;
 import com.aiproject.smartcampus.pojo.po.TeacherStudentMessage;
 import com.aiproject.smartcampus.pojo.vo.ChatQueryVO;
 import com.aiproject.smartcampus.pojo.vo.ConversationUnreadCountVO;
@@ -168,7 +169,6 @@ public interface StudentTeacherChatMapper {
     @Insert("INSERT INTO teacher_student_messages " +
             "(conversation_id, sender_user_id, content, message_type, file_url, is_read, created_at) " +
             "VALUES (#{conversationId}, #{senderUserId}, #{content}, #{messageType}, #{fileUrl}, FALSE, NOW())")
-    @Options(useGeneratedKeys = true, keyProperty = "messageId", keyColumn = "message_id")
     int sendMessage(@Param("conversationId") Long conversationId,
                     @Param("senderUserId") Integer senderUserId,
                     @Param("content") String content,
@@ -176,5 +176,15 @@ public interface StudentTeacherChatMapper {
                     @Param("fileUrl") String fileUrl);
 
 
+    @Insert("INSERT INTO teacher_student_conversations(student_id, teacher_id)\n" +
+            "VALUES(#{studentId},#{teacherId});")
+    @Options(
+            useGeneratedKeys = true,
+            keyProperty = "id",       // 生成的主键值要赋值给实体类的哪个属性（需与实体类属性名一致）
+            keyColumn = "conversation_id"          // 数据库表中的主键字段名（需与表结构一致，可省略如果和属性名相同）
+    )
+    int setConnection(TeacherStudentConversation conversation);
 
+    @Select("SELECT conversation_id FROM teacher_student_conversations WHERE student_id = #{studentId} AND teacher_id = #{teacherId}")
+    Long getConnection(TeacherStudentConversation conversation);
 }

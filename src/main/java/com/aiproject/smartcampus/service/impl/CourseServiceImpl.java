@@ -138,8 +138,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public Result<List<CourseVO>> getAllStudentHaveCourse() {
 
-        /*String studentId = userToTypeUtils.change();*/
-        String studentId = "1";
+        String studentId = userToTypeUtils.change();
 
         List<CourseVO> allCourseByByStudent = courseMapper.findAllCourseByStudentId(studentId);
         for (CourseVO course : allCourseByByStudent) {

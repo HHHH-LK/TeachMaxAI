@@ -4,6 +4,7 @@ import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
 import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
 import com.aiproject.smartcampus.service.KnoledgeService;
+import com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -72,6 +73,13 @@ public class KnowledgeController {
     public Result<Double> getAver(){
 
         return knoledgeService.getAver();
+    }
+
+    @GetMapping("/getKonwledgeNameById")
+    public Result<String> getKonwledgeNameById(@RequestParam(value = "PointId") String pointId) {
+
+        return knoledgeService.getKonwledgeNameById(pointId);
+
     }
 
 

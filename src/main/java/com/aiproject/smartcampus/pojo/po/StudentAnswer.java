@@ -34,7 +34,7 @@ public class StudentAnswer implements Serializable {
     private String studentAnswer;
     
     @TableField("is_correct")
-    private Boolean isCorrect;
+    private String isCorrect;
     
     @TableField("score_earned")
     private BigDecimal scoreEarned;

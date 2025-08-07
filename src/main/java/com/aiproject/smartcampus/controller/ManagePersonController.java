@@ -23,9 +23,9 @@ public class ManagePersonController {
 
     /**
      * 根据学号查询学生信息
-     * */
+     */
     @GetMapping("/getstudent/student_number")
-    public Result<Student> getStudentsBystudentNumber(@RequestParam(value = "studentNumber") String studentNumber){
+    public Result<Student> getStudentsBystudentNumber(@RequestParam(value = "studentNumber") String studentNumber) {
 
         return adminService.getStudentBystudentNumber(studentNumber);
 
@@ -33,9 +33,9 @@ public class ManagePersonController {
 
     /**
      * 根据学号删除学生信息
-     * */
+     */
     @PostMapping("/deletestudent/student_number")
-    public Result deleteStudentsBystudentNumber(@RequestParam(value = "studentNumber") String studentNumber){
+    public Result deleteStudentsBystudentNumber(@RequestParam(value = "studentNumber") String studentNumber) {
 
         return adminService.deleteStudentBystudentNumber(studentNumber);
 
@@ -43,9 +43,9 @@ public class ManagePersonController {
 
     /**
      * 根据学号修改学生信息
-     * */
+     */
     @PostMapping("/updatestudent/student_number")
-    public Result updateStudentsByStudentId(@RequestBody Student student){
+    public Result updateStudentsByStudentId(@RequestBody Student student) {
 
         return adminService.updateStudentBystudentNumber(student);
 
@@ -53,20 +53,20 @@ public class ManagePersonController {
 
     /**
      * 新增学生信息
-     * */
+     */
     @PostMapping("/addstudent")
-    public Result addStudent(@RequestBody Student student){
+    public Result addStudent(@RequestBody Student student) {
 
         return adminService.addStudent(student);
     }
 
     /**
      * 修改用户状态
-     * */
+     */
     @PostMapping("/updateuserstatus")
-    public Result updateUserStatus(String userId,String status){
+    public Result updateUserStatus(String userId, String status) {
 
-        return adminService.updateUserStatus(userId,status);
+        return adminService.updateUserStatus(userId, status);
     }
 
 

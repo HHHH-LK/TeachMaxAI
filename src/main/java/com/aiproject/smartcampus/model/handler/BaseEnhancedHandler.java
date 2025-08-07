@@ -3,6 +3,7 @@ package com.aiproject.smartcampus.model.handler;
 
 import com.aiproject.smartcampus.commons.client.StatusCilent;
 import com.aiproject.smartcampus.commons.utils.CreateDiagram;
+import com.aiproject.smartcampus.commons.utils.StreamingOutputUtils;
 import com.aiproject.smartcampus.pojo.bo.TaskAction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public abstract class BaseEnhancedHandler extends EnhancedAutoRegisterHandler {
     
     @Autowired
     protected CreateDiagram createDiagram;
+    @Autowired
+    protected StreamingOutputUtils streamingUtils;
+
 
     @Override
     public final String run(String intent, List<CompletableFuture<String>> result) {
@@ -139,4 +143,12 @@ public abstract class BaseEnhancedHandler extends EnhancedAutoRegisterHandler {
     protected String getHandlerType() {
         return this.getClass().getSimpleName();
     }
+
+
+
+
+
+
+
+
 }
