@@ -186,4 +186,7 @@ public interface AdminMapper extends BaseMapper<Admin> {
 
     @Delete("DELETE FROM admins WHERE user_id = #{userId}")
     int deleteByUserId(@Param("userId") Integer userId);
+
+    @Select("SELECT * FROM admins WHERE user_id = #{userId}")
+    Admin selectByUserId(Integer userId);
 }

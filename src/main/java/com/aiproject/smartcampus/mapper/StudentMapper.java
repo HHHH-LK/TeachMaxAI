@@ -120,4 +120,10 @@ public interface StudentMapper extends BaseMapper<Student> {
 
     @Select("SELECT * FROM students WHERE student_id = #{studentId}")
     Student findById(@Param("studentId") Integer studentId);
+
+    /**
+     * 根据用户ID查询学生
+     */
+    @Select("SELECT * FROM students WHERE user_id = #{userId}")
+    Student selectByUserId(Integer userId);
 }

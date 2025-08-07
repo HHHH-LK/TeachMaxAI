@@ -87,4 +87,13 @@ public class InfomationAdminController {
     public Result getHighFrequencyErrorPoints() {
         return informationAdminService.getHighFrequencyErrorPoints();
     }
+
+    /**
+     * 获取全部用户信息
+     */
+    @GetMapping("/getAllUserInfo")
+    @Operation(summary = "获取全部用户信息", description = "获取所有用户的详细信息")
+    public Result getAllUserInfo() {
+        return informationAdminService.getAllUserInfo();
+    }
 }

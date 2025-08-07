@@ -20,4 +20,6 @@ public interface InformationAdminService {
     Result updateUserInfo(AdminUserDTO adminUserDTO);
 
     Result getHighFrequencyErrorPoints();
+
+    Result getAllUserInfo();
 }

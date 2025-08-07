@@ -462,6 +462,47 @@ public class InformationAdminserviceImpl implements InformationAdminService {
         }
     }
 
+    @Override
+    public Result getAllUserInfo() {
+        try {
+            // 1. 查询所有用户信息
+            List<User> users = userMapper.selectList(null);
+            if (users.isEmpty()) {
+                return Result.error("没有找到任何用户信息");
+            }
+
+            // 2. 构建结果列表
+            List<Map<String, Object>> userInfoList = new ArrayList<>();
+            for (User user : users) {
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("user", user);
+
+                // 根据用户类型查询对应的扩展信息
+                switch (user.getUserType()) {
+                    case ADMIN:
+                        Admin admin = adminMapper.selectByUserId(user.getUserId());
+                        userInfo.put("admin", admin);
+                        break;
+                    case STUDENT:
+                        Student student = studentMapper.selectByUserId(user.getUserId());
+                        userInfo.put("student", student);
+                        break;
+                    case TEACHER:
+                        Teacher teacher = teacherMapper.selectByUserId(user.getUserId());
+                        userInfo.put("teacher", teacher);
+                        break;
+                }
+                userInfoList.add(userInfo);
+            }
+
+            return Result.success(userInfoList);
+
+        } catch (Exception e) {
+            log.error("获取用户信息失败: {}", e.getMessage(), e);
+            return Result.error("获取用户信息失败");
+        }
+    }
+
     // 处理教师外键依赖并返回结果
     private Result handleTeacherDependencies(Integer userId) {
         try {
