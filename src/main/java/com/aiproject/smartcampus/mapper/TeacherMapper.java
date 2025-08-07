@@ -75,4 +75,7 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
 
     @Select("SELECT * FROM teachers WHERE user_id = #{userId}")
     Teacher selectByUserId(@Param("userId") Integer userId);
+
+    @Select("select teachers.user_id from teachers where teacher_id=#{teacherId} ")
+    Integer getUserIdByTeacherId(Integer teacherId);
 }
