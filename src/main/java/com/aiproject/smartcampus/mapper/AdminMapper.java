@@ -170,4 +170,20 @@ public interface AdminMapper extends BaseMapper<Admin> {
     int batchUpdateStatus(@Param("adminIds") List<Integer> adminIds, @Param("status") String status);
 
 
+    @Update("UPDATE admins SET " +
+            "admin_number = #{a.adminNumber}, " +
+            "department = #{a.department}, " +
+            "position = #{a.position}, " +
+            "admin_level = #{a.adminLevel} " +
+            "WHERE user_id = #{a.userId}")
+    int updateByUserId(@Param("a") Admin admin);
+
+    @Select("SELECT user_id FROM admins WHERE admin_number = #{adminNumber} AND user_id != #{currentUserId}")
+    Integer checkAdminNumberConflict(
+            @Param("adminNumber") String adminNumber,
+            @Param("currentUserId") int currentUserId
+    );
+
+    @Delete("DELETE FROM admins WHERE user_id = #{userId}")
+    int deleteByUserId(@Param("userId") Integer userId);
 }

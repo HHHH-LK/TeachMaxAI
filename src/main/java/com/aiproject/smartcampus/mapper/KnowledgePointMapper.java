@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.mapper;
 
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
+import com.aiproject.smartcampus.pojo.bo.StudentKnowBO;
 import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 
@@ -9,7 +10,6 @@ import com.aiproject.smartcampus.pojo.vo.KnowledgePointVO;
 import com.aiproject.smartcampus.pojo.vo.StudentKnowledgePointVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.*;
-import org.checkerframework.checker.optional.qual.Present;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -21,6 +21,24 @@ import java.util.List;
 @Repository
 @Mapper
 public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
+    @Select("SELECT\n" +
+            "    kp.point_id,\n" +
+            "    kp.point_name,\n" +
+            "    kp.description,\n" +
+            "    kp.difficulty_level,\n" +
+            "    kp.keywords,\n" +
+            "    c.course_name,\n" +
+            "    sa.student_id,\n" +
+            "    COUNT(CASE WHEN sa.is_correct = 0 THEN 1 END) as wrong_answer_count,\n" +
+            "    COUNT(*) as total_answer_count,\n" +
+            "    ROUND(AVG(CASE WHEN sa.is_correct = 1 THEN 1 ELSE 0 END) * 100, 2) as accuracy_rate\n" +
+            "FROM student_answers sa\n" +
+            "INNER JOIN question_bank qb ON sa.question_id = qb.question_id\n" +
+            "INNER JOIN knowledge_points kp ON qb.point_id = kp.point_id\n" +
+            "INNER JOIN courses c ON kp.course_id = c.course_id\n" +
+            "GROUP BY kp.point_id, kp.point_name, kp.description, kp.difficulty_level, kp.keywords, c.course_name, sa.student_id\n" +
+            "ORDER BY kp.point_id, sa.student_id;")
+    List<StudentKnowBO> getAllWrongKnowledgeFrequency();
 
     @Select("SELECT\n" +
             "    kp.point_id,\n" +

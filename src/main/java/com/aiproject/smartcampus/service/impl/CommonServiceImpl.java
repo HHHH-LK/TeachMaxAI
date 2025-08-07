@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -32,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
@@ -99,9 +102,11 @@ public class CommonServiceImpl implements CommonService {
         log.info("用户 {} 登录成功，生成令牌: {}", user.getUsername(), token);
 
         String key = tokenKey + token;
+        user.setCreatedAt(LocalDateTime.now());
         userRedisTemplate.opsForValue().set(key, user, 7, TimeUnit.DAYS);
 
         System.out.println(user.getUserType());
+        System.out.println(user.getCreatedAt() + "time");
         return Result.success(user.getUserType().getValue() + ":" + token);
 
 

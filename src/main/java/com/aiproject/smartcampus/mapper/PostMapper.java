@@ -40,7 +40,7 @@ public interface PostMapper extends BaseMapper<Post> {
     @Select("SELECT p.*, u.username " +
             "FROM post p " +
             "LEFT JOIN users u ON p.user_id = u.user_id " +
-            "WHERE u.userid = #{id}" +
+            "WHERE u.user_id = #{id} " +
             "ORDER BY p.create_time DESC")
     @Results({
             @Result(property = "id", column = "id"),

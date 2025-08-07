@@ -115,7 +115,6 @@ public interface StudentMapper extends BaseMapper<Student> {
             "ORDER BY sa.exam_id DESC, sa.question_id;")
     List<StudentWrongQuestionVO> selectWrongQuestion(@Param("studentId") String studentId, @Param("courseId") String courseId);
 
-
-
-
+    @Delete("DELETE FROM students WHERE user_id = #{userId}")
+    int deleteByUserId(@Param("userId") Integer userId);
 }

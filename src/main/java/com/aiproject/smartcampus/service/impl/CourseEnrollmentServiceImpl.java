@@ -48,6 +48,7 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
                         catch(InterruptedException e){
                             log.error("添加选课信息线程被中断",e);
                             Thread.currentThread().interrupt();
+                            break;
                         }
                         catch(Exception e){
                             e.printStackTrace();

@@ -69,4 +69,10 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
             "t.employee_number = #{employee_number}, t.department = #{department} " +
             "WHERE t.user_id = #{userId}")
     int updateTeacherProfile(TeacherQueryDTO dto);
+
+    @Delete("DELETE FROM teachers WHERE user_id = #{userId}")
+    int deleteByUserId(@Param("userId") Integer userId);
+
+    @Select("SELECT * FROM teachers WHERE user_id = #{userId}")
+    Teacher selectByUserId(@Param("userId") Integer userId);
 }
