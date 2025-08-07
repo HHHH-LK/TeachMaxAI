@@ -27,4 +27,6 @@ public interface CourseService extends IService<Course> {
     Result<List<ExamQuestionDetailVO>> getCourseExamInfo(String examId);
 
     Result<List<ExamQuestionDetailVO>> getCourseExamStudent(String examId, String studentId);
+
+    Result getCourseHomeworkInfo(String courseId);
 }

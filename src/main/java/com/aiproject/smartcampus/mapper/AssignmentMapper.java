@@ -46,4 +46,11 @@ public interface AssignmentMapper extends BaseMapper<Assignment> {
             "WHERE a.assignment_id = #{assignmentId} " +
             "GROUP BY a.assignment_id")
     Map<String, Object> getAssignmentStatistics(@Param("assignmentId") Integer assignmentId);
+
+    @Select("SELECT COUNT(*) FROM assignments WHERE course_id = #{courseId}")
+    Integer countAssignmentsByCourseId(@Param("courseId") String courseId);
+
+    // 根据课程ID查询所有作业
+    @Select("SELECT * FROM assignments WHERE course_id = #{courseId}")
+    List<Assignment> selectByCourseId(@Param("courseId") String courseId);
 }

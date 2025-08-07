@@ -8,9 +8,7 @@ import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 
 //import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
 import com.aiproject.smartcampus.pojo.po.Course;
-import com.aiproject.smartcampus.pojo.vo.ChapterQuestionDetailTeacherVO;
-import com.aiproject.smartcampus.pojo.vo.ChapterQuestionDetailVO;
-import com.aiproject.smartcampus.pojo.vo.ExamStudentVO;
+import com.aiproject.smartcampus.pojo.vo.*;
 import com.aiproject.smartcampus.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -152,5 +150,32 @@ public class TeacherController {
     @GetMapping("/getUserIdByteacher")
     public Result<Integer> getUserIdByteacher(@RequestParam("teacherId") Integer teacherId) {
         return teacherService.getUserIdByteacher(teacherId);
+    }
+
+    /**
+     * 获取学生的作业情况
+     */
+    @GetMapping("/getStudentHomework")
+    @Operation(summary = "获取课程作业情况", description = "根据课程ID获取其作业情况")
+    public Result<CourseSummaryVO> getStudentHomework(@RequestParam("courseId") String courseId) {
+        return teacherService.getStudentHomework(courseId);
+    }
+
+    /**
+     * 获取学生的考试情况
+     */
+    @GetMapping("/getStudentExam")
+    @Operation(summary = "获取课程考试情况", description = "根据课程ID获取其考试情况")
+    public Result<ExamSummaryVO> getStudentExam(@RequestParam("courseId") String courseId) {
+        return teacherService.getStudentExam(courseId);
+    }
+
+    /**
+     * 根据课程Id查询知识点掌握
+     */
+    @GetMapping("/getKnowledgePointMastery")
+    @Operation(summary = "获取知识点掌握情况", description = "根据课程ID获取知识点掌握情况")
+    public Result<Map<String, KnowledgePointMasteryVO>> getKnowledgePointMastery(@RequestParam("courseId") String courseId) {
+        return teacherService.getKnowledgePointMastery(courseId);
     }
 }

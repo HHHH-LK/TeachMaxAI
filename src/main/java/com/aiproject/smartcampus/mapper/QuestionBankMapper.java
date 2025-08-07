@@ -98,4 +98,9 @@ public interface QuestionBankMapper extends BaseMapper<QuestionBank> {
                                             @Param("mediumRatio") Double mediumRatio,
                                             @Param("hardRatio") Double hardRatio);
 
+    @Select("SELECT * FROM question_bank " +
+            "WHERE FIND_IN_SET(point_id, #{pointIds}) > 0")
+    List<QuestionBank> findByPointIds(@Param("pointIds") String pointIds);
+
+
 }

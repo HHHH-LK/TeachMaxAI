@@ -77,4 +77,17 @@ public interface StudentAnswerMapper extends BaseMapper<StudentAnswer> {
             "INNER JOIN courses c ON kp.course_id = c.course_id\n" +
             "ORDER BY kp.point_id, sa.student_id;")
     List<StudentKnowBO> getAllAnswerKnowledgeFrequency();
+
+
+    @Select("SELECT\n" +
+            "    kp.point_id,\n" +
+            "    kp.point_name,\n" +
+            "    c.course_name,\n" +
+            "    sa.is_correct\n" +
+            "FROM student_answers sa\n" +
+            "INNER JOIN question_bank qb ON sa.question_id = qb.question_id\n" +
+            "INNER JOIN knowledge_points kp ON qb.point_id = kp.point_id\n" +
+            "INNER JOIN courses c ON kp.course_id = c.course_id\n" +
+            "WHERE c.course_id = #{courseId}")
+    List<StudentKnowBO> getAnswerKnowledgeFrequencyByCourseId(@Param("courseId") String courseId);
 }

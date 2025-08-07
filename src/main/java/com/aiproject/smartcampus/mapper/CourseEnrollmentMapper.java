@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.mapper;
 
 import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.po.CourseEnrollment;
+import com.aiproject.smartcampus.pojo.po.Student;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -64,4 +65,16 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
             "JOIN courses c ON ce.course_id = c.course_id " +
             "WHERE ce.course_id = #{courseId}")
     List<TeacherGetStudentDTO> getStudentInfo(@Param("courseId") Integer courseId);
+
+    @Select("SELECT COUNT(*) FROM course_enrollments WHERE course_id = #{courseId}")
+    Integer countEnrollmentsByCourseId(@Param("courseId") String courseId);
+
+    @Select("SELECT COUNT(*) FROM course_enrollments WHERE course_id = #{courseId} AND status = 'active'")
+    Integer countActiveEnrollmentsByCourseId(@Param("courseId") String courseId);
+
+    // 根据课程ID查询所有选课学生
+    @Select("SELECT s.* FROM students s " +
+            "JOIN course_enrollments ce ON s.student_id = ce.student_id " +
+            "WHERE ce.course_id = #{courseId}")
+    List<Student> findStudentsByCourseId(@Param("courseId") String courseId);
 }

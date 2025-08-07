@@ -136,4 +136,14 @@ public class CourseController {
         return courseService.getAllLearnDate();
     }
 
+    /**
+     * 查询课程作业信息
+     */
+    @GetMapping("/getCourseHomeworkInfo")
+    @Operation(summary = "查询课程作业信息")
+    public Result getCourseHomeworkInfo(
+            @RequestParam(value = "courseId") String courseId) {
+        return courseService.getCourseHomeworkInfo(courseId);
+    }
+
 }

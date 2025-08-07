@@ -263,6 +263,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         }
     }
 
+    @Override
+    public Result getCourseHomeworkInfo(String courseId) {
+        return null;
+    }
+
 
 }
 

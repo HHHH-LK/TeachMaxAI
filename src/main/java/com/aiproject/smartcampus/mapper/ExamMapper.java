@@ -308,4 +308,8 @@ public interface ExamMapper extends BaseMapper<Exam> {
     List<ExamStudentVO> getExamStudentInfo(
             @Param("examId") String examId,
             @Param("teacherId") String teacherId);
+
+    @Select("SELECT * FROM exams WHERE course_id = #{courseId} AND status != 'draft'")
+    List<Exam> findByCourseIdAndStatusNotDraft(@Param("courseId") String courseId);
+
 }

@@ -42,4 +42,7 @@ public interface UserMapper extends BaseMapper<User> {
      */
     @Select("SELECT * FROM users WHERE real_name LIKE CONCAT('%', #{keyword}, '%') OR username LIKE CONCAT('%', #{keyword}, '%')")
     List<User> searchUsers(@Param("keyword") String keyword);
+
+    @Select("SELECT * FROM users WHERE user_id = #{userId}")
+    User findById(@Param("userId") Integer userId);
 }

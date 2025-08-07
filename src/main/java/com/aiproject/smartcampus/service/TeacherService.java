@@ -8,9 +8,7 @@ import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 //import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.po.Teacher;
-import com.aiproject.smartcampus.pojo.vo.ChapterQuestionDetailTeacherVO;
-import com.aiproject.smartcampus.pojo.vo.ChapterQuestionDetailVO;
-import com.aiproject.smartcampus.pojo.vo.ExamStudentVO;
+import com.aiproject.smartcampus.pojo.vo.*;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -47,4 +45,9 @@ public interface TeacherService extends IService<Teacher> {
 
     Result<Integer> getUserIdByteacher(Integer teacherId);
 
+    Result<CourseSummaryVO> getStudentHomework(String courseId);
+
+    Result<ExamSummaryVO> getStudentExam(String courseId);
+
+    Result<Map<String, KnowledgePointMasteryVO>> getKnowledgePointMastery(String courseId);
 }

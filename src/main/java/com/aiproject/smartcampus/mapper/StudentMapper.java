@@ -117,4 +117,7 @@ public interface StudentMapper extends BaseMapper<Student> {
 
     @Delete("DELETE FROM students WHERE user_id = #{userId}")
     int deleteByUserId(@Param("userId") Integer userId);
+
+    @Select("SELECT * FROM students WHERE student_id = #{studentId}")
+    Student findById(@Param("studentId") Integer studentId);
 }
