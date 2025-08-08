@@ -108,8 +108,7 @@ public class TowerCreateToolUtils {
         createKnowledgeGraph(pointNameList);
 
         //初始化塔层与塔层相关信息
-        createTowerDefault(courseId);
-
+        createTowerDefault(studentId, courseId);
 
         return true;
 
@@ -144,12 +143,12 @@ public class TowerCreateToolUtils {
     /**
      * 创建初始固定塔层（初始值默认拓扑排序后的层数）
      */
-    private void createTowerDefault(String courseId) {
+    private void createTowerDefault(String studentId, String courseId) {
 
         //获取每层知识点的结果
         Map<Integer, List<Integer>> TOWER_FLOOR_POINTS_MAP = getTowerFloorPointIds();
 
-        Tower towerInfo = getTowerInfo(TOWER_FLOOR_POINTS_MAP.size(), courseId);
+        Tower towerInfo = getTowerInfo(TOWER_FLOOR_POINTS_MAP.size(), courseId, studentId);
         //加入db中
         initTowerToDB(towerInfo, courseId);
 
@@ -493,7 +492,7 @@ public class TowerCreateToolUtils {
     /**
      * 获取塔相关信息
      */
-    public Tower getTowerInfo(Integer size, String courseId) {
+    public Tower getTowerInfo(Integer size, String courseId, String studentId) {
 
 
         String courseName = courseMapper.getCourseByid(Integer.valueOf(courseId));
@@ -504,7 +503,7 @@ public class TowerCreateToolUtils {
         tower.setName(towerName);
         tower.setCourseId(Long.valueOf(courseId));
         tower.setTotalFloors(size);
-
+        tower.setStudentId(Long.valueOf(studentId));
 
         return tower;
 

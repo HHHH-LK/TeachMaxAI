@@ -54,4 +54,10 @@ public class Tower implements Serializable {
     @TableField(value = "description")
     private String description;
 
+    /**
+     * 所属学生id
+     */
+    @TableField(value = "student_id")
+    private Long studentId;
+
 }
