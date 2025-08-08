@@ -1,0 +1,536 @@
+const exams = ref([
+  {
+    id: 1,
+    name: '第一次月考',
+    startTime: '2025-06-04 10:10',
+    endTime: '2025-06-04 12:10',
+    status: '已结束',
+    durationMinutes: '120min',
+    myPaper: '已公布',
+    score: 98,
+    // 模拟试卷数据
+    paper: {
+      title: '2025上学期《WEB高级开发技术》期末考试',
+      questions: [
+        { id: 'q1', title: 'HTML属于什么类型的语言？', type: 'single', score: 5, options: [ { value: 'A', label: '标记语言' }, { value: 'B', label: '编译语言' }, { value: 'C', label: '脚本语言' } ] },
+        { id: 'q2', title: '以下哪些属于CSS选择器？', type: 'multiple', score: 8, options: [ { value: 'A', label: '类选择器' }, { value: 'B', label: 'ID选择器' }, { value: 'C', label: '标签选择器' } ] },
+        { id: 'q3', title: 'JavaScript可以直接操作DOM节点。', type: 'judge', score: 4 },
+        { id: 'q4', title: '简述前端三大件的作用。', type: 'short', score: 10 },
+        { id: 'q5', title: 'CSS的层叠顺序属性是____。', type: 'blank', score: 5 }
+      ],
+      userAnswers: { q1: 'A', q2: ['A', 'B'], q3: true, q4: 'HTML结构，CSS样式，JS交互', q5: 'z-index' }
+    },
+    wrongAnalysis: { q2: 'ID选择器和类选择器都属于CSS选择器。', q4: '三大件分别负责结构、样式和交互。' }
+  },
+  {
+    id: 2,
+    name: '期中考试',
+    startTime: '2025-07-04 10:10',
+    endTime: '2025-06-04 12:10',
+    status: '已结束',
+    durationMinutes: '120min',
+    myPaper: '已公布',
+    score: 98,
+    // 模拟试卷数据
+    paper: {
+      title: '2025Java程序设计期中考试',
+      questions: [
+        {
+          id: 'q1',
+          title: 'Java属于哪种类型的语言？',
+          type: 'single',
+          score: 5,
+          options: [
+            { value: 'A', label: '编译型语言' },
+            { value: 'B', label: '解释型语言' },
+            { value: 'C', label: '混合型语言（编译+解释）' }
+          ]
+        },
+        {
+          id: 'q2',
+          title: '下列哪些是Java的基本数据类型？',
+          type: 'multiple',
+          score: 8,
+          options: [
+            { value: 'A', label: 'int' },
+            { value: 'B', label: 'String' },
+            { value: 'C', label: 'boolean' },
+            { value: 'D', label: 'float' }
+          ]
+        },
+        {
+          id: 'q3',
+          title: 'Java中String是基本数据类型。',
+          type: 'judge',
+          score: 4
+        },
+        {
+          id: 'q4',
+          title: '简述Java中接口和抽象类的区别。',
+          type: 'short',
+          score: 10
+        },
+        {
+          id: 'q5',
+          title: 'Java中用于定义常量的关键字是____。',
+          type: 'blank',
+          score: 5
+        },
+        {
+          id: 'q6',
+          title: 'Java中哪个关键字用于定义包？',
+          type: 'single',
+          score: 5,
+          options: [
+            { value: 'A', label: 'import' },
+            { value: 'B', label: 'package' },
+            { value: 'C', label: 'class' },
+            { value: 'D', label: 'public' }
+          ]
+        },
+        {
+          id: 'q7',
+          title: 'Java中String类的常用方法有哪些？',
+          type: 'multiple',
+          score: 8,
+          options: [
+            { value: 'A', label: 'substring()' },
+            { value: 'B', label: 'indexOf()' },
+            { value: 'C', label: 'charAt()' },
+            { value: 'D', label: 'length()' }
+          ]
+        },
+        {
+          id: 'q8',
+          title: 'Java中可以使用==比较两个字符串的内容。',
+          type: 'judge',
+          score: 4
+        },
+        {
+          id: 'q9',
+          title: 'Java中实现Runnable接口是创建线程的一种方式。',
+          type: 'judge',
+          score: 4
+        },
+        {
+          id: 'q10',
+          title: 'Java中泛型的作用是____。',
+          type: 'blank',
+          score: 5
+        },
+        {
+          id: 'q11',
+          title: 'Java中StringBuffer和StringBuilder的区别是？',
+          type: 'short',
+          score: 10
+        },
+        {
+          id: 'q12',
+          title: 'Java中哪个关键字用于声明静态方法？',
+          type: 'single',
+          score: 5,
+          options: [
+            { value: 'A', label: 'static' },
+            { value: 'B', label: 'final' },
+            { value: 'C', label: 'private' },
+            { value: 'D', label: 'public' }
+          ]
+        },
+        {
+          id: 'q13',
+          title: 'Java中常见的垃圾回收器有哪些？',
+          type: 'multiple',
+          score: 8,
+          options: [
+            { value: 'A', label: 'Serial' },
+            { value: 'B', label: 'Parallel' },
+            { value: 'C', label: 'CMS' },
+            { value: 'D', label: 'G1' }
+          ]
+        },
+        {
+          id: 'q14',
+          title: 'Java中可以继承多个类。',
+          type: 'judge',
+          score: 4
+        },
+        {
+          id: 'q15',
+          title: 'Java中使用哪个关键字来抛出异常？',
+          type: 'single',
+          score: 5,
+          options: [
+            { value: 'A', label: 'throw' },
+            { value: 'B', label: 'throws' },
+            { value: 'C', label: 'try' },
+            { value: 'D', label: 'catch' }
+          ]
+        },
+        {
+          id: 'q16',
+          title: 'Java中接口中可以包含默认方法。',
+          type: 'judge',
+          score: 4
+        },
+        {
+          id: 'q17',
+          title: 'Java中集合类ArrayList的底层实现是____。',
+          type: 'blank',
+          score: 5
+        },
+        {
+          id: 'q18',
+          title: 'Java中Java.util包中包含哪些常用类？',
+          type: 'multiple',
+          score: 8,
+          options: [
+            { value: 'A', label: 'ArrayList' },
+            { value: 'B', label: 'HashMap' },
+            { value: 'C', label: 'Date' },
+            { value: 'D', label: 'String' }
+          ]
+        },
+        {
+          id: 'q19',
+          title: 'Java中使用哪个关键字来定义常量？',
+          type: 'single',
+          score: 5,
+          options: [
+            { value: 'A', label: 'final' },
+            { value: 'B', label: 'static' },
+            { value: 'C', label: 'const' },
+            { value: 'D', label: 'volatile' }
+          ]
+        },
+        {
+          id: 'q20',
+          title: 'Java中使用equals()方法可以比较对象的内容。',
+          type: 'judge',
+          score: 4
+        },
+        {
+          id: 'q21',
+          title: 'Java中线程的生命周期包括哪些状态？',
+          type: 'short',
+          score: 10
+        },
+        {
+          id: 'q22',
+          title: 'Java中用于定义类的关键字是____。',
+          type: 'blank',
+          score: 5
+        },
+        {
+          id: 'q23',
+          title: 'Java中使用哪个关键字实现接口？',
+          type: 'single',
+          score: 5,
+          options: [
+            { value: 'A', label: 'implements' },
+            { value: 'B', label: 'extends' },
+            { value: 'C', label: 'interface' },
+            { value: 'D', label: 'class' }
+          ]
+        },
+        {
+          id: 'q24',
+          title: 'Java中常见的设计模式有哪些？',
+          type: 'multiple',
+          score: 8,
+          options: [
+            { value: 'A', label: '单例模式' },
+            { value: 'B', label: '工厂模式' },
+            { value: 'C', label: '观察者模式' },
+            { value: 'D', label: '装饰器模式' }
+          ]
+        },
+        {
+          id: 'q25',
+          title: 'Java中使用finalize()方法进行资源回收。',
+          type: 'judge',
+          score: 4
+        }
+      ]
+    },
+    wrongAnalysis: {
+      q1: 'Java是混合型语言，先编译为字节码，再由JVM解释执行。',
+      q2: 'String是引用类型，不是基本数据类型。',
+      q3: 'String是引用类型，不是基本数据类型。',
+      q4: '接口只有抽象方法和常量，而抽象类可以有具体实现；接口支持多继承，抽象类不支持。',
+      q5: 'Java中使用final关键字定义常量，如 public static final int MAX = 100;',
+      q6: 'package用于定义包，import用于引入包中的类。',
+      q7: 'substring、indexOf、charAt、length都是String类的常用方法。',
+      q8: '==比较的是引用地址，不是内容。应使用equals()方法比较字符串内容。',
+      q9: '正确，实现Runnable接口是创建线程的一种方式，另一种是继承Thread类。',
+      q10: '泛型用于在编译时提供类型安全，避免运行时类型转换错误。',
+      q11: 'StringBuffer是线程安全的，StringBuilder不是，但效率更高。',
+      q12: 'static关键字用于定义静态方法，属于类而非对象。',
+      q13: 'Serial、Parallel、CMS、G1是JVM中常见的垃圾回收器。',
+      q14: 'Java不支持多继承，但可以通过接口实现类似功能。',
+      q15: 'throw用于抛出一个异常实例，throws用于声明方法可能抛出的异常类型。',
+      q16: 'Java 8开始接口中可以定义默认方法（default方法）。',
+      q17: 'ArrayList底层使用数组实现，支持动态扩容。',
+      q18: 'ArrayList、HashMap、Date 是 java.util 包中的常见类。',
+      q19: 'Java中使用 final 关键字定义常量，static final 用于类常量。',
+      q20: 'equals()方法默认比较引用地址，需重写后才能比较内容。',
+      q21: '线程生命周期包括新建、就绪、运行、阻塞、死亡状态。',
+      q22: 'Java中使用 class 关键字定义类，例如 public class MyClass { ... }。',
+      q23: 'implements 用于实现接口，extends 用于继承类或实现接口中的默认方法。',
+      q24: '单例、工厂、观察者、装饰器是常见的设计模式。',
+      q25: 'finalize()方法在对象被垃圾回收前调用，但不推荐用于资源回收，应使用try-with-resources等机制。'
+    }
+  },
+  {
+    id: 3,
+    name: '第二次月考',
+    startTime: '2025-08-04 10:10',
+    endTime: '2025-06-04 12:10',
+    status: '已结束',
+    durationMinutes: '120min',
+    myPaper: '已公布',
+    score: 98,
+    // 模拟试卷数据
+    paper: {
+      title: '2025上学期《WEB高级开发技术》期末考试',
+      questions: [
+        { id: 'q1', title: 'HTML属于什么类型的语言？', type: 'single', score: 5, options: [ { value: 'A', label: '标记语言' }, { value: 'B', label: '编译语言' }, { value: 'C', label: '脚本语言' } ] },
+        { id: 'q2', title: '以下哪些属于CSS选择器？', type: 'multiple', score: 8, options: [ { value: 'A', label: '类选择器' }, { value: 'B', label: 'ID选择器' }, { value: 'C', label: '标签选择器' } ] },
+        { id: 'q3', title: 'JavaScript可以直接操作DOM节点。', type: 'judge', score: 4 },
+        { id: 'q4', title: '简述前端三大件的作用。', type: 'short', score: 10 },
+        { id: 'q5', title: 'CSS的层叠顺序属性是____。', type: 'blank', score: 5 }
+      ],
+      userAnswers: { q1: 'A', q2: ['A', 'B'], q3: true, q4: 'HTML结构，CSS样式，JS交互', q5: 'z-index' }
+    },
+    wrongAnalysis: { q2: 'ID选择器和类选择器都属于CSS选择器。', q4: '三大件分别负责结构、样式和交互。' }
+  },
+  // {
+  //   id: 4,
+  //   name: '期末考试',
+  //   startTime: '2025-08-10 09:00',
+  //   endTime: '2025-06-10 11:00',
+  //   status: '未开始',
+  //   durationMinutes: '120min',
+  //   myPaper: '未提交',
+  //   score: null
+  // },
+  {
+    id: 5,
+    name: '期末考试',
+    startTime: '2025-07-12 09:00',
+    endTime: '2025-07-12 15:00',
+    status: '进行中',
+    durationMinutes: '120min',
+    myPaper: '未提交',
+    score: null,
+    paper: {
+      "title": "2025上学期《Java程序设计》期末测验",
+      "questions": [
+        {
+          "id": "q1",
+          "title": "Java程序的三大特性是什么？请按顺序写出名称。",
+          "type": "short",
+          "score": 6
+        },
+        {
+          "id": "q2",
+          "title": "抽象类和接口的区别是？请简要说明。",
+          "type": "short",
+          "score": 6
+        },
+        {
+          "id": "q3",
+          "title": "用于实现多态性的Java机制是____。",
+          "type": "blank",
+          "score": 3
+        },
+        {
+          "id": "q4",
+          "title": "下列哪项不是Java关键字？",
+          "type": "single",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "const"},
+            {"value": "B", "label": "interface"},
+            {"value": "C", "label": "null"}
+          ]
+        },
+        {
+          "id": "q5",
+          "title": "请选择所有访问修饰符。",
+          "type": "multiple",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "public"},
+            {"value": "B", "label": "private"},
+            {"value": "C", "label": "synchronized"}
+          ]
+        },
+        {
+          "id": "q6",
+          "title": "Java中实现线程安全的集合类是____。",
+          "type": "blank",
+          "score": 3
+        },
+        {
+          "id": "q7",
+          "title": "this关键字的作用？",
+          "type": "short",
+          "score": 6
+        },
+        {
+          "id": "q8",
+          "title": "下列哪项不是基本数据类型？",
+          "type": "single",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "int"},
+            {"value": "B", "label": "String"},
+            {"value": "C", "label": "char"}
+          ]
+        },
+        {
+          "id": "q9",
+          "title": "以下哪些属于运行时异常？",
+          "type": "multiple",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "NullPointerException"},
+            {"value": "B", "label": "FileNotFoundException"},
+            {"value": "C", "label": "IOException"},
+            {"value": "D", "label": "ArrayIndexOutOfBoundsException"}
+          ]
+        },
+        {
+          "id": "q10",
+          "title": "JVM的作用是？",
+          "type": "single",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "编译Java代码"},
+            {"value": "B", "label": "执行字节码文件"},
+            {"value": "C", "label": "调试程序"}
+          ]
+        },
+        {
+          "id": "q11",
+          "title": "反射机制主要应用于？",
+          "type": "single",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "动态加载类"},
+            {"value": "B", "label": "内存管理"},
+            {"value": "C", "label": "异常处理"}
+          ]
+        },
+        {
+          "id": "q12",
+          "title": "try-with-resources语法需实现____接口。",
+          "type": "blank",
+          "score": 3
+        },
+        {
+          "id": "q13",
+          "title": "Math.round(11.5)的返回值是____。",
+          "type": "blank",
+          "score": 3
+        },
+        {
+          "id": "q14",
+          "title": "Java中数组是对象。",
+          "type": "judge",
+          "score": 3
+        },
+        {
+          "id": "q15",
+          "title": "简述static关键字的四种应用场景。",
+          "type": "short",
+          "score": 6
+        },
+        {
+          "id": "q16",
+          "title": "Java中用于定义接口的关键字是？",
+          "type": "single",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "class"},
+            {"value": "B", "label": "interface"},
+            {"value": "C", "label": "abstract"},
+            {"value": "D", "label": "extends"}
+          ]
+        },
+        {
+          "id": "q17",
+          "title": "以下哪些是Java集合框架中的接口？",
+          "type": "multiple",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "List"},
+            {"value": "B", "label": "Map"},
+            {"value": "C", "label": "Set"},
+            {"value": "D", "label": "Array"}
+          ]
+        },
+        {
+          "id": "q18",
+          "title": "Java中HashMap允许null键和null值。",
+          "type": "judge",
+          "score": 4
+        },
+        {
+          "id": "q19",
+          "title": "Java中final关键字可以修饰哪些元素？",
+          "type": "multiple",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "类"},
+            {"value": "B", "label": "方法"},
+            {"value": "C", "label": "变量"},
+            {"value": "D", "label": "接口"}
+          ]
+        },
+        {
+          "id": "q20",
+          "title": "Java中String类是可变类。",
+          "type": "judge",
+          "score": 3
+        },
+        {
+          "id": "q21",
+          "title": "Java中实现多线程的方式有哪几种？",
+          "type": "short",
+          "score": 6
+        },
+        {
+          "id": "q22",
+          "title": "Java中用于创建对象的关键字是____。",
+          "type": "blank",
+          "score": 3
+        },
+        {
+          "id": "q23",
+          "title": "Java中super关键字的作用是____。",
+          "type": "blank",
+          "score": 3
+        },
+        {
+          "id": "q24",
+          "title": "Java中Thread类的start()方法用于启动线程。",
+          "type": "judge",
+          "score": 2
+        },
+        {
+          "id": "q25",
+          "title": "Java中异常处理机制使用哪些关键字？",
+          "type": "multiple",
+          "score": 4,
+          "options": [
+            {"value": "A", "label": "try"},
+            {"value": "B", "label": "catch"},
+            {"value": "C", "label": "finally"},
+            {"value": "D", "label": "throw"}
+          ]
+        }
+      ]
+    }
+  }
+]);

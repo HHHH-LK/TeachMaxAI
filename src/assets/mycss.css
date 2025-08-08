@@ -1,0 +1,10 @@
+:root {
+    --primary-green: #7fad71;       /* 主绿色 */
+    --light-green: #c1e1b9;         /* 浅绿背景 */
+    --dark-green: #5a8f4d;          /* 深绿按钮 */
+    --chat-user: #7fad71;           /* 用户消息绿色 */
+    --chat-ai: #e8f5e9;             /* AI消息浅绿 */
+    --sidebar-bg: #f1f8e9;          /* 侧边栏背景 */
+    --text-dark: #2e7d32;           /* 深绿文字 */
+    --text-light: #ffffff;          /* 白色文字 */
+}

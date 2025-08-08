@@ -1,0 +1,342 @@
+{
+	"Version": 3,
+	"Parameters": [
+		{
+			"Id": "ParamAngleX",
+			"GroupId": "",
+			"Name": "角度 X"
+		},
+		{
+			"Id": "ParamAngleY",
+			"GroupId": "",
+			"Name": "角度 Y"
+		},
+		{
+			"Id": "ParamAngleZ",
+			"GroupId": "",
+			"Name": "角度 Z"
+		},
+		{
+			"Id": "ParamEyeLOpen",
+			"GroupId": "",
+			"Name": "左眼　开闭"
+		},
+		{
+			"Id": "ParamEyeLSmile",
+			"GroupId": "",
+			"Name": "左眼　微笑"
+		},
+		{
+			"Id": "ParamEyeROpen",
+			"GroupId": "",
+			"Name": "右眼  开闭"
+		},
+		{
+			"Id": "ParamEyeRSmile",
+			"GroupId": "",
+			"Name": "右眼　微笑"
+		},
+		{
+			"Id": "ParamEyeBallX",
+			"GroupId": "",
+			"Name": "眼球 X"
+		},
+		{
+			"Id": "ParamEyeBallY",
+			"GroupId": "",
+			"Name": "眼球 Y"
+		},
+		{
+			"Id": "ParamBrowLY",
+			"GroupId": "",
+			"Name": "左眉上下"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"GroupId": "",
+			"Name": "右眉　上下"
+		},
+		{
+			"Id": "ParamBrowLX",
+			"GroupId": "",
+			"Name": "左眉　左右"
+		},
+		{
+			"Id": "ParamBrowRX",
+			"GroupId": "",
+			"Name": "右眉　左右"
+		},
+		{
+			"Id": "ParamBrowLAngle",
+			"GroupId": "",
+			"Name": "左眉　角度"
+		},
+		{
+			"Id": "ParamBrowRAngle",
+			"GroupId": "",
+			"Name": "右眉　角度"
+		},
+		{
+			"Id": "ParamBrowLForm",
+			"GroupId": "",
+			"Name": "左眉　変形"
+		},
+		{
+			"Id": "ParamBrowRForm",
+			"GroupId": "",
+			"Name": "右眉　変形"
+		},
+		{
+			"Id": "ParamMouthForm",
+			"GroupId": "",
+			"Name": "嘴部　变形"
+		},
+		{
+			"Id": "ParamMouthOpenY",
+			"GroupId": "",
+			"Name": "嘴巴　张开和闭合"
+		},
+		{
+			"Id": "ParamCheek",
+			"GroupId": "",
+			"Name": "脸颊"
+		},
+		{
+			"Id": "ParamBodyAngleX",
+			"GroupId": "",
+			"Name": "身体旋转　X"
+		},
+		{
+			"Id": "ParamBodyAngleY",
+			"GroupId": "",
+			"Name": "身体旋转　Y"
+		},
+		{
+			"Id": "ParamBodyAngleZ",
+			"GroupId": "",
+			"Name": "身体旋转　Z"
+		},
+		{
+			"Id": "ParamBreath",
+			"GroupId": "",
+			"Name": "呼吸"
+		},
+		{
+			"Id": "Param15",
+			"GroupId": "",
+			"Name": "M3待机1"
+		},
+		{
+			"Id": "Param17",
+			"GroupId": "",
+			"Name": "M3 XY"
+		},
+		{
+			"Id": "Param18",
+			"GroupId": "",
+			"Name": "M3xiaoshi"
+		},
+		{
+			"Id": "ParamHairFront",
+			"GroupId": "",
+			"Name": "摇动　前发"
+		},
+		{
+			"Id": "ParamHairSide",
+			"GroupId": "",
+			"Name": "摇动　侧发"
+		},
+		{
+			"Id": "ParamHairBack",
+			"GroupId": "",
+			"Name": "摇动　后发"
+		},
+		{
+			"Id": "Param2",
+			"GroupId": "",
+			"Name": "叹气"
+		},
+		{
+			"Id": "Param9",
+			"GroupId": "",
+			"Name": "疑问"
+		},
+		{
+			"Id": "Param21",
+			"GroupId": "",
+			"Name": "惊讶"
+		},
+		{
+			"Id": "Param22",
+			"GroupId": "",
+			"Name": "冷汗"
+		},
+		{
+			"Id": "Param12",
+			"GroupId": "",
+			"Name": "猫猫脸"
+		},
+		{
+			"Id": "Param13",
+			"GroupId": "",
+			"Name": "无语"
+		},
+		{
+			"Id": "Param",
+			"GroupId": "",
+			"Name": "打盹"
+		},
+		{
+			"Id": "Param26",
+			"GroupId": "",
+			"Name": "R 飞机耳"
+		},
+		{
+			"Id": "Param8",
+			"GroupId": "",
+			"Name": "R 抖耳朵"
+		},
+		{
+			"Id": "Param27",
+			"GroupId": "",
+			"Name": "L 飞机耳"
+		},
+		{
+			"Id": "Param20",
+			"GroupId": "",
+			"Name": "L 抖耳朵"
+		},
+		{
+			"Id": "Param11",
+			"GroupId": "",
+			"Name": "烦躁"
+		},
+		{
+			"Id": "Param10",
+			"GroupId": "",
+			"Name": "脸红"
+		},
+		{
+			"Id": "Param3",
+			"GroupId": "",
+			"Name": "工作量"
+		},
+		{
+			"Id": "Param23",
+			"GroupId": "",
+			"Name": "戳文件"
+		},
+		{
+			"Id": "Param24",
+			"GroupId": "",
+			"Name": "文件物理"
+		},
+		{
+			"Id": "Param4",
+			"GroupId": "",
+			"Name": "办公中"
+		},
+		{
+			"Id": "Param5",
+			"GroupId": "",
+			"Name": "写字"
+		},
+		{
+			"Id": "Param6",
+			"GroupId": "",
+			"Name": "时间（1）"
+		},
+		{
+			"Id": "Param7",
+			"GroupId": "",
+			"Name": "时间（2）"
+		},
+		{
+			"Id": "Param14",
+			"GroupId": "",
+			"Name": "苦恼"
+		},
+		{
+			"Id": "Param16",
+			"GroupId": "",
+			"Name": "M3待机2"
+		},
+		{
+			"Id": "Param19",
+			"GroupId": "",
+			"Name": "脸黑"
+		},
+		{
+			"Id": "Param25",
+			"GroupId": "",
+			"Name": "高光消失"
+		}
+	],
+	"ParameterGroups": [],
+	"Parts": [
+		{
+			"Id": "biaoqing",
+			"Name": "biaoqing"
+		},
+		{
+			"Id": "hair",
+			"Name": "hair"
+		},
+		{
+			"Id": "hand",
+			"Name": "hand"
+		},
+		{
+			"Id": "desk",
+			"Name": "desk"
+		},
+		{
+			"Id": "shoubi",
+			"Name": "shoubi"
+		},
+		{
+			"Id": "ear",
+			"Name": "ear"
+		},
+		{
+			"Id": "face",
+			"Name": "face"
+		},
+		{
+			"Id": "body",
+			"Name": "body"
+		},
+		{
+			"Id": "Part5",
+			"Name": "M3.psd"
+		},
+		{
+			"Id": "back",
+			"Name": "back"
+		},
+		{
+			"Id": "Part",
+			"Name": "R ear"
+		},
+		{
+			"Id": "Part2",
+			"Name": "L ear"
+		},
+		{
+			"Id": "Part3",
+			"Name": "R eye"
+		},
+		{
+			"Id": "Part4",
+			"Name": "L eye"
+		},
+		{
+			"Id": "clothes",
+			"Name": "clothes"
+		},
+		{
+			"Id": "jianbang",
+			"Name": "jianbang"
+		}
+	]
+}
