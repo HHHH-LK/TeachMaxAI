@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.dto.*;
+import com.aiproject.smartcampus.pojo.po.Chapter;
 import com.aiproject.smartcampus.pojo.vo.*;
 import com.aiproject.smartcampus.service.ChapterService;
 import dev.langchain4j.agent.tool.P;
@@ -153,6 +154,33 @@ public class ChapterController {
     public Result juTest(@RequestBody StudentTextAnswerDTO studentTextAnswerDTO) {
 
         return chapterService.juTest(studentTextAnswerDTO);
+    }
+
+    /**
+     * 修改章节名称
+     */
+    @PostMapping("/updateChapterName")
+    @Operation(summary = "修改章节名称", description = "根据章节ID修改章节名称")
+    public Result<String> updateChapterName(@RequestBody Chapter chapter) {
+        return chapterService.updateChapterName(chapter);
+    }
+
+    /**
+     * 删除章节
+     */
+    @DeleteMapping("/deleteChapter")
+    @Operation(summary = "删除章节", description = "根据章节ID删除指定章节")
+    public Result<String> deleteChapter(@RequestParam(value = "chapterId") String chapterId) {
+        return chapterService.deleteChapter(chapterId);
+    }
+
+    /**
+     * 添加章节
+     */
+    @PostMapping("/addChapter")
+    @Operation(summary = "添加章节", description = "根据课程ID添加新章节")
+    public Result<String> addChapter(@RequestBody Chapter chapter) {
+        return chapterService.addChapter(chapter);
     }
 
 

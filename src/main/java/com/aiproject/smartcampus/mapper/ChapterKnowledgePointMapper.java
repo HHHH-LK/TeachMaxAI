@@ -1,11 +1,12 @@
 package com.aiproject.smartcampus.mapper;
 
 import com.aiproject.smartcampus.pojo.po.ChapterKnowledgePoint;
+import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
+import retrofit2.http.DELETE;
 
 import java.util.List;
 
@@ -61,4 +62,31 @@ public interface ChapterKnowledgePointMapper extends BaseMapper<ChapterKnowledge
             "INNER JOIN chapters c ON ckp.chapter_id = c.chapter_id " +
             "WHERE c.course_id = #{courseId} ORDER BY c.chapter_order, ckp.point_order")
     List<ChapterKnowledgePoint> getKnowledgePointsByCourseId(@Param("courseId") Integer courseId);
+
+    /**
+     * 批量插入章节知识点关系
+     * @param relations 章节知识点关系列表
+     */
+    @Insert({
+        "<script>",
+        "INSERT INTO chapter_knowledge_points (chapter_id, point_id, point_order, is_core) VALUES ",
+        "<foreach collection='relations' item='relation' separator=','>",
+        "(#{relation.chapterId}, #{relation.pointId}, #{relation.pointOrder}, #{relation.isCore})",
+        "</foreach>",
+        "</script>"})
+    void batchInsert(List<ChapterKnowledgePoint> relations);
+
+    /**
+     * 根据知识点ID删除章节知识点关系
+     * @param pointId 知识点ID
+     * @return 删除的记录数
+     */
+    @Delete("DELETE FROM chapter_knowledge_points WHERE point_id = #{pointId}")
+    int deleteByPointId(String pointId);
+
+    @Select("SELECT point_id FROM chapter_knowledge_points WHERE chapter_id = #{chapterId}")
+    List<String> selectPointIdsByChapterId(String chapterId);
+
+    @Select("SELECT MAX(point_order) FROM chapter_knowledge_points WHERE chapter_id = #{chapterId}")
+    Integer selectMaxPointOrderByChapterId(String chapterId);
 }

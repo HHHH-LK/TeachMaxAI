@@ -146,4 +146,13 @@ public class CourseController {
         return courseService.getCourseHomeworkInfo(courseId);
     }
 
+    /**
+     * 智能创建课程
+     */
+    @PostMapping("/createCourse")
+    @Operation(summary = "智能创建课程")
+    public Result<String> createCourse(String courseName, String teacherId, String semester) {
+        return courseService.createCourse(courseName, teacherId, semester);
+    }
+
 }
