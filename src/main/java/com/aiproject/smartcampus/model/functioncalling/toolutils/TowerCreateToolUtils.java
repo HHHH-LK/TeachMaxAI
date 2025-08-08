@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.model.functioncalling.toolutils;
 
+import com.aiproject.smartcampus.commons.sort.RedisSort;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.Side;
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
@@ -50,6 +51,7 @@ public class TowerCreateToolUtils {
     private final TowerFloorMapper towerFloorMapper;
     private final ItemMapper itemMapper;
     private final TaskMapper taskMapper;
+    private final RedisSort redisSort;
     private final BossMapper bossMapper;
 
 
@@ -148,7 +150,7 @@ public class TowerCreateToolUtils {
         Tower towerInfo = getTowerInfo(TOWER_FLOOR_POINTS_MAP.size(), courseId, studentId);
 
         //初始化主塔
-        initTowerToDB(towerInfo, courseId);
+        initTowerToDB(towerInfo, courseId, studentId);
 
         //初始化塔层
         initTowerFloorToDB(towerInfo, TOWER_FLOOR_POINTS_MAP);
@@ -294,7 +296,7 @@ public class TowerCreateToolUtils {
     }
 
     /**
-     * 创建塔层到数据库中
+     * 创建塔层到数据库中(后续可以将智能创建故事情节异步创建)
      */
     private void initTowerFloorToDB(Tower towerInfo, Map<Integer, List<Integer>> TOWER_FLOOR_POINTS_MAP) {
 
@@ -415,7 +417,7 @@ public class TowerCreateToolUtils {
     /**
      * 创建主塔到数据库中
      */
-    private void initTowerToDB(Tower towerInfo, String courseId) {
+    private void initTowerToDB(Tower towerInfo, String courseId, String studentId) {
 
         //查询该学生课程中的所有知识点
         List<KnowledgePointVO> studentKnowledgePointVOS = knowledgePointMapper.getCourseKnowledgePoints(Integer.valueOf(courseId));
@@ -438,6 +440,10 @@ public class TowerCreateToolUtils {
                 return false;
             }
         });
+
+        //初始化排行榜(初始值为0)
+        redisSort.addToSortedList(String.valueOf(towerInfo.getTowerId()), studentId, "0");
+        redisSort.addToTotalSortedList(studentId, "0");
 
         //异步创建塔的背景故事
         STORY_BACKGROUND_CREATE_EXECUTOR.execute(() -> {
