@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cc6c9634-249c-46c3-ac25-a528c2b43b5c" name="Changes" comment="大体完整的代码" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+        <option value="Vue Composition API Component" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="REMOTE">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="origin/fronts" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="fronts" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../Documents/xwechat_files/wxid_gcsj9ozsvhno22_8358/msg/file/2025-07/LessonPlanGenerator(1).vue" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2zdnBfRGpc4gkh8s3Gj2RrUBH9m" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "fronts",
+    "last_opened_file_path": "D:/homeworks/program/fine/system/system",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "D:\\欧阳\\study\\JetBrains全家桶\\JeBrains\\WebStorm 2024.1.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "vue.recent.templates": [
+      "Vue Composition API Component"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Users\cup\SmartCampus-front\src\views\teacher" />
+      <recent name="D:\Users\cup\SmartCampus-front\src\composables" />
+      <recent name="D:\Users\cup\SmartCampus-front\src\views" />
+      <recent name="D:\Users\cup\SmartCampus-front\src\components" />
+      <recent name="D:\Users\Downloads\SmartCampus-front\src\components\student" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\Downloads\SmartCampus-front\src\components" />
+      <recent name="D:\Users\Downloads\SmartCampus-front\src\components\student\knowledge" />
+      <recent name="D:\Users\Downloads\SmartCampus-front\src\views\student\knowledge-base" />
+      <recent name="D:\Users\Downloads\SmartCampus-front\src\views\student" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-WS-241.15989.105" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cc6c9634-249c-46c3-ac25-a528c2b43b5c" name="Changes" comment="" />
+      <created>1752069683587</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1752069683587</updated>
+      <workItem from="1752069684687" duration="12166000" />
+      <workItem from="1752103012904" duration="3980000" />
+      <workItem from="1752110803686" duration="8687000" />
+      <workItem from="1752153516010" duration="10422000" />
+      <workItem from="1752195072235" duration="3836000" />
+      <workItem from="1752542479576" duration="33071000" />
+      <workItem from="1752596209800" duration="1443000" />
+      <workItem from="1752618640759" duration="7168000" />
+      <workItem from="1752628282572" duration="22440000" />
+      <workItem from="1752671985278" duration="478000" />
+      <workItem from="1752672685036" duration="296000" />
+      <workItem from="1752708740445" duration="2609000" />
+      <workItem from="1752715220199" duration="18526000" />
+      <workItem from="1752755894498" duration="41000" />
+      <workItem from="1752913406641" duration="16876000" />
+      <workItem from="1752944641319" duration="8298000" />
+      <workItem from="1752972989627" duration="2034000" />
+      <workItem from="1753004543505" duration="684000" />
+      <workItem from="1753019830119" duration="639000" />
+      <workItem from="1753065932701" duration="3147000" />
+      <workItem from="1753150322143" duration="10182000" />
+      <workItem from="1753317689429" duration="222000" />
+      <workItem from="1753443477866" duration="1163000" />
+      <workItem from="1753451068556" duration="19000" />
+      <workItem from="1753838518752" duration="3901000" />
+      <workItem from="1753863097741" duration="1023000" />
+      <workItem from="1753875900814" duration="16087000" />
+      <workItem from="1753939138871" duration="2891000" />
+      <workItem from="1754181824290" duration="13440000" />
+      <workItem from="1754203777721" duration="4710000" />
+      <workItem from="1754222826894" duration="9048000" />
+      <workItem from="1754268607689" duration="7404000" />
+      <workItem from="1754291128424" duration="8271000" />
+      <workItem from="1754311065638" duration="1251000" />
+      <workItem from="1754335461587" duration="7566000" />
+      <workItem from="1754353307479" duration="583000" />
+      <workItem from="1754356090311" duration="6111000" />
+      <workItem from="1754381259631" duration="13005000" />
+      <workItem from="1754465656803" duration="21377000" />
+      <workItem from="1754527672410" duration="2055000" />
+      <workItem from="1754535355967" duration="15638000" />
+      <workItem from="1754569657556" duration="5175000" />
+      <workItem from="1754575198549" duration="6411000" />
+      <workItem from="1754616358349" duration="651000" />
+      <workItem from="1754617022102" duration="2120000" />
+      <workItem from="1754619223112" duration="636000" />
+    </task>
+    <task id="LOCAL-00001" summary="大体完整的代码">
+      <option name="closed" value="true" />
+      <created>1754618012635</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1754618012635</updated>
+    </task>
+    <task id="LOCAL-00002" summary="大体完整的代码">
+      <option name="closed" value="true" />
+      <created>1754619648011</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1754619648011</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add files via upload" />
+    <MESSAGE value="大体完整的代码" />
+    <option name="LAST_COMMIT_MESSAGE" value="大体完整的代码" />
+  </component>
+</project>

@@ -1,0 +1,30 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "凯尔希.moc3",
+		"Textures": [
+			"凯尔希.4096/texture_00.png"
+		],
+		"Physics": "凯尔希.physics3.json",
+		"DisplayInfo": "凯尔希.cdi3.json"
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen",
+				"ParamHairFront",
+				"ParamHairSide",
+				"ParamHairBack",
+				"Param8"
+			]
+		}
+	]
+}
