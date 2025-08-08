@@ -1,5 +1,5 @@
   server:
-    port: 8107
+    port: 8108
     address: localhost
 
   spring:
