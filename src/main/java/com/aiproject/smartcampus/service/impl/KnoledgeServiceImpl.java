@@ -219,7 +219,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         for (StudentWrongKnowledgeBO studentWrongKnowledgeBO : studentWrongKnowledgeByStudentId) {
             sum += studentWrongKnowledgeBO.getAccuracyRate();
         }
-        sum =100.00- (sum / studentWrongKnowledgeByStudentId.size());
+        sum = 100.00 - (sum / studentWrongKnowledgeByStudentId.size());
 
         return Result.success(sum);
     }
@@ -228,7 +228,6 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     public Result<String> getKonwledgeNameById(String pointId) {
 
         String ponintNameById = knowledgePointMapper.getPonintNameById(pointId);
-
 
         return Result.success(ponintNameById);
     }
@@ -556,10 +555,6 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         log.info("完成用户自定义权重抽取，共抽取 {} 个知识点，总尝试次数：{}", resultList.size(), attemptCount);
         return resultList;
     }
-
-
-
-
 
 
 }

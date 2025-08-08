@@ -75,6 +75,7 @@ public class KnowledgeController {
         return knoledgeService.getAver();
     }
 
+
     @GetMapping("/getKonwledgeNameById")
     public Result<String> getKonwledgeNameById(@RequestParam(value = "PointId") String pointId) {
 

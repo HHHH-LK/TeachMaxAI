@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class BossController {
 
-    //获取塔层boss信息
+    //获取塔层boss信息（boss攻击加权 ）
 
     //
 

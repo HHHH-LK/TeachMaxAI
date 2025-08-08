@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class FightingController {
 
-    //进入战斗
 
     //回合战斗
 

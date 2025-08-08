@@ -1,9 +1,12 @@
 package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.service.TowerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -16,13 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/tower")
+@RequiredArgsConstructor
 public class TowerController {
 
-    //根据学生和课程定制化生成战斗塔
-    @PostMapping("")
-    public Result<Boolean> createTowerByAgent(){
+    private final TowerService towerService;
 
-        return Result.success(true);
+    //根据学生和课程定制化生成战斗塔
+    @PostMapping("/createByAgent")
+    public Result<Boolean> createTowerByAgent(@RequestParam(value = "studentId")String studentId,@RequestParam(value = "courseId")String courseId){
+
+        return towerService.createTowerByAgent(studentId,courseId);
     }
 
     //所有塔列表展示
