@@ -130,6 +130,7 @@ public class CommonServiceImpl implements CommonService {
         user.setPasswordHash(passwordEncoder.encode(registerDTO.getPassword()));
         user.setRealName("默认用户名");
         user.setUserType(User.UserType.fromValue(registerDTO.getUserType()));
+        user.setCreatedAt(LocalDateTime.now());
         userMapper.insert(user);
 
         // 创建对应实体
