@@ -25,9 +25,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.aiproject.smartcampus.commons.utils.JsonUtils.parseRelationsFromJson;
@@ -55,7 +53,7 @@ public class TowerCreateToolUtils {
     private final BossMapper bossMapper;
 
 
-    private Executor STORY_BACKGROUND_CREATE_EXECUTOR = Executors.newFixedThreadPool(5);
+    private ExecutorService STORY_BACKGROUND_CREATE_EXECUTOR = Executors.newFixedThreadPool(5);
     private Map<String, KnowledgePointNode> POINTNAME_TO_NODE_MAP = new ConcurrentHashMap<>();
     private Map<KnowledgePointNode, List<KnowledgePointNode>> KNOWLEDGE_POINT_NODE_MAP = new ConcurrentHashMap<>();
     private Map<KnowledgePointNode, Integer> INDEGREE_MAP = new HashMap<>();
@@ -74,7 +72,6 @@ public class TowerCreateToolUtils {
         Double accuracyRate;
 
     }
-
 
     public Boolean createTowerByStudentIdAndCourseId(String studentId, String courseId) {
 
@@ -149,7 +146,8 @@ public class TowerCreateToolUtils {
         Map<Integer, List<Integer>> TOWER_FLOOR_POINTS_MAP = getTowerFloorPointIds();
 
         Tower towerInfo = getTowerInfo(TOWER_FLOOR_POINTS_MAP.size(), courseId, studentId);
-        //加入db中
+
+        //初始化主塔
         initTowerToDB(towerInfo, courseId);
 
         //初始化塔层
@@ -231,7 +229,6 @@ public class TowerCreateToolUtils {
 
         return hp;
     }
-
 
     /**
      * 为boss设置名字
@@ -331,21 +328,22 @@ public class TowerCreateToolUtils {
 
         });
 
-        STORY_BACKGROUND_CREATE_EXECUTOR.execute(() -> {
-            // 获取主塔背景
-            LambdaQueryWrapper<Tower> towerQuery = new LambdaQueryWrapper<>();
-            towerQuery.eq(Tower::getTowerId, towerId);
-            Tower tower = towerMapper.selectOne(towerQuery);
-            if (tower == null) {
-                log.error("主塔{}不存在", towerId);
-                throw new RuntimeException("主塔不存在");
-            }
+        List<Callable<Void>> tasks = new ArrayList<>();
+        // 获取主塔背景
+        LambdaQueryWrapper<Tower> towerQuery = new LambdaQueryWrapper<>();
+        towerQuery.eq(Tower::getTowerId, towerId);
+        Tower tower = towerMapper.selectOne(towerQuery);
+        if (tower == null) {
+            log.error("主塔{}不存在", towerId);
+            throw new RuntimeException("主塔不存在");
+        }
+        String description = tower.getDescription();
 
-            String description = tower.getDescription();
+        for (Map.Entry<Integer, List<Integer>> towerFloorPoints : TOWER_FLOOR_POINTS_MAP.entrySet()) {
+            Integer floorNo = towerFloorPoints.getKey();
+            List<Integer> knowledgePoints = towerFloorPoints.getValue();
 
-            for (Map.Entry<Integer, List<Integer>> towerFloorPoints : TOWER_FLOOR_POINTS_MAP.entrySet()) {
-                Integer floorNo = towerFloorPoints.getKey();
-
+            tasks.add(() -> {
                 LambdaQueryWrapper<TowerFloor> floorQuery = new LambdaQueryWrapper<>();
                 floorQuery.eq(TowerFloor::getTowerId, towerId);
                 floorQuery.eq(TowerFloor::getFloorNo, floorNo);
@@ -353,15 +351,21 @@ public class TowerCreateToolUtils {
 
                 if (towerFloor == null) {
                     log.warn("<塔层>{}<没有加入背景故事>", floorNo);
-                    continue;
+                    return null;
                 }
 
-                List<Integer> knowledgePoints = towerFloorPoints.getValue();
                 List<String> knowledgeNameList = knowledgePoints.stream()
                         .map(a -> knowledgePointMapper.getPonintNameById(String.valueOf(a)))
                         .toList();
 
-                String prompt = "请基于塔的故事背景" + description + "以及该层的知识点" + knowledgeNameList + "生成该塔的故事背景，只返回故事背景";
+                String prompt = String.format(
+                        "请结合总塔的故事背景：“%s”，以及该层的知识点列表：%s，生成第%d层的故事背景。\n" +
+                                "要求：\n" +
+                                "- 故事背景应紧扣总塔的整体故事脉络，体现该层知识点的特色和主题。\n" +
+                                "- 内容应富有代入感和情节性，便于引导玩家理解本层关卡。\n" +
+                                "- 只返回故事背景文本，不要包含解释、分析或其他无关内容。",
+                        description, knowledgeNameList, floorNo
+                );
 
                 String towerFloorDescription = chatLanguageModel.chat(UserMessage.userMessage(prompt))
                         .aiMessage()
@@ -369,7 +373,7 @@ public class TowerCreateToolUtils {
 
                 if (towerFloorDescription == null || towerFloorDescription.trim().isEmpty()) {
                     log.warn("AI返回空背景故事，跳过更新，floorNo={}", floorNo);
-                    continue;
+                    return null;
                 }
 
                 towerFloorDescription = towerFloorDescription.trim();
@@ -388,8 +392,22 @@ public class TowerCreateToolUtils {
                 }
 
                 log.info("<<插入背景故事成功>> {}", towerFloorDescription);
+                return null;
+            });
+        }
+
+        // 提交所有任务，等待全部完成
+        try {
+            List<Future<Void>> futures = STORY_BACKGROUND_CREATE_EXECUTOR.invokeAll(tasks);
+            for (Future<Void> future : futures) {
+                future.get(); // 等待每个任务完成，顺便抛异常
             }
-        });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("生成塔层故事背景任务被中断", e);
+        } catch (ExecutionException e) {
+            log.error("生成塔层故事背景任务执行异常", e.getCause());
+        }
 
 
     }

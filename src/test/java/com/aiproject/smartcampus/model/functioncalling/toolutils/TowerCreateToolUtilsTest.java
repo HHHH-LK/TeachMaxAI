@@ -17,7 +17,7 @@ class TowerCreateToolUtilsTest {
     @Test
     void getPonintNameById() {
 
-        Boolean towerByStudentIdAndCourseId = towerCreateToolUtils.createTowerByStudentIdAndCourseId("1", "7");
+        Boolean towerByStudentIdAndCourseId = towerCreateToolUtils.createTowerByStudentIdAndCourseId("1", "1");
 
         System.out.println(Boolean.TRUE.equals(towerByStudentIdAndCourseId) ? "塔初始化成功" : "初始化失败");
 
@@ -27,7 +27,7 @@ class TowerCreateToolUtilsTest {
     @Test
     void getPonintNameById2() {
 
-        Tower towerInfo = towerCreateToolUtils.getTowerInfo(3, "5");
+        Tower towerInfo = towerCreateToolUtils.getTowerInfo(3, "5","1");
 
     }
 
