@@ -20,6 +20,7 @@ import Center from '@/views/Center.vue';
 import TeacherChat from "@/views/student/TeacherChat.vue";
 import TestView from "@/views/teacher/teacherCourse/CourseCenter.vue";
 import ExamReview from "@/views/admin/ExamReview.vue";
+import Test from "@/views/Test.vue"
 // import { useAuthStore } from '@/store/authStore'
 
 const router = createRouter({
@@ -169,7 +170,7 @@ const router = createRouter({
     {
       path: "/test",
       name: "test",
-      component: Center
+      component: Test
     },
   ]
 })

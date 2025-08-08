@@ -273,6 +273,59 @@ export const teacherService = {
   },
 };
 
+//管理员服务
+export const adminService = {
+  //获取全部用户信息
+  getAllUsers: async () => {
+    return await apiClient.get("/admin/getAllUserInfo");
+  },
+
+  editUser: async (userData) => {
+    return await apiClient.put(`/admin/updateUserInfo`, {
+      userId: userData.userId,
+      realName: userData.realName,
+      userType: userData.userType,
+      email: userData.email,
+    });
+  },
+
+  deleteUser: async (userId) => {
+    return await apiClient.delete(`/admin/deleteInformation/${userId}`);
+  },
+
+  getResource: async () => {
+    return await apiClient.post(`/admin/getAllResources`);
+  },
+
+  deleteResource: async (resourceId) => {
+    return await apiClient.delete(`/admin/deleteResource/${resourceId}`);
+  },
+
+  getUseTimes: async () => {
+    return await apiClient.post(`/admin/Information`);
+  },
+
+  getErrorKnow: async () => {
+    return await apiClient.get(`/admin/getHighFrequencyErrorPoints`);
+  },
+
+  getAllPaper: async (courseId) => {
+    return apiClient.get("/teacher/addPaper", {
+      params: {
+        courseId: courseId,
+      },
+    });
+  },
+
+  getQuestion: async (examId) => {
+    return apiClient.get("/course/getCourseExamInfo", {
+      params: {
+        examId: examId,
+      },
+    });
+  },
+
+};
 
 // 学生服务
 export const studentService = {

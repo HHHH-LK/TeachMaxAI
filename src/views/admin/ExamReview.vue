@@ -25,7 +25,6 @@
             <el-tag :type="statusTagType(scope.row.status)">{{ scope.row.status }}</el-tag>
           </template>
         </el-table-column>
-        <!-- 新增：查看试卷操作列 -->
         <el-table-column label="查看试卷" width="120" align="center">
           <template #default="scope">
             <el-button size="small" @click="openExamView(scope.row)">查看</el-button>
@@ -41,12 +40,12 @@
       </el-table>
       <div class="pagination-bar">
         <el-pagination
-          background
-          layout="prev, pager, next, jumper"
-          :total="filteredExams.length"
-          :page-size="pageSize"
-          v-model:current-page="currentPage"
-          @current-change="handlePageChange"
+            background
+            layout="prev, pager, next, jumper"
+            :total="filteredExams.length"
+            :page-size="pageSize"
+            v-model:current-page="currentPage"
+            @current-change="handlePageChange"
         />
       </div>
       <el-dialog v-model="dialogVisible" :title="dialogTitle" width="400px" center>
@@ -56,7 +55,6 @@
           <el-button type="primary" @click="handleDialogConfirm">确定</el-button>
         </template>
       </el-dialog>
-      <!-- 新增：试卷查看弹窗 -->
       <el-dialog v-model="examViewVisible" title="试卷预览" width="900px" center :close-on-click-modal="false">
         <ExamAttempt v-if="currentExamPaper" :paper="currentExamPaper" :readonly="true" />
         <template #footer>
@@ -68,41 +66,39 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import ExamAttempt from '@/components/ExamAttempt.vue';
+import { adminService, studentService } from '@/services/api';
 
-const exams = ref([
-  { id: 1, name: '数学期中试卷', creator: '张发在', createdAt: '2024-04-01 10:00', expectedPublish: '2024-05-01 09:00', status: '待审核' },
-  { id: 2, name: '英语月考试卷', creator: '李京东', createdAt: '2024-04-05 14:30', expectedPublish: '2024-05-03 14:00', status: '已审核' },
-  { id: 3, name: '物理模拟卷', creator: '王暖是', createdAt: '2024-03-28 09:20', expectedPublish: '2024-04-20 09:00', status: '已发布' },
-  { id: 4, name: '化学期末卷', creator: '赵星河', createdAt: '2024-04-10 16:10', expectedPublish: '2024-05-10 10:00', status: '待审核' },
-  { id: 5, name: '生物竞赛卷', creator: '钱三幅', createdAt: '2024-04-12 11:45', expectedPublish: '2024-05-12 08:30', status: '已审核' },
-  { id: 6, name: 'Java期末考试', creator: '张冬梅', createdAt: '2025-07-12 11:45', expectedPublish: '2025-07-12 09:00', status: '已发布' },
-  { id: 6, name: 'Java期末考试（A）', creator: '张冬梅', createdAt: '2025-07-14 11:45', expectedPublish: '2025-07-14 09:00', status: '待审核' },
-]);
-
+const exams = ref([]);
 const search = ref('');
-const filteredExams = ref([...exams.value]);
-
-function filterExams() {
-  const keyword = search.value.trim();
-  if (!keyword) {
-    filteredExams.value = [...exams.value];
-  } else {
-    filteredExams.value = exams.value.filter(
-      exam => exam.name.includes(keyword) || exam.creator.includes(keyword)
-    );
-  }
-  currentPage.value = 1;
-}
-
 const pageSize = 8;
 const currentPage = ref(1);
+const dialogVisible = ref(false);
+const dialogTitle = ref('');
+const dialogMessage = ref('');
+const examViewVisible = ref(false);
+const currentExamPaper = ref(null);
+let dialogAction = null;
+let dialogRow = null;
+
+const filteredExams = computed(() => {
+  const keyword = search.value.trim().toLowerCase();
+  if (!keyword) return exams.value;
+
+  return exams.value.filter(
+      exam =>
+          (exam.name || '').toLowerCase().includes(keyword) ||
+          (exam.creator || '').toLowerCase().includes(keyword)
+  );
+});
+
 const pagedExams = computed(() => {
   const start = (currentPage.value - 1) * pageSize;
   return filteredExams.value.slice(start, start + pageSize);
 });
+
 function handlePageChange(page) {
   currentPage.value = page;
 }
@@ -116,13 +112,6 @@ function statusTagType(status) {
   }
 }
 
-const dialogVisible = ref(false);
-const dialogTitle = ref('');
-dialogTitle.value = '';
-const dialogMessage = ref('');
-let dialogAction = null;
-let dialogRow = null;
-
 function confirmReview(row) {
   dialogTitle.value = '审核确认';
   dialogMessage.value = `确定要通过【${row.name}】的审核吗？`;
@@ -130,6 +119,7 @@ function confirmReview(row) {
   dialogAction = 'review';
   dialogRow = row;
 }
+
 function confirmPublish(row) {
   dialogTitle.value = '发布确认';
   dialogMessage.value = `确定要发布【${row.name}】吗？`;
@@ -137,293 +127,55 @@ function confirmPublish(row) {
   dialogAction = 'publish';
   dialogRow = row;
 }
+
 function handleDialogConfirm() {
   if (dialogAction === 'review') {
-    dialogRow.status = '已审核';
-    ElMessage.success('审核通过！');
+    updateExamStatus(dialogRow.id, 'completed')
+        .then(() => {
+          dialogRow.status = '已审核';
+          ElMessage.success('审核通过！');
+        })
+        .catch(error => {
+          console.error('审核失败:', error);
+          ElMessage.error('审核操作失败');
+        });
   } else if (dialogAction === 'publish') {
-    dialogRow.status = '已发布';
-    ElMessage.success('发布成功！');
+    updateExamStatus(dialogRow.id, 'scheduled')
+        .then(() => {
+          dialogRow.status = '已发布';
+          ElMessage.success('发布成功！');
+        })
+        .catch(error => {
+          console.error('发布失败:', error);
+          ElMessage.error('发布操作失败');
+        });
   }
   dialogVisible.value = false;
-  filterExams();
 }
 
-const examPapers = {
-  1: {
-    title: '数学期中试卷',
-    questions: [
-      {
-        id: 'q1',
-        title: '下列哪个是质数？',
-        type: 'single',
-        options: [
-          { label: 'A', value: 'A' },
-          { label: 'B', value: 'B' },
-          { label: 'C', value: 'C' },
-          { label: 'D', value: 'D' }
-        ],
-        score: 5
-      },
-      {
-        id: 'q2',
-        title: '选择所有偶数',
-        type: 'multiple',
-        options: [
-          { label: 'A', value: 'A' },
-          { label: 'B', value: 'B' },
-          { label: 'C', value: 'C' },
-          { label: 'D', value: 'D' }
-        ],
-        score: 6
-      },
-      {
-        id: 'q3',
-        title: '1+1=2，对吗？',
-        type: 'judge',
-        score: 2
-      },
-      {
-        id: 'q4',
-        title: '请简述牛顿第一定律。',
-        type: 'short',
-        score: 10
-      }
-    ]
-  },
-  2: {
-    title: '英语月考试卷',
-    questions: [
-      {
-        id: 'q1',
-        title: 'Which is a fruit?',
-        type: 'single',
-        options: [
-          { label: 'A', value: 'A' },
-          { label: 'B', value: 'B' },
-          { label: 'C', value: 'C' },
-          { label: 'D', value: 'D' }
-        ],
-        score: 5
-      }
-    ]
-  },
-  6: {
-    "title": "2025上学期《Java程序设计》期末测验",
-    "questions": [
-      {
-        "id": "q1",
-        "title": "Java程序的三大特性是什么？请按顺序写出名称。",
-        "type": "short",
-        "score": 6
-      },
-      {
-        "id": "q2",
-        "title": "抽象类和接口的区别是？请简要说明。",
-        "type": "short",
-        "score": 6
-      },
-      {
-        "id": "q3",
-        "title": "用于实现多态性的Java机制是____。",
-        "type": "blank",
-        "score": 3
-      },
-      {
-        "id": "q4",
-        "title": "下列哪项不是Java关键字？",
-        "type": "single",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "const"},
-          {"value": "B", "label": "interface"},
-          {"value": "C", "label": "null"}
-        ]
-      },
-      {
-        "id": "q5",
-        "title": "请选择所有访问修饰符。",
-        "type": "multiple",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "public"},
-          {"value": "B", "label": "private"},
-          {"value": "C", "label": "synchronized"}
-        ]
-      },
-      {
-        "id": "q6",
-        "title": "Java中实现线程安全的集合类是____。",
-        "type": "blank",
-        "score": 3
-      },
-      {
-        "id": "q7",
-        "title": "this关键字的作用？",
-        "type": "short",
-        "score": 6
-      },
-      {
-        "id": "q8",
-        "title": "下列哪项不是基本数据类型？",
-        "type": "single",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "int"},
-          {"value": "B", "label": "String"},
-          {"value": "C", "label": "char"}
-        ]
-      },
-      {
-        "id": "q9",
-        "title": "以下哪些属于运行时异常？",
-        "type": "multiple",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "NullPointerException"},
-          {"value": "B", "label": "FileNotFoundException"},
-          {"value": "C", "label": "IOException"},
-          {"value": "D", "label": "ArrayIndexOutOfBoundsException"}
-        ]
-      },
-      {
-        "id": "q10",
-        "title": "JVM的作用是？",
-        "type": "single",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "编译Java代码"},
-          {"value": "B", "label": "执行字节码文件"},
-          {"value": "C", "label": "调试程序"}
-        ]
-      },
-      {
-        "id": "q11",
-        "title": "反射机制主要应用于？",
-        "type": "single",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "动态加载类"},
-          {"value": "B", "label": "内存管理"},
-          {"value": "C", "label": "异常处理"}
-        ]
-      },
-      {
-        "id": "q12",
-        "title": "try-with-resources语法需实现____接口。",
-        "type": "blank",
-        "score": 3
-      },
-      {
-        "id": "q13",
-        "title": "Math.round(11.5)的返回值是____。",
-        "type": "blank",
-        "score": 3
-      },
-      {
-        "id": "q14",
-        "title": "Java中数组是对象。",
-        "type": "judge",
-        "score": 3
-      },
-      {
-        "id": "q15",
-        "title": "简述static关键字的四种应用场景。",
-        "type": "short",
-        "score": 6
-      },
-      {
-        "id": "q16",
-        "title": "Java中用于定义接口的关键字是？",
-        "type": "single",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "class"},
-          {"value": "B", "label": "interface"},
-          {"value": "C", "label": "abstract"},
-          {"value": "D", "label": "extends"}
-        ]
-      },
-      {
-        "id": "q17",
-        "title": "以下哪些是Java集合框架中的接口？",
-        "type": "multiple",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "List"},
-          {"value": "B", "label": "Map"},
-          {"value": "C", "label": "Set"},
-          {"value": "D", "label": "Array"}
-        ]
-      },
-      {
-        "id": "q18",
-        "title": "Java中HashMap允许null键和null值。",
-        "type": "judge",
-        "score": 4
-      },
-      {
-        "id": "q19",
-        "title": "Java中final关键字可以修饰哪些元素？",
-        "type": "multiple",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "类"},
-          {"value": "B", "label": "方法"},
-          {"value": "C", "label": "变量"},
-          {"value": "D", "label": "接口"}
-        ]
-      },
-      {
-        "id": "q20",
-        "title": "Java中String类是可变类。",
-        "type": "judge",
-        "score": 3
-      },
-      {
-        "id": "q21",
-        "title": "Java中实现多线程的方式有哪几种？",
-        "type": "short",
-        "score": 6
-      },
-      {
-        "id": "q22",
-        "title": "Java中用于创建对象的关键字是____。",
-        "type": "blank",
-        "score": 3
-      },
-      {
-        "id": "q23",
-        "title": "Java中super关键字的作用是____。",
-        "type": "blank",
-        "score": 3
-      },
-      {
-        "id": "q24",
-        "title": "Java中Thread类的start()方法用于启动线程。",
-        "type": "judge",
-        "score": 2
-      },
-      {
-        "id": "q25",
-        "title": "Java中异常处理机制使用哪些关键字？",
-        "type": "multiple",
-        "score": 4,
-        "options": [
-          {"value": "A", "label": "try"},
-          {"value": "B", "label": "catch"},
-          {"value": "C", "label": "finally"},
-          {"value": "D", "label": "throw"}
-        ]
-      }
-    ]
+// 修复3：添加状态更新API函数
+async function updateExamStatus(examId, status) {
+  try {
+    const response = await adminService.updateExamStatus({
+      examId: examId,
+      status: status
+    });
+
+    if (response.data && response.data.code === 0) {
+      return response.data;
+    }
+
+    throw new Error(response.data?.msg || '状态更新失败');
+  } catch (error) {
+    console.error(`更新试卷状态失败 (examId: ${examId}, status: ${status}):`, error);
+    throw error;
   }
-};
-const examViewVisible = ref(false);
-const currentExamPaper = ref(null);
+}
+
+const examPapers = ref({});
+
 function openExamView(row) {
-  // 取模拟数据，真实项目可用row.id请求后端
-  currentExamPaper.value = examPapers[row.id] || null;
+  currentExamPaper.value = examPapers.value[row.id] || null;
   examViewVisible.value = true;
 }
 
@@ -436,6 +188,268 @@ function headerStyle() {
     letterSpacing: '1px',
   };
 }
+
+const getAllPapers = async () => {
+  try {
+    console.log('开始获取试卷数据...');
+
+    // 1. 获取所有课程数据
+    console.log('获取课程数据...');
+    const courseResponse = await studentService.getCourses();
+    console.log('课程响应:', courseResponse);
+
+    if (!courseResponse.data || courseResponse.data.code !== 0) {
+      const errorMsg = courseResponse.data?.msg || '获取课程失败';
+      console.error(errorMsg);
+      throw new Error(errorMsg);
+    }
+
+    // 2. 创建课程映射
+    console.log('创建课程映射...');
+    const courseMap = {};
+    courseResponse.data.data.forEach(course => {
+      const teacherName = course.teacher?.user?.realName || '未知教师';
+      courseMap[course.courseId] = {
+        courseName: course.courseName,
+        teacherName: teacherName
+      };
+    });
+
+    // 3. 获取试卷数据
+    console.log('获取试卷数据...');
+    const courseIds = Object.keys(courseMap);
+
+    const paperPromises = courseIds.map(courseId =>
+        adminService.getAllPaper(courseId)
+            .then(response => {
+              if (response.data && response.data.code === 0 && Array.isArray(response.data.data)) {
+                return response.data.data;
+              }
+              console.warn(`课程 ${courseId} 的试卷获取失败:`, response.data?.message);
+              return [];
+            })
+            .catch(error => {
+              console.error(`获取课程 ${courseId} 的试卷失败:`, error);
+              return [];
+            })
+    );
+
+    const papersResults = await Promise.all(paperPromises);
+    const allPapers = papersResults.flat();
+    console.log('原始试卷数据:', allPapers);
+
+    // 4. 处理试卷数据
+    const processedPapers = allPapers
+        .filter(paper => paper?.status !== 'draft')
+        .map(paper => {
+          if (!paper || typeof paper !== 'object') {
+            console.warn('无效的试卷数据:', paper);
+            return null;
+          }
+
+          const courseInfo = courseMap[paper.courseId] || {
+            courseName: '未知课程',
+            teacherName: '未知教师'
+          };
+
+          const statusMap = {
+            'draft': '待审核',
+            'completed': '已结束',
+            'scheduled': '已发布'
+          };
+
+          const status = paper.status || 'unknown';
+          const statusText = statusMap[status] || '未知';
+
+          const formatDate = (dateStr) => {
+            if (!dateStr) return '';
+            try {
+              return dateStr.split('T')[0];
+            } catch (e) {
+              return dateStr;
+            }
+          };
+
+          return {
+            id: paper.examId || 0,
+            name: paper.title || '未命名试卷',
+            creator: courseInfo.teacherName,
+            createdAt: formatDate(paper.createdAt),
+            expectedPublish: formatDate(paper.examDate),
+            status: statusText,
+            courseName: courseInfo.courseName
+          };
+        })
+        .filter(paper => paper !== null);
+
+    console.log('处理后的试卷数据（已跳过草稿状态）:', processedPapers);
+
+    // 5. 更新exams ref
+    exams.value = processedPapers;
+
+    return processedPapers;
+
+  } catch (error) {
+    console.error('获取试卷数据失败:', error);
+
+    const backupData = [
+      { id: 1, name: '数学期中试卷', creator: '张发在', createdAt: '2024-04-01',
+        expectedPublish: '2024-05-01', status: '待审核' },
+      { id: 2, name: '英语月考试卷', creator: '李京东', createdAt: '2024-04-05',
+        expectedPublish: '2024-05-03', status: '已审核' },
+      { id: 3, name: '物理模拟卷', creator: '王暖是', createdAt: '2024-03-28',
+        expectedPublish: '2024-04-20', status: '已发布' },
+      { id: 4, name: '化学期末卷', creator: '赵星河', createdAt: '2024-04-10',
+        expectedPublish: '2024-05-10', status: '待审核' },
+      { id: 5, name: '生物竞赛卷', creator: '钱三幅', createdAt: '2024-04-12',
+        expectedPublish: '2024-05-12', status: '已审核' },
+      { id: 6, name: 'Java期末考试', creator: '张冬梅', createdAt: '2025-07-12',
+        expectedPublish: '2025-07-12', status: '已发布' },
+    ];
+
+    exams.value = backupData.filter(item => item.status !== 'draft');
+
+    return exams.value;
+  }
+};
+const getPaperQues = async () => {
+  try {
+    console.log('开始获取试卷详情...');
+
+    if (!exams.value || exams.value.length === 0) {
+      console.warn('exams.value为空，无法获取试卷详情');
+      return;
+    }
+
+    const examIds = exams.value.map(exam => exam.id);
+    const papers = [];
+
+    // 串行处理每份试卷
+    for (const examId of examIds) {
+      try {
+        console.log(`正在获取试卷 ${examId} 的题目...`);
+
+        const examIdNum = Number(examId);
+        if (isNaN(examIdNum)) {
+          throw new Error(`无效的试卷ID: ${examId}`);
+        }
+
+
+        const response = await adminService.getQuestion(examIdNum);
+
+        if (!response.data || response.data.code !== 0) {
+          throw new Error(response.data?.msg || `获取试卷 ${examId} 题目失败`);
+        }
+
+        const questionsData = response.data.data;
+        if (!Array.isArray(questionsData)) {
+          throw new Error(`试卷 ${examId} 题目数据格式无效`);
+        }
+
+        // 转换数据结构
+        const questions = questionsData.map(q => {
+          let options = [];
+          try {
+            if (q.questionOptions) {
+
+              const parsedOptions = JSON.parse(q.questionOptions);
+              options = parsedOptions.map(opt => ({
+                label: opt.label || '',
+                value: opt.value || opt.label || '',
+                text: opt.content || opt.text || ''
+              }));
+            }
+          } catch (error) {
+            console.error(`解析试卷 ${examId} 选项失败:`, error);
+          }
+
+          const typeMap = {
+            'single_choice': 'single',
+            'multiple_choice': 'multiple',
+            'true_false': 'judge',
+            'short_answer': 'short',
+            'fill_blank': 'blank'
+          };
+
+          return {
+            id: `q${q.questionId}`,
+            title: q.questionContent,
+            type: typeMap[q.questionType] || q.questionType,
+            options: options,
+            score: q.scorePoints || 0
+          };
+        });
+
+        // 使用exams.value中的试卷名称
+        const examInfo = exams.value.find(e => e.id === examId);
+        papers.push({
+          examId: examId,
+          title: examInfo?.name || '未命名试卷',
+          questions: questions
+        });
+
+        // 存储到examPapers以便预览
+        examPapers.value[examId] = {
+          title: examInfo?.name || '未命名试卷',
+          questions: questions
+        };
+
+        console.log(`试卷 ${examId} 题目获取成功`);
+
+      } catch (error) {
+        console.error(`处理试卷 ${examId} 时出错:`, error);
+
+        // 尝试使用后备数据
+        if (examPapers.value[examId]) {
+          papers.push({
+            examId: examId,
+            title: examPapers.value[examId].title,
+            questions: examPapers.value[examId].questions
+          });
+          console.log(`使用后备数据 for 试卷 ${examId}`);
+        } else {
+          const examInfo = exams.value.find(e => e.id === examId);
+          papers.push({
+            examId: examId,
+            title: examInfo?.name || `试卷 ${examId} 详情获取失败`,
+            questions: []
+          });
+          console.warn(`无法获取试卷 ${examId} 且无后备数据`);
+        }
+      }
+    }
+
+    // 更新exams数据添加paper属性
+    exams.value = exams.value.map(exam => {
+      const paper = papers.find(p => p.examId === exam.id);
+      return {
+        ...exam,
+        paper: paper || {
+          title: `试卷 ${exam.id} 详情获取失败`,
+          questions: []
+        }
+      };
+    });
+
+    console.log('更新带试卷详情的exams:', exams.value);
+
+  } catch (error) {
+    console.error('处理试卷详情时发生全局错误:', error);
+
+    exams.value = exams.value.map(exam => ({
+      ...exam,
+      paper: {
+        title: `试卷 ${exam.id} 详情获取失败`,
+        questions: []
+      }
+    }));
+  }
+};
+
+onMounted(async () => {
+  await getAllPapers();
+  await getPaperQues();
+});
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@
       <h2>大屏一览</h2>
       <p>全面掌握情况，精准提升质量</p>
     </div>
-
+    <!--
     <div class="filter-container">
       <el-select
           v-model="selectedClass"
@@ -21,9 +21,9 @@
             :value="item.value">
         </el-option>
       </el-select>
-    </div>
+    </div> -->
 
-    <el-row :gutter="24" style="margin-top: 24px;">
+    <el-row :gutter="24" style="margin-top: 24px">
       <el-col :span="12">
         <div class="chart-container">
           <div class="chart-header">
@@ -43,7 +43,7 @@
         </div>
       </el-col>
     </el-row>
-    <el-row :gutter="24" style="margin-top: 24px;">
+    <el-row :gutter="24" style="margin-top: 24px">
       <el-col :span="12">
         <div class="chart-container">
           <div class="chart-header">
@@ -82,13 +82,19 @@
 </template>
 
 <script setup>
-import * as echarts from 'echarts';
-import { ref, onMounted, computed } from 'vue';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart, PieChart } from 'echarts/charts'; // Removed RadarChart
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
-import VChart from 'vue-echarts';
+import * as echarts from "echarts";
+import { ref, onMounted, computed } from "vue";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { BarChart, PieChart } from "echarts/charts"; // Removed RadarChart
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent,
+} from "echarts/components";
+import VChart from "vue-echarts";
+import { adminService } from "@/services/api";
 
 use([
   CanvasRenderer,
@@ -103,257 +109,301 @@ use([
 // 格式化当前时间作为更新时间
 const updateTime = computed(() => {
   const now = new Date();
-  return now.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+  return now.toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 });
 
 // 使用次数统计 - 优化了配色和动画
 const usageOption = ref({
   tooltip: {
-    trigger: 'axis',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderColor: '#eee',
+    trigger: "axis",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderColor: "#eee",
     borderWidth: 1,
-    textStyle: { color: '#333' },
+    textStyle: { color: "#333" },
     padding: 12,
-    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.1)',
-    transition: 'all 0.3s'
+    boxShadow: "0 3px 10px rgba(0, 0, 0, 0.1)",
+    transition: "all 0.3s",
   },
   legend: {
-    data: ['教师', '学生'],
+    data: ["教师", "学生"],
     top: 0,
-    textStyle: { color: '#666' }
+    textStyle: { color: "#666" },
   },
   xAxis: {
-    type: 'category',
-    data: ['当日', '本周'],
-    axisLine: { lineStyle: { color: '#eee' } },
-    axisLabel: { color: '#666' }
+    type: "category",
+    data: ["当日", "本周"],
+    axisLine: { lineStyle: { color: "#eee" } },
+    axisLabel: { color: "#666" },
   },
   yAxis: {
-    type: 'value',
+    type: "value",
     axisLine: { show: false },
-    splitLine: { lineStyle: { color: '#f5f5f5' } },
-    axisLabel: { color: '#666' }
+    splitLine: { lineStyle: { color: "#f5f5f5" } },
+    axisLabel: { color: "#666" },
   },
   series: [
     {
-      name: '教师',
-      type: 'bar',
+      name: "教师",
+      type: "bar",
       data: [120, 820],
       itemStyle: {
-        color: '#165DFF',
-        borderRadius: [4, 4, 0, 0]
+        color: "#165DFF",
+        borderRadius: [4, 4, 0, 0],
       },
       emphasis: {
-        itemStyle: { color: '#0E42D2' }
-      },
-      animationDuration: 1500
-    },
-    {
-      name: '学生',
-      type: 'bar',
-      data: [250, 1500],
-      itemStyle: {
-        color: '#36D399',
-        borderRadius: [4, 4, 0, 0]
-      },
-      emphasis: {
-        itemStyle: { color: '#2AA97A' }
+        itemStyle: { color: "#0E42D2" },
       },
       animationDuration: 1500,
-      animationDelay: 300
+    },
+    {
+      name: "学生",
+      type: "bar",
+      data: [250, 1500],
+      itemStyle: {
+        color: "#36D399",
+        borderRadius: [4, 4, 0, 0],
+      },
+      emphasis: {
+        itemStyle: { color: "#2AA97A" },
+      },
+      animationDuration: 1500,
+      animationDelay: 300,
     },
   ],
-  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true }
+  grid: { left: "3%", right: "4%", bottom: "3%", containLabel: true },
 });
 
 // 教学效率指数 - 更改为柱状图
 const efficiencyOption = ref({
   tooltip: {
-    trigger: 'axis',
+    trigger: "axis",
     axisPointer: {
-      type: 'shadow'
+      type: "shadow",
     },
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderColor: '#eee',
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderColor: "#eee",
     borderWidth: 1,
-    textStyle: { color: '#333' },
+    textStyle: { color: "#333" },
     padding: 12,
-    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.1)',
+    boxShadow: "0 3px 10px rgba(0, 0, 0, 0.1)",
   },
   xAxis: {
-    type: 'category',
-    data: ['备课耗时', '练习设计耗时', '课程优化', '修正耗时'],
-    axisLine: { lineStyle: { color: '#eee' } },
-    axisLabel: { color: '#666' }
+    type: "category",
+    data: ["备课耗时", "练习设计耗时", "课程优化", "修正耗时"],
+    axisLine: { lineStyle: { color: "#eee" } },
+    axisLabel: { color: "#666" },
   },
   yAxis: {
-    type: 'value',
-    name: '效率得分',
+    type: "value",
+    name: "效率得分",
     axisLine: { show: false },
-    splitLine: { lineStyle: { color: '#f5f5f5' } },
-    axisLabel: { color: '#666' }
+    splitLine: { lineStyle: { color: "#f5f5f5" } },
+    axisLabel: { color: "#666" },
   },
   series: [
     {
-      name: '效率得分',
-      type: 'bar',
+      name: "效率得分",
+      type: "bar",
       data: [85, 90, 75, 80],
       itemStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-          offset: 0,
-          color: '#165DFF'
-        }, {
-          offset: 1,
-          color: '#6987ff'
-        }]),
-        borderRadius: [4, 4, 0, 0]
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          {
+            offset: 0,
+            color: "#165DFF",
+          },
+          {
+            offset: 1,
+            color: "#6987ff",
+          },
+        ]),
+        borderRadius: [4, 4, 0, 0],
       },
       emphasis: {
-        itemStyle: { color: '#0E42D2' }
+        itemStyle: { color: "#0E42D2" },
       },
-      animationDuration: 1500
-    }
+      animationDuration: 1500,
+    },
   ],
-  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true }
+  grid: { left: "3%", right: "4%", bottom: "3%", containLabel: true },
 });
 
-// 学生学习效果 - 更改为水平柱状图
+// 学生学习效果 - 水平柱状图（保持原样式）
 const learningEffectOption = ref({
   tooltip: {
-    trigger: 'axis',
+    trigger: "axis",
     axisPointer: {
-      type: 'shadow'
+      type: "shadow",
     },
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderColor: '#eee',
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderColor: "#eee",
     borderWidth: 1,
-    textStyle: { color: '#333' },
+    textStyle: { color: "#333" },
     padding: 12,
-    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.1)',
+    boxShadow: "0 3px 10px rgba(0, 0, 0, 0.1)",
   },
   xAxis: {
-    type: 'value',
-    name: '掌握程度 (%)',
+    type: "value",
+    name: "掌握程度 (%)",
     axisLine: { show: false },
-    splitLine: { lineStyle: { color: '#f5f5f5' } },
-    axisLabel: { color: '#666' }
+    splitLine: { lineStyle: { color: "#f5f5f5" } },
+    axisLabel: { color: "#666" },
   },
   yAxis: {
-    type: 'category',
-    data: ['函数', '几何', '代数', '概率'],
-    axisLine: { lineStyle: { color: '#eee' } },
-    axisLabel: { color: '#666' }
+    type: "category",
+    data: ["函数", "几何", "代数", "概率"],
+    axisLine: { lineStyle: { color: "#eee" } },
+    axisLabel: { color: "#666" },
   },
   series: [
     {
-      name: '掌握程度',
-      type: 'bar',
+      name: "掌握程度",
+      type: "bar",
       data: [
-        { value: 90, itemStyle: { color: '#165DFF' } },
-        { value: 75, itemStyle: { color: '#36D399' } },
-        { value: 60, itemStyle: { color: '#FF9F43' } },
-        { value: 82, itemStyle: { color: '#722ED1' } },
+        { value: 90, itemStyle: { color: "#165DFF" } },
+        { value: 75, itemStyle: { color: "#36D399" } },
+        { value: 60, itemStyle: { color: "#FF9F43" } },
+        { value: 82, itemStyle: { color: "#722ED1" } },
       ],
       itemStyle: {
-        borderRadius: [0, 4, 4, 0] // Rounded corners on the right
+        borderRadius: [0, 4, 4, 0], // Rounded corners on the right
       },
       label: {
         show: true,
-        position: 'right',
+        position: "right",
         valueAnimation: true,
-        formatter: '{c}%',
-        color: '#333',
-        fontWeight: 'bold'
+        formatter: "{c}%",
+        color: "#333",
+        fontWeight: "bold",
       },
       animationDuration: 1500,
-      animationEasing: 'quinticInOut'
-    }
+      animationEasing: "quinticInOut",
+    },
   ],
-  grid: { left: '3%', right: '7%', bottom: '3%', containLabel: true }
+  grid: { left: "3%", right: "7%", bottom: "3%", containLabel: true },
 });
+
 
 // 高频错误知识点
 const commonErrors = ref([]);
 
-const selectedClass = ref('all');
+const selectedClass = ref("all");
 const classes = ref([
-  { value: 'all', label: '全校' },
-  { value: 'class1', label: '2306701班' },
-  { value: 'class2', label: '2306801班' },
-  { value: 'class3', label: '2306901班' },
+  { value: "all", label: "全校" },
+  { value: "class1", label: "2306701班" },
+  { value: "class2", label: "2306801班" },
+  { value: "class3", label: "2306901班" },
 ]);
 
 // 表格行样式
 const tableRowClassName = ({ row, rowIndex }) => {
-  return rowIndex === 0 ? 'highlight-row' : '';
+  return rowIndex === 0 ? "highlight-row" : "";
 };
 
 // 数据获取与更新，添加了动画效果
-const fetchData = () => {
-  // 添加加载状态效果
-  commonErrors.value = [];
+const fetchData = async () => {
+  try {
+    commonErrors.value = []; // 清空错误列表
 
-  // Use setTimeout to simulate async loading
-  setTimeout(() => {
-    if (selectedClass.value === 'all') {
-      // 全校数据
-      usageOption.value.series[0].data = [120, 820];
-      usageOption.value.series[1].data = [250, 1500];
-      efficiencyOption.value.series[0].data = [85, 90, 75, 80];
-      learningEffectOption.value.series[0].data = [
-        { value: 90, itemStyle: { color: '#165DFF' } },
-        { value: 75, itemStyle: { color: '#36D399' } },
-        { value: 60, itemStyle: { color: '#FF9F43' } },
-        { value: 82, itemStyle: { color: '#722ED1' } },
+    // 1. 获取使用次数数据
+    const usageResponse = await adminService.getUseTimes();
+    if (usageResponse.data && usageResponse.data.code === 0) {
+      const usageData = usageResponse.data.data;
+
+      // 更新教师使用次数
+      usageOption.value.series[0].data = [
+        usageData.teacher.week || 0,
+        usageData.teacher.today || 0,
       ];
-      commonErrors.value = [
-        { point: '三角函数公式', count: 45 },
-        { point: '虚拟语气', count: 32 },
-        { point: '牛顿第二定律', count: 28 },
-        { point: '化学方程式配平', count: 19 },
-        { point: '逻辑运算符', count: 19 },
-        { point: '等式解题', count: 18 },
-        { point: '矩阵乘法', count: 17 },
-        { point: '矩阵求逆', count: 16 },
-        { point: '矩阵求秩', count: 15 },
-        { point: '矩阵求迹', count: 13 },
-        { point: '矩阵求行列式', count: 12 },
-        { point: '矩阵求逆', count: 10 },
-        { point: '矩阵求秩', count: 10 },
-        { point: '矩阵求迹', count: 9 },
+
+      // 更新学生使用次数
+      usageOption.value.series[1].data = [
+        usageData.student.week || 0,
+        usageData.student.today || 0,
       ];
     } else {
-      // 模拟班级数据
-      const randomFactor = Math.random() + 0.5;
-      usageOption.value.series[0].data = [20 * randomFactor, 150 * randomFactor];
-      usageOption.value.series[1].data = [40 * randomFactor, 300 * randomFactor];
-      efficiencyOption.value.series[0].data = [
-        (70 + 10 * randomFactor).toFixed(0),
-        (80 + 10 * randomFactor).toFixed(0),
-        (65 + 10 * randomFactor).toFixed(0),
-        (75 + 10 * randomFactor).toFixed(0),
-      ];
-      learningEffectOption.value.series[0].data = [
-        { value: (80 + 10 * randomFactor).toFixed(0), itemStyle: { color: '#165DFF' } },
-        { value: (70 + 10 * randomFactor).toFixed(0), itemStyle: { color: '#36D399' } },
-        { value: (55 + 10 * randomFactor).toFixed(0), itemStyle: { color: '#FF9F43' } },
-        { value: (78 + 10 * randomFactor).toFixed(0), itemStyle: { color: '#722ED1' } },
-      ];
-      commonErrors.value = [
-        { point: '三角函数公式', count: (10 * randomFactor).toFixed(0) },
-        { point: '虚拟语气', count: (8 * randomFactor).toFixed(0) },
-        { point: '牛顿第二定律', count: (5 * randomFactor).toFixed(0) },
-        { point: '化学方程式配平', count: (3 * randomFactor).toFixed(0) },
-      ].sort((a, b) => b.count - a.count);
+      throw new Error(usageResponse.data?.msg || "获取使用次数失败");
     }
-  }, 300); // 模拟网络延迟
+
+    // 2. 获取高频错误知识点（不过滤错误次数为0）
+    const errorsResponse = await adminService.getErrorKnow();
+    if (errorsResponse.data && errorsResponse.data.code === 0) {
+      // 处理所有知识点数据
+      const allErrors = errorsResponse.data.data.map((error) => ({
+        point: error.pointName,
+        count: error.totalWrongCount || 0,
+        rate: error.averageErrorRate || 0,
+        mastery: 100 - (error.averageErrorRate || 0) // 掌握程度
+      }));
+
+      // 3. 更新学习效果图表（按掌握程度排序）
+      const masterySorted = [...allErrors].sort((a, b) => b.mastery - a.mastery);
+
+      // 取前4个知识点（按掌握程度排序）
+      const topMastery = masterySorted.slice(0, 4);
+
+      // 更新y轴数据（知识点名称）
+      learningEffectOption.value.yAxis.data = topMastery.map(item => item.point);
+
+      // 更新系列数据（掌握程度）
+      learningEffectOption.value.series[0].data = topMastery.map((item, index) => {
+        const colors = [
+          { value: item.mastery, itemStyle: { color: "#165DFF" } },
+          { value: item.mastery, itemStyle: { color: "#36D399" } },
+          { value: item.mastery, itemStyle: { color: "#FF9F43" } },
+          { value: item.mastery, itemStyle: { color: "#722ED1" } },
+        ];
+        return colors[index] || { value: item.mastery, itemStyle: { color: "#722ED1" } };
+      });
+
+      const errorsWithCount = allErrors.filter(error => error.count > 0);
+      //过滤错误次数为0
+      const countSorted = [...errorsWithCount].sort((a, b) => b.count - a.count);
+      commonErrors.value = countSorted.slice(0, 10);
+    } else {
+      throw new Error(errorsResponse.data?.msg || "获取高频错误失败");
+    }
+
+    // 5. 效率数据（没有对应接口，保持模拟数据）
+    efficiencyOption.value.series[0].data = [85, 90, 75, 80];
+  } catch (error) {
+    console.error("获取数据失败:", error);
+
+
+    usageOption.value.series[0].data = [120, 820];
+    usageOption.value.series[1].data = [250, 1500];
+    efficiencyOption.value.series[0].data = [85, 90, 75, 80];
+
+    // 学习效果图表后备数据（保持原样式）
+    learningEffectOption.value.yAxis.data = ["函数", "几何", "代数", "概率"];
+    learningEffectOption.value.series[0].data = [
+      { value: 90, itemStyle: { color: "#165DFF" } },
+      { value: 75, itemStyle: { color: "#36D399" } },
+      { value: 60, itemStyle: { color: "#FF9F43" } },
+      { value: 82, itemStyle: { color: "#722ED1" } },
+    ];
+
+    // 使用模拟错误数据（按错误次数排序）
+    commonErrors.value = [
+      { point: "三角函数公式", count: 45, mastery: 55 },
+      { point: "虚拟语气", count: 32, mastery: 68 },
+      { point: "牛顿第二定律", count: 28, mastery: 72 },
+      { point: "化学方程式配平", count: 19, mastery: 81 },
+      { point: "逻辑运算符", count: 19, mastery: 81 },
+      { point: "等式解题", count: 18, mastery: 82 },
+      { point: "矩阵乘法", count: 17, mastery: 83 },
+      { point: "矩阵求逆", count: 16, mastery: 84 },
+      { point: "矩阵求秩", count: 15, mastery: 85 },
+      { point: "矩阵求迹", count: 13, mastery: 87 },
+    ].sort((a, b) => b.count - a.count); // 按错误次数降序排序
+
+    ElMessage.error(`获取数据失败: ${error.message || "服务器错误"}`);
+  }
 };
 
 onMounted(() => {
@@ -363,24 +413,27 @@ onMounted(() => {
 
 <style scoped>
 /* 引入现代无衬线字体 */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 .dashboard {
   padding: 0 32px 32px;
   background-color: #f9fafb;
   min-height: 100vh;
   box-sizing: border-box;
-  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background-image:
-      radial-gradient(at 40% 20%, rgba(22, 93, 255, 0.05) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, rgba(54, 211, 153, 0.05) 0px, transparent 50%),
-      radial-gradient(at 0% 50%, rgba(114, 46, 209, 0.05) 0px, transparent 50%);
+  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-image: radial-gradient(
+      at 40% 20%,
+      rgba(22, 93, 255, 0.05) 0px,
+      transparent 50%
+  ),
+  radial-gradient(at 80% 0%, rgba(54, 211, 153, 0.05) 0px, transparent 50%),
+  radial-gradient(at 0% 50%, rgba(114, 46, 209, 0.05) 0px, transparent 50%);
 }
 
 /* 顶部装饰条 */
 .top-bar {
   height: 6px;
-  background: linear-gradient(90deg, #165DFF, #36D399, #722ED1);
+  background: linear-gradient(90deg, #165dff, #36d399, #722ed1);
   width: 100%;
 }
 
@@ -394,7 +447,7 @@ onMounted(() => {
   margin: 0 0 12px;
   font-size: 28px;
   font-weight: 700;
-  color: #1D2939;
+  color: #1d2939;
   letter-spacing: -0.5px;
 }
 
@@ -428,20 +481,20 @@ onMounted(() => {
 .el-select .el-input__inner {
   height: 44px;
   border-radius: 8px;
-  border-color: #E5E7EB;
+  border-color: #e5e7eb;
   padding: 0 16px;
   transition: all 0.2s;
 }
 
 .el-select .el-input__inner:focus {
-  border-color: #165DFF;
+  border-color: #165dff;
   box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
 }
 
 /* 自定义下拉菜单样式 */
 :deep(.custom-select-dropdown) {
   border-radius: 8px;
-  border-color: #E5E7EB;
+  border-color: #e5e7eb;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   padding: 8px 0;
 }
@@ -452,13 +505,13 @@ onMounted(() => {
 }
 
 :deep(.custom-select-dropdown .el-select-dropdown__item:hover) {
-  background-color: #F0F5FF;
-  color: #165DFF;
+  background-color: #f0f5ff;
+  color: #165dff;
 }
 
 :deep(.custom-select-dropdown .el-select-dropdown__item.selected) {
-  background-color: #E6F7FF;
-  color: #165DFF;
+  background-color: #e6f7ff;
+  color: #165dff;
   font-weight: 500;
 }
 
@@ -477,13 +530,13 @@ onMounted(() => {
 
 /* 卡片顶部装饰线 */
 .chart-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #165DFF, #36D399);
+  background: linear-gradient(90deg, #165dff, #36d399);
   opacity: 0.8;
 }
 
@@ -500,17 +553,17 @@ onMounted(() => {
   margin: 0 0 8px;
   font-size: 18px;
   font-weight: 600;
-  color: #1D2939;
+  color: #1d2939;
   position: relative;
   padding-left: 12px;
 }
 
 .chart-container h3::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 4px;
   height: 18px;
-  background-color: #165DFF;
+  background-color: #165dff;
   left: 0;
   top: 50%;
   transform: translateY(-50%);
@@ -535,41 +588,41 @@ onMounted(() => {
   overflow: hidden;
   font-size: 14px;
   box-shadow: none;
-  border: 1px solid #F2F4F7;
+  border: 1px solid #f2f4f7;
 }
 
 .el-table th {
-  background-color: #F9FAFB;
+  background-color: #f9fafb;
   font-weight: 600;
   color: #344054;
   height: 48px;
   padding: 0 16px;
-  border-bottom: 1px solid #F2F4F7;
+  border-bottom: 1px solid #f2f4f7;
 }
 
 .el-table td {
   color: #344054;
   height: 48px;
   padding: 0 16px;
-  border-bottom: 1px solid #F2F4F7;
+  border-bottom: 1px solid #f2f4f7;
 }
 
 /* 高亮显示错误次数最多的行 */
 :deep(.highlight-row td) {
-  color: #D92D20;
+  color: #d92d20;
   font-weight: 500;
-  background-color: #FEF3F2 !important;
+  background-color: #fef3f2 !important;
 }
 
 :deep(.el-table__body tr:hover > td) {
-  background-color: #F9FAFB !important;
+  background-color: #f9fafb !important;
 }
 
 /* 页脚样式 */
 .page-footer {
   margin-top: 48px;
   padding: 24px 0;
-  border-top: 1px solid #F2F4F7;
+  border-top: 1px solid #f2f4f7;
 }
 
 .footer-content {

@@ -142,16 +142,16 @@ const navItems = ref([
   { name: "备课资料", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" }
 ]);
 
-
 const activeNavItem = ref("章节目录");
 const teacherId = "1";
 
 // 根据课程ID加载课程信息
 const loadCourseInfo = async () => {
   // 这里可以根据courseId从API获取课程信息
-  console.log("加载课程信息:", courseId);
+  // console.log("加载课程信息:", courseId);
 
   const response = await teacherService.getAllCourse(teacherId);
+  // console.log("获取课程成功", response)
   if (response.data) {
     const courseData = response.data.data.map((item) => ({
       id: item.courseId,
