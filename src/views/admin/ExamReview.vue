@@ -458,6 +458,7 @@ onMounted(async () => {
   background: linear-gradient(135deg, #eaf1ff 0%, #f7faff 100%);
   padding-bottom: 60px;
 }
+
 .banner {
   width: 100%;
   height: 180px;
@@ -469,10 +470,12 @@ onMounted(async () => {
   border-radius: 0 0 32px 32px;
   margin-bottom: 36px;
 }
+
 .banner-content {
   text-align: center;
   color: #fff;
 }
+
 .banner-content h1 {
   font-size: 38px;
   font-weight: 900;
@@ -480,11 +483,13 @@ onMounted(async () => {
   letter-spacing: 3px;
   text-shadow: 0 4px 16px rgba(35,94,231,0.18);
 }
+
 .banner-content p {
   font-size: 18px;
   opacity: 0.92;
   letter-spacing: 1px;
 }
+
 .exam-review-card {
   background: #fff;
   border-radius: 24px;
@@ -496,12 +501,14 @@ onMounted(async () => {
   position: relative;
   z-index: 2;
 }
+
 .header-bar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   margin-bottom: 24px;
 }
+
 .search-input {
   width: 320px;
   font-size: 16px;

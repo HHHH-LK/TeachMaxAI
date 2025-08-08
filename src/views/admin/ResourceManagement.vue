@@ -218,13 +218,11 @@ const deleteResource = (resource) => {
 
 const exportAllResources = () => {
   console.log('Exporting all filtered resources:', filteredResources.value);
-  // Here you would implement the actual export logic (e.g., to CSV or Excel)
   ElMessage.success('所有筛选资源已导出');
 };
 
 const exportSingleResource = (resource) => {
   console.log('Exporting single resource:', resource);
-  // Here you would implement the actual export logic for a single resource
   ElMessage.success(`课件 “${resource.title}” 已导出`);
 };
 

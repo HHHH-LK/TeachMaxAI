@@ -635,7 +635,6 @@ onMounted(() => {
   margin: 0;
 }
 
-/* 响应式调整 */
 @media (max-width: 1024px) {
   .dashboard {
     padding: 0 24px 24px;

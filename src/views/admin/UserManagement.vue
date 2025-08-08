@@ -383,7 +383,7 @@ const getAllUsers = async () => {
             createdAt,
           };
         })
-        .filter((item) => item !== null); // 过滤无效项
+        .filter((item) => item !== null);
 
     return userList;
   } catch (error) {

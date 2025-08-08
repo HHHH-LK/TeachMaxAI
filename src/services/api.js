@@ -324,7 +324,6 @@ export const adminService = {
       },
     });
   },
-
 };
 
 // 学生服务
