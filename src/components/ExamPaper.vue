@@ -160,11 +160,13 @@ const displayUserAnswers = computed(() => {
 // 解析考试内容
 const parseExamContent = (content) => {
   if (!content) return [];
+  
   const lines = content.split('\n').filter(line => line.trim() !== '');
+  
   const parsedQuestions = [];
   let currentQuestion = null;
 
-  lines.forEach(line => {
+  lines.forEach((line, lineIndex) => {
     const trimmedLine = line.trim();
 
     // 匹配题目行（支持单/多选、填空、判断和简答）
@@ -197,13 +199,17 @@ const parseExamContent = (content) => {
       if (optionMatch) {
         // 如果是单选或多选
         if (currentQuestion.type === 'single-choice' || currentQuestion.type === 'multiple-choice') {
-          currentQuestion.options.push({
-            label: optionMatch[1],
-            content: optionMatch[2],
-            value: optionMatch[1] // 设置value
-          });
-        }else{
-
+          // 过滤掉 [object Object] 这样的无效内容
+          const optionContent = optionMatch[2].trim();
+          if (optionContent && !optionContent.includes('[object Object]')) {
+            currentQuestion.options.push({
+              label: optionMatch[1],
+              content: optionContent,
+              value: optionMatch[1] // 设置value
+            });
+          } else {
+            console.warn('跳过无效选项:', optionContent);
+          }
         }
       }
     }
@@ -219,7 +225,8 @@ const parseExamContent = (content) => {
     }
     // 匹配解析行
     else if (currentQuestion && trimmedLine.startsWith('解析: ')) {
-      currentQuestion.explanation = trimmedLine.replace('解析: ', '');
+      const explanationText = trimmedLine.replace('解析: ', '');
+      currentQuestion.explanation = explanationText;
     }
   });
 
@@ -389,7 +396,10 @@ const submitExam = async () => {
 // 监听examContent变化以解析题目
 watch(() => props.examContent, (newContent) => {
   if (newContent) {
-    questions.value = parseExamContent(newContent);
+    const parsed = parseExamContent(newContent);
+    questions.value = parsed;
+  } else {
+    questions.value = [];
   }
 }, { immediate: true });
 </script>

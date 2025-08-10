@@ -85,7 +85,7 @@
             <LessonPlanGenerator />
           </div>
           <div v-else-if="activeNavItem === '作业情况'">
-            <HomeworkStats />
+            <HomeworkStats :course-id="courseId" />
           </div>
           <div v-else-if="activeNavItem === '成绩统计'">
             <GradeStatistics />

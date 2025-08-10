@@ -32,7 +32,8 @@ const navbarItems = [
   {id: 'user-management', label: '用户管理', icon: 'people-outline', route: '/admin/user-management'},
   {id: 'resource-management', label: '教案资源管理', icon: 'library-outline', route: '/admin/resource-management'},
   {id: 'exam-review', label: '试卷审核与发布', icon: 'document-text-outline', route: '/admin/exam-review'},
-  {id: 'community-admin', label: '社区交流中心', icon: 'people-outline', route: '/admin/community-admin'}
+  {id: 'community-admin', label: '社区交流中心', icon: 'people-outline', route: '/admin/community-admin'},
+  {id: 'course-assignment', label: '课程分配', icon: 'book-outline', route: '/admin/course-assignment'}
 ];
 
 const activeMenu = ref('');

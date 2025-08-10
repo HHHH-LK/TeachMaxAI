@@ -110,6 +110,19 @@ export const teacherService = {
     });
   },
 
+  /**
+   * 根据学生获取所有作业信息
+   * @param {string} studentId - 学生ID
+   * @param {string} courseId - 课程ID
+   * @param {string} chapterId - 章节ID
+   * @returns {Promise<object>} 作业信息列表
+   */
+  getHomeworkByStudent: async (studentId, courseId, chapterId) => {
+    return await apiClient.get('/teacher/getHomeworkByStudent', {
+      params: { studentId, courseId, chapterId }
+    });
+  },
+
   // 获取学生个人学情数据分析
   getStudentAnalysis: async (studentId, courseId) => {
     return await apiClient.get('/teacher/student-analysis', {
@@ -192,14 +205,17 @@ export const teacherService = {
       });
     },
 
-    // 智能阅卷 - 传递题目答案进行自动评分
-    autoGrade: async (params) => {
-      return await apiClient.post('/teacher/assessment/auto-grade', {
-        assessmentId: params.assessmentId,
-        answers: params.answers // 题目答案数组
+    /**
+     * AI阅卷
+     * @param {string} studentId - 学生ID
+     * @param {string} examId - 考试ID
+     * @returns {Promise<object>} 阅卷结果
+     */
+    aiMarkingExam: async (studentId, examId) => {
+      return await apiClient.post('/teacher/aiMarkingExam', null, {
+        params: { studentId, examId }
       });
     },
-
 
     // 获取考核提交列表
     getSubmissions: async (assessmentId) => {
@@ -227,7 +243,28 @@ export const teacherService = {
         params: { chapterId, courseId }
       });
     },
+  },
 
+  /**
+   * 获取课程考试情况
+   * @param {string} courseId - 课程ID
+   * @returns {Promise<object>} 课程考试情况数据
+   */
+  getStudentExam: async (courseId) => {
+    return await apiClient.get('/teacher/getStudentExam', {
+      params: { courseId }
+    });
+  },
+
+  /**
+   * 获取课程作业情况
+   * @param {string} courseId - 课程ID
+   * @returns {Promise<object>} 课程作业情况数据
+   */
+  getStudentHomework: async (courseId) => {
+    return await apiClient.get('/teacher/getStudentHomework', {
+      params: { courseId }
+    });
   },
 
   /**
@@ -354,6 +391,14 @@ export const studentService = {
     return await apiClient.get('/knowledge/checkAllNOtCruuent'); // 假设后端接口为 /student/error-analysis
   },
 
+  /**
+   * 根据学号查询学生信息
+   * @param {string} studentNumber - 学号
+   * @returns {Promise<object>} 学生信息
+   */
+  findByStudentNumber: async (studentNumber) => {
+    return await apiClient.get(`/stu/student/${studentNumber}`);
+  },
 
   /**
    * 获取平均错误率
@@ -508,7 +553,6 @@ export const studentService = {
   unlikePost: async (postId) => {
     return await apiClient.post(`/community/${postId}/unlike`);
   },
-
 
   //获取作业信息
   getAllWork: async( chapterId, courseId) => {

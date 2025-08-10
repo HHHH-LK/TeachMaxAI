@@ -9,7 +9,23 @@
       </el-radio-group>
       <el-button type="primary" @click="addUser">新增用户</el-button>
     </div>
-    <el-table :data="filteredUsers" stripe style="width: 100%">
+    
+    <!-- 搜索框 -->
+    <div class="search-bar">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索用户名或邮箱"
+        style="width: 300px"
+        clearable
+        @input="handleSearch"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
+    </div>
+    
+    <el-table :data="paginatedUsers" stripe style="width: 100%">
       <el-table-column prop="name" label="姓名" width="180" />
       <el-table-column prop="role" label="角色" width="180" />
       <el-table-column prop="email" label="邮箱" />
@@ -23,6 +39,19 @@
         </template>
       </el-table-column>
     </el-table>
+    
+    <!-- 分页组件 -->
+    <div class="pagination-container">
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="totalUsers"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
 
     <el-dialog :title="dialogTitle" v-model="dialogVisible">
       <el-form :model="form" label-width="80px">
@@ -55,8 +84,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { ElMessageBox, ElMessage } from "element-plus";
+import { Search } from "@element-plus/icons-vue";
 import { adminService, authService } from "@/services/api";
 
 const users = ref([
@@ -161,13 +191,40 @@ const users = ref([
 ]);
 
 const filterRole = ref("");
+const searchKeyword = ref("");
+const currentPage = ref(1);
+const pageSize = ref(10);
 
+// 过滤和搜索用户
 const filteredUsers = computed(() => {
-  if (!filterRole.value) {
-    return users.value;
+  let filtered = users.value;
+  
+  // 按角色过滤
+  if (filterRole.value) {
+    filtered = filtered.filter((user) => user.role === filterRole.value);
   }
-  return users.value.filter((user) => user.role === filterRole.value);
+  
+  // 按关键词搜索
+  if (searchKeyword.value) {
+    const keyword = searchKeyword.value.toLowerCase();
+    filtered = filtered.filter((user) => 
+      user.name.toLowerCase().includes(keyword) || 
+      user.email.toLowerCase().includes(keyword)
+    );
+  }
+  
+  return filtered;
 });
+
+// 分页后的用户数据
+const paginatedUsers = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return filteredUsers.value.slice(start, end);
+});
+
+// 总用户数
+const totalUsers = computed(() => filteredUsers.value.length);
 
 const dialogVisible = ref(false);
 const dialogTitle = ref("");
@@ -277,6 +334,27 @@ function convertRoleToType(role) {
 const cancelForm = () => {
   dialogVisible.value = false;
 };
+
+// 搜索处理函数
+const handleSearch = () => {
+  currentPage.value = 1; // 重置到第一页
+};
+
+// 分页大小改变处理
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  currentPage.value = 1; // 重置到第一页
+};
+
+// 当前页改变处理
+const handleCurrentChange = (newPage) => {
+  currentPage.value = newPage;
+};
+
+// 监听过滤条件变化，重置分页
+watch([filterRole, searchKeyword], () => {
+  currentPage.value = 1;
+});
 
 const deleteUser = (user) => {
   ElMessageBox.confirm(`确定要删除用户 “${user.name}” 吗?`, "提示", {
@@ -400,6 +478,8 @@ const getAllUsers = async () => {
 
 onMounted(async () => {
   users.value = await getAllUsers();
+  // 初始化分页
+  currentPage.value = 1;
 });
 </script>
 
@@ -414,5 +494,15 @@ onMounted(async () => {
   display: flex;
   margin-bottom: 16px;
   justify-content: space-between;
+}
+
+.search-bar {
+  margin-bottom: 16px;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
 </style>

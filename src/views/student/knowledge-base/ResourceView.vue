@@ -43,7 +43,6 @@ const props = defineProps({
   },
 });
 
-
 const resources = ref([]);
 
 const showPreviewModal = ref(false);

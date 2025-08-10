@@ -56,6 +56,7 @@ const fetchAllWork = async () => {
   try {
     const chapter = ref([]);
     const responseChapter = await studentService.getChapterInfo(props.courseId);
+    console.log("chapter", responseChapter.data);
     if (responseChapter.data) {
       chapter.value = responseChapter.data.data.map((item) => ({
         id: item.chapterId,
@@ -67,6 +68,7 @@ const fetchAllWork = async () => {
           chapter.value[i].id,
           props.courseId
       );
+      console.log("response", response.data);
       if (response.data.data) {
         const homework = {
           id: `${props.courseId}-${chapter.value[i].id}-${number}`,

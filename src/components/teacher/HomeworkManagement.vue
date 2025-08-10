@@ -13,14 +13,7 @@
       </el-button>
     </div>
 
-    <!-- 作业状态筛选 -->
-    <div class="filter-section">
-      <el-radio-group v-model="currentStatus" @change="filterHomework">
-        <el-radio-button label="all">全部作业</el-radio-button>
-        <!-- <el-radio-button label="published">已发布</el-radio-button>
-        <el-radio-button label="completed">已完成</el-radio-button> -->
-      </el-radio-group>
-    </div>
+
 
     <!-- 作业列表 -->
     <div class="homework-list">
@@ -32,9 +25,6 @@
         <div class="homework-header">
           <div class="homework-title">
             <h3>{{ homework.title }}</h3>
-            <el-tag :type="getStatusType(homework.status)" size="small">
-              {{ getStatusText(homework.status) }}
-            </el-tag>
           </div>
           <div class="homework-actions">
             <el-button size="small" @click="viewHomework(homework)"
@@ -50,16 +40,14 @@
         </div>
 
         <div class="homework-content">
-          <!-- <p class="homework-description">{{ homework.description }}</p> -->
           <div class="homework-meta">
-            <!-- <span><el-icon><Calendar /></el-icon> 截止时间: {{ formatDate(homework.deadline) }}</span> -->
             <span
             ><el-icon><User /></el-icon> 已提交:
               {{ homework.submittedCount }}/{{ homework.totalStudents }}</span
             >
-            <span
-            ><el-icon><Clock /></el-icon> 创建时间:
-              {{ formatDate(homework.createdAt) }}</span
+            <span v-if="homework.questions && homework.questions.length > 0"
+            ><el-icon><QuestionFilled /></el-icon> 题目数量:
+              {{ homework.questions.length }}</span
             >
           </div>
         </div>
@@ -165,6 +153,18 @@
               label="学号"
               width="120"
           ></el-table-column>
+          <el-table-column 
+              label="班级信息" 
+              width="150"
+              v-if="submissions.some(s => s.studentDetail?.className)"
+          >
+            <template #default="scope">
+              <span v-if="scope.row.studentDetail?.className">
+                {{ scope.row.studentDetail.className }}
+              </span>
+              <span v-else class="text-muted">-</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="submitTime" label="提交时间" width="180">
             <template #default="scope">
               {{
@@ -174,13 +174,18 @@
               }}
             </template>
           </el-table-column>
-          <!-- <el-table-column prop="status" label="状态" width="100">
+          <el-table-column 
+              label="得分" 
+              width="100"
+              v-if="submissions.some(s => s.score !== undefined)"
+          >
             <template #default="scope">
-              <el-tag :type="scope.row.status === 'submitted' ? 'success' : 'warning'">
-                {{ scope.row.status === 'submitted' ? '已提交' : '未提交' }}
-              </el-tag>
+              <span v-if="scope.row.score !== undefined" :class="getScoreClass(scope.row.score)">
+                {{ scope.row.score }}/{{ scope.row.maxScore || 100 }}
+              </span>
+              <span v-else class="text-muted">-</span>
             </template>
-          </el-table-column> -->
+          </el-table-column>
           <el-table-column prop="reviewStatus" label="评阅状态" width="120">
             <template #default="scope">
               <el-tag
@@ -246,6 +251,8 @@
               "
                 :readonly="true"
                 :userAnswers="selectedSubmission.studentAnswers || []"
+                :chapterId="selectedHomework?.chapterId || ''"
+                :courseId="courseId"
             />
           </div>
         </div>
@@ -318,32 +325,35 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Plus,
   Calendar,
   User,
-  Clock,
   MagicStick,
+  QuestionFilled,
 } from "@element-plus/icons-vue";
 import ExamPaper from "@/components/ExamPaper.vue";
-import {teacherService} from "@/services/api.js";
+import { teacherService, studentService } from "@/services/api.js";
 
-const res = teacherService.getHomework('1','3')
-console.log("获取作业数据成功:", res)
+// 作业列表数据
+const homeworkList = ref([]);
 
 // 响应式数据
 const showCreateDialog = ref(false);
 const showDetailDialog = ref(false);
 const showSubmissionsDialog = ref(false);
 const showSubmissionDetailDialog = ref(false);
-const currentStatus = ref("all");
 const selectedHomework = ref(null);
 const submissions = ref([]);
 const selectedSubmission = ref(null);
 const tableLoading = ref(false);
 const batchReviewLoading = ref(false);
+
+// 课程和学生数据
+const courseStudents = ref([]);
+const courseId = ref('1'); // 默认课程ID，可以从路由或props获取
 
 // 手动评阅数据
 const manualReview = ref({
@@ -367,60 +377,285 @@ const rules = {
   maxScore: [{ required: true, message: "请输入满分", trigger: "blur" }],
 };
 
-// 模拟作业数据
-const homeworkList = ref([
-  {
-    id: 1,
-    title: "第一次作业",
-    // description: '完成线性表、栈、队列的基本操作实现',
-    // deadline: new Date('2024-01-15 23:59:59'),
-    maxScore: 100,
-    status: "published",
-    createdAt: new Date("2024-01-01 10:00:00"),
-    submittedCount: 5,
-    totalStudents: 7,
-  },
-  {
-    id: 2,
-    title: "第二次作业",
-    // description: '设计并实现排序算法',
-    // deadline: new Date('2024-01-20 23:59:59'),
-    maxScore: 80,
-    status: "published",
-    createdAt: new Date("2024-01-05 14:30:00"),
-    submittedCount: 4,
-    totalStudents: 7,
-  },
-  {
-    id: 3,
-    title: "第三次作业",
-    // description: '实现二叉树的基本操作',
-    // deadline: new Date('2024-01-10 23:59:59'),
-    maxScore: 90,
-    status: "published",
-    createdAt: new Date("2023-12-28 09:15:00"),
-    submittedCount: 0,
-    totalStudents: 7,
-  },
-]);
+// 获取课程学生列表
+const fetchCourseStudents = async () => {
+  try {
+    const response = await teacherService.getClassStudents(courseId.value);
+    if (response.data && response.data.success && response.data.data) {
+      courseStudents.value = response.data.data;
+      console.log('课程学生列表:', courseStudents.value);
+    }
+  } catch (error) {
+    console.error('获取课程学生列表失败:', error);
+    ElMessage.error('获取课程学生列表失败');
+  }
+};
+
+// 获取学生详细信息
+const getStudentDetail = async (studentNumber) => {
+  try {
+    const response = await studentService.findByStudentNumber(studentNumber);
+    if (response.data && response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error('获取学生详细信息失败:', error);
+    return null;
+  }
+};
+
+// 获取学生作业信息
+const getStudentHomework = async (studentId, courseId, chapterId) => {
+  try {
+    const response = await teacherService.getHomeworkByStudent(studentId, courseId, chapterId);
+    if (response.data && response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('获取学生作业信息失败:', error);
+    return [];
+  }
+};
+
+// 获取作业列表
+const fetchAllWork = async () => {
+  try {
+    // 获取章节信息
+    const responseChapter = await studentService.getChapterInfo(courseId.value);
+    console.log("章节列表", responseChapter);
+    
+    if (responseChapter.data && responseChapter.data.data) {
+      const chapters = responseChapter.data.data;
+      let homeworkNumber = 1;
+      
+      for (const chapter of chapters) {
+        const response = await teacherService.getHomework(courseId.value, chapter.chapterId);
+        console.log("homework", response);
+        
+        if (response.data && response.data.data && response.data.data.length > 0) {
+          const homework = {
+            id: `${courseId.value}-${chapter.chapterId}-${homeworkNumber}`,
+            title: `第${homeworkNumber}次作业`,
+            chapterId: chapter.chapterId,
+            chapterName: chapter.chapterName,
+            questions: [],
+            maxScore: 100,
+            status: "published",
+            createdAt: new Date(),
+            submittedCount: 0,
+            totalStudents: courseStudents.value.length || 0,
+          };
+          
+          homework.questions = response.data.data.map((item) => {
+            let parsedOptions = [];
+            try {
+              parsedOptions = JSON.parse(item.questionOptions || '[]');
+            } catch (e) {
+              console.warn("选项解析失败:", item.questionOptions);
+              parsedOptions = [];
+            }
+
+            return {
+              id: item.questionId,
+              type: item.questionType,
+              text: item.questionContent,
+              options: parsedOptions,
+              answer: item.correctAnswer ? item.correctAnswer.replace(/"/g, "") : "",
+              explanation: item.explanation,
+              difficultyLevel: item.difficultyLevel,
+              scorePoints: item.scorePoints,
+              pointName: item.pointName,
+            };
+          });
+
+          if (homework.questions.length > 0) {
+            homeworkNumber++;
+            homeworkList.value.push(homework);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error("获取作业列表失败:", error);
+    ElMessage.error("获取作业列表失败");
+  }
+};
+
+// 获取学生提交情况
+const fetchStudentSubmissions = async (homework) => {
+  if (!homework || !homework.chapterId) return;
+  
+  tableLoading.value = true;
+  try {
+    const submissionsData = [];
+    
+    for (const student of courseStudents.value) {
+      // 获取学生详细信息
+      const studentDetail = await getStudentDetail(student.studentNumber);
+      
+      // 获取学生作业信息
+      const homeworkData = await getStudentHomework(
+        studentDetail?.studentId || student.studentNumber, 
+        courseId.value, 
+        homework.chapterId
+      );
+      
+      const submission = {
+        studentName: student.realName,
+        studentId: student.studentNumber,
+        studentDetail: studentDetail,
+        submitTime: null,
+        status: "not_submitted",
+        content: "",
+        examContent: "",
+        studentAnswers: [],
+        score: undefined,
+        reviewStatus: "not_submitted",
+        aiGradingLoading: false,
+        homeworkData: homeworkData,
+      };
+      
+      // 如果有作业数据，说明学生已提交
+      if (homeworkData && homeworkData.length > 0) {
+        submission.status = "submitted";
+        submission.submitTime = new Date();
+        submission.reviewStatus = "pending";
+        
+        // 处理作业内容 - 转换为ExamPaper期望的格式
+        submission.examContent = homeworkData.map((item, index) => {
+          // 转换题目类型为ExamPaper期望的格式
+          let questionType = 'question';
+          if (item.questionType) {
+            switch (item.questionType.toLowerCase()) {
+              case 'single':
+              case 'single_choice':
+              case 'single-choice':
+                questionType = 'single-choice';
+                break;
+              case 'multiple':
+              case 'multiple_choice':
+              case 'multiple-choice':
+                questionType = 'multiple-choice';
+                break;
+              case 'fill':
+              case 'fill_blank':
+              case 'fill-in-blank':
+                questionType = 'fill-in-blank';
+                break;
+              case 'judge':
+              case 'true_false':
+              case 'true-false':
+                questionType = 'true-false';
+                break;
+              case 'short':
+              case 'short_answer':
+              case 'short-answer':
+                questionType = 'short-answer';
+                break;
+              default:
+                questionType = 'question';
+            }
+          }
+          
+          const questionText = `${index + 1}. [${questionType}] ${item.questionContent || ''}`;
+          
+                  // 处理选项 - 修复[object Object]问题
+        let optionsText = '';
+        if (item.questionOptions) {
+          try {
+            const options = JSON.parse(item.questionOptions);
+            
+            if (Array.isArray(options) && options.length > 0) {
+              // 过滤掉无效的选项内容
+              const validOptions = options.filter(opt => {
+                if (typeof opt === 'string') return opt && opt.trim() !== '';
+                if (typeof opt === 'object' && opt !== null) {
+                  // 如果是对象，尝试提取有用的字段
+                  return opt.content || opt.text || opt.label || opt.value;
+                }
+                return false;
+              });
+              
+              if (validOptions.length > 0) {
+                optionsText = validOptions.map((opt, i) => {
+                  let optionText = '';
+                  if (typeof opt === 'string') {
+                    optionText = opt;
+                  } else if (typeof opt === 'object' && opt !== null) {
+                    // 尝试从对象中提取选项文本
+                    optionText = opt.content || opt.text || opt.label || opt.value || JSON.stringify(opt);
+                  }
+                  return `${String.fromCharCode(65 + i)}. ${optionText}`;
+                }).join('\n');
+              }
+            }
+          } catch (e) {
+            console.warn('选项解析失败:', item.questionOptions, e);
+            // 如果JSON解析失败，尝试直接使用字符串
+            if (typeof item.questionOptions === 'string') {
+              const lines = item.questionOptions.split('\n').filter(line => line.trim() !== '');
+              if (lines.length > 0) {
+                optionsText = lines.map((line, i) => `${String.fromCharCode(65 + i)}. ${line.trim()}`).join('\n');
+              }
+            }
+          }
+        }
+          
+          // 处理答案 - 使用ExamPaper期望的格式
+          const answer = `答案: ${item.studentAnswer || ''}`;
+          
+          // 处理解析
+          const explanation = item.explanation ? `\n解析: ${item.explanation}` : '';
+          
+          return `${questionText}\n${optionsText}\n${answer}${explanation}`;
+        }).join('\n\n');
+        
+        // 处理学生答案
+        submission.studentAnswers = homeworkData.map(item => item.studentAnswer || '');
+        
+        // 计算得分
+        let totalScore = 0;
+        let earnedScore = 0;
+        homeworkData.forEach(item => {
+          totalScore += item.scorePoints || 0;
+          if (item.isCorrect) {
+            earnedScore += item.scorePoints || 0;
+          }
+        });
+        submission.score = earnedScore;
+        submission.maxScore = totalScore;
+      }
+      
+      submissionsData.push(submission);
+    }
+    
+    submissions.value = submissionsData;
+    console.log('学生提交情况:', submissionsData);
+    
+  } catch (error) {
+    console.error('获取学生提交情况失败:', error);
+    ElMessage.error('获取学生提交情况失败');
+  } finally {
+    tableLoading.value = false;
+  }
+};
+
+// 组件挂载时获取数据
+onMounted(async () => {
+  await fetchCourseStudents();
+  await fetchAllWork();
+});
+
+
 
 // 计算属性
 const filteredHomework = computed(() => {
-  if (currentStatus.value === "all") {
-    return homeworkList.value;
-  }
-  return homeworkList.value.filter((hw) => hw.status === currentStatus.value);
+  return homeworkList.value;
 });
 
 // 方法
-const getStatusType = (status) => {
-  const types = {
-    published: "success",
-    completed: "primary",
-  };
-  return types[status] || "info";
-};
-
 const getStatusText = (status) => {
   const texts = {
     published: "已发布",
@@ -434,9 +669,7 @@ const formatDate = (date) => {
   return new Date(date).toLocaleString("zh-CN");
 };
 
-const filterHomework = () => {
-  // 筛选逻辑已在计算属性中处理
-};
+
 
 const createHomework = () => {
   const homework = {
@@ -464,7 +697,12 @@ const viewHomework = (homework) => {
   showDetailDialog.value = true;
 };
 
-// 删除publishHomework方法，因为不再需要
+const viewSubmissions = (homework) => {
+  selectedHomework.value = homework;
+  fetchStudentSubmissions(homework);
+  showSubmissionsDialog.value = true;
+};
+
 
 // 计算属性
 const submittedCount = computed(() => {
@@ -472,156 +710,12 @@ const submittedCount = computed(() => {
 });
 
 const totalStudents = computed(() => {
-  return submissions.value.length;
+  return courseStudents.value.length;
 });
-
-const viewSubmissions = (homework) => {
-  selectedHomework.value = homework;
-  // 模拟学生提交数据
-  submissions.value = [
-    {
-      studentName: "陈小明",
-      studentId: "2023001",
-      submitTime: new Date("2024-01-14 15:30:00"),
-      status: "submitted",
-      content:
-          "我完成了线性表的基本操作，包括插入、删除、查找等功能。代码已经过测试，运行正常。",
-      examContent: `1. [single-choice] ArrayList是线程安全的。\nA. 插入、删除、查找\nB. 排序、合并、分割\nC. 遍历、复制、清空\nD. 以上都是\nAnswer: A\nExplanation: 线性表的基本操作主要包括插入、删除、查找等操作。\n\n2. [fill-in-blank] 栈的特点是___。\nAnswer: 后进先出\nExplanation: 栈是一种后进先出(LIFO)的数据结构。\n\n3. [short-answer] 请简述线性表的顺序存储和链式存储的区别。\nAnswer: 顺序存储使用连续的内存空间，访问速度快但插入删除慢；链式存储使用指针连接，插入删除快但访问速度慢。\nExplanation: 两种存储方式各有优缺点，需要根据具体应用场景选择。`,
-      studentAnswers: ["A", "后进先出", "顺序存储使用连续的内存空间，访问速度快但插入删除慢；链式存储使用指针连接，插入删除快但访问速度慢。"],
-      score: undefined,
-      reviewStatus: "pending",
-      aiGradingLoading: false,
-    },
-    {
-      studentName: "刘小红",
-      studentId: "2023001",
-      submitTime: new Date("2024-01-14 15:30:00"),
-      status: "submitted",
-      content:
-          "我完成了线性表的基本操作，包括插入、删除、查找等功能。代码已经过测试，运行正常。",
-      examContent: `1. [single-choice] ArrayList是线程安全的。
-A. 插入、删除、查找
-B. 排序、合并、分割
-C. 遍历、复制、清空
-D. 以上都是
-Answer: A
-Explanation: 线性表的基本操作主要包括插入、删除、查找等操作。
-
-2. [fill-in-blank] 栈的特点是___。
-Answer: 后进先出
-Explanation: 栈是一种后进先出(LIFO)的数据结构。
-
-3. [short-answer] 请简述线性表的顺序存储和链式存储的区别。
-Answer: 顺序存储使用连续的内存空间，访问速度快但插入删除慢；链式存储使用指针连接，插入删除快但访问速度慢。
-Explanation: 两种存储方式各有优缺点，需要根据具体应用场景选择。`,
-      studentAnswers: ["B", "后进先出", "顺序存储使用连续的内存空间，访问速度快但插入删除慢；链式存储使用指针连接，插入删除快但访问速度慢。"],
-      score: undefined,
-      reviewStatus: "pending",
-      aiGradingLoading: false,
-    },
-    {
-      studentName: "张小华",
-      studentId: "2023002",
-      submitTime: new Date("2024-01-14 16:45:00"),
-      status: "submitted",
-      content: "实现了栈和队列的基本操作，代码结构清晰，注释详细。",
-      examContent: `1. [single-choice] 队列的特点是___？
-A. 先进先出
-B. 后进先出
-C. 随机访问
-D. 双向访问
-Answer: A
-Explanation: 队列是一种先进先出(FIFO)的数据结构。
-
-2. [multiple-choice] 以下哪些是栈的基本操作？
-A. push
-B. pop
-C. peek
-D. enqueue
-Answer: A,B,C
-Explanation: push(入栈)、pop(出栈)、peek(查看栈顶)是栈的基本操作，enqueue是队列的操作。
-
-3. [short-answer] 请说明栈和队列在计算机科学中的应用场景。
-Answer: 栈用于函数调用、表达式求值、括号匹配等；队列用于任务调度、缓冲区管理、广度优先搜索等。
-Explanation: 栈和队列在算法和系统设计中都有广泛应用。`,
-      studentAnswers: ["A", "A,B,D", "栈用于函数调用、任务调度、缓冲区管理、广度优先搜索等。"],
-      score: 85,
-      reviewStatus: "reviewed",
-      aiGradingLoading: false,
-    },
-
-    {
-      studentName: "周小雯",
-      studentId: "2023004",
-      submitTime: new Date("2024-01-15 10:20:00"),
-      status: "submitted",
-      content: "完成了所有要求的功能，代码质量较高，算法实现正确。",
-      examContent: `1. [true-false] 线性表可以是空表。
-Answer: true
-Explanation: 线性表可以为空，即不包含任何元素。
-
-2. [fill-in-blank] 在顺序表中，元素的存储位置是___的。
-Answer: 连续
-Explanation: 顺序表使用连续的内存空间存储元素。
-
-3. [short-answer] 请分析顺序表和链表的优缺点。
-Answer: 顺序表优点：随机访问快、存储密度高；缺点：插入删除慢、需要连续空间。链表优点：插入删除快、空间利用灵活；缺点：随机访问慢、需要额外空间存储指针。
-Explanation: 两种实现方式各有特点，需要根据具体需求选择。`,
-      studentAnswers: ["true", "连续", "顺序表优点：随机访问快、存储密度高；缺点：插入删除慢、需要连续空间。链表优点：插入删除快、空间利用灵活；缺点：随机访问慢、需要额外空间存储指针。"],
-      score: undefined,
-      reviewStatus: "pending",
-      aiGradingLoading: false,
-    },
-    {
-      studentName: "冯小琴",
-      studentId: "2023004",
-      submitTime: new Date("2024-01-15 10:20:00"),
-      status: "submitted",
-      content: "完成了所有要求的功能，代码质量较高，算法实现正确。",
-      examContent: `1. [true-false] 线性表可以是空表。
-Answer: true
-Explanation: 线性表可以为空，即不包含任何元素。
-
-2. [fill-in-blank] 在顺序表中，元素的存储位置是___的。
-Answer: 连续
-Explanation: 顺序表使用连续的内存空间存储元素。
-
-3. [short-answer] 请分析顺序表和链表的优缺点。
-Answer: 顺序表优点：随机访问快、存储密度高；缺点：插入删除慢、需要连续空间。链表优点：插入删除快、空间利用灵活；缺点：随机访问慢、需要额外空间存储指针。
-Explanation: 两种实现方式各有特点，需要根据具体需求选择。`,
-      studentAnswers: ["true", "连续", "顺序表优点：随机访问快、存储密度高；缺点：插入删除慢、需要连续空间。链表优点：插入删除快、空间利用灵活；缺点：随机访问慢、需要额外空间存储指针。"],
-      score: undefined,
-      reviewStatus: "pending",
-      aiGradingLoading: false,
-    },
-    {
-      studentName: "韩小慧",
-      studentId: "2023003",
-      submitTime: null,
-      status: "not_submitted",
-      content: "",
-      examContent: "",
-      score: undefined,
-      reviewStatus: "not_submitted",
-      aiGradingLoading: false,
-    },
-    {
-      studentName: "孙小亮",
-      studentId: "2023003",
-      submitTime: null,
-      status: "not_submitted",
-      content: "",
-      examContent: "",
-      score: undefined,
-      reviewStatus: "not_submitted",
-      aiGradingLoading: false,
-    },
-  ];
-  showSubmissionsDialog.value = true;
-};
 
 // 获取成绩样式类
 const getScoreClass = (score) => {
+  if (!score && score !== 0) return "no-score";
   if (score >= 90) return "score-excellent";
   if (score >= 80) return "score-good";
   if (score >= 70) return "score-average";
@@ -635,6 +729,7 @@ const getReviewStatusType = (status) => {
     pending: "warning",
     reviewed: "success",
     not_submitted: "info",
+    ai_reviewed: "primary",
   };
   return types[status] || "info";
 };
@@ -645,6 +740,7 @@ const getReviewStatusText = (status) => {
     pending: "待评阅",
     reviewed: "已评阅",
     not_submitted: "未提交",
+    ai_reviewed: "AI已评阅",
   };
   return texts[status] || "未知";
 };
@@ -658,6 +754,7 @@ const viewSubmission = (submission) => {
   };
   // 直接传递studentAnswers
   selectedSubmission.value.studentAnswers = submission.studentAnswers || [];
+  
   showSubmissionDetailDialog.value = true;
 };
 
@@ -669,16 +766,11 @@ const startAIGrading = async (submission) => {
     // 模拟AI评阅过程
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // 模拟AI评阅结果
+    // 基于真实作业数据生成AI评阅结果
     const aiReview = {
-      suggestedScore: Math.floor(Math.random() * 30) + 70, // 70-100分
-      feedback: generateAIFeedback(submission.content),
-      criteria: [
-        { name: "代码质量", score: Math.floor(Math.random() * 20) + 15 },
-        { name: "功能完整性", score: Math.floor(Math.random() * 20) + 15 },
-        { name: "算法正确性", score: Math.floor(Math.random() * 20) + 15 },
-        { name: "注释规范性", score: Math.floor(Math.random() * 10) + 5 },
-      ],
+      suggestedScore: submission.score || Math.floor(Math.random() * 30) + 70, // 使用实际得分或随机70-100分
+      feedback: generateAIFeedback(submission),
+      criteria: generateAICriteria(submission),
     };
 
     submission.aiReview = aiReview;
@@ -693,15 +785,45 @@ const startAIGrading = async (submission) => {
 };
 
 // 生成AI评阅意见
-const generateAIFeedback = (content) => {
-  const feedbacks = [
-    "作业完成度较高，代码结构清晰，逻辑正确。建议在注释方面可以更加详细。",
-    "功能实现完整，算法思路正确。代码风格良好，但可以进一步优化性能。",
-    "整体表现优秀，代码质量较高。建议在边界条件处理上更加严谨。",
-    "作业质量良好，实现了基本功能。建议加强代码的可读性和维护性。",
-    "代码实现正确，功能完整。建议在算法复杂度方面进行优化。",
+const generateAIFeedback = (submission) => {
+  if (!submission.homeworkData || submission.homeworkData.length === 0) {
+    return "作业数据不完整，无法进行AI评阅。";
+  }
+  
+  const totalQuestions = submission.homeworkData.length;
+  const correctAnswers = submission.homeworkData.filter(item => item.isCorrect).length;
+  const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions * 100).toFixed(1) : 0;
+  
+  if (accuracy >= 90) {
+    return `作业完成度很高，正确率${accuracy}%。答案准确，理解深入，表现优秀。`;
+  } else if (accuracy >= 80) {
+    return `作业完成度良好，正确率${accuracy}%。大部分答案正确，个别地方需要改进。`;
+  } else if (accuracy >= 60) {
+    return `作业完成度一般，正确率${accuracy}%。部分答案正确，建议加强相关知识点的学习。`;
+  } else {
+    return `作业完成度较低，正确率${accuracy}%。建议重新学习相关知识点，提高理解程度。`;
+  }
+};
+
+// 生成AI评分标准
+const generateAICriteria = (submission) => {
+  if (!submission.homeworkData || submission.homeworkData.length === 0) {
+    return [
+      { name: "作业完整性", score: 0 },
+      { name: "答案正确性", score: 0 },
+      { name: "理解深度", score: 0 },
+    ];
+  }
+  
+  const totalQuestions = submission.homeworkData.length;
+  const correctAnswers = submission.homeworkData.filter(item => item.isCorrect).length;
+  const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) : 0;
+  
+  return [
+    { name: "作业完整性", score: Math.round(20 * (submission.status === "submitted" ? 1 : 0)) },
+    { name: "答案正确性", score: Math.round(50 * accuracy) },
+    { name: "理解深度", score: Math.round(30 * accuracy) },
   ];
-  return feedbacks[Math.floor(Math.random() * feedbacks.length)];
 };
 
 // 批量智能评阅
@@ -850,6 +972,33 @@ const handleClose = () => {
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.homework-meta span:hover {
+  background: #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+/* 得分显示样式优化 */
+.score-display {
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+/* 班级信息样式 */
+.class-info {
+  background: #e0f2fe;
+  color: #0277bd;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .homework-detail {
@@ -1081,5 +1230,11 @@ const handleClose = () => {
   margin: 0 0 16px 0;
   color: #92400e;
   font-size: 16px;
+}
+
+/* 新增样式 */
+.text-muted {
+  color: #9ca3af;
+  font-style: italic;
 }
 </style>

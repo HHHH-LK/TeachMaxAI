@@ -4,14 +4,17 @@
       <template #header>
         <div class="card-header">
           <span>教学资源管理</span>
-          <el-button type="primary" @click="showUploadDialog = true">上传PPT</el-button>
+          <div>
+            <el-button @click="fetchResource" :loading="loading" style="margin-right: 10px;">刷新</el-button>
+            <el-button type="primary" @click="showUploadDialog = true">上传PPT</el-button>
+          </div>
         </div>
       </template>
 
-      <el-table :data="resources" style="width: 100%">
+      <el-table :data="resources" style="width: 100%" v-loading="loading">
         <el-table-column prop="name" label="资源名称" width="180" />
         <el-table-column prop="type" label="类型" width="100" />
-        <el-table-column prop="size" label="大小" width="100" />
+        <el-table-column prop="description" label="描述" width="200" />
         <el-table-column prop="uploadTime" label="上传时间" width="180" />
         <el-table-column label="操作">
           <template #default="scope">
@@ -56,8 +59,8 @@
       <div class="preview-container">
         <iframe 
           v-if="currentPreviewResource" 
-          :src="getPreviewUrl(currentPreviewResource)" 
-          frameborder="0" 
+          :src="getPreviewUrl(currentPreviewResource)"
+          frameborder="0"
           class="preview-iframe"
         ></iframe>
       </div>
@@ -66,32 +69,59 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { UploadFilled } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import {teacherService} from "@/services/api.js";
+import { studentService, teacherService } from "@/services/api.js";
 
-const res = teacherService.assessment.getAllMaterialsByChapterAndCourse('2', '1')
-console.log(res)
+const route = useRoute();
+const courseId = ref(route.params.courseId);
 
-const resources = ref([
-  {
-    id: 1,
-    name: 'Java程序设计第二章',
-    type: 'PPT',
-    size: '5.2MB',
-    uploadTime: '2023-10-15 14:30',
-    url: 'https://manongbook.com/java/1526.html'
-  },
-  {
-    id: 2,
-    name: 'Java程序设计第一章',
-    type: 'PDF',
-    size: '3.8MB',
-    uploadTime: '2023-10-10 09:15',
-    url: 'https://manongbook.com/java/1526.html'
+// const res = teacherService.assessment.getAllMaterialsByChapterAndCourse('2', courseId.value)
+// console.log(res)
+
+const fetchResource = async() =>{
+  try{
+    loading.value = true;
+    const chapters = [];
+    const responseChapter = await studentService.getChapterInfo(courseId.value);
+
+    if(responseChapter.data && responseChapter.data.success){
+      chapters.push(...responseChapter.data.data.map(item => ({
+        id: item.chapterId
+      })));
+    }
+    
+    // 清空现有资源
+    resources.value = [];
+    
+    for(var i = 0; i < chapters.length; i++){
+      const response = await studentService.getAllResources(chapters[i].id, courseId.value)
+      
+      if(response.data && response.data.success && response.data.data.courseList){
+        const resourcesTemp = response.data.data.courseList.map(item => ({
+          id: item.materialId,
+          name: item.materialTitle,
+          type: item.materialTypeCn || item.materialType,
+          description: item.materialDescription,
+          uploadTime: new Date().toLocaleString(), // 由于API没有返回时间，使用当前时间
+          url: `https://www.w3cschool.cn/java/java-book.html` // 临时链接
+        }));
+        resources.value.push(...resourcesTemp)
+      }
+    }
+    console.log("获取到的资源:", resources.value)
+  } catch(e) {
+    console.log("获取失败:", e)
+    ElMessage.error('获取教学资源失败')
+  } finally {
+    loading.value = false;
   }
-]);
+}
+
+const resources = ref([]);
+const loading = ref(false);
 
 const showUploadDialog = ref(false);
 const showPreviewDialog = ref(false);
@@ -113,7 +143,7 @@ const confirmUpload = () => {
     id: resources.value.length + 1,
     name: uploadFile.value.name,
     type: uploadFile.value.name.split('.').pop().toUpperCase(),
-    size: (uploadFile.value.size / 1024 / 1024).toFixed(2) + 'MB',
+    description: '新上传的教学资源',
     uploadTime: new Date().toLocaleString(),
     url: `/resources/${uploadFile.value.name}`
   };
@@ -143,6 +173,22 @@ const getPreviewUrl = (resource) => {
   // 实际项目中这里应该返回资源的预览URL
   return resource.url;
 };
+
+// 监听路由参数变化
+watch(
+  () => route.params.courseId,
+  (newCourseId) => {
+    if (newCourseId && newCourseId !== courseId.value) {
+      courseId.value = newCourseId;
+      fetchResource();
+    }
+  }
+);
+
+// 组件挂载时获取资源数据
+onMounted(() => {
+  fetchResource();
+});
 </script>
 
 <style scoped>

@@ -20,6 +20,7 @@ import Center from '@/views/Center.vue';
 import TeacherChat from "@/views/student/TeacherChat.vue";
 import TestView from "@/views/teacher/teacherCourse/CourseCenter.vue";
 import ExamReview from "@/views/admin/ExamReview.vue";
+import CourseAssignment from "@/views/admin/CourseAssignment.vue";
 import Test from "@/views/Test.vue"
 // import { useAuthStore } from '@/store/authStore'
 
@@ -159,6 +160,11 @@ const router = createRouter({
           path: 'community-admin',
           name: 'community-admin',
           component: () => import('@/views/admin/CommunityAdmin.vue')
+        },
+        {
+          path: 'course-assignment',
+          name: 'course-assignment',
+          component: CourseAssignment
         },
         {
           path: 'admin-user-center',

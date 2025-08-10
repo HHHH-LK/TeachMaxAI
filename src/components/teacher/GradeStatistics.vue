@@ -97,7 +97,7 @@
           </div>
         </template>
 
-        <el-table :data="gradeList" style="width: 100%" v-loading="loading">
+                 <el-table :data="paginatedGradeList" style="width: 100%" v-loading="loading">
           <el-table-column prop="studentName" label="学生姓名" width="120" />
           <el-table-column prop="studentId" label="学号" width="120" />
           <el-table-column prop="examName" label="考试名称" width="150" />
@@ -134,14 +134,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch, onBeforeUnmount, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { User, Document, TrendCharts, Trophy, Download } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import * as echarts from 'echarts';
 import {teacherService} from "@/services/api.js";
 
-// const res = teacherService.getAllSituation(1)
-// console.log(res)
+const route = useRoute();
+const courseId = ref(route.params.courseId);
 
 // 响应式数据
 const loading = ref(false);
@@ -150,88 +151,58 @@ const pageSize = ref(10);
 const total = ref(0);
 
 // 统计数据
-const totalStudents = ref(7);
-const totalExams = ref(5);//todu
-const averageScore = ref(79.8);
-const passRate = ref(85.7);
+const totalStudents = ref(0);
+const totalExams = ref(0);
+const averageScore = ref(0);
+const passRate = ref(0);
+
+// 成绩分布数据
+const scoreDistribution = ref({
+  scoreA: 0, // 优秀
+  scoreB: 0, // 良好
+  scoreC: 0, // 中等
+  scoreD: 0, // 及格
+  scoreF: 0  // 不及格
+});
+
+// 成绩趋势数据
+const scoreTrend = ref({
+  examTitles: [],
+  averageScores: []
+});
 
 // 图表引用
 const scoreDistributionChart = ref(null);
 const scoreTrendChart = ref(null);
+let scoreDistributionChartInstance = null;
+let scoreTrendChartInstance = null;
 
 // 成绩列表数据
-const gradeList = ref([
-  {
-    studentName: '陈小明',
-    studentId: '2023001',
-    examName: '期中考试',
-    score: 85,
-    rank: 3,
-    examDate: '2024-01-15',
-    status: '已批改'
-  },
-  {
-    studentName: '刘小红',
-    studentId: '2023002',
-    examName: '期中考试',
-    score: 92,
-    rank: 2,
-    examDate: '2024-01-15',
-    status: '已批改'
-  },
-  {
-    studentName: '张小华',
-    studentId: '2023003',
-    examName: '期中考试',
-    score: 78,
-    rank: 5,
-    examDate: '2024-01-15',
-    status: '已批改'
-  },
-  {
-    studentName: '孙小亮',
-    studentId: '2023004',
-    examName: '期中考试',
-    score: 95,
-    rank: 1,
-    examDate: '2024-01-15',
-    status: '已批改'
-  },
-  {
-    studentName: '周小雯',
-    studentId: '2023005',
-    examName: '期中考试',
-    score: 68,
-    rank: 6,
-    examDate: '2024-01-15',
-    status: '已批改'
-  },
-  {
-    studentName: '冯小琴',
-    studentId: '2023005',
-    examName: '期中考试',
-    score: 82,
-    rank: 4,
-    examDate: '2024-01-15',
-    status: '已批改'
-  },
-  {
-    studentName: '韩小慧',
-    studentId: '2023005',
-    examName: '期中考试',
-    score: 59,
-    rank: 7,
-    examDate: '2024-01-15',
-    status: '已批改'
-  },
-]);
+const gradeList = ref([]);
+
+// 分页后的成绩列表
+const paginatedGradeList = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  const result = gradeList.value.slice(start, end);
+  console.log('分页信息:', {
+    currentPage: currentPage.value,
+    pageSize: pageSize.value,
+    total: gradeList.value.length,
+    start,
+    end,
+    resultLength: result.length
+  });
+  return result;
+});
 
 // 获取成绩样式类
 const getScoreClass = (score) => {
-  if (score >= 90) return 'score-excellent';
-  if (score >= 80) return 'score-good';
-  if (score >= 70) return 'score-average';
-  if (score >= 60) return 'score-pass';
+  const numScore = Number(score) || 0;
+  if (numScore >= 90) return 'score-excellent';
+  if (numScore >= 80) return 'score-good';
+  if (numScore >= 70) return 'score-average';
+  if (numScore >= 60) return 'score-pass';
   return 'score-fail';
 };
 
@@ -248,30 +219,91 @@ const getStatusType = (status) => {
 // 处理分页
 const handleSizeChange = (val) => {
   pageSize.value = val;
-  loadGradeData();
+  currentPage.value = 1; // 重置到第一页
 };
 
 const handleCurrentChange = (val) => {
   currentPage.value = val;
-  loadGradeData();
 };
 
 // 加载成绩数据
-const loadGradeData = () => {
-  loading.value = true;
-  // 模拟API调用
-  setTimeout(() => {
-    total.value = 7;
+const loadGradeData = async () => {
+  try {
+    loading.value = true;
+    const response = await teacherService.getStudentExam(courseId.value);
+    console.log("loadGradeData:", response);
+    
+    if (response.data && response.data.success) {
+      const data = response.data.data;
+      
+             // 更新统计数据
+       totalStudents.value = data.studentCount || 0;
+       totalExams.value = data.examCount || 0;
+       averageScore.value = data.overallAverageScore || 0;
+       passRate.value = data.passRate || 0;
+      
+             // 更新成绩分布数据
+       scoreDistribution.value = {
+         scoreA: data.scoreA || 0,
+         scoreB: data.scoreB || 0,
+         scoreC: data.scoreC || 0,
+         scoreD: data.scoreD || 0,
+         scoreF: data.scoreF || 0
+       };
+      
+             // 更新成绩趋势数据
+       scoreTrend.value.examTitles = data.examDetails.map(exam => exam.title);
+       scoreTrend.value.averageScores = data.examDetails.map(exam => exam.averageScore || 0);
+      
+      // 更新成绩列表数据
+      gradeList.value = [];
+      data.examDetails.forEach(exam => {
+        if (exam.studentScores && exam.studentScores.length > 0) {
+          exam.studentScores.forEach((student, index) => {
+                         gradeList.value.push({
+               studentName: student.studentName || `学生${index + 1}`,
+               studentId: student.studentId || `ID${index + 1}`,
+               examName: exam.title,
+               score: student.score || 0,
+               rank: student.rank || index + 1,
+               examDate: new Date(exam.examDate).toLocaleDateString(),
+               status: '已批改'
+             });
+          });
+        }
+      });
+      
+             // 设置总数为原始数据长度，用于分页
+       total.value = gradeList.value.length;
+      
+      // 重新初始化图表
+      nextTick(() => {
+        initScoreDistributionChart();
+        initScoreTrendChart();
+      });
+    }
+  } catch (error) {
+    console.error('获取成绩数据失败:', error);
+    ElMessage.error('获取成绩数据失败');
+  } finally {
     loading.value = false;
-  }, 1000);
+  }
 };
 
 // 初始化成绩分布图表
 const initScoreDistributionChart = () => {
-  const chart = echarts.init(scoreDistributionChart.value);
+  if (!scoreDistributionChart.value) return;
+  
+  // 销毁旧实例
+  if (scoreDistributionChartInstance) {
+    scoreDistributionChartInstance.dispose();
+  }
+  
+  scoreDistributionChartInstance = echarts.init(scoreDistributionChart.value);
   const option = {
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c} ({d}%)'
     },
     legend: {
       orient: 'vertical',
@@ -283,11 +315,11 @@ const initScoreDistributionChart = () => {
         type: 'pie',
         radius: '50%',
         data: [
-          { value: 2, name: '优秀(90-100)' },
-          { value: 2, name: '良好(80-89)' },
-          { value: 1, name: '中等(70-79)' },
-          { value: 1, name: '及格(60-69)' },
-          { value: 1, name: '不及格(<60)' }
+          { value: scoreDistribution.value.scoreA, name: '优秀(90-100)', itemStyle: { color: '#10b981' } },
+          { value: scoreDistribution.value.scoreB, name: '良好(80-89)', itemStyle: { color: '#3b82f6' } },
+          { value: scoreDistribution.value.scoreC, name: '中等(70-79)', itemStyle: { color: '#f59e0b' } },
+          { value: scoreDistribution.value.scoreD, name: '及格(60-69)', itemStyle: { color: '#8b5cf6' } },
+          { value: scoreDistribution.value.scoreF, name: '不及格(<60)', itemStyle: { color: '#ef4444' } }
         ],
         emphasis: {
           itemStyle: {
@@ -299,33 +331,49 @@ const initScoreDistributionChart = () => {
       }
     ]
   };
-  chart.setOption(option);
+  scoreDistributionChartInstance.setOption(option);
 };
 
 // 初始化成绩趋势图表
 const initScoreTrendChart = () => {
-  const chart = echarts.init(scoreTrendChart.value);
+  if (!scoreTrendChart.value) return;
+  
+  // 销毁旧实例
+  if (scoreTrendChartInstance) {
+    scoreTrendChartInstance.dispose();
+  }
+  
+  scoreTrendChartInstance = echarts.init(scoreTrendChart.value);
   const option = {
     tooltip: {
-      trigger: 'axis'
+      trigger: 'axis',
+      formatter: function(params) {
+        return `${params[0].name}<br/>平均分: ${params[0].value}`;
+      }
     },
     xAxis: {
       type: 'category',
-      data: ['第一次月考', '期中考试', '第二次月考', '期末考试']
+      data: scoreTrend.value.examTitles,
+      axisLabel: {
+        rotate: 45,
+        fontSize: 12
+      }
     },
     yAxis: {
       type: 'value',
       min: 0,
-      max: 100
+      max: 100,
+      name: '分数'
     },
     series: [
       {
         name: '平均分',
         type: 'line',
-        data: [75, 78.5, 82, 85],
+        data: scoreTrend.value.averageScores,
         smooth: true,
         lineStyle: {
-          color: '#3b82f6'
+          color: '#3b82f6',
+          width: 3
         },
         areaStyle: {
           color: {
@@ -339,19 +387,47 @@ const initScoreTrendChart = () => {
               { offset: 1, color: 'rgba(59, 130, 246, 0.1)' }
             ]
           }
+        },
+        itemStyle: {
+          color: '#3b82f6'
         }
       }
     ]
   };
-  chart.setOption(option);
+  scoreTrendChartInstance.setOption(option);
 };
+
+// 监听路由参数变化
+watch(
+  () => route.params.courseId,
+  (newCourseId) => {
+    if (newCourseId && newCourseId !== courseId.value) {
+      courseId.value = newCourseId;
+      loadGradeData();
+    }
+  }
+);
+
+// 监听数据变化时重置分页
+watch(
+  () => gradeList.value.length,
+  () => {
+    currentPage.value = 1;
+  }
+);
 
 onMounted(() => {
   loadGradeData();
-  nextTick(() => {
-    initScoreDistributionChart();
-    initScoreTrendChart();
-  });
+});
+
+// 组件卸载时清理图表实例
+onBeforeUnmount(() => {
+  if (scoreDistributionChartInstance) {
+    scoreDistributionChartInstance.dispose();
+  }
+  if (scoreTrendChartInstance) {
+    scoreTrendChartInstance.dispose();
+  }
 });
 </script>
 
