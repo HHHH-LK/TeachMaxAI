@@ -8,6 +8,7 @@ import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.dto.StudentAnswerDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentStudyDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentTextAnswerDTO;
+import com.aiproject.smartcampus.pojo.po.Chapter;
 import com.aiproject.smartcampus.pojo.po.QuestionBank;
 import com.aiproject.smartcampus.pojo.po.StudentAnswer;
 import com.aiproject.smartcampus.pojo.po.StudentChapterProgress;
@@ -49,8 +50,10 @@ public class ChapterServiceImpl implements ChapterService {
     private final KnowledgePointMapper knowledgePointMapper;
     private final QuestionBankMapper questionBankMapper;
     private final StudentAnswerMapper studentAnswerMapper;
+    private final ChapterKnowledgePointMapper chapterKnowledgePointMapper;
 
     //查询指定课程中的章节
+
 
     @Override
     public Result<List<CourseChapterVO>> selectChapterByCrouseId(String courseId) {
@@ -451,6 +454,97 @@ public class ChapterServiceImpl implements ChapterService {
         return Result.success(allChapterByCourseId);
     }
 
+    @Override
+    public Result<String> updateChapterName(Chapter chapter) {
+        // 参数校验
+        if (chapter == null || chapter.getChapterId() == null || chapter.getChapterName() == null) {
+            log.warn("章节信息不完整，无法更新");
+            return Result.error("章节信息不完整");
+        }
+
+        // 更新章节名称
+        LambdaUpdateWrapper<Chapter> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Chapter::getChapterId, chapter.getChapterId());
+        updateWrapper.set(Chapter::getChapterName, chapter.getChapterName());
+
+        //更新章节描述
+        if (chapter.getDescription() != null) {
+            updateWrapper.set(Chapter::getDescription, chapter.getDescription());
+        }
+
+        //更新难度
+        if (chapter.getDifficultyLevel() != null) {
+            updateWrapper.set(Chapter::getDifficultyLevel, chapter.getDifficultyLevel());
+        }
+
+        int updateCount = chapterMapper.update(null, updateWrapper);
+        if (updateCount > 0) {
+            return Result.success("章节信息更新成功");
+        } else {
+            log.error("章节信息更新失败，可能是章节不存在");
+            return Result.error("章节信息更新失败");
+        }
+    }
+
+    @Override
+    public Result<String> deleteChapter(String chapterId) {
+        // 参数校验
+        if (chapterId == null || chapterId.trim().isEmpty()) {
+            log.warn("章节ID不能为空，无法删除");
+            return Result.error("章节ID不能为空");
+        }
+
+        try {
+            // 1. 获取该章节关联的所有知识点ID
+            List<String> pointIds = chapterKnowledgePointMapper.selectPointIdsByChapterId(chapterId);
+
+            // 2. 删除关联表中的记录（章节与知识点关系）
+            int deletedRelations = chapterKnowledgePointMapper.deleteByChapterId(Integer.valueOf(chapterId));
+
+            // 3. 批量删除知识点记录
+            if (!pointIds.isEmpty()) {
+                int deletedPoints = knowledgePointMapper.deleteBatchIds(pointIds);
+                log.info("删除章节[{}]关联的知识点，共删除: {} 条知识点记录", chapterId, deletedPoints);
+            }
+
+            // 4. 删除章节本身
+            int deletedChapter = chapterMapper.deleteById(chapterId);
+
+            if (deletedChapter > 0) {
+                log.info("章节[{}]删除成功，共删除 {} 个知识点关联", chapterId, deletedRelations);
+                return Result.success("章节删除成功");
+            } else {
+                log.error("章节删除失败，ID不存在: {}", chapterId);
+                return Result.error("章节删除失败，ID不存在");
+            }
+        } catch (Exception e) {
+            log.error("删除章节时发生错误: ID={}, 错误: {}", chapterId, e.getMessage());
+            return Result.error("章节删除失败，系统异常");
+        }
+    }
+
+    @Override
+    public Result<String> addChapter(Chapter chapter) {
+        // 参数校验
+        if (chapter == null || chapter.getCourseId() == null || chapter.getChapterName() == null) {
+            log.warn("章节信息不完整，无法添加");
+            return Result.error("章节信息不完整");
+        }
+
+        //设置时间
+        chapter.setCreatedAt(LocalDateTime.now());
+        chapter.setUpdatedAt(LocalDateTime.now());
+
+        // 插入新章节
+        int insertCount = chapterMapper.insert(chapter);
+        if (insertCount > 0) {
+            log.info("章节[{}]添加成功", chapter.getChapterName());
+            return Result.success("章节添加成功");
+        } else {
+            log.error("章节添加失败，可能是数据库错误");
+            return Result.error("章节添加失败");
+        }
+    }
 
     @Override
     public Result juTest(StudentTextAnswerDTO studentTextAnswerDTO) {

@@ -264,4 +264,10 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
 
     @Select("SELECT * FROM knowledge_points WHERE course_id = #{courseId}")
     List<KnowledgePoint> findByCourseId(@Param("courseId") String courseId);
+
+    @Update("UPDATE knowledge_points SET point_name = #{pointName} WHERE point_id = #{pointId}")
+    int updateKnowledgeName(KnowledgePoint knowledgePoint);
+
+    @Delete("DELETE FROM knowledge_points WHERE chapter_id = #{chapterId}")
+    void deleteByChapterId(String chapterId);
 }

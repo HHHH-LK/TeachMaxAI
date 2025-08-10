@@ -4,29 +4,30 @@ import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.exception.StudentExpection;
 import com.aiproject.smartcampus.exception.UserExpection;
+import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.model.functioncalling.NotMasterTestCreateTool;
-import com.aiproject.smartcampus.mapper.KnowledgePointMapper;
-import com.aiproject.smartcampus.mapper.StudentKnowledgeMasteryMapper;
-import com.aiproject.smartcampus.mapper.UserMapper;
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
 import com.aiproject.smartcampus.pojo.bo.StudentWrongKnowledgeBO;
 import com.aiproject.smartcampus.pojo.bo.TBO;
 import com.aiproject.smartcampus.pojo.bo.TestTaskBO;
+import com.aiproject.smartcampus.pojo.dto.GetKnowledgePointDTO;
 import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
+import com.aiproject.smartcampus.pojo.po.Chapter;
+import com.aiproject.smartcampus.pojo.po.ChapterKnowledgePoint;
+import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
 import com.aiproject.smartcampus.pojo.vo.StudentWrongKnowledgeVO;
 import com.aiproject.smartcampus.service.KnoledgeService;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -53,6 +54,8 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     private final StudentKnowledgeMasteryMapper studentKnowledgeMasteryMapper;
     private final ChatLanguageModel chatLanguageModel;
     private final UserToTypeUtils getUserToTypeUtils;
+    private final ChapterKnowledgePointMapper chapterKnowledgePointMapper;
+    private final ChapterMapper chapterMapper;
 
     private final Duration duration = Duration.ofHours(3);
     private final String KnledgeRedisKey = "system:knoledge:imformation:";
@@ -230,6 +233,119 @@ public class KnoledgeServiceImpl implements KnoledgeService {
         String ponintNameById = knowledgePointMapper.getPonintNameById(pointId);
 
         return Result.success(ponintNameById);
+    }
+
+    @Override
+    public Result<String> updateKnowledgeName(GetKnowledgePointDTO knowledgePoint) {
+        if (knowledgePoint == null || knowledgePoint.getPointId() == null || knowledgePoint.getPointName() == null) {
+            log.error("知识点信息不完整，无法更新");
+            return Result.error("知识点信息不完整，无法更新");
+        }
+
+        // 更新知识点
+        int updatedRows = knowledgePointMapper.update(
+                null,
+                Wrappers.lambdaUpdate(KnowledgePoint.class)
+                        .eq(KnowledgePoint::getPointId, knowledgePoint.getPointId())
+                        .set(KnowledgePoint::getPointName, knowledgePoint.getPointName())
+                        .set(KnowledgePoint::getDescription, knowledgePoint.getDescription())
+                        .set(KnowledgePoint::getDifficultyLevel, knowledgePoint.getDifficulty_level())
+                        .set(KnowledgePoint::getKeywords, knowledgePoint.getKeywords())
+        );
+        if (updatedRows > 0) {
+            log.info("知识点名称更新成功，ID: {}, 新名称: {}", knowledgePoint.getPointId(), knowledgePoint.getPointName());
+            return Result.success("知识点名称更新成功");
+        } else {
+            log.error("知识点名称更新失败，可能是ID不存在");
+            return Result.error("知识点名称更新失败，可能是ID不存在");
+        }
+    }
+
+    @Override
+    public Result<String> deleteKnowledgePoint(String pointId) {
+        if (pointId == null || pointId.isEmpty()) {
+            log.error("知识点ID不能为空，无法删除");
+            return Result.error("知识点ID不能为空，无法删除");
+        }
+
+        // 删除知识点
+        int deletedRows = knowledgePointMapper.delete(
+                Wrappers.lambdaQuery(KnowledgePoint.class).eq(KnowledgePoint::getPointId, pointId)
+        );
+
+        //删除对应章节对应
+
+        int deletedChapterRows = chapterKnowledgePointMapper.deleteByPointId(pointId);
+
+        if (deletedRows > 0 && deletedChapterRows > 0) {
+            log.info("知识点删除成功，ID: {}", pointId);
+            return Result.success("知识点删除成功");
+        } else {
+            log.error("知识点删除失败，可能是ID不存在");
+            return Result.error("知识点删除失败，可能是ID不存在");
+        }
+    }
+
+    @Override
+    public Result<String> addKnowledgePoint(GetKnowledgePointDTO knowledgePoint, String chapterId) {
+        // 参数校验
+        if (knowledgePoint == null || knowledgePoint.getPointName() == null || chapterId == null) {
+            log.error("知识点信息不完整，无法添加");
+            return Result.error("知识点信息不完整");
+        }
+
+        try {
+            // 1. 获取章节信息（以获取课程ID）
+            Chapter chapter = chapterMapper.selectById(chapterId);
+            if (chapter == null) {
+                log.error("章节不存在: ID={}", chapterId);
+                return Result.error("章节不存在");
+            }
+
+            // 2. 创建新知识点对象，包含课程ID
+            KnowledgePoint newKnowledgePoint = new KnowledgePoint();
+            BeanUtils.copyProperties(knowledgePoint, newKnowledgePoint);
+            newKnowledgePoint.setCourseId(chapter.getCourseId()); // 设置课程ID
+
+            // 3. 插入知识点表（先生成知识点ID）
+            int insertedRows = knowledgePointMapper.insert(newKnowledgePoint);
+            if (insertedRows == 0) {
+                log.error("知识点插入失败: {}", knowledgePoint.getPointName());
+                return Result.error("知识点插入失败");
+            }
+
+            // 4. 获取新生成的知识点ID
+            String pointId = String.valueOf(newKnowledgePoint.getPointId());
+
+            // 5. 获取当前章节最大顺序号
+            Integer maxOrder = chapterKnowledgePointMapper.selectMaxPointOrderByChapterId(chapterId);
+            int newOrder = (maxOrder == null) ? 1 : maxOrder + 1;
+
+            // 6. 创建并插入关联关系
+            ChapterKnowledgePoint relation = new ChapterKnowledgePoint();
+            relation.setChapterId(Integer.valueOf(chapterId));
+            relation.setPointId(Integer.valueOf(pointId));
+            relation.setPointOrder(newOrder);
+            relation.setIsCore(true); // 默认不是核心知识点
+
+            //设置时间
+            relation.setCreatedAt(LocalDateTime.now());
+            relation.setUpdatedAt(LocalDateTime.now());
+
+
+            int chapterInsertedRows = chapterKnowledgePointMapper.insert(relation);
+
+            if (chapterInsertedRows > 0) {
+                log.info("知识点添加成功: ID={}, 名称={}, 课程={}, 章节={}",
+                        pointId, knowledgePoint.getPointName(), chapter.getCourseId(), chapterId);
+                return Result.success("知识点添加成功");
+            } else {
+                throw new RuntimeException("关联表插入失败");
+            }
+        } catch (Exception e) {
+            log.error("知识点添加失败: 章节ID={}, 错误={}", chapterId, e.getMessage());
+            return Result.error("知识点添加失败: " + e.getMessage());
+        }
     }
 
     // TODO:智能进行获取错误知识点信息 后续改成策略模式 - 修复死循环版本（利用对数压缩进行修改处理）

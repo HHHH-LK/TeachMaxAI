@@ -7,6 +7,7 @@ import com.aiproject.smartcampus.exception.StudentExpection;
 import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
 import com.aiproject.smartcampus.mapper.CourseMapper;
 import com.aiproject.smartcampus.mapper.ExamPaperMapper;
+import com.aiproject.smartcampus.model.functioncalling.CourseCreateTool;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.po.ExamPaper;
 import com.aiproject.smartcampus.pojo.po.User;
@@ -35,6 +36,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final CourseEnrollmentMapper courseEnrollmentMapper;
     private final UserToTypeUtils userToTypeUtils;
     private final ExamPaperMapper examPaperMapper;
+    private final CourseCreateTool courseCreateTool;
 
     /**
      * 查询所有课程信息
@@ -266,6 +268,33 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public Result getCourseHomeworkInfo(String courseId) {
         return null;
+    }
+
+    @Override
+    public Result<String> createCourse(String courseName, String teacherId, String semester) {
+        try {
+            // 创建课程对象
+            Course course = new Course();
+            course.setCourseName(courseName);
+            course.setTeacherId(Integer.valueOf(teacherId));
+            course.setSemester(semester);
+            course.setStatus(Course.CourseStatus.ACTIVE);
+
+            // 设置课程信息
+            courseCreateTool.setCourse(course);
+
+            // 执行创建流程
+            courseCreateTool.run();
+
+            // 获取生成结果
+            String result = courseCreateTool.getResult();
+
+            return Result.success(result);
+
+        } catch (Exception e) {
+            log.error("课程创建失败", e);
+            return Result.error("课程创建失败: " + e.getMessage());
+        }
     }
 
 

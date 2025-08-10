@@ -3,6 +3,7 @@ package com.aiproject.smartcampus.service;
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.dto.StudentStudyDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentTextAnswerDTO;
+import com.aiproject.smartcampus.pojo.po.Chapter;
 import com.aiproject.smartcampus.pojo.vo.*;
 
 import java.util.List;
@@ -39,4 +40,10 @@ public interface ChapterService {
     Result setStudentAwser(StudentTextAnswerDTO studentTextAnswerDTO);
 
     Result<List<ChapterTeacherVO>> getChapterByCourseId(String courseId);
+
+    Result<String> updateChapterName(Chapter chapter);
+
+    Result<String> deleteChapter(String chapterId);
+
+    Result<String> addChapter(Chapter chapter);
 }

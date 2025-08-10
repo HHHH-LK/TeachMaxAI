@@ -1,7 +1,9 @@
 package com.aiproject.smartcampus.service;
 
 import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.dto.GetKnowledgePointDTO;
 import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
+import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 
 import java.util.List;
 
@@ -33,4 +35,10 @@ public interface KnoledgeService {
     Result<Double> getAver();
 
     Result<String> getKonwledgeNameById(String pointId);
+
+    Result<String> updateKnowledgeName(GetKnowledgePointDTO knowledgePoint);
+
+    Result<String> deleteKnowledgePoint(String pointId);
+
+    Result<String> addKnowledgePoint(GetKnowledgePointDTO knowledgePoint, String chapterId);
 }

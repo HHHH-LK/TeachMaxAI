@@ -2,12 +2,15 @@ package com.aiproject.smartcampus.controller;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
+import com.aiproject.smartcampus.pojo.dto.GetKnowledgePointDTO;
 import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
+import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
 import com.aiproject.smartcampus.service.KnoledgeService;
 import com.aiproject.smartcampus.service.impl.KnoledgeServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
@@ -83,5 +86,34 @@ public class KnowledgeController {
 
     }
 
+    /**
+     * 修改知识点名称
+     */
+    @PostMapping("/updateKnowledgeName")
+    @ApiOperation("修改知识点名称")
+    @Operation(summary = "修改知识点名称")
+    public Result<String> updateKnowledgeName(@RequestBody GetKnowledgePointDTO knowledgePoint) {
+        return knoledgeService.updateKnowledgeName(knowledgePoint);
+    }
+
+    /**
+     * 删除知识点并删除对应chapter关系
+     */
+    @DeleteMapping("/deleteKnowledgePoint")
+    @ApiOperation("删除知识点")
+    @Operation(summary = "删除知识点")
+    public Result<String> deleteKnowledgePoint(@ApiParam(value = "知识点ID", required = true) @RequestParam("pointId") String pointId) {
+        return knoledgeService.deleteKnowledgePoint(pointId);
+    }
+
+    /**
+     * 添加知识点
+     */
+    @PostMapping("/addKnowledgePoint")
+    @ApiOperation("添加知识点")
+    @Operation(summary = "添加知识点")
+    public Result<String> addKnowledgePoint(@RequestBody GetKnowledgePointDTO knowledgePoint, @RequestParam("chapterId") String chapterId) {
+        return knoledgeService.addKnowledgePoint(knowledgePoint, chapterId);
+    }
 
 }
