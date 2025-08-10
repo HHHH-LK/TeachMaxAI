@@ -1,13 +1,11 @@
-package com.aiproject.smartcampus.commons.sort;
+package com.aiproject.smartcampus.commons.redis;
 
-import com.aiproject.smartcampus.pojo.po.Tower;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 
 /**

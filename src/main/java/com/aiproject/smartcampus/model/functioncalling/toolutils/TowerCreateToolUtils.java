@@ -1,29 +1,24 @@
 package com.aiproject.smartcampus.model.functioncalling.toolutils;
 
-import com.aiproject.smartcampus.commons.sort.RedisSort;
+import com.aiproject.smartcampus.commons.redis.RedisSort;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.Side;
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
 import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.KnowledgePointVO;
-import com.aiproject.smartcampus.pojo.vo.StudentKnowledgePointVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 import java.util.concurrent.*;

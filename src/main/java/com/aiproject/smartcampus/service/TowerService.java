@@ -28,4 +28,6 @@ public interface TowerService {
     Result<TowerFloor> getTowerFloorInfoByFloorId(String towerFloorId);
 
     Result setIsPass(String towerFloorId, Integer isPass);
+
+    Result loadTest(String towerId, String floorId,String courseId,String studentId);
 }

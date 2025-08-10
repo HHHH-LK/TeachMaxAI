@@ -32,7 +32,9 @@ public class SenderTypeHandler extends BaseTypeHandler<SenderType> {
     }
 
     private SenderType codeOf(String code) {
-        if (code == null) return null;
+        if (code == null) {
+            return null;
+        }
         for (SenderType value : SenderType.values()) {
             if (value.getCode().equals(code)) {
                 return value;

@@ -1,5 +1,6 @@
-package com.aiproject.smartcampus.commons.sort;
+package com.aiproject.smartcampus.service.impl;
 
+import com.aiproject.smartcampus.service.TowerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -7,17 +8,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class RedisSortTest {
+class TowerServiceImplTest {
 
     @Autowired
-    private RedisSort redisSort;
+    private TowerService towerService;
 
     @Test
-    void test(){
+    void createTower() {
 
-        redisSort.getSortedList("2");
+        towerService.loadTest("20","83","1","1");
 
     }
-
 
 }

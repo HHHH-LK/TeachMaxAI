@@ -4,6 +4,7 @@ import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.po.Tower;
 import com.aiproject.smartcampus.pojo.po.TowerFloor;
 import com.aiproject.smartcampus.service.TowerService;
+import com.aiproject.smartcampus.service.impl.TaskServiceImpl;
 import com.aiproject.smartcampus.service.impl.TowerServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.Set;
 public class TowerController {
 
     private final TowerService towerService;
+
 
     /**
      * 根据学生和课程定制化生成战斗塔
@@ -112,6 +114,17 @@ public class TowerController {
     public Result setIsPass(@RequestParam(value = "towerFloorId") String towerFloorId, Integer isPass) {
 
         return towerService.setIsPass(towerFloorId, isPass);
+    }
+
+
+    /**
+     * 进入塔层时异步加载对应的题目（存入redis中）并定时同步
+     * */
+    @PostMapping("/load")
+    public Result loadTest(@RequestParam(value = "towerId") String towerId,@RequestParam(value = "floorId")String floorId,
+                           @RequestParam(value = "courseId")String courseId,@RequestParam(value = "studentId")String studentId) {
+
+        return towerService.loadTest(towerId,floorId,courseId,studentId);
     }
 
 

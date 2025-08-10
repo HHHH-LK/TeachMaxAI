@@ -23,44 +23,44 @@ import java.util.Map;
 public class JsonUtils {
 
 
-        public static Object toJsonObject(String json, Class<?> clazz) throws Exception {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> map = objectMapper.readValue(json, Map.class);
-            Object newObject = clazz.getDeclaredConstructor().newInstance();
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                try {
-                    Field field=clazz.getDeclaredField(key);
-                    field.setAccessible(true);
-                    Class<?> fieldType = field.getType();
+    public static Object toJsonObject(String json, Class<?> clazz) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> map = objectMapper.readValue(json, Map.class);
+        Object newObject = clazz.getDeclaredConstructor().newInstance();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            try {
+                Field field = clazz.getDeclaredField(key);
+                field.setAccessible(true);
+                Class<?> fieldType = field.getType();
 
-                    // 字符串
-                    if (fieldType.equals(String.class)) {
-                        field.set(newObject, value.toString());
-                    }
-                    // 布尔型（兼容boolean/Boolean）
-                    else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)) {
-                        field.set(newObject, Boolean.valueOf(value.toString()));
-                    }
-                    // 数值型（整数/浮点数）
-                    else if (fieldType.equals(Integer.class) || fieldType.equals(int.class)) {
-                        field.set(newObject, Integer.valueOf(value.toString()));
-                    } else if (fieldType.equals(Double.class) || fieldType.equals(double.class)) {
-                        field.set(newObject, Double.valueOf(value.toString()));
-                    }
-                    // 通用Object类型
-                    else if (fieldType.equals(Object.class)) {
-                        field.set(newObject, value);
-                    }
-
-
-                } catch (NoSuchFieldException e) {
-                    log.error("创建类失败,字段名:{}", key, e);
+                // 字符串
+                if (fieldType.equals(String.class)) {
+                    field.set(newObject, value.toString());
                 }
+                // 布尔型（兼容boolean/Boolean）
+                else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)) {
+                    field.set(newObject, Boolean.valueOf(value.toString()));
+                }
+                // 数值型（整数/浮点数）
+                else if (fieldType.equals(Integer.class) || fieldType.equals(int.class)) {
+                    field.set(newObject, Integer.valueOf(value.toString()));
+                } else if (fieldType.equals(Double.class) || fieldType.equals(double.class)) {
+                    field.set(newObject, Double.valueOf(value.toString()));
+                }
+                // 通用Object类型
+                else if (fieldType.equals(Object.class)) {
+                    field.set(newObject, value);
+                }
+
+
+            } catch (NoSuchFieldException e) {
+                log.error("创建类失败,字段名:{}", key, e);
             }
-            return newObject;
         }
+        return newObject;
+    }
 
     public static String toJsonString(Object object) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -125,9 +125,6 @@ public class JsonUtils {
         }
         return relations;
     }
-
-
-
 
 
 }
