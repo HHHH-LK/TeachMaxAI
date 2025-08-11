@@ -76,7 +76,7 @@
             <ChapterList :courseId="courseId" />
           </div>
           <div v-else-if="activeNavItem === '课堂作业'">
-            <HomeworkManagement />
+            <HomeworkManagement :courseId="courseId" />
           </div>
           <div v-else-if="activeNavItem === '教学资源'">
             <TeachingResources />

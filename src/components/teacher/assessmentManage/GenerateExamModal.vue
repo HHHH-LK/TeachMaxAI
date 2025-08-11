@@ -245,7 +245,7 @@ const generateAssessment = async () => {
 
     ElMessage.info("正在根据选择的章节生成试卷内容...");
 
-    const response = await teacherService.assessment.generateExam(
+    const response = await teacherService.assessment.createIntelligentExam(
       generateDescription.value, 
       generateForm.courseId
     );

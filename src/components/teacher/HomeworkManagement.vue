@@ -13,8 +13,6 @@
       </el-button>
     </div>
 
-
-
     <!-- 作业列表 -->
     <div class="homework-list">
       <div
@@ -252,7 +250,7 @@
                 :readonly="true"
                 :userAnswers="selectedSubmission.studentAnswers || []"
                 :chapterId="selectedHomework?.chapterId || ''"
-                :courseId="courseId"
+                :courseId="props.courseId"
             />
           </div>
         </div>
@@ -326,16 +324,23 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import {
   Plus,
-  Calendar,
   User,
   MagicStick,
   QuestionFilled,
 } from "@element-plus/icons-vue";
 import ExamPaper from "@/components/ExamPaper.vue";
 import { teacherService, studentService } from "@/services/api.js";
+
+// 定义props接收课程ID
+const props = defineProps({
+  courseId: {
+    type: [String, Number],
+    required: true,
+  },
+});
 
 // 作业列表数据
 const homeworkList = ref([]);
@@ -353,7 +358,8 @@ const batchReviewLoading = ref(false);
 
 // 课程和学生数据
 const courseStudents = ref([]);
-const courseId = ref('1'); // 默认课程ID，可以从路由或props获取
+// 使用props中的courseId，而不是硬编码
+// const courseId = ref('1'); // 删除这行
 
 // 手动评阅数据
 const manualReview = ref({
@@ -380,7 +386,8 @@ const rules = {
 // 获取课程学生列表
 const fetchCourseStudents = async () => {
   try {
-    const response = await teacherService.getClassStudents(courseId.value);
+    const response = await teacherService.getClassStudents(props.courseId);
+    console.log('获取课程学生列表:', response);
     if (response.data && response.data.success && response.data.data) {
       courseStudents.value = response.data.data;
       console.log('课程学生列表:', courseStudents.value);
@@ -409,6 +416,7 @@ const getStudentDetail = async (studentNumber) => {
 const getStudentHomework = async (studentId, courseId, chapterId) => {
   try {
     const response = await teacherService.getHomeworkByStudent(studentId, courseId, chapterId);
+    console.log('获取学生作业信息:', response);
     if (response.data && response.data.success && response.data.data) {
       return response.data.data;
     }
@@ -423,7 +431,7 @@ const getStudentHomework = async (studentId, courseId, chapterId) => {
 const fetchAllWork = async () => {
   try {
     // 获取章节信息
-    const responseChapter = await studentService.getChapterInfo(courseId.value);
+    const responseChapter = await studentService.getChapterInfo(props.courseId);
     console.log("章节列表", responseChapter);
     
     if (responseChapter.data && responseChapter.data.data) {
@@ -431,12 +439,12 @@ const fetchAllWork = async () => {
       let homeworkNumber = 1;
       
       for (const chapter of chapters) {
-        const response = await teacherService.getHomework(courseId.value, chapter.chapterId);
+        const response = await teacherService.getHomework(props.courseId, chapter.chapterId);
         console.log("homework", response);
         
         if (response.data && response.data.data && response.data.data.length > 0) {
           const homework = {
-            id: `${courseId.value}-${chapter.chapterId}-${homeworkNumber}`,
+            id: `${props.courseId}-${chapter.chapterId}-${homeworkNumber}`,
             title: `第${homeworkNumber}次作业`,
             chapterId: chapter.chapterId,
             chapterName: chapter.chapterName,
@@ -498,7 +506,7 @@ const fetchStudentSubmissions = async (homework) => {
       // 获取学生作业信息
       const homeworkData = await getStudentHomework(
         studentDetail?.studentId || student.studentNumber, 
-        courseId.value, 
+        props.courseId, 
         homework.chapterId
       );
       

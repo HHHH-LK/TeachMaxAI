@@ -175,6 +175,18 @@ export const teacherService = {
     },
 
     /**
+     * 智能生成考试试卷
+     * @param {string} content - 考试内容要求
+     * @param {string} courseId - 课程ID
+     * @returns {Promise<object>} 考试创建结果
+     */
+    createIntelligentExam: async (content, courseId) => {
+      return await apiClient.post('/teacher/ai/createExamByai', null, {
+        params: { content, courseId }
+      });
+    },
+
+    /**
      * 获取课程考试信息题目
      * @param {string} examId - 考试ID
      * @returns {Promise<object>} 考试题目信息
@@ -264,6 +276,19 @@ export const teacherService = {
   getStudentHomework: async (courseId) => {
     return await apiClient.get('/teacher/getStudentHomework', {
       params: { courseId }
+    });
+  },
+
+  /**
+   * 教师创建练习题
+   * @param {string} content - 练习内容要求
+   * @param {string} courseId - 课程ID
+   * @param {string} chapterId - 章节ID
+   * @returns {Promise<object>} 创建结果
+   */
+  teacherCreateTest: async (content, courseId, chapterId) => {
+    return await apiClient.post('/teacher/ai/teacher/createPractice', null, {
+      params: { content, courseId, chapterId }
     });
   },
 
