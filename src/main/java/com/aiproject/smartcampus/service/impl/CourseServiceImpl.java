@@ -297,6 +297,19 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         }
     }
 
+    @Override
+    public Result<String> changeTeacher(Integer courseId, String teacherId) {
+        //查询课程是否存在
+        Course course = courseMapper.selectById(courseId);
+        if (course == null) {
+            return Result.error(NO_EXIST_COURSE);
+        }
 
+        //更新课程教师信息
+        course.setTeacherId(Integer.valueOf(teacherId));
+        courseMapper.updateById(course);
+
+        return Result.success(SUCCESS_UPDATE_COURSE);
+    }
 }
 
