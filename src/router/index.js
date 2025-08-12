@@ -21,7 +21,7 @@ import TeacherChat from "@/views/student/TeacherChat.vue";
 import TestView from "@/views/teacher/teacherCourse/CourseCenter.vue";
 import ExamReview from "@/views/admin/ExamReview.vue";
 import CourseAssignment from "@/views/admin/CourseAssignment.vue";
-import Test from "@/views/Test.vue"
+import Test from "@/views/tower/Fight.vue"
 import Game from "@/views/student/game/Game.vue"
 // import { useAuthStore } from '@/store/authStore'
 
@@ -177,7 +177,7 @@ const router = createRouter({
     {
       path: "/test",
       name: "test",
-      component: Test
+      component:  Test
     },
     {
       path: '/game',
