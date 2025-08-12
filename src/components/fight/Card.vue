@@ -1,9 +1,7 @@
 <template>
   <div class="fight-container">
-    <!-- 主页面容器 -->
     <div class="fight-footer">
       <div class="card-fight">
-        <!-- 游戏卡片组件 -->
         <div class="game-container">
           <div
             class="container-card"
@@ -23,7 +21,7 @@
               ref="cardImg"
             ></div>
 
-            <!-- 箭头画布 -->
+            <!-- 箭头 -->
             <canvas ref="arrowCanvas" class="arrow-canvas"></canvas>
           </div>
         </div>
@@ -42,7 +40,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 
-// 响应式数据
 const imageSrc = ref("/Image/GameCard.png");
 const isActive = ref(false);
 const activationDistance = ref(150);
@@ -58,7 +55,7 @@ const isEnemyTargeted = ref(false);
 const enemyPosition = ref({ x: 0, y: 0 });
 const cardDifficulty = ref(null);
 const showModal = ref(false);
-const interactionEnabled = ref(true); // 新增：控制交互是否启用
+const interactionEnabled = ref(true); //控制交互是否启用
 const originalImage = "/Image/GameCard.png"; // 原始卡牌图片路径
 let enemyElement = null;
 
@@ -93,9 +90,9 @@ const resizeCanvas = () => {
   }
 };
 
-// 开始交互（鼠标按下）
+// 开始交互
 const startInteraction = () => {
-  if (!interactionEnabled.value) return; // 新增：检查交互是否启用
+  if (!interactionEnabled.value) return; // 检查交互是否启用
 
   isActive.value = true;
   resizeCanvas();
@@ -111,14 +108,14 @@ const startInteraction = () => {
 
   mousePos.value = { ...arrowStart.value };
 
-  // 开始绘制箭头（使用 requestAnimationFrame 代替 setInterval）
+  // 开始绘制箭头
   stopDrawing();
   drawInterval = requestAnimationFrame(drawLoop);
 };
 
 // 全局鼠标移动处理
 const handleGlobalMouseMove = (event) => {
-  if (!interactionEnabled.value) return; // 新增：检查交互是否启用
+  if (!interactionEnabled.value) return; // 检查交互是否启用
 
   mousePos.value = { x: event.clientX, y: event.clientY };
 
@@ -146,13 +143,12 @@ const checkEnemyTarget = () => {
   const dy = mousePos.value.y - enemyCenterY;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  // 如果距离小于150px，视为接近敌人
-  const newStatus = distance < 150;
+  // 如果距离小于100px，视为接近敌人
+  const newStatus = distance < 100;
 
   if (isEnemyTargeted.value !== newStatus) {
     isEnemyTargeted.value = newStatus;
 
-    // 全局通知敌人组件显示/隐藏括号
     document.dispatchEvent(
       new CustomEvent("global-bracket-visibility", { detail: newStatus })
     );
@@ -164,7 +160,7 @@ const checkEnemyTarget = () => {
 
 // 全局鼠标释放处理
 const handleGlobalMouseUp = async () => {
-  if (!interactionEnabled.value) return; // 新增：检查交互是否启用
+  if (!interactionEnabled.value) return;
 
   if (isActive.value) {
     // 检查是否击中敌人
@@ -180,7 +176,7 @@ const handleGlobalMouseUp = async () => {
         // 显示模态框
         showModal.value = true;
 
-        // 新增：禁用卡片交互
+        // 禁用卡片交互
         disableCardInteraction();
       } catch (error) {
         console.error("获取卡牌难度失败:", error);
@@ -188,7 +184,6 @@ const handleGlobalMouseUp = async () => {
         stopInteraction();
       }
     } else {
-      // 检查是否需要显示复制提示
       const dx = mousePos.value.x - arrowStart.value.x;
       const dy = mousePos.value.y - arrowStart.value.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -230,7 +225,7 @@ const enableCardInteraction = () => {
 const fetchCardDifficulty = async () => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // 随机选择一种难度作为示例
+      // 随机选择一种难度
       const difficulties = ["Easy", "Normal", "Hard"];
       const difficulty =
         difficulties[Math.floor(Math.random() * difficulties.length)];
@@ -254,7 +249,7 @@ const resetCardImage = () => {
   stopInteraction();
 };
 
-// 停止交互（鼠标释放）
+// 停止交互
 const stopInteraction = () => {
   isActive.value = false;
   stopDrawing();
@@ -434,7 +429,7 @@ const drawArrow = () => {
   }
 };
 
-// 生命周期钩子
+
 onMounted(() => {
   positionCard();
   window.addEventListener("resize", positionCard);
@@ -458,14 +453,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* 游戏卡片容器 */
+
 .game-container {
   position: relative;
   z-index: 200;
   pointer-events: auto;
 }
 
-/* 卡片容器 */
+
 .container-card {
   position: fixed;
   width: 190px;
@@ -481,7 +476,7 @@ onBeforeUnmount(() => {
   z-index: 10001 !important;
 }
 
-/* 卡片图像 */
+
 .card-image {
   position: absolute;
   width: 100%;
@@ -498,7 +493,7 @@ onBeforeUnmount(() => {
   z-index: 2;
 }
 
-/* 卡片激活状态 */
+
 .container-card:active .card-image {
   box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.7), 0 25px 50px rgba(0, 0, 0, 0.9),
     0 12px 25px rgba(0, 0, 0, 0.8);
@@ -512,7 +507,7 @@ onBeforeUnmount(() => {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 150; /* 高于普通内容，低于顶层UI */
+  z-index: 150; 
 }
 
 .active-mode {

@@ -48,7 +48,6 @@
 import { ref, onMounted, defineEmits } from "vue";
 import ExitConfirmationModal from "./ExitConfirmationModal.vue";
 
-// 动态数据
 const turnCount = ref(8);
 const floorLevel = ref(10);
 const playerName = ref("爬塔王");
@@ -61,7 +60,7 @@ const emit = defineEmits(['exit-click']);
 const handleExitClick = () => {
   showExitModal.value = true;
   
-  // 添加按钮点击反馈（可选）
+  // 添加按钮点击反馈
   const button = document.querySelector('.exit-button');
   if (button) {
     button.classList.add('clicked');
@@ -76,11 +75,8 @@ const handleConfirmExit = () => {
   console.log("确认退出");
   showExitModal.value = false;
   
-  // 实际退出逻辑：
-  // 1. 关闭游戏视图
-  // 2. 返回主菜单
-  // 3. 保存游戏进度
-  // 4. 触发父组件事件：emit('game-exit')
+  
+  // 触发父组件事件：emit('game-exit')
 };
 
 // 处理取消退出
@@ -98,10 +94,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 引入字体图标 */
+
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
-/* ==================== 顶部栏样式 ==================== */
 .top-bar {
   position: fixed;
   top: 0;
@@ -129,7 +124,7 @@ onMounted(() => {
   overflow: hidden;
 }
 
-/* 哥特式边框装饰 - 增强版 */
+
 .top-bar::before,
 .top-bar::after {
   content: "";
@@ -152,7 +147,7 @@ onMounted(() => {
   transform: scaleX(-1);
 }
 
-/* 玩家信息样式 - 增强版 */
+
 .player-info {
   display: flex;
   gap: 25px;
@@ -241,7 +236,7 @@ onMounted(() => {
   animation: rotate 10s linear infinite;
 }
 
-/* 战斗信息样式 - 增强版 */
+
 .battle-info {
   display: flex;
   gap: 30px;
@@ -319,7 +314,7 @@ onMounted(() => {
   animation: pulse 2s infinite 0.5s;
 }
 
-/* 退出按钮样式 - 增强版 */
+
 .exit-control {
   position: relative;
   z-index: 3;
@@ -486,7 +481,7 @@ onMounted(() => {
   animation: dragonBreath 5s infinite;
 }
 
-/* 动画定义 */
+
 @keyframes rotate {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }

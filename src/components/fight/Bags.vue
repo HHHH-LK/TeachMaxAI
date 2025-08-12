@@ -18,7 +18,6 @@
                 <span v-if="item.heal">回血: {{ item.heal }}</span>
               </div>
             </div>
-            <!-- 恐怖风格的使用按钮 -->
             <button class="use-button" @click="handleUseItem(item)">
               <span class="button-text">使用</span>
               <span class="blood-drip"></span>
