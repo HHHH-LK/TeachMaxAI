@@ -10,7 +10,7 @@
     >
       <img :src="humanImage" alt="Main Character" />
 
-      <!-- 主角血条 - 黑暗奇幻风格 -->
+      <!-- 主角血条  -->
       <div class="health-bar">
         <div class="health-background">
           <div class="metal-frame"></div>
@@ -63,12 +63,11 @@
     >
       <div class="bracket-container" :style="bracketTransform">
         <div class="bracket bracket-left"></div>
-        <!-- 修复右括号类名 -->
         <div class="bracket bracket-right"></div>
       </div>
       <img :src="enemyImage" alt="Enemy Character" ref="enemyImg" />
 
-      <!-- 敌人血条 - 黑暗奇幻风格 -->
+      <!-- 敌人血条  -->
       <div class="health-bar">
         <div class="health-background">
           <div class="metal-frame"></div>
@@ -116,7 +115,6 @@ import { ref, onMounted, onBeforeUnmount, computed, nextTick } from "vue";
 import humanImage from "/Image/Human.png";
 import enemyImage from "/Image/Enemy.png";
 
-// 接收props
 const props = defineProps({
   mainHealth: {
     type: Number,
@@ -178,12 +176,12 @@ const enemyHealthPercentage = computed(() => {
 // 生成粒子数据
 const generateParticles = (count, isEnemy = false) => {
   const particles = [];
-  const baseColor = isEnemy ? "#8b0000" : "#ff0000"; // 更深的红色模拟血液
+  const baseColor = isEnemy ? "#8b0000" : "#ff0000";
 
   for (let i = 0; i < count; i++) {
     // 随机角度和距离
     const angle = Math.random() * Math.PI * 2;
-    const distance = 100 + Math.random() * 150; // 增加扩散距离
+    const distance = 100 + Math.random() * 150;
 
     // 随机起始位置偏移
     const startX = (Math.random() - 0.5) * 30;
@@ -194,7 +192,7 @@ const generateParticles = (count, isEnemy = false) => {
     const endY = Math.sin(angle) * distance;
 
     // 随机大小
-    const size = Math.random() * 8 + 6; // 更大的粒子
+    const size = Math.random() * 8 + 6;
 
     // 随机动画延迟
     const delay = Math.random() * 0.5;
@@ -337,7 +335,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* 整体容器 - 关键修复 */
 .characters {
   background: url("/Image/FightBackground.png") center/cover;
   position: absolute;
@@ -346,7 +343,7 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  z-index: 1; /* 确保在卡牌组件之下 */
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -367,14 +364,14 @@ onBeforeUnmount(() => {
 .main-character img {
   width: 250px;
   height: auto;
-  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3)); /* 发光效果 */
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
   pointer-events: none;
 }
 
 .enemy-character {
   position: absolute;
-  right: 10%; /* 位于画面右半部分 */
-  bottom: 30%; /* 与主角色相同高度 */
+  right: 10%; 
+  bottom: 30%; 
   transform: translateY(0);
   transition: transform 0.3s ease;
   z-index: 10;
@@ -382,13 +379,13 @@ onBeforeUnmount(() => {
 }
 
 .enemy-character img {
-  width: 400px; /* 角色尺寸 */
+  width: 400px; 
   height: auto;
-  filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.3)); /* 红色发光效果 */
+  filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.3)); 
   pointer-events: none;
 }
 
-/* 血条样式 - 黑暗奇幻中世纪风格 */
+/* 血条样式  */
 .health-bar {
   position: absolute;
   bottom: -40px;
@@ -618,13 +615,11 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 添加中世纪字体 */
 @font-face {
   font-family: "Medieval";
   src: url("https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap");
 }
 
-/* 括号容器 */
 .bracket-container {
   position: absolute;
   width: 110%;
@@ -636,7 +631,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   transition: transform 0.3s ease, opacity 0.3s ease;
   opacity: 0.9;
-  z-index: 10000; /* 确保高于其他元素 */
+  z-index: 10000; 
 }
 
 /* 基本括号样式 */
@@ -662,7 +657,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 15px #ff0000, inset 0 0 10px rgba(255, 0, 0, 0.8);
 }
 
-/* 右括号样式 - 修复后 */
+/* 右括号样式 */
 .bracket-right::before {
   content: "";
   position: absolute;
@@ -809,7 +804,7 @@ onBeforeUnmount(() => {
   background-color: var(--color, #8b0000);
 }
 
-/* 新增：流血效果 */
+/* 流血效果 */
 .blood-effect {
   position: absolute;
   top: 0;

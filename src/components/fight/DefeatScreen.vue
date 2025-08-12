@@ -128,14 +128,14 @@ watch(
   font-family: "Medieval", "Times New Roman", serif;
 }
 
-/* 纯黑色半透明背景 */
+
 .background-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgb(0, 0, 0); /* 纯黑色，透明度0.7 */
+  background: rgb(0, 0, 0); 
   z-index: -1;
 }
 

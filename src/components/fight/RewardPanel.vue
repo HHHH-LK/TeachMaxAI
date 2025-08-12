@@ -37,7 +37,7 @@
             </div>
           </div>
 
-          <!-- 奖励区域（可滚动） -->
+          <!-- 奖励区域 -->
           <div class="scrollable-content">
             <div class="panel-content">
               <div class="rewards-section">
@@ -128,11 +128,9 @@ export default {
 </script>
 
 <style scoped>
-/* 引入字体图标 */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=MedievalSharp&display=swap');
 
-/* ==================== 过渡动画增强 ==================== */
 .panel-enter-active,
 .panel-leave-active {
   transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -171,7 +169,6 @@ export default {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* ==================== 背景与覆盖层 ==================== */
 .panel-bg-overlay {
   position: fixed;
   top: 0;
@@ -195,7 +192,7 @@ export default {
   font-family: 'Cinzel', 'MedievalSharp', serif;
 }
 
-/* ==================== 全局悬浮粒子效果 ==================== */
+
 .floating-particles {
   position: absolute;
   top: 0;
@@ -261,7 +258,7 @@ export default {
   75% { transform: translate(15px, 10px); }
 }
 
-/* ==================== 箭头形状容器 ==================== */
+
 .arrow-container {
   position: relative;
   display: flex;
@@ -284,7 +281,6 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* ==================== 左侧退出按钮 - 向左箭头形状 ==================== */
 .exit-label {
   position: absolute;
   left: 6%;
@@ -342,7 +338,6 @@ export default {
   border-color: rgba(178, 34, 34, 0.6);
 }
 
-/* ==================== 右侧进入下一层按钮 - 向右箭头形状 ==================== */
 .next-wrapper {
   position: absolute;
   right: 6%;

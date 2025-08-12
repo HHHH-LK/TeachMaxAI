@@ -1,8 +1,7 @@
 <template>
-  <!-- 遮罩层 - 移除点击事件 -->
+  <!-- 遮罩层  -->
   <div class="modal-mask" v-if="isModalOpen"></div>
 
-  <!-- 模态框内容 -->
   <div class="modal-overlay" v-if="isModalOpen">
     <!-- 背景粒子效果 -->
     <div class="background-particles">
@@ -75,7 +74,6 @@
     </div>
   </div>
 
-  <!-- 题目模态框 -->
   <ChallengeModal
     v-if="showChallenge"
     :question="currentQuestion"
@@ -107,12 +105,11 @@ const damageMap = {
   Legendary: 100,
 };
 
-// 挑战相关状态
 const showChallenge = ref(false);
 const isModalOpen = ref(true);
 const currentQuestion = ref("");
 const currentAnswers = ref([]);
-const timeLimit = ref(120); // 默认120秒
+const timeLimit = ref(120); 
 
 // 背景粒子效果
 const backgroundParticles = ref([]);
@@ -156,7 +153,7 @@ const damageValue = computed(() => {
   return damageMap[props.difficulty] || 30;
 });
 
-// 计算伤害百分比（用于进度条）
+// 计算伤害百分比
 const damagePercentage = computed(() => {
   return (damageValue.value / damageMap.Legendary) * 100;
 });
@@ -171,8 +168,8 @@ const handleCardMove = (event) => {
   const y = (event.clientY - rect.top) / rect.height;
   
   // 计算旋转角度 (最大15度)
-  const rotateX = (0.5 - y) * 15;
-  const rotateY = (x - 0.5) * 15;
+  const rotateX = (0.5 - y) * 30;
+  const rotateY = (x - 0.5) * 30;
   
   cardRotation.value = {
     x: rotateX,
@@ -185,7 +182,7 @@ const handleCardLeave = () => {
   cardRotation.value = { x: 0, y: 0 };
 };
 
-// 题库 - 包含不同学科的简答题
+// 题库 
 const questionBank = [
   {
     question: "请简述牛顿第一定律的内容",
@@ -241,7 +238,6 @@ const questionBank = [
   },
 ];
 
-// 开始挑战
 const startChallenge = () => {
   // 根据难度筛选题目
   const filteredQuestions = questionBank.filter(
@@ -259,22 +255,21 @@ const startChallenge = () => {
     // 根据难度调整时间限制
     switch (props.difficulty) {
       case "Easy":
-        timeLimit.value = 150; // 150秒
+        timeLimit.value = 150; 
         break;
       case "Normal":
-        timeLimit.value = 120; // 120秒
+        timeLimit.value = 120; 
         break;
       case "Hard":
-        timeLimit.value = 90; // 90秒
+        timeLimit.value = 90; 
         break;
       case "Legendary":
-        timeLimit.value = 60; // 60秒
+        timeLimit.value = 60; 
         break;
       default:
         timeLimit.value = 120;
     }
 
-    // 关键修复：确保显示挑战模态框
     showChallenge.value = true;
   } else {
     // 如果没有匹配的题目，使用默认题目
@@ -284,7 +279,6 @@ const startChallenge = () => {
   }
 };
 
-// 处理放弃按钮
 const handleGiveUp = () => {
   // 触发全局放弃事件
   const event = new CustomEvent("global-give-up");
@@ -333,7 +327,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* 遮罩层样式 - 移除点击事件 */
 .modal-mask {
   position: fixed;
   top: 0;
@@ -344,7 +337,7 @@ onBeforeUnmount(() => {
   z-index: 19999; 
   backdrop-filter: blur(10px);
   animation: maskPulse 8s infinite alternate;
-  pointer-events: none; /* 禁止点击事件 */
+  pointer-events: none; 
 }
 
 @keyframes maskPulse {
@@ -369,7 +362,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   align-items: center;
   z-index: 20000;
-  pointer-events: none; /* 禁止点击事件 */
+  pointer-events: none;
 }
 
 /* 背景粒子效果 */
@@ -539,7 +532,7 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 添加关闭按钮样式 */
+/* 关闭按钮样式 */
 .close-button {
   position: absolute;
   top: 10px;
@@ -820,7 +813,6 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 响应式设计 */
 @media (max-width: 768px) {
   .card-img {
     display: none;
