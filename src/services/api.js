@@ -386,6 +386,14 @@ export const adminService = {
       },
     });
   },
+
+  /**
+   * 获取所有课程(包含教师信息)
+   * @returns {Promise<object>} 所有课程数据列表
+   */
+  getAllCourses: async () => {
+    return await apiClient.get('/course/all');
+  },
 };
 
 // 学生服务
