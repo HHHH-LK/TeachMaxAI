@@ -1,5 +1,12 @@
 <template>
   <div class="course-card">
+    <!-- 删除按钮 -->
+    <div class="delete-btn-wrapper">
+      <button class="delete-btn" @click.stop="handleDelete" title="删除课程">
+        <el-icon :size="16"><Delete /></el-icon>
+      </button>
+    </div>
+    
     <div class="card-header">
       <div class="card-icon-bg" :style="course.iconStyle">
         <el-icon :size="24"><component :is="course.icon"></component></el-icon>
@@ -24,7 +31,7 @@
 </template>
 
 <script setup>
-import { User, Clock, Ship } from '@element-plus/icons-vue';
+import { User, Clock, Ship, Delete } from '@element-plus/icons-vue';
 
 const props = defineProps({
   course: {
@@ -33,9 +40,9 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['enter-course']);
+const emit = defineEmits(['enter-course', 'delete-course']);
 
-// 格式化教师名称12
+// 格式化教师名称
 const formatTeacherName = (teacherList) => {
   if (!teacherList || teacherList.length === 0) {
     return '未分配';
@@ -50,6 +57,11 @@ const formatTeacherName = (teacherList) => {
 const handleEnterCourse = () => {
   emit('enter-course', props.course);
 };
+
+// 处理删除课程
+const handleDelete = () => {
+  emit('delete-course', props.course);
+};
 </script>
 
 <style lang="less" scoped>
@@ -58,6 +70,7 @@ const handleEnterCourse = () => {
 @text-primary: #1e293b;
 @text-secondary: #64748b;
 @accent-gradient: linear-gradient(90deg, #66b5fa 0%, #5c8df6 100%);
+@danger-color: #ef4444;
 
 .course-card {
   background: @card-bg-color;
@@ -70,11 +83,54 @@ const handleEnterCourse = () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
 
   &:hover {
     transform: translateY(-10px) scale(1.02);
     box-shadow: 0 16px 40px 0 rgba(99, 102, 241, 0.12);
     border-color: rgba(255, 255, 255, 0.8);
+    
+    .delete-btn {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // 删除按钮样式
+  .delete-btn-wrapper {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+  }
+
+  .delete-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+
+    &:hover {
+      background: rgba(239, 68, 68, 1);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
   }
 
   .card-header {

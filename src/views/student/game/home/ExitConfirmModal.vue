@@ -1,11 +1,11 @@
 <template>
   <div v-if="visible" class="exit-confirm-overlay" @click="handleClose">
     <div class="exit-confirm-container" @click.stop>
-      <CanvasRenderer 
-        :width="500" 
-        :height="350" 
-        render-type="exit-confirm"
-        canvas-class="exit-confirm-canvas"
+      <CanvasRenderer
+          :width="500"
+          :height="350"
+          render-type="exit-confirm"
+          canvas-class="exit-confirm-canvas"
       />
       <div class="exit-confirm-content">
         <h2 class="exit-confirm-title">⚠️ 退出警告</h2>
@@ -28,30 +28,35 @@
   </div>
 </template>
 
-<script>
-import CanvasRenderer from './CanvasRenderer.vue'
+<script setup>
+import CanvasRenderer from './CanvasRenderer.vue';
+import { defineProps, defineEmits, defineOptions } from 'vue';
 
-export default {
-  name: 'ExitConfirmModal',
-  components: {
-    CanvasRenderer
-  },
-  props: {
-    visible: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['close', 'confirm'],
-  methods: {
-    handleClose() {
-      this.$emit('close');
-    },
-    handleConfirm() {
-      this.$emit('confirm');
-    }
+// 声明组件接收的props
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: false
   }
-}
+});
+
+// 声明组件发出的事件
+const emit = defineEmits(['close', 'confirm']);
+
+// 处理关闭事件
+const handleClose = () => {
+  emit('close');
+};
+
+// 处理确认退出事件
+const handleConfirm = () => {
+  emit('confirm');
+};
+
+// 定义组件名称
+defineOptions({
+  name: 'ExitConfirmModal'
+});
 </script>
 
 <style lang="less" scoped>

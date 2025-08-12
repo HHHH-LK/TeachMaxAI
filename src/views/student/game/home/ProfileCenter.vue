@@ -4,15 +4,13 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ProfileCenter',
-  emits: ['open-profile'],
-  methods: {
-    handleOpen() {
-      this.$emit('open-profile');
-    }
-  }
+<script setup>
+// 定义要触发的事件
+const emit = defineEmits(['open-profile'])
+
+// 处理点击事件
+const handleOpen = () => {
+  emit('open-profile')
 }
 </script>
 

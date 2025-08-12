@@ -56,6 +56,11 @@
       v-model="chapterDialogVisible"
       :title="isEditing ? '编辑章节' : '添加章节'"
       :width="500"
+      append-to-body
+      center
+      lock-scroll
+      modal
+      :close-on-press-escape="false"
       @close="resetChapterForm"
     >
       <el-form
@@ -114,7 +119,7 @@
 import { ref, reactive, onMounted, watch, nextTick, computed } from 'vue';
 import { Plus, Collection, View, Edit, Delete } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { teacherService } from '@/services/api';
+import { teacherService, adminService } from '@/services/api';
 import KnowledgePointManagement from './KnowledgePointManagement.vue';
 
 const props = defineProps({
@@ -324,16 +329,20 @@ const deleteChapter = async (chapter) => {
       }
     );
 
-    // TODO: 调用删除章节API
-    // await teacherService.deleteChapter(chapter.chapterId);
+    // 调用删除章节API
+    const response = await adminService.deleteChapter(chapter.chapterId);
     
-    ElMessage.success('章节删除成功');
-    await loadChapters();
-    emit('refresh');
+    if (response.data.code === 0) {
+      ElMessage.success('章节删除成功');
+      await loadChapters();
+      emit('refresh');
+    } else {
+      throw new Error(response.data.message || '删除章节失败');
+    }
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除章节失败:', error);
-      ElMessage.error('删除章节失败，请稍后重试');
+      ElMessage.error(error.message || '删除章节失败，请稍后重试');
     }
   }
 };
@@ -365,37 +374,53 @@ const submitChapterForm = async () => {
     await chapterFormRef.value.validate();
     
     if (isEditing.value) {
-      // 编辑模式：只更新名称和描述，保持章节顺序不变
+      // 编辑模式：更新章节信息
       const updateData = {
+        chapterId: currentChapter.value.chapterId,
         chapterName: chapterForm.chapterName,
         description: chapterForm.description,
-        // 保持原有章节顺序
         chapterOrder: currentChapter.value.chapterOrder,
-        chapterId: currentChapter.value.chapterId,
         courseId: props.courseId
       };
       
-      // TODO: 调用更新章节API
-      // await teacherService.updateChapter(updateData);
-      ElMessage.success('章节更新成功');
+      // 调用更新章节API
+      const response = await adminService.updateChapterName(updateData);
+      
+      if (response.data.code === 0) {
+        ElMessage.success('章节更新成功');
+        chapterDialogVisible.value = false;
+        await loadChapters();
+        emit('refresh');
+      } else {
+        throw new Error(response.data.message || '更新章节失败');
+      }
     } else {
-      // 添加模式：包含所有字段
+      // 添加模式：创建新章节
       const createData = {
-        ...chapterForm,
-        courseId: props.courseId
+        chapterName: chapterForm.chapterName,
+        chapterOrder: chapterForm.chapterOrder,
+        description: chapterForm.description,
+        courseId: props.courseId,
+        difficultyLevel: 'medium', // 默认难度级别
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       
-      // TODO: 调用创建章节API
-      // await teacherService.createChapter(createData);
-      ElMessage.success('章节创建成功');
+      // 调用创建章节API
+      const response = await adminService.addChapter(createData);
+      
+      if (response.data.code === 0) {
+        ElMessage.success('章节创建成功');
+        chapterDialogVisible.value = false;
+        await loadChapters();
+        emit('refresh');
+      } else {
+        throw new Error(response.data.message || '创建章节失败');
+      }
     }
-    
-    chapterDialogVisible.value = false;
-    await loadChapters();
-    emit('refresh');
   } catch (error) {
     console.error('提交章节表单失败:', error);
-    ElMessage.error('操作失败，请稍后重试');
+    ElMessage.error(error.message || '操作失败，请稍后重试');
   }
 };
 

@@ -7,6 +7,7 @@
         :key="course.id || index"
         :course="course"
         @enter-course="handleEnterCourse"
+        @delete-course="handleDeleteCourse"
       />
     </div>
     
@@ -37,9 +38,9 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['enter-course']);
+const emit = defineEmits(['enter-course', 'delete-course']);
 
-// 课程分页相关de
+// 课程分页相关
 const currentCoursePage = ref(1);
 const coursePageSize = ref(9);
 
@@ -53,6 +54,11 @@ const paginatedCourses = computed(() => {
 // 处理进入课程
 const handleEnterCourse = (course) => {
   emit('enter-course', course);
+};
+
+// 处理删除课程
+const handleDeleteCourse = (course) => {
+  emit('delete-course', course);
 };
 
 // 处理课程分页大小改变

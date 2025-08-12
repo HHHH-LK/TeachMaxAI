@@ -4,6 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="解耦合教师分配功能，增删改查知识点等">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/ChapterManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/ChapterManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseGrid.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseGrid.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/KnowledgePointManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/KnowledgePointManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/Game.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/Game.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/Backpack.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/Backpack.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/CanvasRenderer.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/CanvasRenderer.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ExitButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ExitButton.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ExitConfirmModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ExitConfirmModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/InventoryModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/InventoryModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/Leaderboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/Leaderboard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ProfileCenter.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ProfileCenter.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ProfileModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ProfileModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/StartButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/StartButton.vue" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -50,26 +71,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "fronts",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "D:\\欧阳\\study\\JetBrains全家桶\\JeBrains\\WebStorm 2024.1.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;fronts&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\欧阳\\study\\JetBrains全家桶\\JeBrains\\WebStorm 2024.1.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+  &quot;keyToStringList&quot;: {
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Users\cup\SmartCampus-front\src\views\teacher" />
@@ -111,7 +132,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="cc6c9634-249c-46c3-ac25-a528c2b43b5c" name="Changes" comment="" />
+      <changelist id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="解耦合教师分配功能，增删改查知识点等" />
       <created>1752069683587</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -161,14 +182,16 @@
       <workItem from="1754575198549" duration="6411000" />
       <workItem from="1754616358349" duration="651000" />
       <workItem from="1754617022102" duration="2120000" />
+      <workItem from="1754991483825" duration="313000" />
+      <workItem from="1754996791170" duration="3686000" />
     </task>
-    <task id="LOCAL-00001" summary="大体完整的代码">
+    <task id="LOCAL-00001" summary="解耦合教师分配功能，增删改查知识点等">
       <option name="closed" value="true" />
-      <created>1754618012635</created>
+      <created>1754968173663</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1754618012635</updated>
+      <updated>1754968173663</updated>
     </task>
     <task id="LOCAL-00002" summary="大体完整的代码">
       <option name="closed" value="true" />
@@ -178,13 +201,28 @@
       <option name="project" value="LOCAL" />
       <updated>1754619648011</updated>
     </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add files via upload" />
     <MESSAGE value="大体完整的代码" />
+    <MESSAGE value="游戏页面设计" />
+    <MESSAGE value="解耦合教师分配功能，增删改查知识点等" />
+    <option name="LAST_COMMIT_MESSAGE" value="解耦合教师分配功能，增删改查知识点等" />
   </component>
 </project>

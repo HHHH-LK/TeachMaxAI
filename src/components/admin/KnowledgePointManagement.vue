@@ -3,6 +3,11 @@
     v-model="dialogVisible"
     :title="`${chapter?.chapterName || '章节'} - 知识点管理`"
     :width="900"
+    append-to-body
+    center
+    lock-scroll
+    modal
+    :close-on-press-escape="false"
     @close="handleClose"
   >
     <div class="knowledge-point-management">
@@ -65,6 +70,10 @@
       :title="isEditing ? '编辑知识点' : '添加知识点'"
       :width="600"
       append-to-body
+      center
+      lock-scroll
+      modal
+      :close-on-press-escape="false"
       @close="resetKnowledgePointForm"
     >
       <el-form
@@ -126,7 +135,7 @@
 import { ref, reactive, watch, onMounted } from 'vue';
 import { Plus, Collection, Edit, Delete } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { teacherService } from '@/services/api';
+import { teacherService, adminService } from '@/services/api';
 
 const props = defineProps({
   visible: {
@@ -342,16 +351,20 @@ const deleteKnowledgePoint = async (point) => {
       }
     );
 
-    // TODO: 调用删除知识点API
-    // await teacherService.deleteKnowledgePoint(point.pointId);
+    // 调用删除知识点API
+    const response = await adminService.deleteKnowledgePoint(point.pointId);
     
-    ElMessage.success('知识点删除成功');
-    await loadKnowledgePoints();
-    emit('refresh');
+    if (response.data.code === 0) {
+      ElMessage.success('知识点删除成功');
+      await loadKnowledgePoints();
+      emit('refresh');
+    } else {
+      throw new Error(response.data.message || '删除知识点失败');
+    }
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除知识点失败:', error);
-      ElMessage.error('删除知识点失败，请稍后重试');
+      ElMessage.error(error.message || '删除知识点失败，请稍后重试');
     }
   }
 };
@@ -362,28 +375,52 @@ const submitKnowledgePointForm = async () => {
     await knowledgePointFormRef.value.validate();
     
     if (isEditing.value) {
-      // TODO: 调用更新知识点API
-      // await teacherService.updateKnowledgePoint({
-      //   ...knowledgePointForm,
-      //   pointId: currentKnowledgePoint.value.pointId,
-      //   chapterId: props.chapter.chapterId
-      // });
-      ElMessage.success('知识点更新成功');
+      // 编辑模式：更新知识点信息
+      const updateData = {
+        pointId: currentKnowledgePoint.value.pointId,
+        pointName: knowledgePointForm.pointName,
+        description: knowledgePointForm.description,
+        difficulty_level: knowledgePointForm.difficultyLevel,
+        keywords: knowledgePointForm.keywords,
+        courseId: props.courseId
+      };
+      
+      // 调用更新知识点API
+      const response = await adminService.updateKnowledgeName(updateData);
+      
+      if (response.data.code === 0) {
+        ElMessage.success('知识点更新成功');
+        knowledgePointDialogVisible.value = false;
+        await loadKnowledgePoints();
+        emit('refresh');
+      } else {
+        throw new Error(response.data.message || '更新知识点失败');
+      }
     } else {
-      // TODO: 调用创建知识点API
-      // await teacherService.createKnowledgePoint({
-      //   ...knowledgePointForm,
-      //   chapterId: props.chapter.chapterId
-      // });
-      ElMessage.success('知识点创建成功');
+      // 添加模式：创建新知识点
+      const createData = {
+        pointName: knowledgePointForm.pointName,
+        description: knowledgePointForm.description,
+        difficulty_level: knowledgePointForm.difficultyLevel,
+        keywords: knowledgePointForm.keywords,
+        courseId: props.courseId
+      };
+      
+      // 调用创建知识点API
+      const response = await adminService.addKnowledgePoint(createData, props.chapter.chapterId);
+      
+      if (response.data.code === 0) {
+        ElMessage.success('知识点创建成功');
+        knowledgePointDialogVisible.value = false;
+        await loadKnowledgePoints();
+        emit('refresh');
+      } else {
+        throw new Error(response.data.message || '创建知识点失败');
+      }
     }
-    
-    knowledgePointDialogVisible.value = false;
-    await loadKnowledgePoints();
-    emit('refresh');
   } catch (error) {
     console.error('提交知识点表单失败:', error);
-    ElMessage.error('操作失败，请稍后重试');
+    ElMessage.error(error.message || '操作失败，请稍后重试');
   }
 };
 

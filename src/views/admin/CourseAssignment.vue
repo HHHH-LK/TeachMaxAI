@@ -27,6 +27,7 @@
         v-if="!loading"
         :courses="courses" 
         @enter-course="handleEnterCourse"
+        @delete-course="handleDeleteCourse"
       />
       
       <!-- 加载状态 -->
@@ -55,13 +56,49 @@
       @close="handleCourseDetailClose"
       @assign-teachers="handleAssignTeachers"
     />
+
+    <!-- 删除确认对话框 -->
+    <el-dialog
+      v-model="deleteDialogVisible"
+      title="确认删除课程"
+      width="400px"
+      append-to-body
+      center
+      lock-scroll
+      modal
+      :close-on-press-escape="false"
+    >
+      <div class="delete-confirm-content">
+        <el-icon :size="48" color="#ef4444"><Warning /></el-icon>
+        <p class="delete-message">
+          确定要删除课程《<strong>{{ courseToDelete?.title }}</strong>》吗？
+        </p>
+        <p class="delete-warning">此操作不可撤销，删除后将无法恢复！</p>
+      </div>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="deleteDialogVisible = false" size="large">
+            取消
+          </el-button>
+          <el-button 
+            type="danger" 
+            @click="confirmDeleteCourse" 
+            size="large"
+            :loading="deleteLoading"
+          >
+            确认删除
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { CirclePlus, Refresh } from '@element-plus/icons-vue';
+import { CirclePlus, Refresh, Warning } from '@element-plus/icons-vue';
 import { 
   CourseGrid, 
   CreateCourseDialog, 
@@ -82,6 +119,11 @@ const dialogVisible = ref(false);
 const courseDetailVisible = ref(false);
 const currentCourse = ref(null);
 const currentCourseIndex = ref(-1);
+
+// 删除相关
+const deleteDialogVisible = ref(false);
+const courseToDelete = ref(null);
+const deleteLoading = ref(false);
 
 // 模拟课程数据
 const mockCourses = [
@@ -254,20 +296,45 @@ const handleAssignTeachers = (selectedTeachers) => {
 };
 
 // 处理删除课程
-const handleDeleteCourse = async (courseId) => {
+const handleDeleteCourse = (course) => {
+  if (!course) {
+    ElMessage.error('课程数据不存在');
+    return;
+  }
+  if (!course.id) {
+    ElMessage.error('课程ID不存在，无法删除');
+    return;
+  }
+  courseToDelete.value = course;
+  deleteDialogVisible.value = true;
+};
+
+// 确认删除课程
+const confirmDeleteCourse = async () => {
+  if (!courseToDelete.value) return;
+
+  deleteLoading.value = true;
   try {
-    // 这里可以调用API删除课程
-    // const response = await adminService.deleteCourse(courseId);
+    // 调用API删除课程
+    const response = await adminService.deleteCourse(courseToDelete.value.id);
     
-    // 暂时从本地数据中删除
-    const index = courses.value.findIndex(c => c.id === courseId);
-    if (index !== -1) {
-      courses.value.splice(index, 1);
-      ElMessage.success('课程删除成功！');
+    if (response.data.code === 0) {
+      // 从本地数据中删除
+      const index = courses.value.findIndex(c => c.id === courseToDelete.value.id);
+      if (index !== -1) {
+        courses.value.splice(index, 1);
+        ElMessage.success('课程删除成功！');
+      }
+    } else {
+      ElMessage.error(response.data.message || '删除课程失败');
     }
   } catch (error) {
     console.error('删除课程失败:', error);
-    ElMessage.error('删除课程失败，请重试');
+    ElMessage.error('删除课程失败，请检查网络连接');
+  } finally {
+    deleteLoading.value = false;
+    deleteDialogVisible.value = false;
+    courseToDelete.value = null;
   }
 };
 
@@ -454,6 +521,81 @@ const handleEditCourse = (course) => {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid @card-border-color;
+}
+
+// 删除确认对话框样式
+:deep(.el-dialog) {
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  .el-dialog__header {
+    border-bottom: 1px solid rgba(240, 240, 240, 0.8);
+    padding: 20px 24px;
+    
+    .el-dialog__title {
+      font-size: 18px;
+      font-weight: 600;
+      color: @text-primary;
+    }
+  }
+  
+  .el-dialog__body {
+    padding: 24px;
+  }
+  
+  .el-dialog__footer {
+    border-top: 1px solid rgba(240, 240, 240, 0.8);
+    padding: 20px 24px;
+  }
+}
+
+.delete-confirm-content {
+  text-align: center;
+  padding: 20px 0;
+  
+  .el-icon {
+    margin-bottom: 16px;
+  }
+  
+  .delete-message {
+    font-size: 16px;
+    color: @text-primary;
+    margin-bottom: 12px;
+    line-height: 1.5;
+    
+    strong {
+      color: #ef4444;
+    }
+  }
+  
+  .delete-warning {
+    font-size: 14px;
+    color: #f59e0b;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  
+  .el-button {
+    border-radius: 8px;
+    font-weight: 500;
+    
+    &.el-button--danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border: none;
+      
+      &:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        transform: translateY(-1px);
+      }
+    }
+  }
 }
 
 // 动画

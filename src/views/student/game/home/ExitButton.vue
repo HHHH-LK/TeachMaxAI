@@ -5,28 +5,32 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ExitButton',
-  emits: ['exit-game'],
-  
-  // 添加错误处理
-  errorCaptured(err, vm, info) {
-    console.error('ExitButton 组件错误:', err, vm, info);
-    return false; // 阻止错误继续传播
-  },
-  
-  methods: {
-    handleExit() {
-      try {
-        this.$emit('exit-game');
-      } catch (error) {
-        console.error('退出按钮点击处理失败:', error);
-        // 可以在这里添加错误UI反馈
-      }
-    }
+<script setup>
+import { onErrorCaptured } from 'vue';
+
+// 声明组件发出的事件
+const emit = defineEmits(['exit-game']);
+
+// 处理退出按钮点击事件
+const handleExit = () => {
+  try {
+    emit('exit-game');
+  } catch (error) {
+    console.error('退出按钮点击处理失败:', error);
+    // 可以在这里添加错误UI反馈
   }
-}
+};
+
+// 错误捕获处理
+onErrorCaptured((err, vm, info) => {
+  console.error('ExitButton 组件错误:', err, vm, info);
+  return false; // 阻止错误继续传播
+});
+
+// 定义组件名称
+defineOptions({
+  name: 'ExitButton'
+});
 </script>
 
 <style lang="less" scoped>
@@ -63,7 +67,7 @@ export default {
   &:hover {
     transform: scale(1.05);
     text-shadow: 3px 3px 6px rgba(@light-red, 0.8);
-    
+
     .exit-icon {
       text-shadow: 0 0 20px @shadow-red;
     }

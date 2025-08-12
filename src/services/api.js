@@ -394,6 +394,76 @@ export const adminService = {
   getAllCourses: async () => {
     return await apiClient.get('/course/all');
   },
+
+  /**
+   * 删除课程
+   * @param {number} courseId - 课程ID
+   * @returns {Promise<object>} 删除结果
+   */
+  deleteCourse: async (courseId) => {
+    return await apiClient.delete(`/course/delete/${courseId}`);
+  },
+
+  /**
+   * 修改章节名称
+   * @param {object} chapter - 章节信息，包含章节ID和新名称
+   * @returns {Promise<object>} 修改结果
+   */
+  updateChapterName: async (chapter) => {
+    return await apiClient.post('/chapter/updateChapterName', chapter);
+  },
+
+  /**
+   * 删除章节
+   * @param {string} chapterId - 章节ID
+   * @returns {Promise<object>} 删除结果
+   */
+  deleteChapter: async (chapterId) => {
+    return await apiClient.delete('/chapter/deleteChapter', {
+      params: { chapterId }
+    });
+  },
+
+  /**
+   * 添加章节
+   * @param {object} chapter - 章节信息，包含课程ID和章节名称
+   * @returns {Promise<object>} 添加结果
+   */
+  addChapter: async (chapter) => {
+    return await apiClient.post('/chapter/addChapter', chapter);
+  },
+
+  /**
+   * 修改知识点名称
+   * @param {object} knowledgePoint - 知识点信息，包含知识点ID和新名称
+   * @returns {Promise<object>} 修改结果
+   */
+  updateKnowledgeName: async (knowledgePoint) => {
+    return await apiClient.post('/knowledge/updateKnowledgeName', knowledgePoint);
+  },
+
+  /**
+   * 删除知识点
+   * @param {string} pointId - 知识点ID
+   * @returns {Promise<object>} 删除结果
+   */
+  deleteKnowledgePoint: async (pointId) => {
+    return await apiClient.delete('/knowledge/deleteKnowledgePoint', {
+      params: { pointId }
+    });
+  },
+
+  /**
+   * 添加知识点
+   * @param {object} knowledgePoint - 知识点信息
+   * @param {string} chapterId - 章节ID
+   * @returns {Promise<object>} 添加结果
+   */
+  addKnowledgePoint: async (knowledgePoint, chapterId) => {
+    return await apiClient.post('/knowledge/addKnowledgePoint', knowledgePoint, {
+      params: { chapterId }
+    });
+  },
 };
 
 // 学生服务

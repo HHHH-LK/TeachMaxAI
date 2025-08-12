@@ -1,11 +1,11 @@
 <template>
   <div v-if="visible" class="profile-overlay" @click="handleClose">
     <div class="profile-container" @click.stop>
-      <CanvasRenderer 
-        :width="600" 
-        :height="550" 
-        render-type="profile"
-        canvas-class="profile-canvas"
+      <CanvasRenderer
+          :width="600"
+          :height="550"
+          render-type="profile"
+          canvas-class="profile-canvas"
       />
       <div class="profile-content">
         <h2 class="profile-title">角色信息</h2>
@@ -20,50 +20,55 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { defineProps, defineEmits } from 'vue'
 import CanvasRenderer from './CanvasRenderer.vue'
 
-export default {
-  name: 'ProfileModal',
-  components: {
-    CanvasRenderer
+// 定义组件名称
+defineOptions({
+  name: 'ProfileModal'
+})
+
+// 定义props
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: false
   },
-  props: {
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    userProfile: {
-      type: Object,
-      default: () => ({
-        nickname: '牢大',
-        level: 2,
-        totalExp: 120,
-        towerLevel: 23,
-        hp: 100,
-        attack: 50,
-        defense: 50,
-      })
-    }
-  },
-  emits: ['close'],
-  methods: {
-    handleClose() {
-      this.$emit('close');
-    },
-    getLabel(key) {
-      const labelMap = {
-        nickname: '昵称',
-        level: '等级',
-        totalExp: '总经验',
-        towerLevel: '总塔数',
-        hp: '生命值',
-        attack: '攻击力',
-        defense: '防御力'
-      };
-      return labelMap[key] || key;
-    }
+  userProfile: {
+    type: Object,
+    default: () => ({
+      nickname: '牢大',
+      level: 2,
+      totalExp: 120,
+      towerLevel: 23,
+      hp: 100,
+      attack: 50,
+      defense: 50,
+    })
   }
+})
+
+// 定义emits
+const emit = defineEmits(['close'])
+
+// 处理关闭事件
+const handleClose = () => {
+  emit('close')
+}
+
+// 获取标签映射
+const getLabel = (key) => {
+  const labelMap = {
+    nickname: '昵称',
+    level: '等级',
+    totalExp: '总经验',
+    towerLevel: '总塔数',
+    hp: '生命值',
+    attack: '攻击力',
+    defense: '防御力'
+  }
+  return labelMap[key] || key
 }
 </script>
 
@@ -209,22 +214,22 @@ export default {
 
   .profile-content {
     padding: 30px;
-    
+
     .profile-title {
       font-size: 2em;
       margin-bottom: 30px;
     }
-    
+
     .profile-info {
       gap: 20px;
-      
+
       .info-item {
         padding: 12px 15px;
-        
+
         .info-label {
           font-size: 1.1em;
         }
-        
+
         .info-value {
           font-size: 1.2em;
         }

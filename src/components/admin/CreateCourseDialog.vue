@@ -3,6 +3,11 @@
     v-model="dialogVisible"
     title="智能创建课程"
     :width="400"
+    append-to-body
+    center
+    lock-scroll
+    modal
+    :close-on-press-escape="false"
     :before-close="handleClose"
     custom-class="create-course-dialog"
   >

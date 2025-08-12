@@ -5,7 +5,7 @@
       <div class="button-content">
         <div class="button-icon">⚔️</div>
         <div class="button-text">
-          <span class="main-text">开始闯关</span>
+          <span class="main-text">选择塔层</span>
         </div>
       </div>
       <div class="button-particles">
@@ -15,34 +15,35 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'StartButton',
-  props: {
-    gameStarted: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['start-game'],
-  
-  // 添加错误处理
-  errorCaptured(err, vm, info) {
-    console.error('StartButton 组件错误:', err, vm, info);
-    return false; // 阻止错误继续传播
-  },
-  
-  methods: {
-    handleStart() {
-      try {
-        this.$emit('start-game');
-      } catch (error) {
-        console.error('开始按钮点击处理失败:', error);
-        // 可以在这里添加错误UI反馈
-      }
-    }
+<script setup>
+import { onErrorCaptured } from 'vue';
+
+// 定义props
+const props = defineProps({
+  gameStarted: {
+    type: Boolean,
+    default: false
   }
-}
+});
+
+// 定义事件
+const emit = defineEmits(['start-game']);
+
+// 错误捕获
+onErrorCaptured((err, vm, info) => {
+  console.error('StartButton 组件错误:', err, vm, info);
+  return false; // 阻止错误继续传播
+});
+
+// 处理开始游戏
+const handleStart = () => {
+  try {
+    emit('start-game');
+  } catch (error) {
+    console.error('开始按钮点击处理失败:', error);
+    // 可以在这里添加错误UI反馈
+  }
+};
 </script>
 
 <style lang="less" scoped>
@@ -145,7 +146,7 @@ export default {
       animation: float 2s infinite ease-in-out var(--delay);
       width: 4px;
       height: 4px;
-      
+
       &:nth-child(1) { top: 20%; left: 20%; }
       &:nth-child(2) { top: 20%; right: 20%; }
       &:nth-child(3) { bottom: 20%; left: 20%; }
@@ -169,11 +170,11 @@ export default {
   &:not(.pulsing) {
     background: rgba(@dark-gray, 0.9);
     border-color: @gray;
-    
+
     .button-content .button-text .main-text {
       color: @gray;
     }
-    
+
     .button-content .button-icon {
       color: @gray;
     }

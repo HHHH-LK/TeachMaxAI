@@ -1,11 +1,11 @@
 <template>
   <div v-if="visible" class="inventory-overlay" @click="handleClose">
     <div class="inventory-container" @click.stop>
-      <CanvasRenderer 
-        :width="800" 
-        :height="600" 
-        render-type="inventory"
-        canvas-class="inventory-canvas"
+      <CanvasRenderer
+          :width="800"
+          :height="600"
+          render-type="inventory"
+          canvas-class="inventory-canvas"
       />
       <div class="inventory-content">
         <h2 class="inventory-title">道具库</h2>
@@ -31,34 +31,39 @@
   </div>
 </template>
 
-<script>
-import CanvasRenderer from './CanvasRenderer.vue'
+<script setup>
+import CanvasRenderer from './CanvasRenderer.vue';
+import { defineProps, defineEmits, defineOptions } from 'vue';
 
-export default {
-  name: 'InventoryModal',
-  components: {
-    CanvasRenderer
+// 声明组件接收的props
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: false
   },
-  props: {
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    items: {
-      type: Array,
-      default: () => []
-    }
-  },
-  emits: ['close', 'select-item'],
-  methods: {
-    handleClose() {
-      this.$emit('close');
-    },
-    handleSelectItem(item) {
-      this.$emit('select-item', item);
-    }
+  items: {
+    type: Array,
+    default: () => []
   }
-}
+});
+
+// 声明组件发出的事件
+const emit = defineEmits(['close', 'select-item']);
+
+// 处理关闭事件
+const handleClose = () => {
+  emit('close');
+};
+
+// 处理道具选择事件
+const handleSelectItem = (item) => {
+  emit('select-item', item);
+};
+
+// 定义组件名称
+defineOptions({
+  name: 'InventoryModal'
+});
 </script>
 
 <style lang="less" scoped>

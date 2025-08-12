@@ -3,6 +3,11 @@
     v-model="dialogVisible"
     :title="currentCourse ? currentCourse.title : '课程详情'"
     :width="1000"
+    append-to-body
+    center
+    lock-scroll
+    modal
+    :close-on-press-escape="false"
     :before-close="handleClose"
     custom-class="course-detail-dialog"
   >

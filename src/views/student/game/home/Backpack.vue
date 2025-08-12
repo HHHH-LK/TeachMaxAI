@@ -4,16 +4,19 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Backpack',
-  emits: ['toggle-inventory'],
-  methods: {
-    handleToggle() {
-      this.$emit('toggle-inventory');
-    }
-  }
-}
+<script setup>
+// 声明组件发出的事件
+const emit = defineEmits(['toggle-inventory']);
+
+// 处理点击事件，触发toggle-inventory事件
+const handleToggle = () => {
+  emit('toggle-inventory');
+};
+
+// 定义组件名称（可选，用于调试等）
+defineOptions({
+  name: 'Backpack'
+});
 </script>
 
 <style lang="less" scoped>
