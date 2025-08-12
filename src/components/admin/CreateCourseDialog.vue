@@ -52,7 +52,7 @@ const emit = defineEmits(['close', 'submit']);
 const dialogVisible = ref(false);
 const courseFormRef = ref(null);
 
-// 课程表单数据
+// 课程表单数据a
 const courseForm = reactive({
   title: '',
   time: ''

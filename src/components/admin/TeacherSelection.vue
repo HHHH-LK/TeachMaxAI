@@ -55,7 +55,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:selectedTeacherIds']);
 
-// 教师分页相关
+// 教师分页相关数据
 const currentTeacherPage = ref(1);
 const pageSize = ref(6);
 

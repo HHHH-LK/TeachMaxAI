@@ -39,7 +39,7 @@ const props = defineProps({
 
 const emit = defineEmits(['enter-course']);
 
-// 课程分页相关
+// 课程分页相关de
 const currentCoursePage = ref(1);
 const coursePageSize = ref(9);
 

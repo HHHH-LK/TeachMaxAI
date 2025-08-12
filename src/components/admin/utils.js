@@ -5,7 +5,7 @@ import {
   Histogram
 } from '@element-plus/icons-vue';
 
-// 生成随机图标和样式
+// 生成随机图标和样式集合
 export const generateRandomIcon = () => {
   const icons = [
     {icon: markRaw(Document), style: 'background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'},

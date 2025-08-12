@@ -35,7 +35,7 @@ const props = defineProps({
 
 const emit = defineEmits(['enter-course']);
 
-// 格式化教师名称
+// 格式化教师名称12
 const formatTeacherName = (teacherList) => {
   if (!teacherList || teacherList.length === 0) {
     return '未分配';

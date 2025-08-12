@@ -145,7 +145,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'refresh']);
 
-// 响应式数据
+// 响应式数据列表
 const dialogVisible = ref(false);
 const knowledgePoints = ref([]);
 const knowledgePointDialogVisible = ref(false);

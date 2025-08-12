@@ -1,4 +1,4 @@
-// 导出所有admin组件
+// 导出所有的admin组件
 export { default as CourseCard } from './CourseCard.vue';
 export { default as CreateCourseDialog } from './CreateCourseDialog.vue';
 export { default as CourseDetailDialog } from './CourseDetailDialog.vue';

@@ -8,7 +8,7 @@
   >
     <div class="course-detail-content">
       <!-- 课程基本信息 -->
-      <div class="course-info-section">
+      <div class="course-info-section" v-if="isCourseValid">
         <div class="course-info-header">
           <div class="course-icon-lg" :style="currentCourse?.iconStyle">
             <el-icon :size="36"><component :is="currentCourse?.icon"></component></el-icon>
@@ -33,6 +33,17 @@
           <h3>课程描述</h3>
           <p>{{ currentCourse?.description }}</p>
         </div>
+      </div>
+      
+      <!-- 数据不完整提示 -->
+      <div v-else class="course-error-section">
+        <el-alert
+          title="课程数据不完整"
+          description="无法显示课程详情，请检查数据完整性"
+          type="warning"
+          show-icon
+          :closable="false"
+        />
       </div>
 
       <!-- 教师分配区域 -->
@@ -63,16 +74,20 @@
       <!-- 章节管理区域 -->
       <div class="chapter-management-section">
         <ChapterManagement
-          :course-id="currentCourse?.id"
+          v-if="validCourseId"
+          :course-id="validCourseId"
           @refresh="handleRefresh"
         />
+        <div v-else class="no-course-selected">
+          <el-empty description="课程数据不完整，无法显示章节管理" />
+        </div>
       </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Clock, Ship } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import TeacherSelection from './TeacherSelection.vue';
@@ -98,16 +113,37 @@ const emit = defineEmits(['close', 'assign-teachers']);
 const dialogVisible = ref(false);
 const selectedTeacherIds = ref([]);
 
+// 计算属性：验证课程数据是否完整
+const isCourseValid = computed(() => {
+  return props.currentCourse && 
+         props.currentCourse.id && 
+         props.currentCourse.title;
+});
+
+// 计算属性：获取有效的课程ID
+const validCourseId = computed(() => {
+  return isCourseValid.value ? props.currentCourse.id : null;
+});
+
 // 监听visible属性变化
 watch(() => props.visible, (newVal) => {
   dialogVisible.value = newVal;
   if (newVal && props.currentCourse) {
+    // 验证课程数据完整性
+    if (!props.currentCourse.id) {
+      console.error('课程缺少ID:', props.currentCourse);
+      ElMessage.error('课程数据不完整，无法显示详情');
+      return;
+    }
+    
     // 初始化选中的教师ID
     if (props.currentCourse.teacherList && props.currentCourse.teacherList.length > 0) {
       selectedTeacherIds.value = props.currentCourse.teacherList.map(teacher => teacher.id);
     } else {
       selectedTeacherIds.value = [];
     }
+    
+    console.log('课程详情对话框已打开，课程数据:', props.currentCourse);
   }
 });
 
@@ -260,6 +296,29 @@ const handleRefresh = () => {
         font-size: 15px;
         color: @text-secondary;
         line-height: 1.8;
+      }
+    }
+  }
+
+  .course-error-section {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid @dialog-border-color;
+
+    .el-alert {
+      border-radius: 12px;
+      background-color: #fffbe6;
+      border: 1px solid #ffe58f;
+      color: #faad14;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .el-alert__icon {
+        font-size: 20px;
       }
     }
   }

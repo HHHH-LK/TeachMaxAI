@@ -9,31 +9,172 @@
 
     <div class="page-container">
       <header class="page-header">
-        <h1 class="page-title">课程中心</h1>
-        <button class="create-course-btn" @click="handleCreateCourse">
-          <el-icon><CirclePlus /></el-icon>
-          <span>智能创建课程</span>
-        </button>
+        <h1 class="page-title">课程分配中心</h1>
+        <div class="header-actions">
+          <button class="refresh-btn" @click="loadData" :disabled="loading">
+            <el-icon><Refresh /></el-icon>
+            <span>刷新</span>
+          </button>
+          <button class="create-course-btn" @click="handleCreateCourse">
+            <el-icon><CirclePlus /></el-icon>
+            <span>智能创建课程</span>
+          </button>
+        </div>
       </header>
 
+      <!-- 课程网格 -->
+      <CourseGrid 
+        v-if="!loading"
+        :courses="courses" 
+        @enter-course="handleEnterCourse"
+      />
+      
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-container">
+        <el-skeleton :rows="6" animated />
+      </div>
+      
+      <!-- 空状态 -->
+      <div v-if="!loading && courses.length === 0" class="empty-state">
+        <el-empty description="暂无课程数据" />
+      </div>
     </div>
 
     <!-- 创建课程对话框 -->
+    <CreateCourseDialog
+      :visible="dialogVisible"
+      @close="handleClose"
+      @submit="handleCreateCourseSubmit"
+    />
 
     <!-- 课程详情与教师选择对话框 -->
+    <CourseDetailDialog
+      :visible="courseDetailVisible"
+      :current-course="currentCourse"
+      :teachers="teachers"
+      @close="handleCourseDetailClose"
+      @assign-teachers="handleAssignTeachers"
+    />
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
+import { CirclePlus, Refresh } from '@element-plus/icons-vue';
+import { 
+  CourseGrid, 
+  CreateCourseDialog, 
+  CourseDetailDialog,
+  generateCourse,
+  processCourseData,
+  processTeacherData
+} from '@/components/admin';
+import {adminService} from "@/services/api.js";
 
-
+// 课程数据
+const courses = ref([]);
+const teachers = ref([]);
+const loading = ref(false);
 
 // 对话框相关
 const dialogVisible = ref(false);
 const courseDetailVisible = ref(false);
 const currentCourse = ref(null);
 const currentCourseIndex = ref(-1);
+
+// 模拟课程数据
+const mockCourses = [
+  {
+    id: 1,
+    title: '高等数学',
+    time: '2025春',
+    description: '深入学习高等数学核心知识，掌握微积分、线性代数等基础理论。',
+    date: '2025-01-15 14:30',
+    teacherList: [],
+    status: 'active'
+  },
+  {
+    id: 2,
+    title: '计算机程序设计',
+    time: '2025春',
+    description: '系统学习编程基础理论和应用方法，掌握多种编程语言。',
+    date: '2025-01-16 09:00',
+    teacherList: [],
+    status: 'active'
+  },
+  {
+    id: 3,
+    title: '数据结构与算法',
+    time: '2025春',
+    description: '通过理论与实践相结合的方式学习数据结构与算法设计。',
+    date: '2025-01-17 15:30',
+    teacherList: [],
+    status: 'active'
+  }
+];
+
+// 模拟教师数据
+const mockTeachers = [
+  { id: 1, name: '张教授', subject: '数学系', avatarColor: '#6366f1' },
+  { id: 2, name: '李老师', subject: '计算机系', avatarColor: '#ec4899' },
+  { id: 3, name: '王博士', subject: '软件工程', avatarColor: '#06b6d4' },
+  { id: 4, name: '陈教授', subject: '人工智能', avatarColor: '#8b5cf6' }
+];
+
+// 初始化数据
+onMounted(async () => {
+  await loadData();
+});
+
+// 加载数据函数
+const loadData = async () => {
+  loading.value = true;
+  try {
+    // 获取所有课程数据
+    const coursesResponse = await adminService.getAllCourses();
+    if (coursesResponse.data.code === 0) {
+      const rawCourses = coursesResponse.data.data;
+      console.log('原始课程数据:', rawCourses);
+      // 使用 processCourseData 处理课程数据
+      courses.value = processCourseData(rawCourses);
+      console.log('处理后的课程数据:', courses.value);
+      
+      // 验证课程ID是否正确设置
+      courses.value.forEach((course, index) => {
+        if (!course.id) {
+          console.warn(`课程 ${index} 缺少ID:`, course);
+        }
+      });
+    } else {
+      console.error('获取课程失败:', coursesResponse.data.message);
+      ElMessage.error('获取课程数据失败');
+    }
+
+    // 获取所有用户数据
+    const usersResponse = await adminService.getAllUsers();
+    if (usersResponse.data.code === 0) {
+      const rawUsers = usersResponse.data.data;
+      // 过滤出教师用户
+      const teacherUsers = rawUsers.filter(user => user.teacher);
+      // 使用 processTeacherData 处理教师数据
+      teachers.value = processTeacherData(teacherUsers);
+      console.log('教师数据加载成功:', teachers.value);
+    } else {
+      console.error('获取用户失败:', usersResponse.data.message);
+      ElMessage.error('获取用户数据失败');
+    }
+  } catch (error) {
+    console.error('数据加载失败:', error);
+    ElMessage.error('数据加载失败，请检查网络连接');
+    
+    // 如果API调用失败，使用模拟数据作为备用
+    courses.value = processCourseData(mockCourses);
+    teachers.value = processTeacherData(mockTeachers);
+  } finally {
+    loading.value = false;
+  }
+};
 
 // 处理创建课程 - 显示对话框
 const handleCreateCourse = () => {
@@ -45,26 +186,96 @@ const handleClose = () => {
   dialogVisible.value = false;
 };
 
+// 处理创建课程提交
+const handleCreateCourseSubmit = async (courseData) => {
+  try {
+    // 这里可以调用API创建课程
+    // const response = await adminService.createCourse(courseData);
+    
+    // 暂时使用模拟数据
+    const newCourse = generateCourse(courseData.title, courseData.time);
+    courses.value.unshift(newCourse);
+    
+    ElMessage.success(`课程《${courseData.title}》创建成功！`);
+    
+    // 关闭对话框
+    dialogVisible.value = false;
+    
+    // 可选：重新加载数据以确保数据一致性
+    // await loadData();
+  } catch (error) {
+    console.error('创建课程失败:', error);
+    ElMessage.error('创建课程失败，请重试');
+  }
 };
 
 // 处理进入课程 - 打开课程详情对话框
-  currentCourse.value = { ...course };
+const handleEnterCourse = (course) => {
+  // 确保课程数据完整
+  if (!course) {
+    ElMessage.error('课程数据不存在');
+    return;
+  }
   
-
+  if (!course.id) {
+    ElMessage.error('课程ID不存在，无法打开详情');
+    console.error('课程缺少ID:', course);
+    return;
+  }
+  
+  if (!course.title) {
+    ElMessage.error('课程标题不存在');
+    return;
+  }
+  
+  console.log('准备打开课程详情:', course);
+  
+  currentCourse.value = { ...course };
+  currentCourseIndex.value = courses.value.findIndex(c => c.id === course.id);
   courseDetailVisible.value = true;
 };
 
 // 关闭课程详情对话框
 const handleCourseDetailClose = () => {
   courseDetailVisible.value = false;
+  currentCourse.value = null;
+  currentCourseIndex.value = -1;
 };
 
-
-  // 更新课程的教师列表
-  currentCourse.value.teacherList = [...selectedTeachers];
+// 处理分配教师
+const handleAssignTeachers = (selectedTeachers) => {
+  if (currentCourseIndex.value !== -1) {
+    // 更新课程的教师列表
+    currentCourse.value.teacherList = [...selectedTeachers];
+    courses.value[currentCourseIndex.value].teacherList = [...selectedTeachers];
     
-    
+    ElMessage.success('教师分配成功！');
   }
+};
+
+// 处理删除课程
+const handleDeleteCourse = async (courseId) => {
+  try {
+    // 这里可以调用API删除课程
+    // const response = await adminService.deleteCourse(courseId);
+    
+    // 暂时从本地数据中删除
+    const index = courses.value.findIndex(c => c.id === courseId);
+    if (index !== -1) {
+      courses.value.splice(index, 1);
+      ElMessage.success('课程删除成功！');
+    }
+  } catch (error) {
+    console.error('删除课程失败:', error);
+    ElMessage.error('删除课程失败，请重试');
+  }
+};
+
+// 处理编辑课程
+const handleEditCourse = (course) => {
+  // 这里可以实现编辑课程的逻辑
+  console.log('编辑课程:', course);
+  ElMessage.info('编辑课程功能待实现');
 };
 </script>
 
@@ -161,31 +372,88 @@ const handleCourseDetailClose = () => {
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
 
-      .create-course-btn {
-        background: @card-bg-color;
-        border: 1px solid @card-border-color;
-        color: @text-primary;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
+      .header-actions {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        gap: 15px;
 
-        &:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
-          background: rgba(255, 255, 255, 0.9);
+        .refresh-btn {
+          background: @card-bg-color;
+          border: 1px solid @card-border-color;
+          color: @text-primary;
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: @card-bg-color;
+            border-color: @card-border-color;
+            color: @text-secondary;
+          }
+        }
+
+        .create-course-btn {
+          background: @card-bg-color;
+          border: 1px solid @card-border-color;
+          color: @text-primary;
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+          }
         }
       }
     }
   }
+}
+
+// 加载状态和空状态样式
+.loading-container {
+  padding: 40px;
+  background: @card-bg-color;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid @card-border-color;
+}
+
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+  background: @card-bg-color;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid @card-border-color;
 }
 
 // 动画
