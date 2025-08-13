@@ -205,25 +205,19 @@ public class TowerCreateToolUtils {
 
     /**
      * 根据层数计算 Boss 血量
-     * 基础血量：100
-     * 每层递增系数：20%
+     * 基础血量：200
+     * 每层递增系数：15%
      * 每5层阶段Boss血量额外×1.5倍
      */
     private int setBossHp(int floorNo) {
-        // 基础血量
-        int baseHp = 100;
+        int baseHp = 200;
+        double growthRate = 0.15;
 
-        // 每层增加比例（例如0.2 = 20%）
-        double growthRate = 0.2;
-
-        // 按层数递增（线性）
         int hp = (int) Math.round(baseHp + baseHp * (floorNo * growthRate));
 
-        // 每5层是阶段Boss，额外增加难度
         if (floorNo % 5 == 0) {
             hp = (int) Math.round(hp * 1.5);
         }
-
         return hp;
     }
 

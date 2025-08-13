@@ -1,8 +1,14 @@
 package com.aiproject.smartcampus.controller;
 
+import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.pojo.po.Item;
+import com.aiproject.smartcampus.service.ItemService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @program: TeacherMaxAI
@@ -13,20 +19,53 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/item")
+@RequiredArgsConstructor
 @Slf4j
 public class ItemController {
 
-    //使用道具
-
-    //查看所有道具
-
-    //查看玩家的道具
+    private final ItemService itemService;
 
 
-    //查看道具数量
+    /**
+     * 查看道具图鉴
+     */
+    @GetMapping("/get/IllustratedBook")
+    public Result<List<Item>> getIllustratedBook() {
+
+        return itemService.getIllustratedBook();
+    }
+
+    /**
+     * 查看玩家的道具
+     */
+    @GetMapping("/get/studentItemInfo")
+    public Result<List<Item>> getStudentItemInfo(@RequestParam Integer studentId) {
+
+        return itemService.getUserItemInfo(studentId);
+    }
 
 
-    //
+    /**
+     * 查看道具数量
+     */
+    @GetMapping("/get/itemnum")
+    public Result<Integer> getItemNum(@RequestParam Integer itemId, @RequestParam Integer studentId) {
+
+        return itemService.getUserItemNum(itemId, studentId);
+
+    }
+
+
+    /**
+     * 使用道具
+     */
+    @PostMapping("/User/useitem")
+    public Result<T> useItem(@RequestParam Integer itemId, @RequestParam Integer studentId,@RequestParam Integer floorId, @RequestParam Integer changeCount)  {
+
+        return itemService.userUseItem(itemId, studentId,floorId,changeCount);
+    }
+
+
 
 
 }

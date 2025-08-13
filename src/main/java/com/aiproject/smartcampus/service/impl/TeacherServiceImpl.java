@@ -168,7 +168,6 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         }
 
         String teacherId = userToTypeUtils.change();
-//        String teacherId = "1";
         // 查询该课程下所有学生 ID
         List<Integer> studentIdList = teacherMapper.selectAllClassStudentInfo(teacherId, couresId);
 

@@ -26,6 +26,7 @@ public class QuestionRedisCache {
     private final String REDIS_QUESTION_NUM_CACHE_NEXT = ":total";
     private final String REDIS_IS_CREATE_TAG_CACHE = "isCreateTagCache:towerFloor:";
     private final String REDIS_QUESTION_DIFFICULTY_LIST_CACHE = "difficultyListCache:towerFloor:";
+    private final String REDIS_TOTAL_QUESTION_DIFFICULTY_LIST_CACHE = "difficultyListCache:total:towerFloor:";
 
     private static final DefaultRedisScript<List> BATCH_LPOP_SCRIPT;
 
@@ -74,7 +75,7 @@ public class QuestionRedisCache {
      */
     public void setQuestionToCache(Integer towerFloorId, List<Integer> questionIds) {
         String key = REDIS_QUESTION_CACHE + towerFloorId;
-        List<String> list = questionIds.stream().map(a -> a.toString()).toList();
+        List<String> list = questionIds.stream().map(Object::toString).toList();
         stringRedisTemplate.opsForList().rightPushAll(key, list);
 
     }
@@ -91,7 +92,7 @@ public class QuestionRedisCache {
     /**
      * 新增单个题目
      */
-    public void getQuestionIdsInCache(Integer towerFloorId, String questionId) {
+    public void setQuestionIdsInCache(Integer towerFloorId, String questionId) {
 
         String key = REDIS_QUESTION_CACHE + towerFloorId;
         stringRedisTemplate.opsForList().rightPush(key, questionId);
@@ -153,6 +154,39 @@ public class QuestionRedisCache {
         );
 
         return result == null ? Collections.emptyList() : result;
+    }
+
+    /**
+     * 存入总难度列表便于用户随机选取题目
+     */
+    public void setTotalQuestionDifficultyInCache(Integer towerFloorId, List<String> totalQuestionDifficulty) {
+
+        String key = REDIS_TOTAL_QUESTION_DIFFICULTY_LIST_CACHE + towerFloorId;
+
+        stringRedisTemplate.opsForList().rightPushAll(key, totalQuestionDifficulty);
+
+    }
+
+    /**
+     * 获取总难度列表
+     */
+    public List<String> getTotalQuestionDifficultyListInCache(Integer towerFloorId) {
+
+        String key = REDIS_TOTAL_QUESTION_DIFFICULTY_LIST_CACHE + towerFloorId;
+        List<String> range = stringRedisTemplate.opsForList().leftPop(key, 1);
+
+        return range == null ? Collections.emptyList() : range;
+    }
+
+    /**
+     * 查看所有题目并不取出
+     */
+    public List<String> getQuestionDifficultyListInCacheAndNotPushInCache(Integer towerFloorId) {
+
+        String key = REDIS_QUESTION_CACHE + towerFloorId;
+        List<String> range = stringRedisTemplate.opsForList().range(key, 0, -1);
+
+        return range == null ? Collections.emptyList() : range;
     }
 
 

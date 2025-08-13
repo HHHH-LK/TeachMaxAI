@@ -1,54 +1,51 @@
 package com.aiproject.smartcampus.pojo.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.time.LocalDateTime;
-
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 游戏用户表，存储玩家基本信息
  */
 @Data
-@TableName("game_user")       // MyBatis-Plus 表名
-public class GameUser {
+@TableName("game_user")
+public class GameUser implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
-     * 玩家ID，主键，自增
+     * 玩家ID，主键
      */
-    @TableId(value = "user_id", type = IdType.AUTO)  // MP 主键及自增策略
+    @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
 
     /**
-     * 游戏昵称，不能为空
+     * 游戏昵称
      */
     @TableField("game_name")
     private String gameName;
 
     /**
-     * 玩家等级，默认1
+     * 玩家等级
      */
-    @TableField("level")
     private Integer level;
 
     /**
-     * 当前经验值，默认0
+     * 当前经验值
      */
-    @TableField("exp")
     private Integer exp;
 
     /**
-     * 注册时间，默认当前时间
+     * 注册时间
      */
-    @TableField("create_time")
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**
-     * 学生Id，不能为空
+     * 学生Id
      */
-    @TableField("studentId")
+    @TableField("student_id") // 如果数据库字段是 studentId 驼峰就不用加
     private Integer studentId;
 }

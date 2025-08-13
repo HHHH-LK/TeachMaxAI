@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan("com.aiproject.smartcampus.mapper")
 @EnableTransactionManagement
 @EnableScheduling
+@EnableAsync
 @Slf4j
 public class SmartCampusApplication {
 
@@ -27,7 +29,6 @@ public class SmartCampusApplication {
         SpringApplication.run(SmartCampusApplication.class, args);
         log.info("程序已经启动");
     }
-
 
 
 }

@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * @author lk_hhh
- */ // 11. 题库Mapper
+ */
 @Repository
 @Mapper
 public interface QuestionBankMapper extends BaseMapper<QuestionBank> {

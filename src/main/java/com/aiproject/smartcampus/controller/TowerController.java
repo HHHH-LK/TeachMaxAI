@@ -58,24 +58,6 @@ public class TowerController {
 
     }
 
-    /**
-     * 分榜排行榜（只有用户到指定课程的塔时才进行修改层数）
-     */
-    @GetMapping("/getTowerSortByCourseId")
-    public Result<List<TowerServiceImpl.SortedUser>> getUserSortByOneTowerId(@RequestParam(value = "courseId") String courseId) {
-
-        return towerService.getUserSortByOneTowerId(courseId);
-    }
-
-    /**
-     * 总榜排行榜（后续修改塔层时用户每个塔都进行修改层数）
-     */
-    @GetMapping("/getTotleSort")
-    public Result<List<TowerServiceImpl.SortedUser>> getTotleSorted() {
-
-        return towerService.getTotleSorted();
-
-    }
 
     /**
      * 查询主塔的背景故事

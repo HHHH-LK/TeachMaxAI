@@ -64,6 +64,7 @@ public class TowerServiceImpl implements TowerService {
     private final QuestionRedisCache questionRedisCache;
     private final ChatLanguageModel chatLanguageModel;
     private final QuestionBankMapper questionBankMapper;
+    private final CourseMapper courseMapper;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final ExecutorService CREATE_QUEXTION_EXECUTOR = Executors.newFixedThreadPool(
@@ -80,6 +81,10 @@ public class TowerServiceImpl implements TowerService {
                 return t;
             }
     );
+    private String towerId;
+    private String floorId;
+    private String courseId;
+    private String studentId;
 
     static {
         // 设置属性命名策略，支持snake_case转camelCase映射
@@ -121,9 +126,6 @@ public class TowerServiceImpl implements TowerService {
         objectMapper.registerModule(module);
     }
 
-    private final CourseMapper courseMapper;
-
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -143,7 +145,6 @@ public class TowerServiceImpl implements TowerService {
         EASY, MEDIUM, HARD
 
     }
-
 
     @Override
     public Result<Boolean> createTowerByAgent(String studentId, String courseId) {
@@ -281,11 +282,21 @@ public class TowerServiceImpl implements TowerService {
         return Result.success();
     }
 
+    void initParameter(String towerId, String floorId, String courseId, String studentId) {
+        this.towerId = towerId;
+        this.floorId = floorId;
+        this.courseId = courseId;
+        this.studentId = studentId;
+    }
+
     /**
      * 初始化生成3道题目
      */
     @Override
     public Result loadTest(String towerId, String floorId, String courseId, String studentId) {
+
+        //初始化参数信息，便于之后的定时任务
+        initParameter(towerId, floorId, courseId, studentId);
 
         //设置初始化题目数量
         Integer LIMIT_QUESTION_NO = 3;
@@ -332,9 +343,16 @@ public class TowerServiceImpl implements TowerService {
         //获取该层的难度分配
         Map<Difficulty, Double> weightsForFloor = getWeightsForFloor(floorNo, totalFloors);
 
-        //生成当前层的难度列表（设置最大简单题数量，最大难题数量）后续需要持久化存储
-        List<Difficulty> difficulties = randomDifficultyListWithLimits(floorNo, totalFloors, questionCountByBossHp, weightsForFloor, 4, 2, 1.8)
-                .stream().limit(LIMIT_QUESTION_NO).collect(Collectors.toList());
+        //生成当前层的难度列表（difficulties 表示总共要生成的题目的难度列表，createQuestionsDifficulty表示当前要生成的难度列表）
+        List<Difficulty> difficulties = randomDifficultyListWithLimits(floorNo, totalFloors, questionCountByBossHp, weightsForFloor, 4, 2, 1.8);
+        List<Difficulty> createQuestionsDifficulty = questionRedisCache.getQuestionDifficultyListInCache(Integer.valueOf(floorId), 3)
+                .stream().map(a -> switch (a) {
+                            case "0" -> Difficulty.EASY;
+                            case "1" -> Difficulty.MEDIUM;
+                            case "2" -> Difficulty.HARD;
+                            default -> throw new RuntimeException("难度不存在");
+                        }
+                ).toList();
 
         //持久化
         List<String> questionDifficultyList = difficulties.stream().map(a -> switch (a) {
@@ -343,13 +361,14 @@ public class TowerServiceImpl implements TowerService {
             default -> "0";
 
         }).toList();
+        questionRedisCache.setTotalQuestionDifficultyInCache(Integer.valueOf(floorId), questionDifficultyList);
 
         //构建出知识点通过率映射map，知识点id映射map，以及创建题目提示词（从异步中提取出来加快异步非守护线程的执行效率）
         Map<String, Double> pointAccessRateMap = pointList.stream()
                 .collect(Collectors.toMap(StudentWrongKnowledgeBO::getPointName, StudentWrongKnowledgeBO::getAccuracyRate));
         Map<String, Integer> pointIdMap = pointList.stream()
                 .collect(Collectors.toMap(StudentWrongKnowledgeBO::getPointName, StudentWrongKnowledgeBO::getPointId));
-        String questionPrompts = createQuestionPrompts(difficulties, pointAccessRateMap, pointIdMap, LIMIT_QUESTION_NO, courseNameByid);
+        String questionPrompts = createQuestionPrompts(createQuestionsDifficulty, pointAccessRateMap, pointIdMap, LIMIT_QUESTION_NO, courseNameByid);
 
         questionRedisCache.setQuestionDifficultyListInCache(Integer.valueOf(floorId), questionDifficultyList);
         log.info("缓存塔层【{}】难度排布成功", floorId);
@@ -365,74 +384,119 @@ public class TowerServiceImpl implements TowerService {
         return Result.success();
     }
 
-
     /**
-     * 定时任务检查并更新题目
+     * 定时任务，固定延迟执行，调用无参方法
      */
     @Scheduled(fixedDelay = 5000)
-    public void checkAndUpdateQuestion(String towerId, String floorId, String courseId, String studentId) {
+    public void scheduledCheckAndUpdate() {
+        log.info("定时任务触发，开始检查和更新题目...");
+        checkAndUpdateQuestion(towerId, floorId, courseId, studentId);
+    }
 
-        //设置最小题目数量
+    /**
+     * 主业务逻辑方法：检查缓存题目数量，不足则补充题目
+     *
+     * @param towerId   塔ID
+     * @param floorId   塔层ID
+     * @param courseId  课程ID
+     * @param studentId 学生ID
+     */
+    public void checkAndUpdateQuestion(String towerId, String floorId, String courseId, String studentId) {
         final int MIN_QUESTION_NO = 2;
         final int UPDATE_QUESTION_NO = 3;
 
-        //查询当前题目数量
-        int questionNumInCache = Integer.parseInt(questionRedisCache.getQuestionNumInCache(Integer.valueOf(floorId)));
+        if (towerId == null || floorId == null || courseId == null || studentId == null) {
+            log.warn("缺少必要参数，跳过本次任务执行");
+            return;
+        }
 
-        //判断是否初始化过(未初始化则退出)
-        String createTagInCache = questionRedisCache.isCreateTagInCache(Integer.valueOf(floorId));
+        // 判断是否初始化过
+        String createTagInCache = Optional.ofNullable(questionRedisCache.isCreateTagInCache(Integer.valueOf(floorId))).orElse("0");
         if ("0".equals(createTagInCache)) {
+            log.info("塔层【{}】未初始化题库，跳过更新", floorId);
             return;
         }
 
-        //判断是否充足
+        // 查询缓存题目数量
+        int questionNumInCache;
+        try {
+            String questionNumStr = questionRedisCache.getQuestionNumInCache(Integer.valueOf(floorId));
+            questionNumInCache = Integer.parseInt(Optional.ofNullable(questionNumStr).orElse("0"));
+        } catch (Exception e) {
+            log.error("获取缓存题目数量失败", e);
+            return;
+        }
+
         if (questionNumInCache > MIN_QUESTION_NO) {
-            log.info("塔【{}】塔层【{}】题目充足", towerId, floorId);
+            log.info("塔【{}】塔层【{}】题目充足，无需更新", towerId, floorId);
             return;
         }
 
-        //进行补充题目到题库中
+        // 获取难度列表
         List<String> questionDifficultyListInCache = questionRedisCache.getQuestionDifficultyListInCache(Integer.valueOf(floorId), UPDATE_QUESTION_NO);
-        List<Difficulty> list = questionDifficultyListInCache.stream().map(a ->
-                switch (a) {
-                    case "0" -> Difficulty.EASY;
-                    case "1" -> Difficulty.MEDIUM;
-                    case "2" -> Difficulty.HARD;
-                    default -> null;
-                }
-        ).toList();
+        List<Difficulty> difficultyList;
+        try {
+            difficultyList = questionDifficultyListInCache.stream()
+                    .map(a -> switch (a) {
+                        case "0" -> Difficulty.EASY;
+                        case "1" -> Difficulty.MEDIUM;
+                        case "2" -> Difficulty.HARD;
+                        default -> throw new RuntimeException("难度不存在: " + a);
+                    })
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            log.error("难度转换失败", e);
+            return;
+        }
 
-        //获取知识点错误信息
-        LambdaQueryWrapper<Task> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Task::getFloorId, floorId);
-        Task task = taskMapper.selectOne(queryWrapper);
+        // 查询知识点错误信息
+        Task task = taskMapper.selectOne(new LambdaQueryWrapper<Task>().eq(Task::getFloorId, floorId));
+        if (task == null) {
+            log.warn("未找到塔层任务数据，floorId: {}", floorId);
+            return;
+        }
         List<Integer> pointsList = taskServiceImpl.parsePoints(task.getPointIds());
+
         List<StudentWrongKnowledgeBO> studentWrongKnowledgeByStudentId = knowledgePointMapper.getStudentWrongKnowledgeByStudentId(studentId);
-        List<StudentWrongKnowledgeBO> pointList = studentWrongKnowledgeByStudentId.stream().distinct()
-                .filter(a -> {
-                    for (Integer pointId : pointsList) {
-                        if (a.getPointId().equals(pointId)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }).toList();
+        if (studentWrongKnowledgeByStudentId == null || studentWrongKnowledgeByStudentId.isEmpty()) {
+            log.info("学生【{}】无错误知识点", studentId);
+        }
+
+        // 过滤相关知识点
+        List<StudentWrongKnowledgeBO> pointList = studentWrongKnowledgeByStudentId.stream()
+                .distinct()
+                .filter(a -> pointsList.contains(a.getPointId()))
+                .toList();
+
         Map<String, Double> pointAccessRateMap = pointList.stream()
                 .collect(Collectors.toMap(StudentWrongKnowledgeBO::getPointName, StudentWrongKnowledgeBO::getAccuracyRate));
+
         Map<String, Integer> pointIdMap = pointList.stream()
                 .collect(Collectors.toMap(StudentWrongKnowledgeBO::getPointName, StudentWrongKnowledgeBO::getPointId));
 
-        //获取课程名字
-        String courseNameByid = courseMapper.findCourseNameByid(courseId);
-        String questionPrompts = createQuestionPrompts(list, pointAccessRateMap, pointIdMap, UPDATE_QUESTION_NO, courseNameByid);
+        // 获取课程名称
+        String courseNameByid = Optional.ofNullable(courseMapper.findCourseNameByid(courseId)).orElse("未知课程");
 
-        //执行更新题目
+        // 构建提示词
+        String questionPrompts = createQuestionPrompts(difficultyList, pointAccessRateMap, pointIdMap, UPDATE_QUESTION_NO, courseNameByid);
+
+        // 异步执行更新题目
         CompletableFuture<List<Integer>> listCompletableFuture = exeCreateQuestion(courseId, floorId, UPDATE_QUESTION_NO, questionPrompts, UPDATE_QUEXTION_EXECUTOR);
+
+        listCompletableFuture.whenComplete((res, ex) -> {
+            if (ex != null) {
+                log.error("异步更新题目异常", ex);
+            } else {
+                log.info("异步更新题目成功，生成题目数量: {}", res.size());
+            }
+        });
+
         listCompletableFuture.join();
-
-
     }
 
+    /**
+     * 异步创建题目
+     */
     public CompletableFuture<List<Integer>> exeCreateQuestion(String courseId, String floorId, Integer createQuestionNum, String createQuestionPrompts, Executor executor) {
 
         //异步执行创建
@@ -478,8 +542,6 @@ public class TowerServiceImpl implements TowerService {
                 (ss) -> {
                     log.info("开始为塔层【{}】设置初始化状态", floorId);
                     questionRedisCache.setCreateTagToCache(Integer.valueOf(floorId), "1");
-                    //从难度系数列表中扣减已经生成的题目
-                    questionRedisCache.getQuestionDifficultyListInCache(Integer.valueOf(floorId), Integer.valueOf(createQuestionNum));
                     log.info("成功为塔层【{}】设置初始化状态", floorId);
                     return null;
                 }, executor

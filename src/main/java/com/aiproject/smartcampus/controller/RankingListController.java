@@ -1,8 +1,15 @@
 package com.aiproject.smartcampus.controller;
 
+import com.aiproject.smartcampus.commons.client.Result;
+import com.aiproject.smartcampus.service.impl.TowerServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @program: TeacherMaxAI
@@ -13,14 +20,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/rankinglist")
 @Slf4j
+@RequiredArgsConstructor
 public class RankingListController {
 
-    //查看总榜
+    private final TowerServiceImpl towerService;
 
+    /**
+     * 分榜排行榜（只有用户到指定课程的塔时才进行修改层数）
+     */
+    @GetMapping("/getTowerSortByCourseId")
+    public Result<List<TowerServiceImpl.SortedUser>> getUserSortByOneTowerId(@RequestParam(value = "courseId") String courseId) {
 
-    //查看分榜
+        return towerService.getUserSortByOneTowerId(courseId);
+    }
 
+    /**
+     * 总榜排行榜（后续修改塔层时用户每个塔都进行修改层数）
+     */
+    @GetMapping("/getTotleSort")
+    public Result<List<TowerServiceImpl.SortedUser>> getTotleSorted() {
 
+        return towerService.getTotleSorted();
+
+    }
 
 
 }

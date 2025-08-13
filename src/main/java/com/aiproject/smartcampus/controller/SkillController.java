@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class SkillController {
 
-    //使用技能
-
-    //获取所有技能信息（伤害等）
 
 
 
