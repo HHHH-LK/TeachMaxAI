@@ -28,7 +28,7 @@
             </span>
           </div>
         </div>
-        
+
         <div class="chapter-actions">
           <el-button size="small" @click="viewKnowledgePoints(chapter)">
             <el-icon><View /></el-icon>
@@ -94,7 +94,7 @@
           />
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="chapterDialogVisible = false">取消</el-button>
@@ -173,7 +173,7 @@ const chapterRules = computed(() => {
 // 加载章节数据
 const loadChapters = async () => {
   if (!props.courseId) return;
-  
+
   try {
     console.log('正在加载课程ID为', props.courseId, '的章节数据');
     const response = await teacherService.getChapterByCourseId(props.courseId);
@@ -190,7 +190,7 @@ const loadChapters = async () => {
   } catch (error) {
     console.error('加载章节失败:', error);
     ElMessage.warning('API调用失败，显示示例数据');
-    
+
     // 根据课程ID生成不同的示例章节数据
     const mockChapters = generateMockChapters(props.courseId);
     chapters.value = mockChapters;
@@ -279,7 +279,7 @@ const generateMockChapters = (courseId) => {
       }
     ]
   };
-  
+
   return courseChapters[courseId] || [];
 };
 
@@ -331,7 +331,7 @@ const deleteChapter = async (chapter) => {
 
     // 调用删除章节API
     const response = await adminService.deleteChapter(chapter.chapterId);
-    
+
     if (response.data.code === 0) {
       ElMessage.success('章节删除成功');
       await loadChapters();
@@ -350,17 +350,17 @@ const deleteChapter = async (chapter) => {
 // 查看知识点
 const viewKnowledgePoints = (chapter) => {
   console.log('准备查看章节知识点:', chapter);
-  
+
   // 如果当前已经有章节在查看，先关闭对话框
   if (knowledgePointDialogVisible.value) {
     console.log('关闭当前知识点对话框');
     knowledgePointDialogVisible.value = false;
   }
-  
+
   // 设置新的章节并打开对话框
   currentChapter.value = chapter;
   console.log('设置新章节:', currentChapter.value);
-  
+
   // 使用nextTick确保DOM更新后再打开对话框
   nextTick(() => {
     console.log('打开知识点对话框，章节:', currentChapter.value);
@@ -372,7 +372,7 @@ const viewKnowledgePoints = (chapter) => {
 const submitChapterForm = async () => {
   try {
     await chapterFormRef.value.validate();
-    
+
     if (isEditing.value) {
       // 编辑模式：更新章节信息
       const updateData = {
@@ -382,10 +382,10 @@ const submitChapterForm = async () => {
         chapterOrder: currentChapter.value.chapterOrder,
         courseId: props.courseId
       };
-      
+
       // 调用更新章节API
       const response = await adminService.updateChapterName(updateData);
-      
+
       if (response.data.code === 0) {
         ElMessage.success('章节更新成功');
         chapterDialogVisible.value = false;
@@ -405,10 +405,10 @@ const submitChapterForm = async () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
-      
+
       // 调用创建章节API
       const response = await adminService.addChapter(createData);
-      
+
       if (response.data.code === 0) {
         ElMessage.success('章节创建成功');
         chapterDialogVisible.value = false;

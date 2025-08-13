@@ -183,6 +183,11 @@ const router = createRouter({
       path: '/game',
       name: 'game',
       component: Game
+    },
+    {
+      path: '/chat',
+      name: 'chat',
+      component: ChatView,
     }
   ]
 })
