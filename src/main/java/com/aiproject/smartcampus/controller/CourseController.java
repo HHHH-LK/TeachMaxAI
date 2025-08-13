@@ -151,8 +151,8 @@ public class CourseController {
      */
     @PostMapping("/createCourse")
     @Operation(summary = "智能创建课程")
-    public Result<String> createCourse(String courseName, String teacherId, String semester) {
-        return courseService.createCourse(courseName, teacherId, semester);
+    public Result<String> createCourse(String courseName, String semester) {
+        return courseService.createCourse(courseName, semester);
     }
 
     /**
@@ -164,4 +164,12 @@ public class CourseController {
         return courseService.changeTeacher(courseId, teacherId);
     }
 
+    /**
+     * 智能分配教师
+     */
+    @PostMapping("/autoAssignTeacher")
+    @Operation(summary = "智能分配教师")
+    public Result<String> autoAssignTeacher(@RequestParam("courseId") Integer courseId) {
+        return courseService.autoAssignTeacher(courseId);
+    }
 }

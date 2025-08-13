@@ -30,7 +30,9 @@ public interface CourseService extends IService<Course> {
 
     Result getCourseHomeworkInfo(String courseId);
 
-    Result<String> createCourse(String courseName, String teacherId, String semester);
+    Result<String> createCourse(String courseName, String semester);
 
     Result<String> changeTeacher(Integer courseId, String teacherId);
+
+    Result<String> autoAssignTeacher(Integer courseId);
 }
