@@ -155,4 +155,13 @@ public class CourseController {
         return courseService.createCourse(courseName, teacherId, semester);
     }
 
+    /**
+     * 更换课程教师
+     */
+    @PutMapping("/changeTeacher")
+    @Operation(summary = "更换课程教师")
+    public Result<String> changeTeacher(@RequestParam("courseId") Integer courseId, @RequestParam("teacherId") String teacherId) {
+        return courseService.changeTeacher(courseId, teacherId);
+    }
+
 }
