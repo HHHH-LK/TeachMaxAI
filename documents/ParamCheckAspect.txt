@@ -1,0 +1,250 @@
+Classfile /Users/lk_hhh/Documents/ss/TeacherMaxAI/target/classes/com/aiproject/smartcampus/aop/ParamCheckAspect.class
+  Last modified 2025年8月4日; size 2003 bytes
+  SHA-256 checksum 28822581460a569581f49f4a583a7ea5c57b5a7320e8ec7e00b50e3b894d41e0
+  Compiled from "ParamCheckAspect.java"
+public class com.aiproject.smartcampus.aop.ParamCheckAspect
+  minor version: 0
+  major version: 65
+  flags: (0x0021) ACC_PUBLIC, ACC_SUPER
+  this_class: #14                         // com/aiproject/smartcampus/aop/ParamCheckAspect
+  super_class: #2                         // java/lang/Object
+  interfaces: 0, fields: 1, methods: 3, attributes: 2
+Constant pool:
+    #1 = Methodref          #2.#3         // java/lang/Object."<init>":()V
+    #2 = Class              #4            // java/lang/Object
+    #3 = NameAndType        #5:#6         // "<init>":()V
+    #4 = Utf8               java/lang/Object
+    #5 = Utf8               <init>
+    #6 = Utf8               ()V
+    #7 = InterfaceMethodref #8.#9         // org/aspectj/lang/JoinPoint.getArgs:()[Ljava/lang/Object;
+    #8 = Class              #10           // org/aspectj/lang/JoinPoint
+    #9 = NameAndType        #11:#12       // getArgs:()[Ljava/lang/Object;
+   #10 = Utf8               org/aspectj/lang/JoinPoint
+   #11 = Utf8               getArgs
+   #12 = Utf8               ()[Ljava/lang/Object;
+   #13 = Fieldref           #14.#15       // com/aiproject/smartcampus/aop/ParamCheckAspect.log:Lorg/slf4j/Logger;
+   #14 = Class              #16           // com/aiproject/smartcampus/aop/ParamCheckAspect
+   #15 = NameAndType        #17:#18       // log:Lorg/slf4j/Logger;
+   #16 = Utf8               com/aiproject/smartcampus/aop/ParamCheckAspect
+   #17 = Utf8               log
+   #18 = Utf8               Lorg/slf4j/Logger;
+   #19 = String             #20           // 传入参数为null
+   #20 = Utf8               传入参数为null
+   #21 = InterfaceMethodref #22.#23       // org/slf4j/Logger.error:(Ljava/lang/String;)V
+   #22 = Class              #24           // org/slf4j/Logger
+   #23 = NameAndType        #25:#26       // error:(Ljava/lang/String;)V
+   #24 = Utf8               org/slf4j/Logger
+   #25 = Utf8               error
+   #26 = Utf8               (Ljava/lang/String;)V
+   #27 = Class              #28           // java/lang/RuntimeException
+   #28 = Utf8               java/lang/RuntimeException
+   #29 = String             #30           // 参数为null
+   #30 = Utf8               参数为null
+   #31 = Methodref          #27.#32       // java/lang/RuntimeException."<init>":(Ljava/lang/String;)V
+   #32 = NameAndType        #5:#26        // "<init>":(Ljava/lang/String;)V
+   #33 = Class              #34           // java/lang/String
+   #34 = Utf8               java/lang/String
+   #35 = Methodref          #33.#36       // java/lang/String.trim:()Ljava/lang/String;
+   #36 = NameAndType        #37:#38       // trim:()Ljava/lang/String;
+   #37 = Utf8               trim
+   #38 = Utf8               ()Ljava/lang/String;
+   #39 = Methodref          #33.#40       // java/lang/String.isEmpty:()Z
+   #40 = NameAndType        #41:#42       // isEmpty:()Z
+   #41 = Utf8               isEmpty
+   #42 = Utf8               ()Z
+   #43 = String             #44           // 参数为字符串，但为空白，方法：{}
+   #44 = Utf8               参数为字符串，但为空白，方法：{}
+   #45 = InterfaceMethodref #8.#46        // org/aspectj/lang/JoinPoint.getSignature:()Lorg/aspectj/lang/Signature;
+   #46 = NameAndType        #47:#48       // getSignature:()Lorg/aspectj/lang/Signature;
+   #47 = Utf8               getSignature
+   #48 = Utf8               ()Lorg/aspectj/lang/Signature;
+   #49 = InterfaceMethodref #50.#51       // org/aspectj/lang/Signature.toShortString:()Ljava/lang/String;
+   #50 = Class              #52           // org/aspectj/lang/Signature
+   #51 = NameAndType        #53:#38       // toShortString:()Ljava/lang/String;
+   #52 = Utf8               org/aspectj/lang/Signature
+   #53 = Utf8               toShortString
+   #54 = InterfaceMethodref #22.#55       // org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;)V
+   #55 = NameAndType        #56:#57       // warn:(Ljava/lang/String;Ljava/lang/Object;)V
+   #56 = Utf8               warn
+   #57 = Utf8               (Ljava/lang/String;Ljava/lang/Object;)V
+   #58 = Class              #59           // java/lang/IllegalArgumentException
+   #59 = Utf8               java/lang/IllegalArgumentException
+   #60 = String             #61           // 参数不能是空字符串！
+   #61 = Utf8               参数不能是空字符串！
+   #62 = Methodref          #58.#32       // java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+   #63 = String             #64           // 方法 {} 参数校验通过
+   #64 = Utf8               方法 {} 参数校验通过
+   #65 = InterfaceMethodref #50.#66       // org/aspectj/lang/Signature.getName:()Ljava/lang/String;
+   #66 = NameAndType        #67:#38       // getName:()Ljava/lang/String;
+   #67 = Utf8               getName
+   #68 = InterfaceMethodref #22.#69       // org/slf4j/Logger.info:(Ljava/lang/String;Ljava/lang/Object;)V
+   #69 = NameAndType        #70:#57       // info:(Ljava/lang/String;Ljava/lang/Object;)V
+   #70 = Utf8               info
+   #71 = Methodref          #72.#73       // org/slf4j/LoggerFactory.getLogger:(Ljava/lang/Class;)Lorg/slf4j/Logger;
+   #72 = Class              #74           // org/slf4j/LoggerFactory
+   #73 = NameAndType        #75:#76       // getLogger:(Ljava/lang/Class;)Lorg/slf4j/Logger;
+   #74 = Utf8               org/slf4j/LoggerFactory
+   #75 = Utf8               getLogger
+   #76 = Utf8               (Ljava/lang/Class;)Lorg/slf4j/Logger;
+   #77 = Utf8               Code
+   #78 = Utf8               LineNumberTable
+   #79 = Utf8               LocalVariableTable
+   #80 = Utf8               this
+   #81 = Utf8               Lcom/aiproject/smartcampus/aop/ParamCheckAspect;
+   #82 = Utf8               before
+   #83 = Utf8               (Lorg/aspectj/lang/JoinPoint;)V
+   #84 = Utf8               str
+   #85 = Utf8               Ljava/lang/String;
+   #86 = Utf8               arg
+   #87 = Utf8               Ljava/lang/Object;
+   #88 = Utf8               joinPoint
+   #89 = Utf8               Lorg/aspectj/lang/JoinPoint;
+   #90 = Utf8               args
+   #91 = Utf8               [Ljava/lang/Object;
+   #92 = Utf8               StackMapTable
+   #93 = Class              #91           // "[Ljava/lang/Object;"
+   #94 = Utf8               MethodParameters
+   #95 = Utf8               RuntimeVisibleAnnotations
+   #96 = Utf8               Lorg/aspectj/lang/annotation/Before;
+   #97 = Utf8               value
+   #98 = Utf8               execution(* com.aiproject.smartcampus.service..*(..))
+   #99 = Utf8               <clinit>
+  #100 = Utf8               SourceFile
+  #101 = Utf8               ParamCheckAspect.java
+  #102 = Utf8               Lorg/springframework/stereotype/Component;
+  #103 = Utf8               Lorg/aspectj/lang/annotation/Aspect;
+{
+  public com.aiproject.smartcampus.aop.ParamCheckAspect();
+    descriptor: ()V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 19: 0
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0       5     0  this   Lcom/aiproject/smartcampus/aop/ParamCheckAspect;
+
+  public void before(org.aspectj.lang.JoinPoint);
+    descriptor: (Lorg/aspectj/lang/JoinPoint;)V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=3, locals=8, args_size=2
+         0: aload_1
+         1: invokeinterface #7,  1            // InterfaceMethod org/aspectj/lang/JoinPoint.getArgs:()[Ljava/lang/Object;
+         6: astore_2
+         7: aload_2
+         8: astore_3
+         9: aload_3
+        10: arraylength
+        11: istore        4
+        13: iconst_0
+        14: istore        5
+        16: iload         5
+        18: iload         4
+        20: if_icmpge     117
+        23: aload_3
+        24: iload         5
+        26: aaload
+        27: astore        6
+        29: aload         6
+        31: ifnonnull     54
+        34: getstatic     #13                 // Field log:Lorg/slf4j/Logger;
+        37: ldc           #19                 // String 传入参数为null
+        39: invokeinterface #21,  2           // InterfaceMethod org/slf4j/Logger.error:(Ljava/lang/String;)V
+        44: new           #27                 // class java/lang/RuntimeException
+        47: dup
+        48: ldc           #29                 // String 参数为null
+        50: invokespecial #31                 // Method java/lang/RuntimeException."<init>":(Ljava/lang/String;)V
+        53: athrow
+        54: aload         6
+        56: instanceof    #33                 // class java/lang/String
+        59: ifeq          111
+        62: aload         6
+        64: checkcast     #33                 // class java/lang/String
+        67: astore        7
+        69: aload         7
+        71: invokevirtual #35                 // Method java/lang/String.trim:()Ljava/lang/String;
+        74: invokevirtual #39                 // Method java/lang/String.isEmpty:()Z
+        77: ifeq          111
+        80: getstatic     #13                 // Field log:Lorg/slf4j/Logger;
+        83: ldc           #43                 // String 参数为字符串，但为空白，方法：{}
+        85: aload_1
+        86: invokeinterface #45,  1           // InterfaceMethod org/aspectj/lang/JoinPoint.getSignature:()Lorg/aspectj/lang/Signature;
+        91: invokeinterface #49,  1           // InterfaceMethod org/aspectj/lang/Signature.toShortString:()Ljava/lang/String;
+        96: invokeinterface #54,  3           // InterfaceMethod org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;)V
+       101: new           #58                 // class java/lang/IllegalArgumentException
+       104: dup
+       105: ldc           #60                 // String 参数不能是空字符串！
+       107: invokespecial #62                 // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+       110: athrow
+       111: iinc          5, 1
+       114: goto          16
+       117: getstatic     #13                 // Field log:Lorg/slf4j/Logger;
+       120: ldc           #63                 // String 方法 {} 参数校验通过
+       122: aload_1
+       123: invokeinterface #45,  1           // InterfaceMethod org/aspectj/lang/JoinPoint.getSignature:()Lorg/aspectj/lang/Signature;
+       128: invokeinterface #65,  1           // InterfaceMethod org/aspectj/lang/Signature.getName:()Ljava/lang/String;
+       133: invokeinterface #68,  3           // InterfaceMethod org/slf4j/Logger.info:(Ljava/lang/String;Ljava/lang/Object;)V
+       138: return
+      LineNumberTable:
+        line 24: 0
+        line 25: 7
+        line 26: 29
+        line 27: 34
+        line 28: 44
+        line 30: 54
+        line 31: 80
+        line 32: 101
+        line 25: 111
+        line 35: 117
+        line 37: 138
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+           69      42     7   str   Ljava/lang/String;
+           29      82     6   arg   Ljava/lang/Object;
+            0     139     0  this   Lcom/aiproject/smartcampus/aop/ParamCheckAspect;
+            0     139     1 joinPoint   Lorg/aspectj/lang/JoinPoint;
+            7     132     2  args   [Ljava/lang/Object;
+      StackMapTable: number_of_entries = 4
+        frame_type = 255 /* full_frame */
+          offset_delta = 16
+          locals = [ class com/aiproject/smartcampus/aop/ParamCheckAspect, class org/aspectj/lang/JoinPoint, class "[Ljava/lang/Object;", class "[Ljava/lang/Object;", int, int ]
+          stack = []
+        frame_type = 252 /* append */
+          offset_delta = 37
+          locals = [ class java/lang/Object ]
+        frame_type = 250 /* chop */
+          offset_delta = 56
+        frame_type = 248 /* chop */
+          offset_delta = 5
+    MethodParameters:
+      Name                           Flags
+      joinPoint
+    RuntimeVisibleAnnotations:
+      0: #96(#97=s#98)
+        org.aspectj.lang.annotation.Before(
+          value="execution(* com.aiproject.smartcampus.service..*(..))"
+        )
+
+  static {};
+    descriptor: ()V
+    flags: (0x0008) ACC_STATIC
+    Code:
+      stack=1, locals=0, args_size=0
+         0: ldc           #14                 // class com/aiproject/smartcampus/aop/ParamCheckAspect
+         2: invokestatic  #71                 // Method org/slf4j/LoggerFactory.getLogger:(Ljava/lang/Class;)Lorg/slf4j/Logger;
+         5: putstatic     #13                 // Field log:Lorg/slf4j/Logger;
+         8: return
+      LineNumberTable:
+        line 16: 0
+}
+SourceFile: "ParamCheckAspect.java"
+RuntimeVisibleAnnotations:
+  0: #102()
+    org.springframework.stereotype.Component
+  1: #103()
+    org.aspectj.lang.annotation.Aspect
