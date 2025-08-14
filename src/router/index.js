@@ -18,7 +18,6 @@ import TabChat from '@/components/student/chat/TabChat.vue';
 import CenterBackground from '@/components/student/center/CenterBackground.vue';
 import Center from '@/views/Center.vue';
 import TeacherChat from "@/views/student/TeacherChat.vue";
-import TestView from "@/views/teacher/teacherCourse/CourseCenter.vue";
 import ExamReview from "@/views/admin/ExamReview.vue";
 import CourseAssignment from "@/views/admin/CourseAssignment.vue";
 import Test from "@/views/tower/Fight.vue"
@@ -31,11 +30,6 @@ const router = createRouter({
     {
       path: '/',
       redirect: '/login'
-    },
-    {
-      path: '/chat',
-      name: 'chat',
-      component: TestView
     },
     {
       path: '/login',

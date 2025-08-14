@@ -1,34 +1,34 @@
 <template>
   <el-dialog
-    v-model="dialogVisible"
-    title="智能创建课程"
-    :width="400"
-    append-to-body
-    center
-    lock-scroll
-    modal
-    :close-on-press-escape="false"
-    :before-close="handleClose"
-    custom-class="create-course-dialog"
+      v-model="dialogVisible"
+      title="智能创建课程"
+      :width="400"
+      append-to-body
+      center
+      lock-scroll
+      modal
+      :close-on-press-escape="false"
+      :before-close="handleClose"
+      custom-class="create-course-dialog"
   >
     <el-form
-      :model="courseForm"
-      :rules="rules"
-      ref="courseFormRef"
-      label-width="80px"
+        :model="courseForm"
+        :rules="rules"
+        ref="courseFormRef"
+        label-width="80px"
     >
       <el-form-item label="课程名称" prop="title">
         <el-input
-          v-model="courseForm.title"
-          placeholder="请输入课程名称"
-          clearable
+            v-model="courseForm.title"
+            placeholder="请输入课程名称"
+            clearable
         ></el-input>
       </el-form-item>
       <el-form-item label="课程时间" prop="time">
         <el-input
-          v-model="courseForm.time"
-          placeholder="例如：2025春"
-          clearable
+            v-model="courseForm.time"
+            placeholder="例如：2025春"
+            clearable
         ></el-input>
       </el-form-item>
     </el-form>
@@ -42,51 +42,63 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue';
-import { ElMessage } from 'element-plus';
+import { reactive, ref, watch } from "vue";
+import { ElMessage } from "element-plus";
 
 const props = defineProps({
   visible: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
-const emit = defineEmits(['close', 'submit']);
+const emit = defineEmits(["close", "submit"]);
 
 const dialogVisible = ref(false);
 const courseFormRef = ref(null);
 
 // 课程表单数据a
 const courseForm = reactive({
-  title: '',
-  time: ''
+  title: "",
+  time: "",
 });
 
 // 表单验证规则
 const rules = reactive({
   title: [
-    { required: true, message: '请输入课程名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '课程名称长度在 2 到 50 个字符', trigger: 'blur' }
+    { required: true, message: "请输入课程名称", trigger: "blur" },
+    {
+      min: 2,
+      max: 50,
+      message: "课程名称长度在 2 到 50 个字符",
+      trigger: "blur",
+    },
   ],
   time: [
-    { required: true, message: '请输入课程时间', trigger: 'blur' },
-    { pattern: /^\d{4}[春夏秋冬]$/, message: '请输入正确的时间格式，例如：2025春', trigger: 'blur' }
-  ]
+    { required: true, message: "请输入课程时间", trigger: "blur" },
+    {
+      pattern: /^\d{4}[春夏秋冬]$/,
+      message: "请输入正确的时间格式，例如：2025春",
+      trigger: "blur",
+    },
+  ],
 });
 
 // 监听visible属性变化
-watch(() => props.visible, (newVal) => {
-  dialogVisible.value = newVal;
-  if (newVal && courseFormRef.value) {
-    courseFormRef.value.resetFields();
-  }
-});
+watch(
+    () => props.visible,
+    (newVal) => {
+      dialogVisible.value = newVal;
+      if (newVal && courseFormRef.value) {
+        courseFormRef.value.resetFields();
+      }
+    }
+);
 
 // 监听对话框状态变化
 watch(dialogVisible, (newVal) => {
   if (!newVal) {
-    emit('close');
+    emit("close");
   }
 });
 
@@ -99,11 +111,13 @@ const handleClose = () => {
 const submitCourseForm = async () => {
   try {
     await courseFormRef.value.validate();
-    emit('submit', { ...courseForm });
-    dialogVisible.value = false;
-    ElMessage.success(`课程《${courseForm.title}》创建成功！`);
+    emit("submit", { ...courseForm });
+    ElMessage.success({
+      message: "正在创建中，请稍后",
+      duration: 20000,
+    });
   } catch (error) {
-    console.log('表单验证失败', error);
+    console.log("表单验证失败", error);
   }
 };
 </script>

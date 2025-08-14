@@ -23,18 +23,18 @@
       </header>
 
       <!-- 课程网格 -->
-      <CourseGrid 
-        v-if="!loading"
-        :courses="courses" 
-        @enter-course="handleEnterCourse"
-        @delete-course="handleDeleteCourse"
+      <CourseGrid
+          v-if="!loading"
+          :courses="courses"
+          @enter-course="handleEnterCourse"
+          @delete-course="handleDeleteCourse"
       />
-      
+
       <!-- 加载状态 -->
       <div v-if="loading" class="loading-container">
         <el-skeleton :rows="6" animated />
       </div>
-      
+
       <!-- 空状态 -->
       <div v-if="!loading && courses.length === 0" class="empty-state">
         <el-empty description="暂无课程数据" />
@@ -43,30 +43,33 @@
 
     <!-- 创建课程对话框 -->
     <CreateCourseDialog
-      :visible="dialogVisible"
-      @close="handleClose"
-      @submit="handleCreateCourseSubmit"
+        :visible="dialogVisible"
+        @close="handleClose"
+        @submit="handleCreateCourseSubmit"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
     />
 
     <!-- 课程详情与教师选择对话框 -->
     <CourseDetailDialog
-      :visible="courseDetailVisible"
-      :current-course="currentCourse"
-      :teachers="teachers"
-      @close="handleCourseDetailClose"
-      @assign-teachers="handleAssignTeachers"
+        :visible="courseDetailVisible"
+        :current-course="currentCourse"
+        :teachers="teachers"
+        @close="handleCourseDetailClose"
+        @assign-teachers="handleAssignTeachers"
+        @auto-assign="handleAutoAssign"
     />
 
     <!-- 删除确认对话框 -->
     <el-dialog
-      v-model="deleteDialogVisible"
-      title="确认删除课程"
-      width="400px"
-      append-to-body
-      center
-      lock-scroll
-      modal
-      :close-on-press-escape="false"
+        v-model="deleteDialogVisible"
+        title="确认删除课程"
+        width="400px"
+        append-to-body
+        center
+        lock-scroll
+        modal
+        :close-on-press-escape="false"
     >
       <div class="delete-confirm-content">
         <el-icon :size="48" color="#ef4444"><Warning /></el-icon>
@@ -75,17 +78,17 @@
         </p>
         <p class="delete-warning">此操作不可撤销，删除后将无法恢复！</p>
       </div>
-      
+
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false" size="large">
             取消
           </el-button>
-          <el-button 
-            type="danger" 
-            @click="confirmDeleteCourse" 
-            size="large"
-            :loading="deleteLoading"
+          <el-button
+              type="danger"
+              @click="confirmDeleteCourse"
+              size="large"
+              :loading="deleteLoading"
           >
             确认删除
           </el-button>
@@ -99,9 +102,9 @@
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { CirclePlus, Refresh, Warning } from '@element-plus/icons-vue';
-import { 
-  CourseGrid, 
-  CreateCourseDialog, 
+import {
+  CourseGrid,
+  CreateCourseDialog,
   CourseDetailDialog,
   generateCourse,
   processCourseData,
@@ -124,6 +127,9 @@ const currentCourseIndex = ref(-1);
 const deleteDialogVisible = ref(false);
 const courseToDelete = ref(null);
 const deleteLoading = ref(false);
+
+// 创建课程加载状态
+const createCourseLoading = ref(false);
 
 // 模拟课程数据
 const mockCourses = [
@@ -181,7 +187,7 @@ const loadData = async () => {
       // 使用 processCourseData 处理课程数据
       courses.value = processCourseData(rawCourses);
       console.log('处理后的课程数据:', courses.value);
-      
+
       // 验证课程ID是否正确设置
       courses.value.forEach((course, index) => {
         if (!course.id) {
@@ -209,7 +215,7 @@ const loadData = async () => {
   } catch (error) {
     console.error('数据加载失败:', error);
     ElMessage.error('数据加载失败，请检查网络连接');
-    
+
     // 如果API调用失败，使用模拟数据作为备用
     courses.value = processCourseData(mockCourses);
     teachers.value = processTeacherData(mockTeachers);
@@ -225,29 +231,40 @@ const handleCreateCourse = () => {
 
 // 关闭对话框
 const handleClose = () => {
-  dialogVisible.value = false;
+  if (!createCourseLoading.value) {
+    dialogVisible.value = false;
+  }
 };
 
-// 处理创建课程提交
 const handleCreateCourseSubmit = async (courseData) => {
   try {
-    // 这里可以调用API创建课程
-    // const response = await adminService.createCourse(courseData);
-    
-    // 暂时使用模拟数据
-    const newCourse = generateCourse(courseData.title, courseData.time);
-    courses.value.unshift(newCourse);
-    
-    ElMessage.success(`课程《${courseData.title}》创建成功！`);
-    
-    // 关闭对话框
-    dialogVisible.value = false;
-    
-    // 可选：重新加载数据以确保数据一致性
-    // await loadData();
+    // 显示加载状态
+    createCourseLoading.value = true;
+
+    // 调用真实API接口
+    const response = await adminService.createCourse({
+      title: courseData.title,
+      time: courseData.time
+    });
+
+    if(response.data.data != null){
+      ElMessage.success(response.data.data );
+
+
+      dialogVisible.value = false;
+
+      await loadData();
+    } else {
+      ElMessage.error(response.data.msg || '创建课程失败');
+    }
   } catch (error) {
     console.error('创建课程失败:', error);
-    ElMessage.error('创建课程失败，请重试');
+
+    const errorMsg = error.response?.data?.msg || '创建课程失败，请重试';
+    ElMessage.error(errorMsg);
+
+  } finally {
+    createCourseLoading.value = false;
   }
 };
 
@@ -258,20 +275,20 @@ const handleEnterCourse = (course) => {
     ElMessage.error('课程数据不存在');
     return;
   }
-  
+
   if (!course.id) {
     ElMessage.error('课程ID不存在，无法打开详情');
     console.error('课程缺少ID:', course);
     return;
   }
-  
+
   if (!course.title) {
     ElMessage.error('课程标题不存在');
     return;
   }
-  
+
   console.log('准备打开课程详情:', course);
-  
+
   currentCourse.value = { ...course };
   currentCourseIndex.value = courses.value.findIndex(c => c.id === course.id);
   courseDetailVisible.value = true;
@@ -290,7 +307,7 @@ const handleAssignTeachers = (selectedTeachers) => {
     // 更新课程的教师列表
     currentCourse.value.teacherList = [...selectedTeachers];
     courses.value[currentCourseIndex.value].teacherList = [...selectedTeachers];
-    
+
     ElMessage.success('教师分配成功！');
   }
 };
@@ -317,7 +334,7 @@ const confirmDeleteCourse = async () => {
   try {
     // 调用API删除课程
     const response = await adminService.deleteCourse(courseToDelete.value.id);
-    
+
     if (response.data.code === 0) {
       // 从本地数据中删除
       const index = courses.value.findIndex(c => c.id === courseToDelete.value.id);
@@ -337,6 +354,50 @@ const confirmDeleteCourse = async () => {
     courseToDelete.value = null;
   }
 };
+
+const handleAutoAssign = async (course) => {
+  try {
+    console.log('开始智能分配教师，课程:', course);
+
+    if (!course) {
+      ElMessage.error('找不到课程信息');
+      return;
+    }
+
+
+    console.log(`调用智能分配API，课程ID: ${course}`);
+    const response = await adminService.autoAssignTeachers(course);
+    console.log('API响应:', response);
+
+    if (!response) {
+      throw new Error('API调用返回空响应');
+    }
+
+    if (response.data.code === 0) {
+      ElMessage.success(response.data.data || '教师分配成功');
+
+      await loadData();
+
+      // 更新当前课程对象
+      const updatedCourse = courses.value.find(c => c.id === course); // 使用course.id
+      if (updatedCourse) {
+        if (currentCourse.value?.id === course) { // 使用course.id
+          currentCourse.value = {...updatedCourse};
+        }
+      }
+    } else {
+      // 显示后端返回的错误消息
+      const errorMsg = response.data.msg || '未找到合适的教师分配';
+      console.warn('API返回错误:', errorMsg);
+      ElMessage.warning(errorMsg);
+    }
+  } catch (error) {
+    console.error('智能分配教师失败:', error);
+    // 添加错误消息显示
+    ElMessage.error('智能分配教师失败: ' + (error.message || '未知错误'));
+  }
+};
+
 
 // 处理编辑课程
 const handleEditCourse = (course) => {
@@ -528,22 +589,22 @@ const handleEditCourse = (course) => {
   border-radius: 16px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  
+
   .el-dialog__header {
     border-bottom: 1px solid rgba(240, 240, 240, 0.8);
     padding: 20px 24px;
-    
+
     .el-dialog__title {
       font-size: 18px;
       font-weight: 600;
       color: @text-primary;
     }
   }
-  
+
   .el-dialog__body {
     padding: 24px;
   }
-  
+
   .el-dialog__footer {
     border-top: 1px solid rgba(240, 240, 240, 0.8);
     padding: 20px 24px;
@@ -553,22 +614,22 @@ const handleEditCourse = (course) => {
 .delete-confirm-content {
   text-align: center;
   padding: 20px 0;
-  
+
   .el-icon {
     margin-bottom: 16px;
   }
-  
+
   .delete-message {
     font-size: 16px;
     color: @text-primary;
     margin-bottom: 12px;
     line-height: 1.5;
-    
+
     strong {
       color: #ef4444;
     }
   }
-  
+
   .delete-warning {
     font-size: 14px;
     color: #f59e0b;
@@ -581,15 +642,15 @@ const handleEditCourse = (course) => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  
+
   .el-button {
     border-radius: 8px;
     font-weight: 500;
-    
+
     &.el-button--danger {
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       border: none;
-      
+
       &:hover {
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         transform: translateY(-1px);

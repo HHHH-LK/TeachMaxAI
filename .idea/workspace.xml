@@ -4,43 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="更新动画">
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/animation/tower.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/护符.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/斗篷.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/斧头.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/生命源泉.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/靴子.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/3（塔）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/天花板（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/宝剑（主体）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/宝剑（无主体）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/总塔（主体）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/总塔（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/柱（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/标靶（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/楼梯（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/楼阁（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/窗（主体）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/窗（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/背景1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/背景2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/背景3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/门口（无水印）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/顶珠（主体）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/龙（主体）.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/龙（无主体）.png" afterDir="false" />
+    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="更新重提交">
+      <change afterPath="$PROJECT_DIR$/public/Image/Anim01.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/Image/Anim02.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/Image/Anim03.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/Image/Anim03.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/Image/Anim04.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/Image/Anim05.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/Video/Anim05.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/fight/Animation.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/fight/StartBattleAnimation.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/fight/Bag.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/Bag.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/fight/CharacterHead.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/CharacterHead.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/router/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/StudentView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/StudentView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/chatView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/chatView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/Game.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/Game.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/animation/Entry.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/animation/Entry.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/InventoryModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/InventoryModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/tower/Fight.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/tower/Fight.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,7 +77,7 @@
     &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;fronts&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Users/cup1/first/SmartCampus-front/src/views/student/game/img&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Users/cup1/first/SmartCampus-front/public/Image&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -111,11 +95,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Users\cup1\first\SmartCampus-front\public\Image" />
+      <recent name="D:\Users\cup1\first\SmartCampus-front\public" />
+      <recent name="D:\Users\cup1\first\SmartCampus-front\src\components\fight" />
       <recent name="D:\Users\cup1\first\SmartCampus-front\src\views\student\game\img" />
       <recent name="D:\Users\cup1\first\SmartCampus-front\src\views\student\game\assets" />
-      <recent name="D:\Users\cup\SmartCampus-front\src\views\teacher" />
-      <recent name="D:\Users\cup\SmartCampus-front\src\composables" />
-      <recent name="D:\Users\cup\SmartCampus-front\src\views" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Users\cup1\first\SmartCampus-front\src\views\tower" />
@@ -207,7 +191,8 @@
       <workItem from="1755045635540" duration="11276000" />
       <workItem from="1755065094778" duration="2805000" />
       <workItem from="1755069339596" duration="19988000" />
-      <workItem from="1755134716378" duration="668000" />
+      <workItem from="1755134716378" duration="1110000" />
+      <workItem from="1755135855467" duration="6791000" />
     </task>
     <task id="LOCAL-00001" summary="解耦合教师分配功能，增删改查知识点等">
       <option name="closed" value="true" />
@@ -233,7 +218,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755071121872</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="更新动画">
+      <option name="closed" value="true" />
+      <created>1755135402052</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1755135402052</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -270,6 +263,7 @@
     <MESSAGE value="game中添加选择tower，调试智能课程接口并增加部分功能" />
     <MESSAGE value="实现进入游戏动画" />
     <MESSAGE value="更新动画" />
-    <option name="LAST_COMMIT_MESSAGE" value="更新动画" />
+    <MESSAGE value="更新重提交" />
+    <option name="LAST_COMMIT_MESSAGE" value="更新重提交" />
   </component>
 </project>

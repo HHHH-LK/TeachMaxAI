@@ -10,7 +10,7 @@ import { defineEmits } from 'vue'
 const emit = defineEmits(['toggle-inventory'])
 
 const handleToggle = () => {
-  emit('toggle-inventory')
+  emit('toggle-inventory') 
 }
 </script>
 

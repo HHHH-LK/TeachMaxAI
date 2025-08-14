@@ -7,7 +7,15 @@
         <div class="crown-icon"></div>
       </div>
       <div class="player-level-container">
-        <span class="player-level">Lv.{{ playerLevel }}</span>
+        <div class="level-and-exp">
+          <span class="player-level">Lv.{{ playerLevel }}</span>
+          <div class="experience-bar">
+            <div class="exp-background">
+              <div class="exp-fill" :style="{ width: expPercentage + '%' }"></div>
+            </div>
+            <div class="exp-text">{{ currentExp }}/{{ maxExp }}</div>
+          </div>
+        </div>
         <div class="level-decoration"></div>
       </div>
     </div>
@@ -45,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits } from "vue";
+import { ref, onMounted, defineEmits, computed } from "vue";
 import ExitConfirmationModal from "./ExitConfirmationModal.vue";
 
 const turnCount = ref(8);
@@ -56,6 +64,14 @@ const playerLevel = ref(17);
 const showExitModal = ref(false);
 // 定义emit事件
 const emit = defineEmits(['exit-click']);
+
+const currentExp = ref(500);
+const maxExp = ref(1000);
+
+// 计算经验百分比
+const expPercentage = computed(() => {
+  return (currentExp.value / maxExp.value) * 100;
+});
 
 const handleExitClick = () => {
   showExitModal.value = true;
@@ -74,9 +90,6 @@ const handleExitClick = () => {
 const handleConfirmExit = () => {
   console.log("确认退出");
   showExitModal.value = false;
-  
-  
-  // 触发父组件事件：emit('game-exit')
 };
 
 // 处理取消退出
@@ -84,7 +97,6 @@ const handleCancelExit = () => {
   console.log("取消退出");
   showExitModal.value = false;
 };
-
 
 // 动画效果
 onMounted(() => {
@@ -94,7 +106,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 .top-bar {
@@ -113,7 +124,7 @@ onMounted(() => {
   align-items: center;
   padding: 0 30px;
   box-shadow: 
-    0 6px 12px rgba(0, 0, 0, 0.8),
+    0 6极px 12px rgba(0, 0, 0, 0.8),
     inset 0 0 20px rgba(0, 0, 0, 0.7);
   z-index: 1000;
   font-family: "MedievalSharp", "Courier New", monospace;
@@ -123,7 +134,6 @@ onMounted(() => {
     2px 2px 3px rgba(0, 0, 0, 0.9);
   overflow: hidden;
 }
-
 
 .top-bar::before,
 .top-bar::after {
@@ -146,7 +156,6 @@ onMounted(() => {
   right: 0;
   transform: scaleX(-1);
 }
-
 
 .player-info {
   display: flex;
@@ -206,6 +215,15 @@ onMounted(() => {
 
 .player-level-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 等级和经验条容器 */
+.level-and-exp {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .player-level {
@@ -236,6 +254,68 @@ onMounted(() => {
   animation: rotate 10s linear infinite;
 }
 
+/* 调整经验条样式 */
+.experience-bar {
+  position: relative;
+  width: 180px; 
+  margin-top: 0; 
+  z-index: 3;
+}
+
+.exp-background {
+  width: 100%;
+  height: 12px;
+  background: rgba(30, 20, 10, 0.7);
+  border: 1px solid #5a3a1a;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 5px rgba(0, 0, 0, 0.8),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.exp-fill {
+  height: 100%;
+  background: 
+    linear-gradient(to right, 
+      #d4af37, 
+      #b8860b,
+      #d4af37);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  box-shadow: 
+    inset 0 0 10px rgba(255, 215, 0, 0.5),
+    0 0 5px rgba(212, 175, 55, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.exp-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.3), 
+      transparent);
+  animation: shine 3s infinite linear;
+}
+
+.exp-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: #ffd700;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+  font-weight: bold;
+  z-index: 2;
+}
 
 .battle-info {
   display: flex;
@@ -295,7 +375,7 @@ onMounted(() => {
   width: 30px;
   height: 30px;
   background: 
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path d="M15,0 L25,8 L25,12 L15,20 L5,12 L5,8 Z M5,18 L5,22 L15,30 L25,22 L25,18 L15,25 Z" fill="%23d4af37"/></svg>');
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="极0 0 30 30"><path d="M15,0 L25,8 L25,12 L15,20 L5,12 L5,8 Z M5,18 L5,22 L15,30 L25,22 L25,18 L15,25 Z" fill="%23d4af37"/></svg>');
   background-size: contain;
   filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.7));
   animation: pulse 2s infinite;
@@ -313,7 +393,6 @@ onMounted(() => {
   filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.7));
   animation: pulse 2s infinite 0.5s;
 }
-
 
 .exit-control {
   position: relative;
@@ -481,7 +560,6 @@ onMounted(() => {
   animation: dragonBreath 5s infinite;
 }
 
-
 @keyframes rotate {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
@@ -584,7 +662,7 @@ onMounted(() => {
   100% { 
     box-shadow: 
       0 0 5px rgba(180, 150, 50, 0.5),
-      inset 0 0 5px rgba(180, 150, 50, 0.3);
+      inset 极0 0 5px rgba(180, 150, 50, 0.3);
   }
 }
 </style>

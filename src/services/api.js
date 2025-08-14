@@ -387,6 +387,20 @@ export const adminService = {
     });
   },
 
+  createCourse: async (courseData) => {
+    return apiClient.post("/course/createCourse", null, {
+      params: {
+        courseName: courseData.title,
+        semester: courseData.time
+      }
+    });
+  },
+
+  autoAssignTeachers: async (courseId) => {
+    return apiClient.post(`/course/autoAssignTeacher?courseId=${courseId}`);
+  },
+
+
   /**
    * 获取所有课程(包含教师信息)
    * @returns {Promise<object>} 所有课程数据列表
