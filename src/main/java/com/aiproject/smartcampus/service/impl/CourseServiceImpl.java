@@ -8,6 +8,7 @@ import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
 import com.aiproject.smartcampus.mapper.CourseMapper;
 import com.aiproject.smartcampus.mapper.ExamPaperMapper;
 import com.aiproject.smartcampus.model.functioncalling.CourseCreateTool;
+import com.aiproject.smartcampus.model.functioncalling.TeacherAssignTool;
 import com.aiproject.smartcampus.pojo.po.Course;
 import com.aiproject.smartcampus.pojo.po.ExamPaper;
 import com.aiproject.smartcampus.pojo.po.User;
@@ -37,7 +38,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final UserToTypeUtils userToTypeUtils;
     private final ExamPaperMapper examPaperMapper;
     private final CourseCreateTool courseCreateTool;
-
+    private final TeacherAssignTool teacherAssignTool;
     /**
      * 查询所有课程信息
      *
@@ -271,12 +272,12 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     }
 
     @Override
-    public Result<String> createCourse(String courseName, String teacherId, String semester) {
+    public Result<String> createCourse(String courseName, String semester) {
         try {
             // 创建课程对象
             Course course = new Course();
             course.setCourseName(courseName);
-            course.setTeacherId(Integer.valueOf(teacherId));
+            course.setTeacherId(0);
             course.setSemester(semester);
             course.setStatus(Course.CourseStatus.ACTIVE);
 
@@ -310,6 +311,26 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         courseMapper.updateById(course);
 
         return Result.success(SUCCESS_UPDATE_COURSE);
+    }
+
+    @Override
+    public Result<String> autoAssignTeacher(Integer courseId) {
+        try {
+            // 设置课程ID
+            teacherAssignTool.setCourseId(courseId);
+
+            // 执行分配流程
+            teacherAssignTool.run();
+
+            // 获取分配结果
+            String result = teacherAssignTool.getResult();
+
+            return Result.success(result);
+
+        } catch (Exception e) {
+            log.error("教师分配失败", e);
+            return Result.error("教师分配失败: " + e.getMessage());
+        }
     }
 }
 
