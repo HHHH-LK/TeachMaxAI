@@ -46,6 +46,6 @@ public class GameUser implements Serializable {
     /**
      * 学生Id
      */
-    @TableField("student_id") // 如果数据库字段是 studentId 驼峰就不用加
+    @TableField("studentId") // 如果数据库字段是 studentId 驼峰就不用加
     private Integer studentId;
 }
