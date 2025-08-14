@@ -10,4 +10,7 @@ public interface GameUserService {
     Result<T> setGamePlayerInfo(GameUser gameUser);
 
     Result<Integer> getGamePlayerLevel(String studentId);
+
+    Result<T> updateGamePlayerName(String name, String gameUserId);
+
 }

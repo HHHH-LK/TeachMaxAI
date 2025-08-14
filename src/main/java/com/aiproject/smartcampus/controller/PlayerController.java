@@ -53,4 +53,14 @@ public class PlayerController {
     }
 
 
+    /**
+     * 修改游戏昵称
+     * */
+    @PostMapping("/update/gameUserName")
+    public Result<T> updateGamePlayerName(@RequestParam(value = "name") String name, @RequestParam(value = "gameUserId") String gameUserId) {
+
+        return gameUserService.updateGamePlayerName(name,gameUserId);
+    }
+
+
 }

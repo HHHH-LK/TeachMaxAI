@@ -5,6 +5,7 @@ import com.aiproject.smartcampus.mapper.GameUserMapper;
 import com.aiproject.smartcampus.pojo.po.GameUser;
 import com.aiproject.smartcampus.service.GameUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
@@ -64,6 +65,22 @@ public class GameUserServiceImpl implements GameUserService {
 
         return Result.success(gameUserForDB.getLevel());
 
+    }
+
+    @Override
+    public Result<T> updateGamePlayerName(String name, String gameUserId) {
+
+        LambdaUpdateWrapper<GameUser> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(GameUser::getUserId, gameUserId);
+        updateWrapper.set(GameUser::getGameName, name);
+
+        int update = gameUserMapper.update(updateWrapper);
+        if (update <= 0) {
+            log.error("修改名称失败");
+            throw new RuntimeException("修改名称失败");
+        }
+
+        return Result.success();
     }
 
     /**
