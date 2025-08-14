@@ -8,7 +8,7 @@
           canvas-class="inventory-canvas"
       />
       <div class="inventory-content">
-        <h2 class="inventory-title">道具库</h2>
+        <h2 class="inventory-title">道具图鉴</h2>
         <div class="items-grid">
           <div class="item" v-for="(item, index) in items" :key="index" @click="handleSelectItem(item)">
             <div class="item-quantity">{{ item.quantity }}</div>
@@ -22,6 +22,7 @@
                 <span v-if="item.attack">攻击: {{ item.attack }}</span>
                 <span v-if="item.defense">防御: {{ item.defense }}</span>
                 <span v-if="item.heal">回血: {{ item.heal }}</span>
+                <span v-if="item.assist">速度: {{ item.assist }}</span>
               </div>
             </div>
           </div>

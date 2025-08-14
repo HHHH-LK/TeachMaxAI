@@ -11,7 +11,7 @@
         <el-main class="main-content">
           <!-- 根据 activeMenu 显示不同的内容 -->
           <router-view></router-view>
-          <aiAssistant />
+          <aiAssistant v-if="!isGamePage" />
         </el-main>
       </el-container>
     </el-container>
@@ -62,6 +62,12 @@ const navbarItems = [
     label: '社区交流中心',
     icon: 'people-outline',
     route: '/student/community-student'
+  },
+  {
+    id: 'game-entry',
+    label: '神秘之塔',
+    icon: 'game-controller-outline',
+    route: '/student/game-entry'
   }
 ]
 
@@ -81,6 +87,11 @@ const currentPageTitle = computed(() => {
     return '';
   };
   return findTitle(navbarItems, route.path);
+});
+
+// 判断当前是否在游戏页面
+const isGamePage = computed(() => {
+  return route.path === '/student/game-entry';
 });
 
 onMounted(() => {

@@ -38,6 +38,9 @@
         </div>
 
         <div class="homework-content">
+          <div class="homework-description" v-if="homework.description">
+            <p>{{ homework.description }}</p>
+          </div>
           <div class="homework-meta">
             <span
             ><el-icon><User /></el-icon> 已提交:
@@ -47,6 +50,12 @@
             ><el-icon><QuestionFilled /></el-icon> 题目数量:
               {{ homework.questions.length }}</span
             >
+            <span v-if="homework.difficultyLevel"
+            ><el-icon><Star /></el-icon> 难度:
+              <span :class="`difficulty-tag difficulty-${homework.difficultyLevel}`">
+                {{ getDifficultyText(homework.difficultyLevel) }}
+              </span>
+            </span>
           </div>
         </div>
       </div>
@@ -55,16 +64,47 @@
     <!-- 创建作业对话框 -->
     <el-dialog
         v-model="showCreateDialog"
-        title="创建并发布新作业"
-        width="50%"
+        title="智能创建并发布新作业"
+        width="60%"
         :before-close="handleClose"
     >
+      <!-- 提示信息 -->
+      <div class="create-tips">
+        <el-alert
+            title="智能创建作业提示"
+            type="info"
+            :closable="false"
+            show-icon
+        >
+          <template #default>
+            <p>1. 选择章节：选择要创建作业的课程章节</p>
+            <p>2. 作业描述：详细描述作业要求，AI将根据描述智能生成相应题目</p>
+            <p>3. 题目数量：设置要生成的题目数量（1-20题）</p>
+            <p>4. 难度等级：选择题目难度，AI将根据难度调整题目复杂度</p>
+          </template>
+        </el-alert>
+      </div>
       <el-form
           :model="newHomework"
           :rules="rules"
           ref="homeworkForm"
           label-width="100px"
       >
+        <el-form-item label="选择章节" prop="chapterId">
+          <el-select
+              v-model="newHomework.chapterId"
+              placeholder="请选择章节"
+              @change="onChapterChange"
+              style="width: 100%"
+          >
+            <el-option
+                v-for="chapter in chapters"
+                :key="chapter.chapterId"
+                :label="chapter.chapterName"
+                :value="chapter.chapterId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="作业标题" prop="title">
           <el-input
               v-model="newHomework.title"
@@ -76,22 +116,40 @@
               type="textarea"
               v-model="newHomework.description"
               :rows="3"
-              placeholder="请输入作业描述"
+              placeholder="请输入作业描述，AI将根据描述智能生成题目"
           ></el-input>
         </el-form-item>
-        <!-- <el-form-item label="截止时间" prop="deadline">
-          <el-date-picker v-model="newHomework.deadline" type="datetime" placeholder="选择截止时间"></el-date-picker>
-        </el-form-item> -->
-        <!-- <el-form-item label="满分" prop="maxScore">
-          <el-input-number v-model="newHomework.maxScore" :min="1" :max="100"></el-input-number>
-        </el-form-item> -->
+        <el-form-item label="题目数量" prop="questionCount">
+          <el-input-number
+              v-model="newHomework.questionCount"
+              :min="1"
+              :max="20"
+              placeholder="请输入题目数量"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item label="难度等级" prop="difficultyLevel">
+          <el-select
+              v-model="newHomework.difficultyLevel"
+              placeholder="请选择难度等级"
+              style="width: 100%"
+          >
+            <el-option label="简单" value="easy"></el-option>
+            <el-option label="中等" value="medium"></el-option>
+            <el-option label="困难" value="hard"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showCreateDialog = false">取消</el-button>
-          <el-button type="primary" @click="createHomework"
-          >创建并发布</el-button
+          <el-button 
+              type="primary" 
+              @click="createHomework"
+              :loading="createLoading"
           >
+            <el-icon><MagicStick /></el-icon>
+            智能创建并发布
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -330,6 +388,7 @@ import {
   User,
   MagicStick,
   QuestionFilled,
+  Star,
 } from "@element-plus/icons-vue";
 import ExamPaper from "@/components/ExamPaper.vue";
 import { teacherService, studentService } from "@/services/api.js";
@@ -355,11 +414,11 @@ const submissions = ref([]);
 const selectedSubmission = ref(null);
 const tableLoading = ref(false);
 const batchReviewLoading = ref(false);
+const createLoading = ref(false); // 新增：创建作业时的加载状态
 
 // 课程和学生数据
 const courseStudents = ref([]);
-// 使用props中的courseId，而不是硬编码
-// const courseId = ref('1'); // 删除这行
+const chapters = ref([]); // 新增：章节列表
 
 // 手动评阅数据
 const manualReview = ref({
@@ -369,18 +428,20 @@ const manualReview = ref({
 
 // 新作业表单数据
 const newHomework = ref({
+  chapterId: "", // 新增：章节ID
   title: "",
   description: "",
-  deadline: "",
-  maxScore: 100,
+  questionCount: 10, // 新增：题目数量
+  difficultyLevel: "medium", // 新增：难度等级
 });
 
 // 表单验证规则
 const rules = {
+  chapterId: [{ required: true, message: "请选择章节", trigger: "change" }],
   title: [{ required: true, message: "请输入作业标题", trigger: "blur" }],
   description: [{ required: true, message: "请输入作业描述", trigger: "blur" }],
-  deadline: [{ required: true, message: "请选择截止时间", trigger: "change" }],
-  maxScore: [{ required: true, message: "请输入满分", trigger: "blur" }],
+  questionCount: [{ required: true, message: "请输入题目数量", trigger: "blur" }],
+  difficultyLevel: [{ required: true, message: "请选择难度等级", trigger: "change" }],
 };
 
 // 获取课程学生列表
@@ -435,59 +496,66 @@ const fetchAllWork = async () => {
     console.log("章节列表", responseChapter);
     
     if (responseChapter.data && responseChapter.data.data) {
-      const chapters = responseChapter.data.data;
-      let homeworkNumber = 1;
+      chapters.value = responseChapter.data.data;
+      console.log('章节列表:', chapters.value);
       
-      for (const chapter of chapters) {
-        const response = await teacherService.getHomework(props.courseId, chapter.chapterId);
-        console.log("homework", response);
-        
-        if (response.data && response.data.data && response.data.data.length > 0) {
-          const homework = {
-            id: `${props.courseId}-${chapter.chapterId}-${homeworkNumber}`,
-            title: `第${homeworkNumber}次作业`,
-            chapterId: chapter.chapterId,
-            chapterName: chapter.chapterName,
-            questions: [],
-            maxScore: 100,
-            status: "published",
-            createdAt: new Date(),
-            submittedCount: 0,
-            totalStudents: courseStudents.value.length || 0,
-          };
+      // 获取每个章节的作业信息
+      for (const chapter of chapters.value) {
+        try {
+          const response = await teacherService.getHomework(props.courseId, chapter.chapterId);
+          console.log(`章节 ${chapter.chapterName} 的作业:`, response);
           
-          homework.questions = response.data.data.map((item) => {
-            let parsedOptions = [];
-            try {
-              parsedOptions = JSON.parse(item.questionOptions || '[]');
-            } catch (e) {
-              console.warn("选项解析失败:", item.questionOptions);
-              parsedOptions = [];
+          if (response.data && response.data.data && response.data.data.length > 0) {
+            // 检查是否已经存在该章节的作业
+            const existingHomework = homeworkList.value.find(h => h.chapterId === chapter.chapterId);
+            if (!existingHomework) {
+              const homework = {
+                id: `${props.courseId}-${chapter.chapterId}-${Date.now()}`,
+                title: `${chapter.chapterName} - 课堂作业`,
+                chapterId: chapter.chapterId,
+                chapterName: chapter.chapterName,
+                description: `基于${chapter.chapterName}的课堂练习`,
+                questions: response.data.data.map((item) => {
+                  let parsedOptions = [];
+                  try {
+                    parsedOptions = JSON.parse(item.questionOptions || '[]');
+                  } catch (e) {
+                    console.warn("选项解析失败:", item.questionOptions);
+                    parsedOptions = [];
+                  }
+
+                  return {
+                    id: item.questionId,
+                    type: item.questionType,
+                    text: item.questionContent,
+                    options: parsedOptions,
+                    answer: item.correctAnswer ? item.correctAnswer.replace(/"/g, "") : "",
+                    explanation: item.explanation,
+                    difficultyLevel: item.difficultyLevel,
+                    scorePoints: item.scorePoints,
+                    pointName: item.pointName,
+                  };
+                }),
+                maxScore: 100,
+                status: "published",
+                createdAt: new Date(),
+                submittedCount: 0,
+                totalStudents: courseStudents.value.length || 0,
+                questionCount: response.data.data.length,
+                difficultyLevel: "medium"
+              };
+              
+              homeworkList.value.push(homework);
             }
-
-            return {
-              id: item.questionId,
-              type: item.questionType,
-              text: item.questionContent,
-              options: parsedOptions,
-              answer: item.correctAnswer ? item.correctAnswer.replace(/"/g, "") : "",
-              explanation: item.explanation,
-              difficultyLevel: item.difficultyLevel,
-              scorePoints: item.scorePoints,
-              pointName: item.pointName,
-            };
-          });
-
-          if (homework.questions.length > 0) {
-            homeworkNumber++;
-            homeworkList.value.push(homework);
           }
+        } catch (error) {
+          console.warn(`获取章节 ${chapter.chapterName} 作业失败:`, error);
         }
       }
     }
   } catch (error) {
-    console.error("获取作业列表失败:", error);
-    ElMessage.error("获取作业列表失败");
+    console.error("获取章节列表失败:", error);
+    ElMessage.error("获取章节列表失败");
   }
 };
 
@@ -679,25 +747,63 @@ const formatDate = (date) => {
 
 
 
-const createHomework = () => {
-  const homework = {
-    id: homeworkList.value.length + 1,
-    ...newHomework.value,
-    status: "published",
-    createdAt: new Date(),
-    submittedCount: 0,
-    totalStudents: 32,
-  };
-  homeworkList.value.unshift(homework);
-  showCreateDialog.value = false;
-  ElMessage.success("作业创建并发布成功！");
-  // 重置表单
-  newHomework.value = {
-    title: "",
-    description: "",
-    deadline: "",
-    maxScore: 100,
-  };
+const createHomework = async () => {
+  if (!newHomework.value.chapterId || !newHomework.value.title || !newHomework.value.description || !newHomework.value.questionCount || !newHomework.value.difficultyLevel) {
+    ElMessage.warning("请填写所有必填项");
+    return;
+  }
+
+  createLoading.value = true;
+  try {
+    // 构建AI创建作业的内容描述
+    const content = `请为${newHomework.value.title}创建${newHomework.value.questionCount}道题目，难度等级为${newHomework.value.difficultyLevel}。作业要求：${newHomework.value.description}`;
+    
+    const response = await teacherService.teacherCreateTest(
+      content,
+      props.courseId,
+      newHomework.value.chapterId
+    );
+    
+    console.log('智能创建作业成功:', response);
+    if (response.data && response.data.success && response.data.data) {
+      // 创建新的作业对象
+      const newHomeworkData = {
+        id: `${props.courseId}-${newHomework.value.chapterId}-${Date.now()}`,
+        title: newHomework.value.title,
+        chapterId: newHomework.value.chapterId,
+        chapterName: chapters.value.find(c => c.chapterId === newHomework.value.chapterId)?.chapterName || '',
+        description: newHomework.value.description,
+        questions: response.data.data || [],
+        maxScore: 100,
+        status: "published",
+        createdAt: new Date(),
+        submittedCount: 0,
+        totalStudents: courseStudents.value.length || 0,
+        questionCount: newHomework.value.questionCount,
+        difficultyLevel: newHomework.value.difficultyLevel
+      };
+      
+      homeworkList.value.unshift(newHomeworkData);
+      ElMessage.success("作业创建并发布成功！");
+      showCreateDialog.value = false;
+      
+      // 重置表单
+      newHomework.value = {
+        chapterId: "",
+        title: "",
+        description: "",
+        questionCount: 10,
+        difficultyLevel: "medium",
+      };
+    } else {
+      ElMessage.error("作业创建失败");
+    }
+  } catch (error) {
+    console.error('智能创建作业失败:', error);
+    ElMessage.error("作业创建失败，请重试");
+  } finally {
+    createLoading.value = false;
+  }
 };
 
 const viewHomework = (homework) => {
@@ -879,6 +985,25 @@ const saveManualReview = () => {
 const handleClose = () => {
   showCreateDialog.value = false;
 };
+
+// 新增：章节选择变化时触发
+const onChapterChange = () => {
+  // 当章节选择变化时，清空作业标题和描述，并重置题目数量和难度
+  newHomework.value.title = "";
+  newHomework.value.description = "";
+  newHomework.value.questionCount = 10;
+  newHomework.value.difficultyLevel = "medium";
+};
+
+// 获取难度等级文本
+const getDifficultyText = (difficulty) => {
+  const texts = {
+    easy: "简单",
+    medium: "中等",
+    hard: "困难"
+  };
+  return texts[difficulty] || "未知";
+};
 </script>
 
 <style scoped>
@@ -966,6 +1091,17 @@ const handleClose = () => {
 .homework-description {
   margin-bottom: 16px;
   line-height: 1.6;
+}
+
+.homework-description p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
 }
 
 .homework-meta {
@@ -1244,5 +1380,66 @@ const handleClose = () => {
 .text-muted {
   color: #9ca3af;
   font-style: italic;
+}
+
+/* 智能创建作业表单样式 */
+.create-tips {
+  margin-bottom: 20px;
+}
+
+.create-tips .el-alert {
+  margin-bottom: 0;
+}
+
+.create-tips p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+.el-select,
+.el-input-number {
+  width: 100%;
+}
+
+.create-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2d58da 0%, #366de7 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 难度等级标签样式 */
+.difficulty-tag {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.difficulty-easy {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.difficulty-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.difficulty-hard {
+  background: #fee2e2;
+  color: #991b1b;
 }
 </style>

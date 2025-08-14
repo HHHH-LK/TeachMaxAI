@@ -128,6 +128,11 @@ const router = createRouter({
           path: 'student-user-center',
           name: 'student-user-center',
           component: Center
+        },
+        {
+          path: 'game-entry',
+          name: 'GameEntry',
+          component: () => import('@/views/student/game/animation/Entry.vue')
         }
       ]
     },
@@ -178,6 +183,11 @@ const router = createRouter({
       path: "/test",
       name: "test",
       component:  Test
+    },
+    {
+      path: '/student/game',
+      name: 'StudentGame',
+      component: () => import('@/views/student/game/Game.vue')
     },
     {
       path: '/game',

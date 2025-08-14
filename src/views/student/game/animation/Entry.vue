@@ -24,11 +24,20 @@
             transform: `rotate(${snowflake.rotation}deg) scale(${snowflake.scale})`,
             animationDuration: snowflake.duration + 's'
           }"
-        >❄</div>
+        >❄
+        </div>
       </div>
     </div>
 
     <div class="ui-overlay">
+      <!-- 退出按钮 -->
+      <div class="exit-button-container">
+        <button @click="exitAnimation" class="exit-btn">
+          <span class="exit-icon">✕</span>
+          <span class="exit-text">退出</span>
+        </button>
+      </div>
+
       <!-- 加载进度条 -->
       <div class="loading-progress" v-if="isLoading">
         <div class="progress-bar" :class="{ 'completed': loadingProgress >= 100 }">
@@ -44,34 +53,45 @@
         <p>{{ loadError }}</p>
         <button @click="retryLoad" class="retry-btn">重试</button>
       </div>
+
+      <!-- 游戏进入提示 -->
+      <div class="game-entry-hint" v-if="showGameHint" @click="enterGame">
+        <div class="hint-content">
+          <p class="hint-text">敲击空格进入游戏</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import {ref, onMounted, onBeforeUnmount} from 'vue'
-import img1 from './assets/远眺.gif'
-import img2 from './assets/初涉.gif'
-import img3 from './assets/摸索.gif'
-import img4 from './assets/临近.gif'
-import img5 from './assets/总塔.gif'
+import { useRouter } from 'vue-router'
+import img1 from '../assets/远眺.gif'
+import img2 from '../assets/初涉.gif'
+import img3 from '../assets/摸索.gif'
+import img4 from '../assets/临近.gif'
+import img5 from '../assets/总塔.gif'
 
 export default {
   name: 'GameTransitionAnimation',
   setup() {
+    const router = useRouter()
     const isLoading = ref(true)
     const loadingProgress = ref(0)
     const loadError = ref('')
     const currentScene = ref(0)
     const loadedGifs = ref(0)
     const snowflakes = ref([])
+    const showGameHint = ref(false)
+    const cycleCount = ref(0)
 
     const gifList = [
-      { src: img1, name: '远眺' },
-      { src: img2, name: '初涉' },
-      { src: img3, name: '摸索' },
-      { src: img4, name: '临近' },
-      { src: img5, name: '总塔' }
+      {src: img1, name: '远眺'},
+      {src: img2, name: '初涉'},
+      {src: img3, name: '摸索'},
+      {src: img4, name: '临近'},
+      {src: img5, name: '总塔'}
     ]
 
     let transitionTimer = null
@@ -105,7 +125,7 @@ export default {
             loadError.value = '部分GIF资源加载失败，但可以继续播放'
           }
           startTransition()
-        }, 1000) // 延迟1秒，让用户看到100%进度
+        }, 1000) // 延迟0.5秒，让用户看到100%进度
       }
     }
 
@@ -113,14 +133,14 @@ export default {
       // 显示第一张图片
       currentScene.value = 0
 
-      // 开始自动转场
+      // 启动雪花效果
+      startSnowEffect()
+
+      // 立即开始自动转场，第一张GIF从0秒开始计时
       sceneTimer = setInterval(() => {
         const nextScene = (currentScene.value + 1) % gifList.length
         performDramaticTransition(nextScene)
       }, 5000) // 每5秒切换一次
-
-      // 启动雪花效果
-      startSnowEffect()
     }
 
     // 执行优雅转场
@@ -131,6 +151,17 @@ export default {
       // 延迟切换场景，让特效先播放
       setTimeout(() => {
         currentScene.value = nextScene
+
+        // 检查是否完成一个完整循环
+        if (nextScene === 0) {
+          cycleCount.value++
+
+          // 完成一个完整循环后显示游戏提示
+          if (cycleCount.value >= 1) {
+            showGameHint.value = true
+            console.log('游戏提示已显示，可以按空格键或点击进入游戏')
+          }
+        }
       }, 500)
     }
 
@@ -148,7 +179,6 @@ export default {
       // 缩放和模糊效果
       createScaleAndBlurEffect()
     }
-
 
 
     // 粒子效果
@@ -330,6 +360,60 @@ export default {
       })
     }
 
+    // 处理键盘事件
+    const handleKeyDown = (event) => {
+      if (event.code === 'Space') {
+        event.preventDefault() // 阻止空格键的默认行为
+        
+        // 如果游戏提示已显示，直接进入游戏
+        if (showGameHint.value) {
+          console.log('空格键触发，游戏提示已显示，进入游戏')
+          enterGame()
+        } else {
+          // 如果游戏提示未显示，强制显示并进入游戏
+          console.log('空格键触发，游戏提示未显示，强制显示并进入游戏')
+          showGameHint.value = true
+          // 延迟一点进入游戏，让用户看到提示
+          setTimeout(() => {
+            enterGame()
+          }, 300)
+        }
+      }
+    }
+
+    // 进入游戏
+    const enterGame = () => {
+      console.log('进入游戏！')
+      
+      try {
+        // 跳转到全屏游戏页面
+        router.push('/student/game')
+        console.log('路由跳转成功')
+      } catch (error) {
+        console.error('路由跳转失败:', error)
+        // 如果路由跳转失败，尝试其他方式
+        window.location.href = '/student/game'
+      }
+      
+      // 隐藏游戏提示
+      showGameHint.value = false
+    }
+
+    // 退出动画
+    const exitAnimation = () => {
+      console.log('退出动画')
+      
+      try {
+        // 返回到学生端主界面
+        router.push('/student/course-selection')
+        console.log('退出成功')
+      } catch (error) {
+        console.error('退出失败:', error)
+        // 如果路由跳转失败，尝试其他方式
+        window.location.href = '/student/course-selection'
+      }
+    }
+
     const retryLoad = () => {
       loadError.value = ''
       isLoading.value = true
@@ -357,6 +441,9 @@ export default {
 
       // 监听窗口大小变化，重新调整雪花位置
       window.addEventListener('resize', handleResize)
+
+      // 监听键盘事件，处理空格键进入游戏
+      window.addEventListener('keydown', handleKeyDown)
     })
 
     onBeforeUnmount(() => {
@@ -372,6 +459,9 @@ export default {
 
       // 移除窗口大小监听器
       window.removeEventListener('resize', handleResize)
+
+      // 移除键盘事件监听器
+      window.removeEventListener('keydown', handleKeyDown)
     })
 
     return {
@@ -381,9 +471,11 @@ export default {
       currentScene,
       gifList,
       snowflakes,
+      showGameHint,
       retryLoad,
       onGifLoad,
-      onGifError
+      onGifError,
+      exitAnimation
     }
   }
 }
@@ -475,6 +567,52 @@ export default {
   z-index: 10;
 }
 
+/* 退出按钮样式 */
+.exit-button-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 11;
+  pointer-events: auto;
+}
+
+.exit-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.exit-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+}
+
+.exit-btn:active {
+  transform: translateY(0);
+}
+
+.exit-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.exit-text {
+  font-size: 14px;
+}
+
 .loading-progress {
   text-align: center;
   color: #ffffff;
@@ -564,6 +702,58 @@ export default {
   transform: translateY(0);
 }
 
+/* 游戏进入提示样式 */
+.game-entry-hint {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: auto;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.6), transparent);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 10000;
+  animation: hintSlideUp 0.6s ease-out;
+  padding: 40px 20px 60px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.game-entry-hint:hover {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.8), transparent);
+  transform: translateY(-5px);
+}
+
+.hint-content {
+  text-align: center;
+  color: white;
+  padding: 20px 30px;
+}
+
+.hint-text {
+  font-size: 20px;
+  margin: 0;
+  color: #ffffff;
+  font-weight: 300;
+  letter-spacing: 2px;
+  line-height: 1.5;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+
+@keyframes hintSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 @keyframes progressShimmer {
   0% {
     background-position: -200% 0;
@@ -622,6 +812,39 @@ export default {
   /* 移动端特效优化 */
   .screen-split-bar {
     height: 1px;
+  }
+
+  /* 移动端退出按钮优化 */
+  .exit-button-container {
+    top: 15px;
+    left: 15px;
+  }
+
+  .exit-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .exit-icon {
+    font-size: 14px;
+  }
+
+  .exit-text {
+    font-size: 12px;
+  }
+
+  /* 移动端游戏提示优化 */
+  .game-entry-hint {
+    padding: 25px 15px 50px 15px;
+  }
+
+  .hint-content {
+    padding: 15px 25px;
+  }
+
+  .hint-text {
+    font-size: 18px;
+    letter-spacing: 1px;
   }
 }
 

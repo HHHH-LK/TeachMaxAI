@@ -2,136 +2,136 @@
   <div class="transition-container">
     <!-- 背景层 -->
     <div class="background-layer">
-      <img src="./student/game/img/背景2.png" alt="背景" class="background-image background-1" :class="{ 'active': currentBackground === 1 }" />
-      <img src="./student/game/img/背景3.png" alt="背景" class="background-image background-2" :class="{ 'active': currentBackground === 2 }" />
-      <img src="./student/game/img/背景1.png" alt="背景" class="background-image background-3" :class="{ 'active': currentBackground === 3 }" />
+      <img src="../img/背景2.png" alt="背景" class="background-image background-1" :class="{ 'active': currentBackground === 1 }" />
+      <img src="../img/背景3.png" alt="背景" class="background-image background-2" :class="{ 'active': currentBackground === 2 }" />
+      <img src="../img/背景1.png" alt="背景" class="background-image background-3" :class="{ 'active': currentBackground === 3 }" />
     </div>
-    
+
     <!-- 内容图片层 -->
     <div class="content-layer">
       <!-- 第一张图片 -->
-      <img 
-        src="./student/game/img/总塔（主体）.png"
-        alt="图片1" 
-        class="content-image image-1" 
-        :class="{ 'active': currentImage === 1 }"
+      <img
+          src="../img/总塔（主体）.png"
+          alt="图片1"
+          class="content-image image-1"
+          :class="{ 'active': currentImage === 1 }"
       />
-      
+
       <!-- 第二张图片 -->
-      <img 
-        src="./student/game/img/门口（无水印）.png"
-        alt="图片2" 
-        class="content-image image-2"
-        :class="{ 'active': currentImage === 2 }"
+      <img
+          src="../img/门口（无水印）.png"
+          alt="图片2"
+          class="content-image image-2"
+          :class="{ 'active': currentImage === 2 }"
       />
-      
+
       <!-- 第三张图片 -->
-      <img 
-        src="./student/game/img/1.png"
-        alt="图片3" 
-        class="content-image image-3"
-        :class="{ 'active': currentImage === 3 }"
+      <img
+          src="../img/1.png"
+          alt="图片3"
+          class="content-image image-3"
+          :class="{ 'active': currentImage === 3 }"
       />
-      
+
       <!-- 第四张图片 -->
-      <img 
-        src="./student/game/img/3（塔）.png"
-        alt="图片4" 
-        class="content-image image-4"
-        :class="{ 'active': currentImage === 4 }"
+      <img
+          src="../img/3（塔）.png"
+          alt="图片4"
+          class="content-image image-4"
+          :class="{ 'active': currentImage === 4 }"
       />
-      
+
       <!-- 第五张图片 -->
-      <img 
-        src="./student/game/img/2.png"
-        alt="图片5" 
-        class="content-image image-5"
-        :class="{ 'active': currentImage === 5 }"
+      <img
+          src="../img/2.png"
+          alt="图片5"
+          class="content-image image-5"
+          :class="{ 'active': currentImage === 5 }"
       />
-      
+
       <!-- 第二轮图片 -->
       <!-- 第六张图片 -->
-      <img 
-        src="./student/game/img/楼梯（无水印）.png"
-        alt="图片6" 
-        class="content-image image-6"
-        :class="{ 'active': currentImage === 6 }"
+      <img
+          src="../img/楼梯（无水印）.png"
+          alt="图片6"
+          class="content-image image-6"
+          :class="{ 'active': currentImage === 6 }"
       />
-      
+
       <!-- 第七张图片 -->
-      <img 
-        src="./student/game/img/柱（无水印）.png"
-        alt="图片7" 
-        class="content-image image-7"
-        :class="{ 'active': currentImage === 7 }"
+      <img
+          src="../img/柱（无水印）.png"
+          alt="图片7"
+          class="content-image image-7"
+          :class="{ 'active': currentImage === 7 }"
       />
-      
+
       <!-- 第八张图片 -->
-      <img 
-        src="./student/game/img/标靶（无水印）.png"
-        alt="图片8" 
-        class="content-image image-8"
-        :class="{ 'active': currentImage === 8 }"
+      <img
+          src="../img/标靶（无水印）.png"
+          alt="图片8"
+          class="content-image image-8"
+          :class="{ 'active': currentImage === 8 }"
       />
-      
+
       <!-- 第九张图片 -->
-      <img 
-        src="./student/game/img/宝剑（主体）.png"
-        alt="图片9" 
-        class="content-image image-9"
-        :class="{ 'active': currentImage === 9 }"
+      <img
+          src="../img/宝剑（主体）.png"
+          alt="图片9"
+          class="content-image image-9"
+          :class="{ 'active': currentImage === 9 }"
       />
-      
+
       <!-- 第十张图片 -->
-      <img 
-        src="./student/game/img/楼阁（无水印）.png"
-        alt="图片10" 
-        class="content-image image-10"
-        :class="{ 'active': currentImage === 10 }"
+      <img
+          src="../img/楼阁（无水印）.png"
+          alt="图片10"
+          class="content-image image-10"
+          :class="{ 'active': currentImage === 10 }"
       />
-      
+
       <!-- 第三轮图片 -->
       <!-- 第十一张图片 -->
-      <img 
-        src="./student/game/img/窗（无水印）.png"
-        alt="图片11" 
-        class="content-image image-11"
-        :class="{ 'active': currentImage === 11 }"
+      <img
+          src="../img/窗（无水印）.png"
+          alt="图片11"
+          class="content-image image-11"
+          :class="{ 'active': currentImage === 11 }"
       />
-      
+
       <!-- 第十二张图片 -->
-      <img 
-        src="./student/game/img/天花板（无水印）.png"
-        alt="图片12" 
-        class="content-image image-12"
-        :class="{ 'active': currentImage === 12 }"
+      <img
+          src="../img/天花板（无水印）.png"
+          alt="图片12"
+          class="content-image image-12"
+          :class="{ 'active': currentImage === 12 }"
       />
-      
+
       <!-- 第十三张图片 -->
-      <img 
-        src="./student/game/img/龙（主体）.png"
-        alt="图片13" 
-        class="content-image image-13"
-        :class="{ 'active': currentImage === 13 }"
+      <img
+          src="../img/龙（主体）.png"
+          alt="图片13"
+          class="content-image image-13"
+          :class="{ 'active': currentImage === 13 }"
       />
-      
+
       <!-- 第十四张图片 -->
-      <img 
-        src="./student/game/img/宝剑（无主体）.png"
-        alt="图片14" 
-        class="content-image image-14"
-        :class="{ 'active': currentImage === 14 }"
+      <img
+          src="../img/宝剑（无主体）.png"
+          alt="图片14"
+          class="content-image image-14"
+          :class="{ 'active': currentImage === 14 }"
       />
-      
+
       <!-- 第十五张图片 -->
-      <img 
-        src="./student/game/img/总塔（无水印）.png"
-        alt="图片15" 
-        class="content-image image-15"
-        :class="{ 'active': currentImage === 15 }"
+      <img
+          src="../img/总塔（无水印）.png"
+          alt="图片15"
+          class="content-image image-15"
+          :class="{ 'active': currentImage === 15 }"
       />
     </div>
-    
+
     <!-- 文字展示区域 -->
     <div class="text-display">
       <div class="text-container">
@@ -181,30 +181,30 @@ let transitionTimer = null
 const startTransition = () => {
   isTransitioning.value = true
   currentImage.value = 1
-  
+
   // 开始显示文字
   startTextDisplay()
-  
+
   // 第一张图片显示
   setTimeout(() => {
     currentImage.value = 2
   }, 4000)
-  
+
   // 第二张图片显示
   setTimeout(() => {
     currentImage.value = 3
   }, 8000)
-  
+
   // 第三张图片显示
   setTimeout(() => {
     currentImage.value = 4
   }, 12000)
-  
+
   // 第四张图片显示
   setTimeout(() => {
     currentImage.value = 5
   }, 16000)
-  
+
   // 第五张图片显示
   setTimeout(() => {
     // 第一轮结束，开始第二轮
@@ -217,52 +217,52 @@ const startTransition = () => {
 // 开始文字显示
 const startTextDisplay = () => {
   currentTextIndex.value = -1
-  
+
   // 第一段文字
   setTimeout(() => {
     currentTextIndex.value = 0
   }, 2000)
-  
+
   // 第二段文字（隐藏第一段）
   setTimeout(() => {
     currentTextIndex.value = 1
   }, 6000)
-  
+
   // 第三段文字（隐藏第二段）
   setTimeout(() => {
     currentTextIndex.value = 2
   }, 10000)
-  
+
   // 第四段文字（隐藏第三段）
   setTimeout(() => {
     currentTextIndex.value = 3
   }, 14000)
-  
+
   // 第五段文字（隐藏第四段）
   setTimeout(() => {
     currentTextIndex.value = 4
   }, 18000)
-  
+
   // 第六段文字（隐藏第五段）
   setTimeout(() => {
     currentTextIndex.value = 5
   }, 22000)
-  
+
   // 第七段文字（隐藏第六段）
   setTimeout(() => {
     currentTextIndex.value = 6
   }, 26000)
-  
+
   // 第八段文字（隐藏第七段）
   setTimeout(() => {
     currentTextIndex.value = 7
   }, 30000)
-  
+
   // 第九段文字（隐藏第八段）
   setTimeout(() => {
     currentTextIndex.value = 8
   }, 34000)
-  
+
   // 最后隐藏所有文字
   setTimeout(() => {
     currentTextIndex.value = -1
@@ -274,27 +274,27 @@ const startSecondRound = () => {
   // 切换背景到背景3
   currentBackground.value = 2
   currentImage.value = 6
-  
+
   // 第六张图片显示
   setTimeout(() => {
     currentImage.value = 7
   }, 4000)
-  
+
   // 第七张图片显示
   setTimeout(() => {
     currentImage.value = 8
   }, 8000)
-  
+
   // 第八张图片显示
   setTimeout(() => {
     currentImage.value = 9
   }, 12000)
-  
+
   // 第九张图片显示
   setTimeout(() => {
     currentImage.value = 10
   }, 16000)
-  
+
   // 第十张图片显示
   setTimeout(() => {
     // 第二轮结束，开始第三轮
@@ -309,27 +309,27 @@ const startThirdRound = () => {
   // 切换背景到背景1
   currentBackground.value = 3
   currentImage.value = 11
-  
+
   // 第十一张图片显示
   setTimeout(() => {
     currentImage.value = 12
   }, 4000)
-  
+
   // 第十二张图片显示
   setTimeout(() => {
     currentImage.value = 13
   }, 8000)
-  
+
   // 第十三张图片显示
   setTimeout(() => {
     currentImage.value = 14
   }, 12000)
-  
+
   // 第十四张图片显示
   setTimeout(() => {
     currentImage.value = 15
   }, 16000)
-  
+
   // 第十五张图片显示
   setTimeout(() => {
     setTimeout(() => {
@@ -476,11 +476,11 @@ onUnmounted(() => {
     width: 90%;
     bottom: 50px;
   }
-  
+
   .text-container {
     min-height: 100px;
   }
-  
+
   .story-text {
     font-size: 20px;
     line-height: 1.5;

@@ -1,11 +1,5 @@
 <template>
   <div class="game-container">
-    <!-- 开始闯关按钮 -->
-<!--    <StartButton-->
-<!--      :game-started="gameStarted"-->
-<!--      @start-game="startGame"-->
-<!--    />-->
-
     <!-- 退出游戏按钮 -->
     <ExitButton @exit-game="exitGame" />
 
@@ -47,6 +41,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import StartButton from './home/StartButton.vue';
 import ExitButton from './home/ExitButton.vue';
 import ProfileCenter from './home/ProfileCenter.vue';
@@ -60,6 +55,13 @@ import InventoryModal from './home/InventoryModal.vue';
 import img1 from './assets/攻击道具（无背景）.png';
 import img2 from './assets/防御道具（无背景）.png';
 import img3 from './assets/回血道具（无背景）.png';
+import img4 from './assets/护符.png';
+import img5 from './assets/斗篷.png';
+import img6 from './assets/斧头.png';
+import img7 from './assets/生命源泉.png';
+import img8 from './assets/靴子.png';
+
+const router = useRouter();
 
 // 响应式状态
 const gameStarted = ref(false);
@@ -106,6 +108,46 @@ const items = reactive([
     heal: 100,
     type: 'heal',
     quantity: 5
+  },
+    {
+    name: '生命之泉',
+    image: img7,
+    description: '强效生命恢复药剂',
+    heal: 150,
+    type: 'heal',
+    quantity: 3
+  },
+  {
+    name: '加速靴',
+    image: img8,
+    description: '提升10点移动速度的轻便靴子',
+    assist: 10,
+    type: 'assist',
+    quantity: 2
+  },
+  {
+    name: '魔法护符',
+    image: img4,
+    description: '增强魔法防御的护符',
+    defense: 30,
+    type: 'defense',
+    quantity: 3
+  },
+  {
+    name: '隐身斗篷',
+    image: img5,
+    description: '提供短时间隐身效果的斗篷',
+    assist: 0,
+    type: 'assist',
+    quantity: 3
+  },
+  {
+    name: '雷霆斧',
+    image: img6,
+    description: '具有雷电效果的强力斧头',
+    attack: 70,
+    type: 'attack',
+    quantity: 3
   },
 ]);
 
@@ -264,8 +306,8 @@ const confirmExit = () => {
     // 清理资源
     cleanup();
 
-    // 暂时不做处理逻辑
-    // router.go(-1);
+    // 返回到学生端主界面
+    router.push('/student/course-selection');
   } catch (error) {
     console.error('确认退出失败:', error);
     handleError(error);

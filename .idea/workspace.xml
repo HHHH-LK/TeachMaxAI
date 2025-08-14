@@ -4,26 +4,43 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="解耦合教师分配功能，增删改查知识点等">
+    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="更新动画">
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/animation/tower.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/护符.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/斗篷.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/斧头.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/生命源泉.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/assets/靴子.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/3（塔）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/天花板（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/宝剑（主体）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/宝剑（无主体）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/总塔（主体）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/总塔（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/柱（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/标靶（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/楼梯（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/楼阁（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/窗（主体）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/窗（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/背景1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/背景2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/背景3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/门口（无水印）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/顶珠（主体）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/龙（主体）.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/student/game/img/龙（无主体）.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/ChapterManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/ChapterManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseCard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseGrid.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseGrid.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/KnowledgePointManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/KnowledgePointManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/router/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/StudentView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/StudentView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/chatView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/chatView.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/student/game/Game.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/Game.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/Backpack.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/Backpack.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/CanvasRenderer.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/CanvasRenderer.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ExitButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ExitButton.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ExitConfirmModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ExitConfirmModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/game/animation/Entry.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/animation/Entry.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/student/game/home/InventoryModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/InventoryModal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/Leaderboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/Leaderboard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ProfileCenter.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ProfileCenter.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/ProfileModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/ProfileModal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/game/home/StartButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/game/home/StartButton.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +93,7 @@
     &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;fronts&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Users/cup1/first/SmartCampus-front/src/views/student/game/img&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -93,12 +111,14 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Users\cup1\first\SmartCampus-front\src\views\student\game\img" />
+      <recent name="D:\Users\cup1\first\SmartCampus-front\src\views\student\game\assets" />
       <recent name="D:\Users\cup\SmartCampus-front\src\views\teacher" />
       <recent name="D:\Users\cup\SmartCampus-front\src\composables" />
       <recent name="D:\Users\cup\SmartCampus-front\src\views" />
-      <recent name="D:\Users\cup\SmartCampus-front\src\components" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\cup1\first\SmartCampus-front\src\views\tower" />
       <recent name="D:\Users\Downloads\SmartCampus-front\src\components" />
       <recent name="D:\Users\Downloads\SmartCampus-front\src\components\student\knowledge" />
       <recent name="D:\Users\Downloads\SmartCampus-front\src\views\student\knowledge-base" />
@@ -183,7 +203,11 @@
       <workItem from="1754616358349" duration="651000" />
       <workItem from="1754617022102" duration="2120000" />
       <workItem from="1754991483825" duration="313000" />
-      <workItem from="1754996791170" duration="3686000" />
+      <workItem from="1754996791170" duration="11816000" />
+      <workItem from="1755045635540" duration="11276000" />
+      <workItem from="1755065094778" duration="2805000" />
+      <workItem from="1755069339596" duration="19988000" />
+      <workItem from="1755134716378" duration="668000" />
     </task>
     <task id="LOCAL-00001" summary="解耦合教师分配功能，增删改查知识点等">
       <option name="closed" value="true" />
@@ -193,15 +217,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754968173663</updated>
     </task>
-    <task id="LOCAL-00002" summary="大体完整的代码">
+    <task id="LOCAL-00002" summary="game中添加选择tower，调试智能课程接口并增加部分功能">
       <option name="closed" value="true" />
-      <created>1754619648011</created>
+      <created>1755003348353</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1754619648011</updated>
+      <updated>1755003348353</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00003" summary="实现进入游戏动画">
+      <option name="closed" value="true" />
+      <created>1755071121872</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1755071121872</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -212,7 +244,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="fronts" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -223,6 +267,9 @@
     <MESSAGE value="大体完整的代码" />
     <MESSAGE value="游戏页面设计" />
     <MESSAGE value="解耦合教师分配功能，增删改查知识点等" />
-    <option name="LAST_COMMIT_MESSAGE" value="解耦合教师分配功能，增删改查知识点等" />
+    <MESSAGE value="game中添加选择tower，调试智能课程接口并增加部分功能" />
+    <MESSAGE value="实现进入游戏动画" />
+    <MESSAGE value="更新动画" />
+    <option name="LAST_COMMIT_MESSAGE" value="更新动画" />
   </component>
 </project>
