@@ -4,26 +4,31 @@
       <div class="course-header">
         <h1>全部课程</h1>
       </div>
-      <div class="course-list">
-        <div
-          v-for="(course, index) in paginatedCourses"
-          :key="course.id"
-          class="course-card-wrapper"
-          :data-index="index"
-          @mousemove="handleMouseMove($event, index)"
-          @mouseenter="handleMouseEnter(index)"
-          @mouseleave="handleMouseLeave(index)"
-        >
-          <div class="course-card" :class="cardClasses(index)">
-            <div class="card-content">
-              <h3>{{ course.name }}</h3>
-              <p>教师：{{ course.teacher }}</p>
-              <p>学期：{{ course.credits }}</p>
-              <div class="button">
-                <select-button
-                  :isSelected="course.selected"
-                  @click="selectCourse(course)"
-                />
+      <div v-if="courses.length === 0" class="no-courses-info">
+        <p>暂无课程信息</p>
+      </div>
+      <div v-else>
+        <div class="course-list">
+          <div
+            v-for="(course, index) in paginatedCourses"
+            :key="course.id"
+            class="course-card-wrapper"
+            :data-index="index"
+            @mousemove="handleMouseMove($event, index)"
+            @mouseenter="handleMouseEnter(index)"
+            @mouseleave="handleMouseLeave(index)"
+          >
+            <div class="course-card" :class="cardClasses(index)">
+              <div class="card-content">
+                <h3>{{ course.name }}</h3>
+                <p>教师：{{ course.teacher }}</p>
+                <p>学期：{{ course.credits }}</p>
+                <div class="button">
+                  <select-button
+                    :isSelected="course.selected"
+                    @click="selectCourse(course)"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -43,7 +48,11 @@
         <p>暂无已选课程</p>
       </div>
       <ul v-else>
-        <li v-for="course in selectedCourses" :key="course.id" class="selected-course-item">
+        <li
+          v-for="course in selectedCourses"
+          :key="course.id"
+          class="selected-course-item"
+        >
           <div class="course-info">
             <span class="course-name">{{ course.name }}</span>
             <span class="course-teacher">- {{ course.teacher }}</span>
@@ -171,13 +180,13 @@ const selectCourse = async (course) => {
 const unselectCourse = async (course) => {
   try {
     const response = await studentService.unselectCourse(course.id);
-    console.log(response)
+    console.log(response);
 
     if (response.data.success) {
       // 更新前端状态
       course.selected = false;
       // 从已选课程列表中移除
-      const index = selectedCourses.value.findIndex(c => c.id === course.id);
+      const index = selectedCourses.value.findIndex((c) => c.id === course.id);
       if (index > -1) {
         selectedCourses.value.splice(index, 1);
       }
@@ -200,15 +209,20 @@ const fetchCourses = async () => {
     const allCourse = [];
     // console.log(response.data);
     if (response.data) {
-      courses.value = response.data.data.map((item) => ({
-        id: item.courseId,
-        name: item.courseName,
-        teacher: item.teacher.user.realName,
-        credits: item.semester,
-        selected: false,
-      }));
+      courses.value = response.data.data.reduce((acc, item) => {
+        // 检查教师名称是否有效
+        if (item.teacher?.user?.realName != null) {
+          acc.push({
+            id: item.courseId,
+            name: item.courseName,
+            teacher: item.teacher.user.realName,
+            credits: item.semester,
+            selected: false,
+          });
+        }
+        return acc;
+      }, []);
     }
-
     const responseSelect = await studentService.getOwnCourses();
     if (responseSelect.data) {
       const selectedCourseIds = new Set(
@@ -220,8 +234,8 @@ const fetchCourses = async () => {
       selectedCourses.value = responseSelect.data.data.map((item) => ({
         id: item.courseId || item.id,
         name: item.courseName,
-        teacher: item.teacherName
-      }))
+        teacher: item.teacherName,
+      }));
 
       // 遍历并更新courses的选中状态
       courses.value = courses.value.map((course) => ({
@@ -264,6 +278,23 @@ onMounted(() => {
 @radius-md: 12px;
 @radius-lg: 16px;
 @transition: all 0.3s ease;
+
+/* 暂无课程信息样式 */
+.no-courses-info {
+  text-align: center;
+  padding: 60px 20px;
+  color: @text-secondary;
+  font-size: 1.2rem;
+  background-color: @bg-white;
+  border-radius: @radius-md;
+  box-shadow: @shadow-sm;
+  margin: 20px 0;
+}
+
+.no-courses-info p {
+  margin: 0;
+  font-weight: 500;
+}
 
 .disabled {
   opacity: 0.6;
@@ -374,7 +405,11 @@ onMounted(() => {
 }
 
 .container--special {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.15));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1),
+    rgba(37, 99, 235, 0.15)
+  );
 }
 
 .container--active {

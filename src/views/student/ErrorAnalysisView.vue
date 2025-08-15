@@ -770,7 +770,9 @@ onMounted(async () => {
   const responseAvr = await studentService.getAverageErrorRate();
   if (responseAvr.data) {
     averageErrorRate.value = responseAvr.data.data;
-  }
+  }  
+
+  if(averageErrorRate.value == "NaN") averageErrorRate.value = 0;
   console.log("responseAvr" + averageErrorRate.value);
 
   updateStats();
