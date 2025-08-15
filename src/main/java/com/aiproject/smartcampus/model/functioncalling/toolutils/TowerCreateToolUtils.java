@@ -9,6 +9,7 @@ import com.aiproject.smartcampus.pojo.vo.KnowledgePointVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ import static com.aiproject.smartcampus.commons.utils.JsonUtils.parseRelationsFr
 
 /**
  * @program: TeacherMaxAI
- * @description: agent智能创建塔
+ * @description: agent智能创建塔（优化版-修复背景生成）
  * @author: lk_hhh
  * @create: 2025-08-07 17:10
  **/
@@ -49,612 +51,500 @@ public class TowerCreateToolUtils {
     private final RedisSort redisSort;
     private final BossMapper bossMapper;
 
+    // 测试期建议 true：等待故事生成完成再返回，便于立即在DB看到描述
+    private static final boolean WAIT_STORY_COMPLETION = false;
+    private static final int MAX_POINTS_PER_FLOOR = 3;
 
-    private ExecutorService STORY_BACKGROUND_CREATE_EXECUTOR = Executors.newFixedThreadPool(5);
-    private Map<String, KnowledgePointNode> POINTNAME_TO_NODE_MAP = new ConcurrentHashMap<>();
-    private Map<KnowledgePointNode, List<KnowledgePointNode>> KNOWLEDGE_POINT_NODE_MAP = new ConcurrentHashMap<>();
-    private Map<KnowledgePointNode, Integer> INDEGREE_MAP = new HashMap<>();
-    private Map<String, Tower> COURSE_TOWER_MAP = new HashMap<>();
+    // 背景故事线程池（命名，非守护线程）
+    private final ExecutorService STORY_BACKGROUND_CREATE_EXECUTOR = new ThreadPoolExecutor(
+            20, 20,
+            60L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(200),
+            r -> {
+                Thread t = new Thread(r);
+                t.setName("tower-story-exec-" + UUID.randomUUID());
+                t.setDaemon(false);
+                return t;
+            },
+            new ThreadPoolExecutor.CallerRunsPolicy()
+    );
 
+    @PreDestroy
+    public void shutdown() {
+        STORY_BACKGROUND_CREATE_EXECUTOR.shutdown();
+    }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class KnowledgePointNode {
-
         String pointId;
         String pointName;
         String description;
         String difficultyLevel;
         Double accuracyRate;
-
+        Set<String> parents = new HashSet<>();
+        Set<String> children = new HashSet<>();
     }
 
     public Boolean createTowerByStudentIdAndCourseId(String studentId, String courseId) {
-
-        //查询该学生课程中的所有知识点
-        List<KnowledgePointVO> studentKnowledgePointVOS = knowledgePointMapper.getCourseKnowledgePoints(Integer.valueOf(courseId));
-
-        //获取所有知识点的名字
-        List<String> pointNameList = studentKnowledgePointVOS.stream().map(a -> a.getPointName()).toList();
-        log.info("知识点名字列表：{}", pointNameList.toString());
-
-        //获取所有pointId并获取所有知识点的通过率
-        List<String> pointIdList = studentKnowledgePointVOS.stream().map(a -> String.valueOf(a.getPointId())).toList();
-        List<SimpleKnowledgeAnalysisBO> simpleKnowledgeAnalysis = knowledgePointMapper.getSimpleKnowledgeAnalysis(pointIdList, studentId);
-
-        //获取知识点id对应的通过率
-        Map<Integer, Double> POINT_ACCURACYRATE_MAP = simpleKnowledgeAnalysis.stream().sorted((a, b) -> a.getAccuracyRate().compareTo(b.getAccuracyRate())).collect(Collectors.toMap(SimpleKnowledgeAnalysisBO::getPointId, SimpleKnowledgeAnalysisBO::getAccuracyRate, (v1, v2) -> (v1 + v2) / 2, LinkedHashMap::new));
-
-        //初始化知识图谱节点
-        initializationKnowledgeGraph(simpleKnowledgeAnalysis);
-
-        //创建对应课程学科的知识图谱
-        createKnowledgeGraph(pointNameList);
-
-        //初始化塔层与塔层相关信息
-        createTowerDefault(studentId, courseId);
-
-        return true;
-
-    }
-
-    /**
-     * 知识图谱节点初始化
-     */
-    private void initializationKnowledgeGraph(List<SimpleKnowledgeAnalysisBO> simpleKnowledgeAnalysis) {
-
-        simpleKnowledgeAnalysis.stream().forEach(a -> {
-            //创建节点
-            KnowledgePointNode knowledgePointNode = new KnowledgePointNode();
-            String pointName = a.getPointName();
-            knowledgePointNode.setPointId(String.valueOf(a.getPointId()));
-            knowledgePointNode.setPointName(pointName);
-            knowledgePointNode.setDescription(a.getDescription());
-            knowledgePointNode.setDifficultyLevel(a.getDifficultyLevel());
-            knowledgePointNode.setAccuracyRate(a.getAccuracyRate());
-
-            //添加节点映射
-            POINTNAME_TO_NODE_MAP.put(pointName, knowledgePointNode);
-            //添加知识图谱节点初始化
-            KNOWLEDGE_POINT_NODE_MAP.put(knowledgePointNode, new ArrayList<>());
-
-        });
-
-    }
-
-    /**
-     * 创建初始固定塔层（初始值默认拓扑排序后的层数）
-     */
-    private void createTowerDefault(String studentId, String courseId) {
-
-        //获取每层知识点的结果
-        Map<Integer, List<Integer>> TOWER_FLOOR_POINTS_MAP = getTowerFloorPointIds();
-
-        Tower towerInfo = getTowerInfo(TOWER_FLOOR_POINTS_MAP.size(), courseId, studentId);
-
-        //初始化主塔
-        initTowerToDB(towerInfo, courseId, studentId);
-
-        //初始化塔层
-        initTowerFloorToDB(towerInfo, TOWER_FLOOR_POINTS_MAP);
-
-        //初始化每层塔任务
-        initTowerFloorTaskToDB(towerInfo, TOWER_FLOOR_POINTS_MAP);
-
-        //初始化每层怪物
-        initTowerFloorBossToDB(towerInfo);
-
-
-    }
-
-    /**
-     * 为每层添加boss
-     */
-    private void initTowerFloorBossToDB(Tower towerInfo) {
-
-        //获取主塔中所有的塔层
-        Long towerId = towerInfo.getTowerId();
-        LambdaQueryWrapper<TowerFloor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(TowerFloor::getTowerId, towerId);
-        List<TowerFloor> towerFloors = towerFloorMapper.selectList(lambdaQueryWrapper);
-
-        transactionTemplate.execute(status -> {
-            try {
-                //为每层创建boss
-                towerFloors.stream().forEach(floor -> {
-                    Monster monster = new Monster();
-                    String bossName = setBossName(floor.getFloorId());
-                    int bossHp = setBossHp(floor.getFloorNo());
-                    monster.setName(bossName);
-                    monster.setHp(bossHp);
-                    monster.setFloorId(floor.getFloorId());
-
-                    int insert = bossMapper.insert(monster);
-                    if (insert <= 0) {
-                        log.error("boss:[{}]创建失败", bossName);
-                        throw new RuntimeException("<boss>:" + bossName + "创建失败");
-                    }
-
-                    log.info("boss:[{}]<创建成功>", bossName);
-
-                });
-
-                return true;
-            } catch (Exception e) {
-                // 事务回滚
-                status.setRollbackOnly();
+        try {
+            // 1) 课程知识点
+            List<KnowledgePointVO> kpList = knowledgePointMapper.getCourseKnowledgePoints(Integer.valueOf(courseId));
+            if (kpList == null || kpList.isEmpty()) {
+                log.warn("课程 {} 没有知识点，不创建学习塔", courseId);
                 return false;
             }
-        });
+            Map<String, String> idToName = kpList.stream()
+                    .collect(Collectors.toMap(
+                            kp -> String.valueOf(kp.getPointId()),
+                            KnowledgePointVO::getPointName,
+                            (a, b) -> a,
+                            LinkedHashMap::new
+                    ));
+            List<String> pointIds = new ArrayList<>(idToName.keySet());
+            List<String> pointNames = new ArrayList<>(idToName.values());
 
+            List<SimpleKnowledgeAnalysisBO> analysisList = knowledgePointMapper.getSimpleKnowledgeAnalysis(pointIds, studentId);
+            if (analysisList == null) analysisList = Collections.emptyList();
 
-    }
+            // 2) 去状态化图
+            Map<String, KnowledgePointNode> nodesById = new LinkedHashMap<>();
+            Map<String, String> nameToId = new HashMap<>();
 
-    /**
-     * 根据层数计算 Boss 血量
-     * 基础血量：200
-     * 每层递增系数：15%
-     * 每5层阶段Boss血量额外×1.5倍
-     */
-    private int setBossHp(int floorNo) {
-        int baseHp = 200;
-        double growthRate = 0.15;
+            for (SimpleKnowledgeAnalysisBO a : analysisList) {
+                KnowledgePointNode n = new KnowledgePointNode();
+                n.setPointId(String.valueOf(a.getPointId()));
+                n.setPointName(a.getPointName());
+                n.setDescription(a.getDescription());
+                n.setDifficultyLevel(a.getDifficultyLevel());
+                n.setAccuracyRate(a.getAccuracyRate());
+                nodesById.put(n.getPointId(), n);
+                nameToId.put(n.getPointName(), n.getPointId());
+            }
+            for (KnowledgePointVO vo : kpList) {
+                String pid = String.valueOf(vo.getPointId());
+                if (!nodesById.containsKey(pid)) {
+                    KnowledgePointNode n = new KnowledgePointNode();
+                    n.setPointId(pid);
+                    n.setPointName(vo.getPointName());
+                    n.setDescription("");
+                    n.setDifficultyLevel("");
+                    n.setAccuracyRate(null);
+                    nodesById.put(pid, n);
+                    nameToId.putIfAbsent(n.getPointName(), n.getPointId());
+                }
+            }
 
-        int hp = (int) Math.round(baseHp + baseHp * (floorNo * growthRate));
+            // 3) LLM 依赖
+            List<Side> relations = buildKnowledgeRelations(pointNames);
+            log.info("LLM 返回依赖关系条数: {}", relations == null ? 0 : relations.size());
+            if (relations != null) {
+                for (Side side : relations) {
+                    if (side == null || side.getFrom() == null || side.getTo() == null) continue;
+                    String fromName = side.getFrom().trim();
+                    String toName = side.getTo().trim();
+                    String fromId = nameToId.get(fromName);
+                    String toId = nameToId.get(toName);
+                    if (fromId == null || toId == null) {
+                        log.warn("忽略未知知识点依赖: {} -> {}", fromName, toName);
+                        continue;
+                    }
+                    if (fromId.equals(toId)) {
+                        log.warn("忽略自依赖: {} -> {}", fromName, toName);
+                        continue;
+                    }
+                    KnowledgePointNode from = nodesById.get(fromId);
+                    KnowledgePointNode to = nodesById.get(toId);
+                    if (to.getParents().add(fromId)) {
+                        from.getChildren().add(toId);
+                    }
+                }
+            }
 
-        if (floorNo % 5 == 0) {
-            hp = (int) Math.round(hp * 1.5);
+            Map<String, Integer> indegree = new HashMap<>();
+            for (KnowledgePointNode n : nodesById.values()) {
+                indegree.put(n.getPointId(), n.getParents().size());
+            }
+
+            // 4) 分层
+            Map<Integer, List<Integer>> floorToPointIds = buildBalancedFloors(nodesById, indegree, MAX_POINTS_PER_FLOOR);
+            if (floorToPointIds.isEmpty()) {
+                log.warn("拓扑分层为空，启用兜底分层");
+                int i = 1, idx = 0;
+                List<String> allIds = new ArrayList<>(nodesById.keySet());
+                while (idx < allIds.size()) {
+                    List<Integer> group = allIds.subList(idx, Math.min(idx + MAX_POINTS_PER_FLOOR, allIds.size()))
+                            .stream().map(Integer::valueOf).collect(Collectors.toList());
+                    floorToPointIds.put(i++, group);
+                    idx += MAX_POINTS_PER_FLOOR;
+                }
+            }
+
+            // 5) 创建塔
+            int totalFloors = floorToPointIds.size();
+            Tower tower = getTowerInfo(totalFloors, courseId, studentId);
+            insertTower(tower);
+
+            Map<Integer, Long> floorNoToId = initFloorsTasksAndBosses(tower, floorToPointIds);
+
+            // 6) 排行榜初始化
+            redisSort.setStudentMaxFloor(String.valueOf(tower.getTowerId()), studentId, "0");
+            redisSort.setStudentTotalScore(studentId, "0");
+
+            // 7) 生成背景（异步），并使用条件更新，避免主键映射问题
+            CompletableFuture<String> towerDescFuture = CompletableFuture.supplyAsync(() -> {
+                log.info("开始生成主塔故事背景");
+                try {
+                    String desc = generateTowerBackground(tower.getName(), new ArrayList<>(idToName.values()), totalFloors);
+                    if (desc == null || desc.isBlank()) {
+                        desc = "在远古遗迹之巅，知识化作阶梯，探路者循着微光——每一层都是一次理解的突破。";
+                    }
+                    LambdaUpdateWrapper<Tower> uw = new LambdaUpdateWrapper<>();
+                    uw.eq(Tower::getTowerId, tower.getTowerId())
+                            .set(Tower::getDescription, desc);
+                    int update = towerMapper.update(null, uw);
+                    log.info("主塔背景已生成(前80字)：{}", desc.substring(0, Math.min(80, desc.length())));
+                    if (update <= 0) {
+                        log.error("主塔背景更新失败, towerId={}", tower.getTowerId());
+                    }
+                    return desc;
+                } catch (Exception e) {
+                    log.error("生成主塔背景失败", e);
+                    return "";
+                }
+            }, STORY_BACKGROUND_CREATE_EXECUTOR);
+
+            List<CompletableFuture<Void>> floorStoryFutures = new ArrayList<>();
+            for (Map.Entry<Integer, List<Integer>> e : floorToPointIds.entrySet()) {
+                Integer floorNo = e.getKey();
+                List<Integer> pids = e.getValue();
+                List<String> names = pids.stream().map(String::valueOf).map(idToName::get).filter(Objects::nonNull).collect(Collectors.toList());
+                Long floorId = floorNoToId.get(floorNo);
+                if (floorId == null) continue;
+
+                CompletableFuture<Void> f = towerDescFuture.thenAcceptAsync(towerDesc -> {
+                    try {
+                        log.info("开始生成塔层故事背景");
+                        String floorStory = generateFloorBackground(towerDesc, floorNo, names);
+                        if (floorStory == null || floorStory.isBlank()) {
+                            floorStory = "尘封的石壁泛起微光，本层将围绕这些知识展开试炼。";
+                        }
+                        LambdaUpdateWrapper<TowerFloor> uf = new LambdaUpdateWrapper<>();
+                        uf.eq(TowerFloor::getFloorId, floorId)
+                                .set(TowerFloor::getDescription, floorStory);
+                        int update = towerFloorMapper.update(null, uf);
+                        log.info("楼层 {} 背景已生成(前80字)：{}", floorNo, floorStory.substring(0, Math.min(80, floorStory.length())));
+                        if (update <= 0) {
+                            log.error("楼层 {} 背景更新失败, floorId={}", floorNo, floorId);
+                        }
+                    } catch (Exception ex) {
+                        log.error("生成楼层 {} 背景失败", floorNo, ex);
+                    }
+                }, STORY_BACKGROUND_CREATE_EXECUTOR);
+                floorStoryFutures.add(f);
+            }
+
+            if (WAIT_STORY_COMPLETION) {
+                try {
+                    CompletableFuture<Void> allFloors = CompletableFuture.allOf(floorStoryFutures.toArray(new CompletableFuture[0]));
+                    allFloors.get(60, TimeUnit.SECONDS);
+                    log.info("背景故事生成已完成（同步等待）");
+                } catch (Exception ex) {
+                    log.warn("等待背景故事生成超时或异常，任务将继续在后台执行", ex);
+                }
+            }
+
+            log.info("学习塔创建成功, towerId={}, totalFloors={}", tower.getTowerId(), totalFloors);
+            return true;
+        } catch (Exception e) {
+            log.error("创建学习塔失败", e);
+            return false;
         }
-        return hp;
     }
 
-    /**
-     * 为boss设置名字
-     */
-    private String setBossName(Long floorId) {
-
-        return "boss-" + floorId + "号";
-
-    }
-
-    /**
-     * 初始化塔层任务到数据库中
-     */
-    private void initTowerFloorTaskToDB(Tower towerInfo, Map<Integer, List<Integer>> TOWER_FLOOR_POINTS_MAP) {
-
-        //获取主塔中所有的塔层
-        Long towerId = towerInfo.getTowerId();
-        LambdaQueryWrapper<TowerFloor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(TowerFloor::getTowerId, towerId);
-        List<TowerFloor> towerFloors = towerFloorMapper.selectList(lambdaQueryWrapper);
-
+    private void insertTower(Tower tower) {
         transactionTemplate.execute(status -> {
             try {
-                towerFloors.stream().forEach(towerFloor -> {
-                    Long floorId = towerFloor.getFloorId();
-                    Integer floorNo = towerFloor.getFloorNo();
-                    String points = TOWER_FLOOR_POINTS_MAP.get(floorNo).toString();
-                    //计算塔层的经验
-                    Integer towerFloorExp = getTowerFloorExp(floorNo);
-                    //设置塔层的道具的稀有度
-                    Integer towerFloorRarity = getTowerFloorItem(floorNo);
-
-                    Task task = new Task();
-                    task.setFloorId(floorId);
-                    task.setPointIds(points);
-                    //默认数量为1
-                    task.setRewardItemQty(1);
-                    task.setRewardExp(towerFloorExp);
-                    task.setRewardItemRarity(towerFloorRarity);
-
-                    int insert = taskMapper.insert(task);
-                    if (insert <= 0) {
-                        log.error("任务插入失败");
-                        throw new RuntimeException("<任务插入失败>");
-                    }
-
-                    log.info("<任务插入成功>{}", task.toString());
-
-                });
-
+                int insert = towerMapper.insert(tower);
+                if (insert <= 0 || tower.getTowerId() == null) {
+                    throw new RuntimeException("主塔插入失败或未返回主键");
+                }
+                log.info("主塔插入成功, towerId={}", tower.getTowerId());
                 return true;
             } catch (Exception e) {
-                // 事务回滚
                 status.setRollbackOnly();
-                return false;
-
+                throw e;
             }
-
         });
-
     }
 
-    /**
-     * 创建塔层到数据库中(后续可以将智能创建故事情节异步创建)
-     */
-    private void initTowerFloorToDB(Tower towerInfo, Map<Integer, List<Integer>> TOWER_FLOOR_POINTS_MAP) {
+    private Map<Integer, Long> initFloorsTasksAndBosses(Tower tower, Map<Integer, List<Integer>> floorToPointIds) {
+        Map<Integer, Long> floorNoToId = new HashMap<>();
 
-        Long towerId = towerInfo.getTowerId();
-        Integer totalFloors = towerInfo.getTotalFloors();
-
-        //开启事务
         transactionTemplate.execute(status -> {
             try {
-                for (int i = 1; i <= totalFloors; i++) {
-                    //将每个塔的第一层给设置成解锁状态
-                    TowerFloor towerFloor = new TowerFloor();
-                    towerFloor.setTowerId(towerId);
-                    towerFloor.setFloorNo(i);
-                    towerFloor.setIsPass(0);
-                    towerFloor.setUnlocked(i == 1);
-                    int insert = towerFloorMapper.insert(towerFloor);
+                // 插入楼层
+                for (int i = 1; i <= tower.getTotalFloors(); i++) {
+                    TowerFloor floor = new TowerFloor();
+                    floor.setTowerId(tower.getTowerId());
+                    floor.setFloorNo(i);
+                    floor.setIsPass(0);
+                    floor.setUnlocked(i == 1);
+                    int insert = towerFloorMapper.insert(floor);
                     if (insert <= 0) {
-                        log.error("第{}层塔创建失败", i);
                         throw new RuntimeException("第" + i + "层塔创建失败");
                     }
+                    floorNoToId.put(i, floor.getFloorId());
                 }
 
+                // 插入任务
+                for (Map.Entry<Integer, List<Integer>> e : floorToPointIds.entrySet()) {
+                    Integer floorNo = e.getKey();
+                    List<Integer> pids = e.getValue();
+                    Long floorId = floorNoToId.get(floorNo);
+                    if (floorId == null) {
+                        throw new RuntimeException("未找到 floorId, floorNo=" + floorNo);
+                    }
+                    Task task = new Task();
+                    task.setFloorId(floorId);
+                    task.setPointIds(pids.toString()); // 若需要CSV: pids.stream().map(String::valueOf).collect(Collectors.joining(","))
+                    task.setRewardItemQty(1);
+                    task.setRewardExp(getTowerFloorExp(floorNo));
+                    task.setRewardItemRarity(getTowerFloorItem(floorNo));
+                    int insert = taskMapper.insert(task);
+                    if (insert <= 0) {
+                        throw new RuntimeException("任务插入失败, floorNo=" + floorNo);
+                    }
+                }
+
+                // 插入 Boss
+                for (int i = 1; i <= tower.getTotalFloors(); i++) {
+                    Monster monster = new Monster();
+                    monster.setName(setBossNameByFloorNo(i));
+                    monster.setHp(setBossHp(i));
+                    monster.setFloorId(floorNoToId.get(i));
+                    int insert = bossMapper.insert(monster);
+                    if (insert <= 0) {
+                        throw new RuntimeException("Boss 插入失败, floorNo=" + i);
+                    }
+                }
+
+                log.info("楼层/任务/Boss 插入完成, towerId={}", tower.getTowerId());
                 return true;
             } catch (Exception e) {
-                // 事务回滚
                 status.setRollbackOnly();
-                return false;
+                throw e;
             }
-
         });
 
-        List<Callable<Void>> tasks = new ArrayList<>();
-
-        // 获取主塔背景
-        LambdaQueryWrapper<Tower> towerQuery = new LambdaQueryWrapper<>();
-        towerQuery.eq(Tower::getTowerId, towerId);
-        Tower tower = towerMapper.selectOne(towerQuery);
-        if (tower == null) {
-            log.error("主塔{}不存在", towerId);
-            throw new RuntimeException("主塔不存在");
-        }
-        String description = tower.getDescription();
-
-        for (Map.Entry<Integer, List<Integer>> towerFloorPoints : TOWER_FLOOR_POINTS_MAP.entrySet()) {
-            Integer floorNo = towerFloorPoints.getKey();
-            List<Integer> knowledgePoints = towerFloorPoints.getValue();
-
-            tasks.add(() -> {
-                LambdaQueryWrapper<TowerFloor> floorQuery = new LambdaQueryWrapper<>();
-                floorQuery.eq(TowerFloor::getTowerId, towerId);
-                floorQuery.eq(TowerFloor::getFloorNo, floorNo);
-                TowerFloor towerFloor = towerFloorMapper.selectOne(floorQuery);
-
-                if (towerFloor == null) {
-                    log.warn("<塔层>{}<没有加入背景故事>", floorNo);
-                    return null;
-                }
-
-                List<String> knowledgeNameList = knowledgePoints.stream().map(a -> knowledgePointMapper.getPonintNameById(String.valueOf(a))).toList();
-
-                String prompt = String.format("请结合总塔的故事背景：“%s”，以及该层的知识点列表：%s，生成第%d层的故事背景。\n" + "要求：\n" + "- 故事背景应紧扣总塔的整体故事脉络，体现该层知识点的特色和主题。\n" + "- 内容应富有代入感和情节性，便于引导玩家理解本层关卡。\n" + "- 只返回故事背景文本，不要包含解释、分析或其他无关内容。", description, knowledgeNameList, floorNo);
-
-                String towerFloorDescription = chatLanguageModel.chat(UserMessage.userMessage(prompt)).aiMessage().text();
-
-                if (towerFloorDescription == null || towerFloorDescription.trim().isEmpty()) {
-                    log.warn("AI返回空背景故事，跳过更新，floorNo={}", floorNo);
-                    return null;
-                }
-
-                towerFloorDescription = towerFloorDescription.trim();
-
-                LambdaUpdateWrapper<TowerFloor> updateWrapper = new LambdaUpdateWrapper<>();
-                updateWrapper.eq(TowerFloor::getTowerId, towerId);
-                updateWrapper.eq(TowerFloor::getFloorNo, floorNo);
-                updateWrapper.set(TowerFloor::getDescription, towerFloorDescription);
-
-                int updateCount = towerFloorMapper.update(null, updateWrapper);
-                log.info("更新塔层背景故事，towerId={}, floorNo={}, 影响行数={}", towerId, floorNo, updateCount);
-
-                if (updateCount <= 0) {
-                    log.error("更新塔层背景故事失败，towerId={}, floorNo={}", towerId, floorNo);
-                    throw new RuntimeException("更新塔层背景故事失败");
-                }
-
-                log.info("<<插入背景故事成功>> {}", towerFloorDescription);
-                return null;
-            });
-        }
-
-        // 提交所有任务，等待全部完成
-        try {
-            List<Future<Void>> futures = STORY_BACKGROUND_CREATE_EXECUTOR.invokeAll(tasks);
-            for (Future<Void> future : futures) {
-                future.get(); // 等待每个任务完成，顺便抛异常
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("生成塔层故事背景任务被中断", e);
-        } catch (ExecutionException e) {
-            log.error("生成塔层故事背景任务执行异常", e.getCause());
-        }
-
-
+        return floorNoToId;
     }
 
-    /**
-     * 创建主塔到数据库中
-     */
-    private void initTowerToDB(Tower towerInfo, String courseId, String studentId) {
+    // 若需要重复建塔时先清理旧数据，可启用此方法
+    @SuppressWarnings("unused")
+    private void cleanupExistingTowers(String courseId, String studentId) {
+        List<Tower> towers = towerMapper.selectList(new LambdaQueryWrapper<Tower>()
+                .eq(Tower::getCourseId, Long.valueOf(courseId))
+                .eq(Tower::getStudentId, Long.valueOf(studentId)));
+        if (towers == null || towers.isEmpty()) return;
 
-        //查询该学生课程中的所有知识点
-        List<KnowledgePointVO> studentKnowledgePointVOS = knowledgePointMapper.getCourseKnowledgePoints(Integer.valueOf(courseId));
-        List<String> pointNameList = studentKnowledgePointVOS.stream().map(a -> a.getPointName()).toList();
-        log.info("知识点名字列表：{}", pointNameList.toString());
-
-        //开启事务
         transactionTemplate.execute(status -> {
             try {
-                int insert = towerMapper.insert(towerInfo);
-                if (insert <= 0) {
-                    log.error("课程:" + courseId + "学习塔插入失败");
-                    throw new RuntimeException("课程:" + courseId + "学习塔插入失败");
+                for (Tower t : towers) {
+                    List<TowerFloor> floors = towerFloorMapper.selectList(new LambdaQueryWrapper<TowerFloor>()
+                            .eq(TowerFloor::getTowerId, t.getTowerId()));
+                    for (TowerFloor f : floors) {
+                        taskMapper.delete(new QueryWrapper<Task>().eq("floor_id", f.getFloorId()));
+                        bossMapper.delete(new QueryWrapper<Monster>().eq("floor_id", f.getFloorId()));
+                    }
+                    towerFloorMapper.delete(new QueryWrapper<TowerFloor>().eq("tower_id", t.getTowerId()));
+                    towerMapper.delete(new QueryWrapper<Tower>().eq("tower_id", t.getTowerId()));
                 }
-                log.info("课程:" + courseId + "学习塔插入成功");
                 return true;
             } catch (Exception e) {
-                // 事务回滚
                 status.setRollbackOnly();
-                return false;
+                throw e;
             }
         });
+        log.info("已清理旧塔数据, courseId={}, studentId={}", courseId, studentId);
+    }
 
-        //初始化排行榜(初始值为0)
-        redisSort.setStudentMaxFloor(String.valueOf(towerInfo.getTowerId()), studentId, "0");
-        redisSort.setStudentTotalScore(studentId, "0");
+    private List<Side> buildKnowledgeRelations(List<String> pointNameList) {
+        try {
+            String sys = createKnowledgeGraphPrompt();
+            String user = "请按照下面的知识点列表进行处理：\n" +
+                    pointNameList.stream().collect(Collectors.joining("\n"));
+            List<ChatMessage> messages = Arrays.asList(
+                    SystemMessage.systemMessage(sys),
+                    UserMessage.userMessage(user)
+            );
+            String resp = chatLanguageModel.chat(messages).aiMessage().text();
+            if (resp == null || resp.trim().isEmpty()) return Collections.emptyList();
+            return parseRelationsFromJson(resp.trim());
+        } catch (Exception e) {
+            log.error("解析知识依赖失败，将使用无依赖兜底策略", e);
+            return Collections.emptyList();
+        }
+    }
 
-        //异步创建塔的背景故事
-        STORY_BACKGROUND_CREATE_EXECUTOR.execute(() -> {
+    /**
+     * 分层算法（硬约束：每层最多 maxPerFloor 个），带环的情况下自动断环
+     */
+    private Map<Integer, List<Integer>> buildBalancedFloors(Map<String, KnowledgePointNode> nodesById,
+                                                            Map<String, Integer> indegreeInit,
+                                                            int maxPerFloor) {
+        Map<Integer, List<Integer>> levelMap = new LinkedHashMap<>();
+        Map<String, Integer> indegree = new HashMap<>(indegreeInit);
+        int total = nodesById.size();
+        Set<String> processed = new HashSet<>();
 
-            String CREATE_DESCRIPTION_PROMPT = "帮我为" + towerInfo.getName() + "他含有以下知识点" + pointNameList + "它的总层数为" + towerInfo.getTotalFloors() + "请基于以上信息为其创建一个故事背景,要求只返回故事背景";
-            String description = chatLanguageModel.chat(UserMessage.userMessage(CREATE_DESCRIPTION_PROMPT)).aiMessage().text().trim();
-            LambdaUpdateWrapper<Tower> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(Tower::getCourseId, courseId);
-            updateWrapper.set(Tower::getDescription, description);
-            int update = towerMapper.update(null, updateWrapper);
-            if (update <= 0) {
-                log.error("课程:" + courseId + "学习塔故事背景插入失败");
-                throw new RuntimeException("课程:" + courseId + "学习塔故事背景插入失败");
+        // 初始 0 入度集合
+        List<String> zeroList = indegree.entrySet().stream()
+                .filter(e -> e.getValue() == 0)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        Comparator<String> cmp = Comparator
+                .comparing((String id) -> Optional.ofNullable(nodesById.get(id).getAccuracyRate()).orElse(1.0))
+                .thenComparing(id -> nodesById.get(id).getPointName(), Comparator.nullsLast(Comparator.naturalOrder()));
+
+        int level = 1;
+        while (processed.size() < total) {
+            if (zeroList.isEmpty()) {
+                List<String> remain = indegree.entrySet().stream()
+                        .filter(e -> !processed.contains(e.getKey()))
+                        .sorted(Comparator.comparingInt(Map.Entry::getValue))
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+                if (remain.isEmpty()) break;
+                zeroList.addAll(remain);
+                log.warn("检测到循环依赖，启动断环策略。本层将强制选择未处理的最小入度节点作为起点。");
             }
 
-        });
+            zeroList.sort(cmp);
+            List<String> currentLayer = new ArrayList<>();
+            int take = Math.min(maxPerFloor, zeroList.size());
+            for (int i = 0; i < take; i++) currentLayer.add(zeroList.get(i));
+
+            List<String> carryOver = new ArrayList<>();
+            if (zeroList.size() > take) {
+                carryOver.addAll(zeroList.subList(take, zeroList.size()));
+            }
+
+            levelMap.put(level, currentLayer.stream().map(Integer::valueOf).collect(Collectors.toList()));
+            processed.addAll(currentLayer);
+
+            List<String> newZeros = new ArrayList<>();
+            for (String id : currentLayer) {
+                KnowledgePointNode node = nodesById.get(id);
+                for (String childId : node.getChildren()) {
+                    if (processed.contains(childId)) continue;
+                    indegree.computeIfPresent(childId, (k, v) -> v - 1);
+                    if (indegree.get(childId) != null && indegree.get(childId) == 0) newZeros.add(childId);
+                }
+            }
+
+            zeroList = new ArrayList<>();
+            zeroList.addAll(carryOver);
+            zeroList.addAll(newZeros);
+
+            level++;
+        }
+
+        for (Map.Entry<Integer, List<Integer>> e : levelMap.entrySet()) {
+            log.info("第{}层：知识点ID {}", e.getKey(), e.getValue());
+        }
+        return levelMap;
     }
 
-    /**
-     * 超级优化的塔层经验获取算法 - 极速升级版本
-     * 让每一层都给玩家带来显著的收益和成就感
-     */
-    private Integer getTowerFloorExp(Integer floorNo) {
-        if (floorNo == null || floorNo <= 0) {
-            return 0;
-        }
-
-        // 第1-10层：新手福利，超高起始奖励
-        if (floorNo <= 10) {
-            return 100 + floorNo * 50;  // 150-600经验
-        }
-        // 第11-25层：进阶层，丰厚递增奖励
-        else if (floorNo <= 25) {
-            return 700 + (floorNo - 10) * 100;  // 800-2200经验
-        }
-        // 第26-50层：困难层，巨额回报
-        else if (floorNo <= 50) {
-            return 2200 + (floorNo - 25) * 150;  // 2350-5950经验
-        }
-        // 第51-75层：专家层，史诗级奖励
-        else if (floorNo <= 75) {
-            return 5950 + (floorNo - 50) * 200;  // 6150-11950经验
-        }
-        // 第76+层：传说层，神话级奖励
-        else {
-            return 11950 + (floorNo - 75) * 300;  // 12250+经验
+    private String generateTowerBackground(String towerName, List<String> pointNames, int totalFloors) {
+        String prompt = "请为学习塔【" + towerName + "】生成一个完整的世界观故事背景。\n" +
+                "它包含的知识点有：" + pointNames + "；总层数为：" + totalFloors + "。\n" +
+                "要求：\n" +
+                "- 有整体世界观和核心任务驱动\n" +
+                "- 融合知识点的主题意象，但不要逐条解释知识点\n" +
+                "- 语言生动有代入感\n" +
+                "- 只返回故事背景文本，不要包含任何解释或提示";
+        try {
+            String text = chatLanguageModel.chat(
+                    Arrays.asList(
+                            SystemMessage.systemMessage("你是擅长写世界观背景的叙事设计师，只输出背景文本。"),
+                            UserMessage.userMessage(prompt)
+                    )
+            ).aiMessage().text();
+            return text == null ? "" : text.trim();
+        } catch (Exception e) {
+            log.error("LLM 生成主塔背景异常", e);
+            return "";
         }
     }
 
-    /**
-     * 根据通关层数获取奖励稀有度
-     *
-     * @param floorNo 当前通关层数
-     * @return 稀有度
-     */
-    private Integer getTowerFloorItem(Integer floorNo) {
-        int rarity;
-        if (floorNo <= 3) {
-            rarity = 0; // 普通
-        } else if (floorNo <= 6) {
-            rarity = 1; // 稀有
-        } else {
-            rarity = 2; // 史诗
+    private String generateFloorBackground(String towerBackground, int floorNo, List<String> knowledgeNames) {
+        String prompt = String.format(
+                "结合总塔的背景：%s\n以及第%d层的知识主题：%s\n请写出本层的故事背景（只返回背景文本，不要解释或提示）。",
+                towerBackground == null ? "" : towerBackground, floorNo, knowledgeNames
+        );
+        try {
+            String text = chatLanguageModel.chat(
+                    Arrays.asList(
+                            SystemMessage.systemMessage("你是擅长章节化叙事的写作者，只输出背景文本。"),
+                            UserMessage.userMessage(prompt)
+                    )
+            ).aiMessage().text();
+            return text == null ? "" : text.trim();
+        } catch (Exception e) {
+            log.error("LLM 生成第{}层背景异常", floorNo, e);
+            return "";
         }
-
-        //返回稀有度
-        return rarity;
     }
 
-    /**
-     * 模拟从数据库中根据稀有度获取随机道具
-     */
-    private Item getRandomItemByRarity(int rarity) {
-        // 这里假设用 MyBatis-Plus 查询
-        List<Item> items = itemMapper.selectList(new QueryWrapper<Item>().eq("rarity", rarity));
-
-        if (items.isEmpty()) {
-            return null;
-        }
-
-        // 随机选一个
-        Random random = new Random();
-        return items.get(random.nextInt(items.size()));
-    }
-
-    /**
-     * 获取塔相关信息
-     */
     public Tower getTowerInfo(Integer size, String courseId, String studentId) {
-
-
         String courseName = courseMapper.getCourseByid(Integer.valueOf(courseId));
         String towerName = courseName + "_学习塔";
-
-
         Tower tower = new Tower();
         tower.setName(towerName);
         tower.setCourseId(Long.valueOf(courseId));
-        tower.setTotalFloors(size);
+        tower.setTotalFloors(size == null ? 0 : size);
         tower.setStudentId(Long.valueOf(studentId));
-
         return tower;
-
     }
 
-    /**
-     * 获取塔层知识点分布
-     */
-    private Map<Integer, List<Integer>> getTowerFloorPointIds() {
-
-        //初始化知识图谱入度
-        initIndegreeMap();
-        log.info("知识图谱入度初始化成功，结果为【{}】", INDEGREE_MAP);
-
-        //获取每层知识点分布
-        Map<Integer, List<Integer>> levelToPointIds = new HashMap<>();
-
-        // 复制入度防止修改原始数据
-        Map<KnowledgePointNode, Integer> indegree = new HashMap<>(INDEGREE_MAP);
-
-        Queue<KnowledgePointNode> queue = new LinkedList<>();
-        Map<KnowledgePointNode, Integer> nodeLevelMap = new HashMap<>();
-
-        // 初始化入度为0的节点，层级设为1
-        for (Map.Entry<KnowledgePointNode, Integer> entry : indegree.entrySet()) {
-            if (entry.getValue() == 0) {
-                KnowledgePointNode node = entry.getKey();
-                queue.offer(node);
-                nodeLevelMap.put(node, 1);
-                levelToPointIds.computeIfAbsent(1, k -> new ArrayList<>()).add(Integer.parseInt(node.getPointId()));
-            }
-        }
-
-        // 反向邻接表：父节点 -> 子节点列表
-        Map<KnowledgePointNode, List<KnowledgePointNode>> parentToChildrenMap = new HashMap<>();
-        for (Map.Entry<KnowledgePointNode, List<KnowledgePointNode>> entry : KNOWLEDGE_POINT_NODE_MAP.entrySet()) {
-            KnowledgePointNode child = entry.getKey();
-            for (KnowledgePointNode parent : entry.getValue()) {
-                parentToChildrenMap.computeIfAbsent(parent, k -> new ArrayList<>()).add(child);
-            }
-        }
-
-        // 拓扑排序遍历
-        while (!queue.isEmpty()) {
-            KnowledgePointNode current = queue.poll();
-            int currentLevel = nodeLevelMap.get(current);
-
-            List<KnowledgePointNode> children = parentToChildrenMap.getOrDefault(current, Collections.emptyList());
-            for (KnowledgePointNode child : children) {
-                indegree.put(child, indegree.get(child) - 1);
-                if (indegree.get(child) == 0) {
-                    queue.offer(child);
-                    int childLevel = currentLevel + 1;
-                    nodeLevelMap.put(child, childLevel);
-                    levelToPointIds.computeIfAbsent(childLevel, k -> new ArrayList<>()).add(Integer.parseInt(child.getPointId()));
-                }
-            }
-        }
-
-        for (HashMap.Entry<Integer, List<Integer>> entry : levelToPointIds.entrySet()) {
-            log.info("第{}层：知识点列表【{}】", entry.getKey(), entry.getValue());
-        }
-
-        return levelToPointIds;
-
+    private Integer getTowerFloorExp(Integer floorNo) {
+        if (floorNo == null || floorNo <= 0) return 0;
+        if (floorNo <= 10) return 100 + floorNo * 50;
+        else if (floorNo <= 25) return 700 + (floorNo - 10) * 100;
+        else if (floorNo <= 50) return 2200 + (floorNo - 25) * 150;
+        else if (floorNo <= 75) return 5950 + (floorNo - 50) * 200;
+        else return 11950 + (floorNo - 75) * 300;
     }
 
-    /**
-     * 初始化知识图谱入度
-     */
-    private void initIndegreeMap() {
-
-        KNOWLEDGE_POINT_NODE_MAP.entrySet().forEach(a -> INDEGREE_MAP.put(a.getKey(), a.getValue().size()));
-
-
+    private Integer getTowerFloorItem(Integer floorNo) {
+        if (floorNo == null || floorNo <= 3) return 0;
+        if (floorNo <= 6) return 1;
+        return 2;
     }
 
-    /**
-     * 知识图谱化算法
-     */
-    private void createKnowledgeGraph(List<String> pointNameList) {
-
-        //获取系统提示词
-        String knowledgeGraphPrompt = createKnowledgeGraphPrompt();
-
-        //构建用户提示词
-        StringBuilder knowledgeGraphBuilder = new StringBuilder("请按照这下面的知识点列表进行处理");
-        for (String pointName : pointNameList) {
-            knowledgeGraphBuilder.append(pointName).append("\n");
-        }
-        String userMessage = knowledgeGraphBuilder.toString();
-
-        //获取知识点依赖列表
-        String responseList = chatLanguageModel.chat(SystemMessage.systemMessage(knowledgeGraphPrompt), UserMessage.userMessage(userMessage)).aiMessage().text();
-        log.info("responseList: {}", responseList);
-
-        //解析成节点信息并存入知识图谱中
-        parseToNode(responseList);
-
-
+    @SuppressWarnings("unused")
+    private Item getRandomItemByRarity(int rarity) {
+        List<Item> items = itemMapper.selectList(new QueryWrapper<Item>().eq("rarity", rarity));
+        if (items == null || items.isEmpty()) return null;
+        return items.get(new Random().nextInt(items.size()));
     }
 
-    /**
-     * 解析成节点存入知识图谱中
-     */
-    private void parseToNode(String responseList) {
-        //解析出知识图谱节点
-        List<Side> relations = parseRelationsFromJson(responseList);
-        log.info("成功解析 {} 个任务依赖关系", relations.size());
-
-        //获取对应的节点信息
-        for (Side side : relations) {
-
-            String fromNodeName = side.getFrom();
-            String toNodeName = side.getTo();
-
-            // 正确方向：前置 -> 后续
-            KnowledgePointNode preNode = POINTNAME_TO_NODE_MAP.get(fromNodeName);
-            KnowledgePointNode postNode = POINTNAME_TO_NODE_MAP.get(toNodeName);
-
-            // 后续节点添加前置节点
-            List<KnowledgePointNode> preNodes = KNOWLEDGE_POINT_NODE_MAP.get(postNode);
-
-            preNodes.add(preNode);
-            KNOWLEDGE_POINT_NODE_MAP.put(postNode, preNodes);
-
-            log.info("知识图谱添加节点:后续节点[{}]成功添加前置节点[{}]", toNodeName, fromNodeName);
-
-        }
-
-        log.info("知识图谱·成功构建 [{}]", KNOWLEDGE_POINT_NODE_MAP);
-
+    private int setBossHp(int floorNo) {
+        int baseHp = 200;
+        double growthRate = 0.15;
+        int hp = (int) Math.round(baseHp + baseHp * (floorNo * growthRate));
+        if (floorNo % 5 == 0) hp = (int) Math.round(hp * 1.5);
+        return hp;
     }
 
-    /**
-     * 智能推荐算法
-     */
-    private List<String> recommondKonledgePoint() {
-
-        return null;
+    private String setBossNameByFloorNo(int floorNo) {
+        return "boss-" + floorNo + "号";
     }
 
-    /**
-     * 构建知识图谱实现系统提示词
-     */
     private String createKnowledgeGraphPrompt() {
-
         String KNOWLEDGE_GRAPH_PROMPT = """
                 你是一名专业的教学设计专家，负责构建知识点间的学习依赖关系，生成符合认知规律的学习路径图（有向无环图，DAG）。
                 
@@ -667,103 +557,24 @@ public class TowerCreateToolUtils {
                 
                 ===============================
                 ## 依赖关系判定标准
-                ### 必须依赖（强制先学）
-                满足以下条件时建立依赖：
-                1. **核心概念依赖**：知识点B的理解绝对需要知识点A的概念基础
-                2. **直接逻辑依赖**：知识点B是知识点A的直接延伸或深化
-                3. **技能前置依赖**：掌握知识点B必须先具备知识点A的操作技能
-                
-                **重要**：以下情况避免建立依赖关系：
-                - 可以通过更基础概念支撑的知识点（如ArrayList可直接依赖数据类型）
-                - 相对独立的工具性概念（如异常处理可只依赖控制结构）
-                - 同类型的并列特性（如封装和继承应该并列而非串行）
-                
-                ### 不建立依赖的情况
-                1. 同类型的并列知识点（如不同数据类型、不同算法）
-                2. 独立的工具性知识点
-                3. 可独立理解和应用的知识单元
-                4. 仅在高级应用中才产生关联的知识点
-                
-                ===============================
-                ## 层级平衡构建策略
-                ### 强制平衡原则
-                - **每层严格限制2-3个知识点**，绝不允许单层超过3个知识点
-                - **避免过长串行链条**，超过4层的串行依赖需要拆分重构
-                - **优先构建并行分支**，让更多知识点可以同时学习
-                - **智能依赖分配**，将集中的依赖关系分散到不同层级
-                
-                ### 依赖关系优化策略
-                1. **最小依赖原则**：只建立真正必要的依赖，避免过度依赖
-                2. **并行分支设计**：将知识体系分为多个相对独立的学习分支
-                3. **依赖前移策略**：让部分知识点依赖更基础的概念，而非中间层概念
-                4. **层级重分配**：当发现某层知识点过多时，主动寻找可前移的知识点
-                
-                ### 具体实现规则
-                - 数据结构类知识点(ArrayList, HashMap等)可直接依赖基础概念
-                - 工具性知识点(异常处理等)可依赖控制结构而非面向对象
-                - 独立特性(封装、继承)应分散到不同层级
-                - 确保每个层级都有1-3个可并行学习的知识点
-                
-                ===============================
-                ## 学习路径优化原则
-                ### 认知负荷管理
-                - 避免单个学习阶段包含过多新概念
-                - 确保每个知识点都有充分的前置基础
-                - 相似或易混淆的知识点应分层学习
-                
-                ### 学习动机维护
-                - 早期层级应包含核心、实用的知识点
-                - 避免过长的前置链条影响学习积极性
-                - 确保每个层级都有相对完整的学习成果
+                必须依赖（强制先学）：
+                1. 核心概念依赖：B 的理解绝对需要 A 的概念基础
+                2. 直接逻辑依赖：B 是 A 的直接延伸或深化
+                3. 技能前置依赖：掌握 B 必须先具备 A 的操作技能
+                避免建立依赖：
+                - 工具性、并列特性、可由更基础概念支撑
                 
                 ===============================
                 ## 输出格式要求
-                严格返回如下JSON格式：
+                严格返回如下JSON：
                 {
                   "relations": [
                     "前置知识点:后续知识点",
                     ...
                   ]
                 }
-                
-                ### 格式规范
-                - 仅输出JSON内容，不添加任何解释性文字
-                - 使用半角冒号":"连接前置与后续知识点
-                - 知识点名称与输入完全一致，不得修改
-                - 依赖关系应覆盖所有必要的强依赖
-                
-                ### 质量保证
-                - 确保输出的图结构为DAG（无循环）
-                - 依赖链条长度适中，避免过长的串行路径
-                - 每个知识点的前置依赖数量控制在1-2个以内
-                
-                ===============================
-                ## 学科适用性示例
-                ### 编程基础（4层结构）
-                - L1：基本语法 → L2：控制结构 → L3：函数设计 → L4：面向对象编程
-                - L1：数据类型 → L2：数据结构 → L3：算法基础 → L4：复杂算法
-                
-                ### 数学基础（4层结构）
-                - L1：数系概念 → L2：基本运算 → L3：方程求解 → L4：函数应用
-                - L1：几何图形 → L2：几何性质 → L3：几何计算 → L4：几何证明
-                
-                ===============================
-                ## 特别注意事项
-                ### 层级平衡检查
-                - 生成依赖关系后，心理模拟拓扑排序结果
-                - 如果预期某层会有超过3个知识点，主动调整依赖策略
-                - 优先让工具性、数据结构类知识点前移到更基础的层级
-                - 确保面向对象特性(继承、封装、多态)适当分散
-                
-                ### 依赖关系决策优先级
-                1. **层级平衡 > 完美依赖**：宁可稍微弱化依赖也要保证层级平衡
-                2. **并行学习 > 串行学习**：优先设计可以同时学习的知识点组合
-                3. **实用学习路径 > 理论完美路径**：确保学习者能够平稳推进
-                
-                请严格按照层级平衡原则分析输入的知识点，确保输出的依赖关系能够形成每层2-3个知识点的平衡结构。
+                仅输出JSON内容，不添加任何解释性文字；知识点名称与输入完全一致。
                 """;
         return KNOWLEDGE_GRAPH_PROMPT;
     }
-
-
 }

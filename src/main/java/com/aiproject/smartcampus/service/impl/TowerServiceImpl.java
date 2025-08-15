@@ -642,7 +642,6 @@ public class TowerServiceImpl implements TowerService {
 
     private void initializeQuestionCache(String floorId) {
         questionRedisCache.setQuestionNumToCache(Integer.valueOf(floorId), 0);
-        questionRedisCache.setQuestionToCache(Integer.valueOf(floorId), new ArrayList<>());
         log.debug("初始化塔层【{}】题目缓存", floorId);
     }
 

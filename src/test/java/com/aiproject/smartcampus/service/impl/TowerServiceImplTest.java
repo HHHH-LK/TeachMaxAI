@@ -31,4 +31,19 @@ class TowerServiceImplTest {
 
     }
 
+    @Test
+    void deleteTower() {
+
+        Result<Boolean> towerByAgent = towerService.createTowerByAgent("1", "1");
+        System.out.println(towerByAgent.getData());
+
+    }
+
+    @Test
+    void listTower() {
+
+        towerService.loadTest("20","83","1","1");
+
+    }
+
 }
