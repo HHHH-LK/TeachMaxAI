@@ -42,7 +42,7 @@ class TowerServiceImplTest {
     @Test
     void listTower() {
 
-        towerService.loadTest("20","83","1","1");
+        towerService.loadTest("44","234","1","1");
 
     }
 

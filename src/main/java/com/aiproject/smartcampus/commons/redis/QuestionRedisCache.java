@@ -8,25 +8,28 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @program: TeacherMaxAI
- * @description: 塔层题目数量缓存
- * @author: lk_hhh
- * @create: 2025-08-10 10:16
- **/
-
+ * @description: 塔层题目与难度的缓存
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class QuestionRedisCache {
 
-    private final String REDIS_QUESTION_CACHE = "questionCache:towerFloor:";
-    private final String REDIS_QUESTION_NUM_CACHE = "questionCache:towerFloor:";
-    private final String REDIS_QUESTION_NUM_CACHE_NEXT = ":total";
-    private final String REDIS_IS_CREATE_TAG_CACHE = "isCreateTagCache:towerFloor:";
-    private final String REDIS_QUESTION_DIFFICULTY_LIST_CACHE = "difficultyListCache:towerFloor:";
-    private final String REDIS_TOTAL_QUESTION_DIFFICULTY_LIST_CACHE = "difficultyListCache:total:towerFloor:";
+    // 题目列表（存放题目ID队列）
+    private static final String KEY_QUESTION_LIST_PREFIX = "questionCache:towerFloor:";      // + floorId
+    // 题目数量
+    private static final String KEY_QUESTION_NUM_PREFIX = "questionCache:towerFloor:";       // + floorId + ":total"
+    private static final String KEY_QUESTION_NUM_SUFFIX = ":total";
+    // 初始化标记
+    private static final String KEY_INIT_TAG_PREFIX = "isCreateTagCache:towerFloor:";        // + floorId
+    // 难度消费队列（用于按顺序弹出下一批难度）
+    private static final String KEY_DIFF_QUEUE_PREFIX = "difficultyListCache:towerFloor:";   // + floorId
+    // 难度总列表（仅用于查看/调试）
+    private static final String KEY_DIFF_TOTAL_PREFIX = "difficultyListCache:total:towerFloor:"; // + floorId
 
     private static final DefaultRedisScript<List> BATCH_LPOP_SCRIPT;
 
@@ -50,144 +53,102 @@ public class QuestionRedisCache {
         BATCH_LPOP_SCRIPT.setResultType(List.class);
     }
 
-
     private final StringRedisTemplate stringRedisTemplate;
 
-    /**
-     * 设置题目数量
-     */
-    public void setQuestionNumToCache(Integer towerFloorId, Integer questionNum) {
-        String key = REDIS_QUESTION_NUM_CACHE + towerFloorId + REDIS_QUESTION_NUM_CACHE_NEXT;
-        stringRedisTemplate.opsForValue().set(key, String.valueOf(questionNum));
+    private String keyQuestionList(Integer floorId) {
+        return KEY_QUESTION_LIST_PREFIX + floorId;
     }
 
-    /**
-     * 变化题目数量
-     */
-    public void deCressQuestionNumInCache(Integer towerFloorId, Integer deCressCount) {
-        String key = REDIS_QUESTION_NUM_CACHE + towerFloorId + REDIS_QUESTION_NUM_CACHE_NEXT;
-        stringRedisTemplate.opsForValue().increment(key, deCressCount);
-
+    private String keyQuestionNum(Integer floorId) {
+        return KEY_QUESTION_NUM_PREFIX + floorId + KEY_QUESTION_NUM_SUFFIX;
     }
 
-    /**
-     * 设置题目集合
-     */
-    public void setQuestionToCache(Integer towerFloorId, List<Integer> questionIds) {
-        String key = REDIS_QUESTION_CACHE + towerFloorId;
+    private String keyInitTag(Integer floorId) {
+        return KEY_INIT_TAG_PREFIX + floorId;
+    }
+
+    private String keyDiffQueue(Integer floorId) {
+        return KEY_DIFF_QUEUE_PREFIX + floorId;
+    }
+
+    private String keyDiffTotal(Integer floorId) {
+        return KEY_DIFF_TOTAL_PREFIX + floorId;
+    }
+
+    // ========== 题目数量 ==========
+    public void setQuestionNumToCache(Integer floorId, Integer questionNum) {
+        stringRedisTemplate.opsForValue().set(keyQuestionNum(floorId), String.valueOf(questionNum));
+    }
+
+    // 注意：此处是增加数量（新增了多少题目）
+    public void incrQuestionNumInCache(Integer floorId, Integer incrCount) {
+        stringRedisTemplate.opsForValue().increment(keyQuestionNum(floorId), incrCount);
+    }
+
+    public String getQuestionNumInCache(Integer floorId) {
+        return stringRedisTemplate.opsForValue().get(keyQuestionNum(floorId));
+    }
+
+    // ========== 题目列表 ==========
+    public void setQuestionToCache(Integer floorId, List<Integer> questionIds) {
+        if (questionIds == null || questionIds.isEmpty()) return;
         List<String> list = questionIds.stream().map(Object::toString).toList();
-        stringRedisTemplate.opsForList().rightPushAll(key, list);
-
+        stringRedisTemplate.opsForList().rightPushAll(keyQuestionList(floorId), list);
     }
 
-    /**
-     * 获取题目
-     */
-    public String getQuestionIdInCache(Integer towerFloorId) {
-        String key = REDIS_QUESTION_CACHE + towerFloorId;
-        return stringRedisTemplate.opsForList().leftPop(key);
-
+    public String getQuestionIdInCache(Integer floorId) {
+        return stringRedisTemplate.opsForList().leftPop(keyQuestionList(floorId));
     }
 
-    /**
-     * 新增单个题目
-     */
-    public void setQuestionIdsInCache(Integer towerFloorId, String questionId) {
-
-        String key = REDIS_QUESTION_CACHE + towerFloorId;
-        stringRedisTemplate.opsForList().rightPush(key, questionId);
-
+    public void setQuestionIdsInCache(Integer floorId, String questionId) {
+        stringRedisTemplate.opsForList().rightPush(keyQuestionList(floorId), questionId);
     }
 
-    /**
-     * 获取题目数量
-     */
-    public String getQuestionNumInCache(Integer towerFloorId) {
-        String key = REDIS_QUESTION_NUM_CACHE + towerFloorId + REDIS_QUESTION_NUM_CACHE_NEXT;
-        return stringRedisTemplate.opsForValue().get(key);
+    public List<String> peekAllQuestionIds(Integer floorId) {
+        List<String> range = stringRedisTemplate.opsForList().range(keyQuestionList(floorId), 0, -1);
+        return range == null ? List.of() : range;
     }
 
-    /**
-     * 获取当前塔层的初始化状态(0/1)
-     */
-    public String isCreateTagInCache(Integer towerFloorId) {
-        String key = REDIS_IS_CREATE_TAG_CACHE + towerFloorId;
-        return stringRedisTemplate.opsForValue().get(key);
+    // ========== 初始化标记 ==========
+    public String isCreateTagInCache(Integer floorId) {
+        return stringRedisTemplate.opsForValue().get(keyInitTag(floorId));
     }
 
-    /**
-     * 设置当前塔层的初始化状态
-     */
-    public void setCreateTagToCache(Integer towerFloorId, String createTag) {
-        String key = REDIS_IS_CREATE_TAG_CACHE + towerFloorId;
-        //如果状态是一样的就跳过
-        if (stringRedisTemplate.opsForValue().get(key).equals(createTag)) {
+    public void setCreateTagToCache(Integer floorId, String createTag) {
+        String key = keyInitTag(floorId);
+        String old = stringRedisTemplate.opsForValue().get(key);
+        if (Objects.equals(old, createTag)) {
             return;
         }
         stringRedisTemplate.opsForValue().set(key, createTag);
-
     }
 
-    /**
-     * 缓存当前塔层题目分配难度(0/1/2)
-     */
-    public void setQuestionDifficultyListInCache(Integer towerFloorId, List<String> questionDifficultyList) {
-
-        String key = REDIS_QUESTION_DIFFICULTY_LIST_CACHE + towerFloorId;
-
-        stringRedisTemplate.opsForList().rightPushAll(key, questionDifficultyList);
-
+    // ========== 难度列表 ==========
+    // 消费队列：用于按序弹出下一批难度
+    public void setQuestionDifficultyListInCache(Integer floorId, List<String> difficultyList) {
+        if (difficultyList == null || difficultyList.isEmpty()) return;
+        stringRedisTemplate.opsForList().rightPushAll(keyDiffQueue(floorId), difficultyList);
     }
 
-    /**
-     * 从 Redis 队列中批量弹出最多 count 个元素，实际不足返回剩余所有
-     */
-    public List<String> getQuestionDifficultyListInCache(Integer towerFloorId, Integer count) {
+    // 从“消费队列”里批量弹出
+    public List<String> popDifficultyListInCache(Integer floorId, Integer count) {
         int popCount = (count == null || count <= 0) ? 1 : count;
-        String key = "question_difficulty_list:" + towerFloorId;
-
-        // 执行Lua脚本
         List<String> result = stringRedisTemplate.execute(
                 BATCH_LPOP_SCRIPT,
-                Collections.singletonList(key),
+                Collections.singletonList(keyDiffQueue(floorId)),
                 String.valueOf(popCount)
         );
-
-        return result == null ? Collections.emptyList() : result;
+        return result == null ? List.of() : result;
     }
 
-    /**
-     * 存入总难度列表便于用户随机选取题目
-     */
-    public void setTotalQuestionDifficultyInCache(Integer towerFloorId, List<String> totalQuestionDifficulty) {
-
-        String key = REDIS_TOTAL_QUESTION_DIFFICULTY_LIST_CACHE + towerFloorId;
-
-        stringRedisTemplate.opsForList().rightPushAll(key, totalQuestionDifficulty);
-
+    // 保存“总难度列表”（仅查看/调试）
+    public void setTotalQuestionDifficultyInCache(Integer floorId, List<String> totalDifficultyList) {
+        if (totalDifficultyList == null || totalDifficultyList.isEmpty()) return;
+        stringRedisTemplate.opsForList().rightPushAll(keyDiffTotal(floorId), totalDifficultyList);
     }
 
-    /**
-     * 获取总难度列表
-     */
-    public List<String> getTotalQuestionDifficultyListInCache(Integer towerFloorId) {
-
-        String key = REDIS_TOTAL_QUESTION_DIFFICULTY_LIST_CACHE + towerFloorId;
-        List<String> range = stringRedisTemplate.opsForList().leftPop(key, 1);
-
-        return range == null ? Collections.emptyList() : range;
+    public List<String> getTotalQuestionDifficultyListInCache(Integer floorId) {
+        List<String> range = stringRedisTemplate.opsForList().range(keyDiffTotal(floorId), 0, -1);
+        return range == null ? List.of() : range;
     }
-
-    /**
-     * 查看所有题目并不取出
-     */
-    public List<String> getQuestionDifficultyListInCacheAndNotPushInCache(Integer towerFloorId) {
-
-        String key = REDIS_QUESTION_CACHE + towerFloorId;
-        List<String> range = stringRedisTemplate.opsForList().range(key, 0, -1);
-
-        return range == null ? Collections.emptyList() : range;
-    }
-
-
 }
