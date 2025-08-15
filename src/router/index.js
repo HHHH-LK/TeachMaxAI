@@ -22,6 +22,7 @@ import ExamReview from "@/views/admin/ExamReview.vue";
 import CourseAssignment from "@/views/admin/CourseAssignment.vue";
 import Test from "@/views/tower/Fight.vue"
 import Game from "@/views/student/game/Game.vue"
+import TowerTransition from "@/views/student/game/animation/tower.vue"
 // import { useAuthStore } from '@/store/authStore'
 
 const router = createRouter({
@@ -187,6 +188,12 @@ const router = createRouter({
       path: '/game',
       name: 'game',
       component: Game
+    },
+    {
+      path: '/tower-transition',
+      name: 'TowerTransition',
+      component: TowerTransition,
+      props: true
     },
     {
       path: '/chat',

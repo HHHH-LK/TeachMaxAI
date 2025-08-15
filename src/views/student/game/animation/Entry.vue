@@ -36,6 +36,12 @@
           <span class="exit-icon">✕</span>
           <span class="exit-text">退出</span>
         </button>
+        
+        <!-- 调试按钮：手动切换场景 -->
+        <button @click="manualNextScene" class="debug-btn">
+          <span class="debug-icon">▶</span>
+          <span class="debug-text">下一场景</span>
+        </button>
       </div>
 
       <!-- 加载进度条 -->
@@ -61,17 +67,28 @@
         </div>
       </div>
     </div>
+    
+    <!-- 角色注册组件 -->
+    <CharacterRegistration
+      :visible="showCharacterRegistration"
+      @registration-success="onRegistrationSuccess"
+      @registration-cancel="onRegistrationCancel"
+      ref="characterRegistrationRef"
+    />
   </div>
 </template>
 
 <script>
 import {ref, onMounted, onBeforeUnmount} from 'vue'
 import { useRouter } from 'vue-router'
+import { gameService } from '@/services/game.js'
+import CharacterRegistration from '@/components/student/game/CharacterRegistration.vue'
 import img1 from '../assets/远眺.gif'
 import img2 from '../assets/初涉.gif'
 import img3 from '../assets/摸索.gif'
 import img4 from '../assets/临近.gif'
 import img5 from '../assets/总塔.gif'
+import userConfig from "@/config/userConfig.js";
 
 export default {
   name: 'GameTransitionAnimation',
@@ -85,6 +102,9 @@ export default {
     const snowflakes = ref([])
     const showGameHint = ref(false)
     const cycleCount = ref(0)
+    const showCharacterRegistration = ref(false)
+    const characterRegistrationRef = ref(null)
+    const hasCheckedCharacter = ref(false)
 
     const gifList = [
       {src: img1, name: '远眺'},
@@ -99,6 +119,35 @@ export default {
     let snowAnimationId = null
     let lastSnowflakeTime = 0
 
+    // 检查角色信息
+    const checkCharacterInfo = async () => {
+      if (hasCheckedCharacter.value) return
+      
+      try {
+        const studentId = userConfig.studentId
+        const response = await gameService.gameUser.getPlayerInfo(studentId)
+        
+        if (response.data && response.data.success && response.data.data) {
+          hasCheckedCharacter.value = true
+          console.log('角色信息获取成功:', response.data.data)
+        } else {
+          // 角色不存在，显示注册框
+          console.log('角色不存在，需要注册')
+          showCharacterRegistration.value = true
+          // 角色不存在时也要启动动画，让用户看到动画效果
+          console.log('角色不存在，启动转场动画...')
+          startTransition()
+        }
+      } catch (error) {
+        console.error('检查角色信息失败:', error)
+        // 如果获取失败，也显示注册框
+        showCharacterRegistration.value = true
+        // 即使检查失败，也要启动动画
+        console.log('角色检查失败，启动转场动画...')
+        startTransition()
+      }
+    }
+
     const onGifLoad = (index) => {
       loadedGifs.value++
       loadingProgress.value = (loadedGifs.value / gifList.length) * 100
@@ -107,7 +156,8 @@ export default {
         // 确保进度条显示100%后再开始动画
         setTimeout(() => {
           isLoading.value = false
-          startTransition()
+          // 资源加载完成后检查角色信息
+          checkCharacterInfo()
         }, 1000) // 延迟1秒，让用户看到100%进度
       }
     }
@@ -124,37 +174,61 @@ export default {
           if (loadedGifs.value < gifList.length) {
             loadError.value = '部分GIF资源加载失败，但可以继续播放'
           }
-          startTransition()
+          // 资源加载完成后检查角色信息
+          checkCharacterInfo()
         }, 1000) // 延迟0.5秒，让用户看到100%进度
       }
     }
 
     const startTransition = () => {
+      console.log('开始转场动画，当前角色状态:', hasCheckedCharacter.value)
+      console.log('GIF列表长度:', gifList.length)
+      console.log('当前场景索引:', currentScene.value)
+      
       // 显示第一张图片
       currentScene.value = 0
+      console.log('设置初始场景为 0')
 
       // 启动雪花效果
       startSnowEffect()
 
+      // 清除可能存在的旧定时器
+      if (sceneTimer) {
+        clearInterval(sceneTimer)
+        console.log('清除旧的场景定时器')
+      }
+
       // 立即开始自动转场，第一张GIF从0秒开始计时
       sceneTimer = setInterval(() => {
-        const nextScene = (currentScene.value + 1) % gifList.length
+        const currentIndex = currentScene.value
+        const nextScene = (currentIndex + 1) % gifList.length
+        console.log(`定时器触发: 当前场景 ${currentIndex} -> 下一个场景 ${nextScene} (${gifList[nextScene].name})`)
         performDramaticTransition(nextScene)
       }, 5000) // 每5秒切换一次
+      
+      console.log('转场动画已启动，每5秒切换一次场景，定时器ID:', sceneTimer)
+      
+      // 立即显示第一张图片
+      console.log('立即显示第一张图片:', gifList[0].name)
     }
 
     // 执行优雅转场
     const performDramaticTransition = (nextScene) => {
+      console.log(`开始执行转场: 从场景 ${currentScene.value} 到场景 ${nextScene}`)
+      
       // 创建转场特效元素
       createTransitionEffects()
 
       // 延迟切换场景，让特效先播放
       setTimeout(() => {
+        console.log(`转场特效播放完成，切换到场景 ${nextScene}`)
         currentScene.value = nextScene
+        console.log(`场景已切换到: ${nextScene} (${gifList[nextScene].name})`)
 
         // 检查是否完成一个完整循环
         if (nextScene === 0) {
           cycleCount.value++
+          console.log(`完成第 ${cycleCount.value} 个完整循环`)
 
           // 完成一个完整循环后显示游戏提示
           if (cycleCount.value >= 1) {
@@ -365,20 +439,92 @@ export default {
       if (event.code === 'Space') {
         event.preventDefault() // 阻止空格键的默认行为
         
-        // 如果游戏提示已显示，直接进入游戏
+        // 只有在游戏提示已显示时，才能进入游戏
         if (showGameHint.value) {
           console.log('空格键触发，游戏提示已显示，进入游戏')
           enterGame()
         } else {
-          // 如果游戏提示未显示，强制显示并进入游戏
-          console.log('空格键触发，游戏提示未显示，强制显示并进入游戏')
-          showGameHint.value = true
-          // 延迟一点进入游戏，让用户看到提示
-          setTimeout(() => {
-            enterGame()
-          }, 300)
+          // 如果游戏提示未显示，说明动画还没有完整播放一轮，不允许进入游戏
+          console.log('空格键触发，但动画尚未完整播放，无法进入游戏')
+          // 可以添加一个提示音效或者视觉反馈，告知用户需要等待动画播放完成
         }
       }
+    }
+
+    // 处理角色注册成功
+    const onRegistrationSuccess = async (data) => {
+      console.log('角色注册成功:', data)
+      showCharacterRegistration.value = false
+      hasCheckedCharacter.value = true
+      
+      // 注册成功后开始动画
+      if (characterRegistrationRef.value) {
+        characterRegistrationRef.value.resetForm()
+      }
+      
+      // 注册成功后，为新用户创建学习塔
+      try {
+        const studentId = userConfig.studentId
+        
+        // 获取用户的课程ID列表
+        const courseIds = userConfig.courseIds || [userConfig.courseId || '1']
+        
+        console.log(`新用户注册成功，开始创建学习塔，课程列表:`, courseIds)
+        
+        // 为每个课程创建学习塔
+        const towerPromises = courseIds.map(async (courseId) => {
+          try {
+            console.log(`正在为新用户创建课程 ${courseId} 的学习塔...`)
+            const towerResponse = await gameService.tower.createTowerByAgent(studentId, courseId)
+            
+            if (towerResponse.data && towerResponse.data.success) {
+              console.log(`课程 ${courseId} 学习塔创建成功:`, towerResponse.data)
+              return { courseId, success: true, data: towerResponse.data }
+            } else {
+              console.warn(`课程 ${courseId} 学习塔创建失败:`, towerResponse.data)
+              return { courseId, success: false, error: towerResponse.data }
+            }
+          } catch (error) {
+            console.error(`课程 ${courseId} 学习塔创建异常:`, error)
+            return { courseId, success: false, error: error.message }
+          }
+        })
+        
+        // 等待所有学习塔创建完成
+        const towerResults = await Promise.allSettled(towerPromises)
+        
+        // 统计创建结果
+        const successCount = towerResults.filter(result => 
+          result.status === 'fulfilled' && result.value.success
+        ).length
+        
+        const totalCount = courseIds.length
+        
+        console.log(`新用户学习塔创建完成: ${successCount}/${totalCount} 成功`)
+        
+        if (successCount > 0) {
+          console.log('新用户至少有一个学习塔创建成功，可以进入游戏')
+        } else {
+          console.warn('新用户所有学习塔创建都失败了，但用户仍可以进入游戏')
+        }
+        
+      } catch (towerError) {
+        console.error('为新用户创建学习塔过程中发生错误:', towerError)
+      }
+      
+      // 延迟一下再开始动画，让用户看到成功提示和学习塔创建过程
+      setTimeout(() => {
+        startTransition()
+      }, 1000) 
+    }
+
+    // 处理角色注册取消
+    const onRegistrationCancel = () => {
+      console.log('角色注册取消')
+      showCharacterRegistration.value = false
+      
+      // 取消注册，返回上一页
+      router.push('/student/course-selection')
     }
 
     // 进入游戏
@@ -412,6 +558,15 @@ export default {
         // 如果路由跳转失败，尝试其他方式
         window.location.href = '/student/course-selection'
       }
+    }
+
+    // 手动切换场景
+    const manualNextScene = () => {
+      console.log('手动切换场景')
+      const currentIndex = currentScene.value
+      const nextScene = (currentIndex + 1) % gifList.length
+      console.log(`手动切换场景: 当前场景 ${currentIndex} -> 下一个场景 ${nextScene} (${gifList[nextScene].name})`)
+      performDramaticTransition(nextScene)
     }
 
     const retryLoad = () => {
@@ -472,10 +627,15 @@ export default {
       gifList,
       snowflakes,
       showGameHint,
+      showCharacterRegistration,
+      characterRegistrationRef,
       retryLoad,
       onGifLoad,
       onGifError,
-      exitAnimation
+      exitAnimation,
+      onRegistrationSuccess,
+      onRegistrationCancel,
+      manualNextScene
     }
   }
 }
@@ -571,9 +731,11 @@ export default {
 .exit-button-container {
   position: absolute;
   top: 20px;
-  left: 20px;
+  left: 20px; 
   z-index: 11;
   pointer-events: auto;
+  display: flex; 
+  gap: 10px; 
 }
 
 .exit-btn {
@@ -604,12 +766,41 @@ export default {
   transform: translateY(0);
 }
 
-.exit-icon {
+/* 调试按钮样式 */
+.debug-btn {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+  padding: 8px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.debug-btn:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.2);
+}
+
+.debug-btn:active {
+  transform: translateY(0);
+}
+
+.debug-icon {
   font-size: 16px;
   font-weight: bold;
 }
 
-.exit-text {
+.debug-text {
   font-size: 14px;
 }
 
@@ -817,7 +1008,7 @@ export default {
   /* 移动端退出按钮优化 */
   .exit-button-container {
     top: 15px;
-    left: 15px;
+    right: 15px; /* Changed from left to right */
   }
 
   .exit-btn {
@@ -830,6 +1021,20 @@ export default {
   }
 
   .exit-text {
+    font-size: 12px;
+  }
+
+  /* 移动端调试按钮优化 */
+  .debug-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .debug-icon {
+    font-size: 14px;
+  }
+
+  .debug-text {
     font-size: 12px;
   }
 

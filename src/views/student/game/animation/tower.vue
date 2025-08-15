@@ -7,16 +7,16 @@
 
     <!-- 背景层 -->
     <div class="background-layer">
-      <img src="./student/game/img/背景2.png" alt="背景" class="background-image background-1" :class="{ 'active': currentBackground === 1 }" />
-      <img src="./student/game/img/背景3.png" alt="背景" class="background-image background-2" :class="{ 'active': currentBackground === 2 }" />
-      <img src="./student/game/img/背景1.png" alt="背景" class="background-image background-3" :class="{ 'active': currentBackground === 3 }" />
+      <img src="../img/背景2.png" alt="背景" class="background-image background-1" :class="{ 'active': currentBackground === 1 }" />
+      <img src="../img/背景3.png" alt="背景" class="background-image background-2" :class="{ 'active': currentBackground === 2 }" />
+      <img src="../img/背景1.png" alt="背景" class="background-image background-3" :class="{ 'active': currentBackground === 3 }" />
     </div>
 
     <!-- 内容图片层 -->
     <div class="content-layer">
       <!-- 第一张图片 -->
       <img
-          src="./student/game/img/总塔（主体）.png"
+          src="../img/总塔（主体）.png"
           alt="图片1"
           class="content-image image-1"
           :class="{ 'active': currentImage === 1 }"
@@ -24,7 +24,7 @@
 
       <!-- 第二张图片 -->
       <img
-          src="./student/game/img/门口（无水印）.png"
+          src="../img/门口（无水印）.png"
           alt="图片2"
           class="content-image image-2"
           :class="{ 'active': currentImage === 2 }"
@@ -32,7 +32,7 @@
 
       <!-- 第三张图片 -->
       <img
-          src="./student/game/img/1.png"
+          src="../img/1.png"
           alt="图片3"
           class="content-image image-3"
           :class="{ 'active': currentImage === 3 }"
@@ -40,7 +40,7 @@
 
       <!-- 第四张图片 -->
       <img
-          src="./student/game/img/3（塔）.png"
+          src="../img/3（塔）.png"
           alt="图片4"
           class="content-image image-4"
           :class="{ 'active': currentImage === 4 }"
@@ -48,7 +48,7 @@
 
       <!-- 第五张图片 -->
       <img
-          src="./student/game/img/2.png"
+          src="../img/2.png"
           alt="图片5"
           class="content-image image-5"
           :class="{ 'active': currentImage === 5 }"
@@ -57,7 +57,7 @@
       <!-- 第二轮图片 -->
       <!-- 第六张图片 -->
       <img
-          src="./student/game/img/楼梯（无水印）.png"
+          src="../img/楼梯（无水印）.png"
           alt="图片6"
           class="content-image image-6"
           :class="{ 'active': currentImage === 6 }"
@@ -65,7 +65,7 @@
 
       <!-- 第七张图片 -->
       <img
-          src="./student/game/img/柱（无水印）.png"
+          src="../img/柱（无水印）.png"
           alt="图片7"
           class="content-image image-7"
           :class="{ 'active': currentImage === 7 }"
@@ -73,7 +73,7 @@
 
       <!-- 第八张图片 -->
       <img
-          src="./student/game/img/标靶（无水印）.png"
+          src="../img/标靶（无水印）.png"
           alt="图片8"
           class="content-image image-8"
           :class="{ 'active': currentImage === 8 }"
@@ -81,7 +81,7 @@
 
       <!-- 第九张图片 -->
       <img
-          src="./student/game/img/宝剑（主体）.png"
+          src="../img/宝剑（主体）.png"
           alt="图片9"
           class="content-image image-9"
           :class="{ 'active': currentImage === 9 }"
@@ -89,7 +89,7 @@
 
       <!-- 第十张图片 -->
       <img
-          src="./student/game/img/楼阁（无水印）.png"
+          src="../img/楼阁（无水印）.png"
           alt="图片10"
           class="content-image image-10"
           :class="{ 'active': currentImage === 10 }"
@@ -98,7 +98,7 @@
       <!-- 第三轮图片 -->
       <!-- 第十一张图片 -->
       <img
-          src="./student/game/img/窗（无水印）.png"
+          src="../img/窗（无水印）.png"
           alt="图片11"
           class="content-image image-11"
           :class="{ 'active': currentImage === 11 }"
@@ -106,7 +106,7 @@
 
       <!-- 第十二张图片 -->
       <img
-          src="./student/game/img/天花板（无水印）.png"
+          src="../img/天花板（无水印）.png"
           alt="图片12"
           class="content-image image-12"
           :class="{ 'active': currentImage === 12 }"
@@ -114,7 +114,7 @@
 
       <!-- 第十三张图片 -->
       <img
-          src="./student/game/img/龙（主体）.png"
+          src="../img/龙（主体）.png"
           alt="图片13"
           class="content-image image-13"
           :class="{ 'active': currentImage === 13 }"
@@ -122,7 +122,7 @@
 
       <!-- 第十四张图片 -->
       <img
-          src="./student/game/img/宝剑（无主体）.png"
+          src="../img/宝剑（无主体）.png"
           alt="图片14"
           class="content-image image-14"
           :class="{ 'active': currentImage === 14 }"
@@ -130,7 +130,7 @@
 
       <!-- 第十五张图片 -->
       <img
-          src="./student/game/img/总塔（无水印）.png"
+          src="../img/总塔（无水印）.png"
           alt="图片15"
           class="content-image image-15"
           :class="{ 'active': currentImage === 15 }"
@@ -140,32 +140,13 @@
     <!-- 文字展示区域 -->
     <div class="text-display">
       <div class="text-container">
-        <p class="story-text" :class="{ 'active': currentTextIndex === 0 }">
-          在遥远的未来，人类文明发展到了一个全新的高度，科技与智慧的结晶催生了一座神秘的高塔"永恒之塔"。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 1 }">
-          这座塔并非由实体砖石建成，而是由无数虚拟系统和数据结构交织而成，象征着人类对完美设计与无穷知识的追求。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 2 }">
-          塔的每一层都蕴含着特定的知识领域，唯有通过理解与掌握该层的核心理念，才能继续向上攀登。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 3 }">
-          传说中，塔的顶层隐藏着一种能够解决所有人类问题的终极模型--"万物蓝图"。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 4 }">
-          然而，进入塔中的人很快发现，这里的挑战并不在于体力或武器，而在于逻辑思维与系统设计能力。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 5 }">
-          每一位挑战者都需要运用UML(统一建模语言)来解析塔中复杂的规则与结构:从用例图描绘塔的功能需求，到类图揭示其内部逻辑。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 6 }">
-          从时序图模拟动态交互，到状态图追踪变化规律。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 7 }">
-          随着挑战者不断深入，他们逐渐意识到，"永恒之塔"不仅是对个人能力的试炼场，更是一面镜子,映射出他们在现实世界中对系统分析与设计的理解深度。
-        </p>
-        <p class="story-text" :class="{ 'active': currentTextIndex === 8 }">
-          只有真正领悟UML建模精髓的人，才能解开层层谜题，最终触及那传说中的"万物蓝图"，为人类开启新的纪元篇章。
+        <p 
+          v-for="(text, index) in storyTexts" 
+          :key="index"
+          class="story-text" 
+          :class="{ 'active': currentTextIndex === index }"
+        >
+          {{ text }}
         </p>
       </div>
     </div>
@@ -173,7 +154,83 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+// 获取路由参数
+const route = useRoute()
+const router = useRouter()
+
+// 从 query 参数中获取数据（因为使用 path + query 方式跳转）
+const towerIndex = route.query.towerIndex
+const towerName = route.query.towerName
+const towerLevel = route.query.towerLevel
+const fullStory = route.query.fullStory
+
+// 如果 query 中没有数据，尝试从 params 中获取（兼容性）
+const fallbackTowerIndex = route.params.towerIndex
+const fallbackTowerName = route.params.towerName
+const fallbackTowerLevel = route.params.towerLevel
+const fallbackFullStory = route.params.fullStory
+
+// 使用 query 参数，如果没有则使用 params 参数
+const finalTowerIndex = towerIndex || fallbackTowerIndex
+const finalTowerName = towerName || fallbackTowerName
+const finalTowerLevel = towerLevel || fallbackTowerLevel
+const finalFullStory = fullStory || fallbackFullStory
+
+// 在控制台输出接收到的参数
+console.log('塔选择器传递的参数:', { 
+  towerIndex: finalTowerIndex, 
+  towerName: finalTowerName, 
+  towerLevel: finalTowerLevel, 
+  fullStory: finalFullStory 
+})
+
+console.log('Query 参数:', route.query)
+console.log('Params 参数:', route.params)
+
+// 处理接收到的故事内容
+const processStoryContent = () => {
+  if (finalFullStory && finalFullStory.trim()) {
+    // 首先按换行符分割，这通常是API返回的段落分隔符
+    let paragraphs = finalFullStory.split(/\n+/).filter(paragraph => paragraph.trim())
+    
+    // 如果按换行符分割后段落太少，尝试按句号分割
+    if (paragraphs.length < 3) {
+      const sentences = finalFullStory.split(/[。！？]/).filter(sentence => sentence.trim())
+      paragraphs = sentences
+    }
+    
+    // 如果段落还是太少，尝试按逗号分割
+    if (paragraphs.length < 3) {
+      const commaSplit = finalFullStory.split(/[，；]/).filter(sentence => sentence.trim())
+      paragraphs = commaSplit
+    }
+    
+    // 限制最多9个段落，并确保每个段落都有内容
+    storyTexts.value = paragraphs
+      .filter(paragraph => paragraph.trim().length > 0)
+      .slice(0, 9)
+      .map(paragraph => paragraph.trim())
+    
+    console.log('处理后的故事段落:', storyTexts.value)
+  } else {
+    // 如果没有故事内容，使用默认故事
+    storyTexts.value = [
+      '在遥远的未来，人类文明发展到了一个全新的高度，科技与智慧的结晶催生了一座神秘的高塔"永恒之塔"。',
+      '这座塔并非由实体砖石建成，而是由无数虚拟系统和数据结构交织而成，象征着人类对完美设计与无穷知识的追求。',
+      '塔的每一层都蕴含着特定的知识领域，唯有通过理解与掌握该层的核心理念，才能继续向上攀登。',
+      '传说中，塔的顶层隐藏着一种能够解决所有人类问题的终极模型--"万物蓝图"。',
+      '然而，进入塔中的人很快发现，这里的挑战并不在于体力或武器，而在于逻辑思维与系统设计能力。',
+      '每一位挑战者都需要运用UML(统一建模语言)来解析塔中复杂的规则与结构:从用例图描绘塔的功能需求，到类图揭示其内部逻辑。',
+      '从时序图模拟动态交互，到状态图追踪变化规律。',
+      '随着挑战者不断深入，他们逐渐意识到，"永恒之塔"不仅是对个人能力的试炼场，更是一面镜子,映射出他们在现实世界中对系统分析与设计的理解深度。',
+      '只有真正领悟UML建模精髓的人，才能解开层层谜题，最终触及那传说中的"万物蓝图"，为人类开启新的纪元篇章。'
+    ]
+    console.log('使用默认故事内容')
+  }
+}
 
 // 响应式数据
 const currentImage = ref(0)
@@ -183,10 +240,60 @@ const isTransitioning = ref(false)
 const showSkipButton = ref(false) // 控制跳过按钮显示
 let transitionTimer = null
 
+// 动态故事文字数组
+const storyTexts = ref([])
+
 // 语音播放相关
 const isSpeaking = ref(false)
 const speechQueue = ref([])
 let currentSpeech = null
+
+// 路由监听 - 当用户离开页面时停止语音
+watch(() => route.path, (newPath, oldPath) => {
+  if (oldPath && oldPath !== newPath) {
+    console.log('路由变化，停止语音播放')
+    stopSpeaking()
+  }
+})
+
+// 页面可见性变化监听 - 当页面隐藏时停止语音
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    console.log('页面隐藏，停止语音播放')
+    stopSpeaking()
+  }
+}
+
+// 页面卸载前清理
+const cleanup = () => {
+  console.log('组件卸载，停止语音播放')
+  stopSpeaking()
+  // 移除事件监听器
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  // 移除全局路由监听
+  removeGlobalRouteListener()
+}
+
+// 添加全局路由变化监听
+const handleRouteChange = () => {
+  console.log('检测到路由变化，停止语音播放')
+  stopSpeaking()
+}
+
+// 在组件挂载时添加全局路由监听
+const addGlobalRouteListener = () => {
+  // 监听 popstate 事件（浏览器前进后退）
+  window.addEventListener('popstate', handleRouteChange)
+  
+  // 监听 hashchange 事件（如果使用 hash 路由）
+  window.addEventListener('hashchange', handleRouteChange)
+}
+
+// 移除全局路由监听
+const removeGlobalRouteListener = () => {
+  window.removeEventListener('popstate', handleRouteChange)
+  window.removeEventListener('hashchange', handleRouteChange)
+}
 
 // 语音播放功能
 const speakText = (text) => {
@@ -245,9 +352,16 @@ const skipAnimation = () => {
   currentTextIndex.value = -1
   showSkipButton.value = false
 
-  // 这里可以添加跳转到下一个页面的逻辑
-  // 例如：router.push('/next-page')
-  console.log('动画已跳过')
+  // 回到原来的页面
+  console.log('动画已跳过，返回原页面')
+  
+  // 使用 router.go(-1) 返回上一页，或者直接跳转到游戏页面
+  if (window.history.length > 1) {
+    router.go(-1) // 返回上一页
+  } else {
+    // 如果没有历史记录，直接跳转到游戏页面
+    router.push('/student/game')
+  }
 }
 
 // 自动开始第一轮转场动画
@@ -294,68 +408,35 @@ const startTransition = () => {
 const startTextDisplay = () => {
   currentTextIndex.value = -1
 
-  // 将所有文字拼在一起，一次性播放语音
-  const fullStory = `在遥远的未来，人类文明发展到了一个全新的高度，科技与智慧的结晶催生了一座神秘的高塔"永恒之塔"。这座塔并非由实体砖石建成，而是由无数虚拟系统和数据结构交织而成，象征着人类对完美设计与无穷知识的追求。塔的每一层都蕴含着特定的知识领域，唯有通过理解与掌握该层的核心理念，才能继续向上攀登。传说中，塔的顶层隐藏着一种能够解决所有人类问题的终极模型--"万物蓝图"。然而，进入塔中的人很快发现，这里的挑战并不在于体力或武器，而在于逻辑思维与系统设计能力。每一位挑战者都需要运用UML(统一建模语言)来解析塔中复杂的规则与结构:从用例图描绘塔的功能需求，到类图揭示其内部逻辑。从时序图模拟动态交互，到状态图追踪变化规律。随着挑战者不断深入，他们逐渐意识到，"永恒之塔"不仅是对个人能力的试炼场，更是一面镜子,映射出他们在现实世界中对系统分析与设计的理解深度。只有真正领悟UML建模精髓的人，才能解开层层谜题，最终触及那传说中的"万物蓝图"，为人类开启新的纪元篇章。`
+  // 使用传递过来的故事内容
+  const storyToPlay = finalFullStory || `在遥远的未来，人类文明发展到了一个全新的高度，科技与智慧的结晶催生了一座神秘的高塔"永恒之塔"。这座塔并非由实体砖石建成，而是由无数虚拟系统和数据结构交织而成，象征着人类对完美设计与无穷知识的追求。塔的每一层都蕴含着特定的知识领域，唯有通过理解与掌握该层的核心理念，才能继续向上攀登。传说中，塔的顶层隐藏着一种能够解决所有人类问题的终极模型--"万物蓝图"。然而，进入塔中的人很快发现，这里的挑战并不在于体力或武器，而在于逻辑思维与系统设计能力。每一位挑战者都需要运用UML(统一建模语言)来解析塔中复杂的规则与结构:从用例图描绘塔的功能需求，到类图揭示其内部逻辑。从时序图模拟动态交互，到状态图追踪变化规律。随着挑战者不断深入，他们逐渐意识到，"永恒之塔"不仅是对个人能力的试炼场，更是一面镜子,映射出他们在现实世界中对系统分析与设计的理解深度。只有真正领悟UML建模精髓的人，才能解开层层谜题，最终触及那传说中的"万物蓝图"，为人类开启新的纪元篇章。`
 
   // 在页面加载后立即开始播放完整故事，确保在动画结束前播放完
   setTimeout(() => {
-    speakText(fullStory)
+    speakText(storyToPlay)
   }, 1000)
 
-  // 第一段文字
-  setTimeout(() => {
-    currentTextIndex.value = 0
-  }, 2000)
+  // 动态计算文字显示时间间隔
+  const totalTexts = storyTexts.value.length
+  const baseInterval = 6000 // 每段文字显示6秒
+  const fadeTime = 1000 // 淡入淡出时间
 
-  // 第二段文字（隐藏第一段）
-  setTimeout(() => {
-    currentTextIndex.value = 1
-  }, 8000)
-
-  // 第三段文字（隐藏第二段）
-  setTimeout(() => {
-    currentTextIndex.value = 2
-  }, 14000)
-
-  // 第四段文字（隐藏第三段）
-  setTimeout(() => {
-    currentTextIndex.value = 3
-  }, 22000)
-
-  // 第五段文字（隐藏第四段）
-  setTimeout(() => {
-    currentTextIndex.value = 4
-  }, 30000)
-
-  // 第六段文字（隐藏第五段）
-  setTimeout(() => {
-    currentTextIndex.value = 5
-  }, 38000)
-
-  // 第七段文字（隐藏第六段）
-  setTimeout(() => {
-    currentTextIndex.value = 6
-  }, 46000)
-
-  // 第八段文字（隐藏第七段）
-  setTimeout(() => {
-    currentTextIndex.value = 7
-  }, 54000)
-
-  // 第九段文字（隐藏第八段）
-  setTimeout(() => {
-    currentTextIndex.value = 8
-  }, 62000)
+  // 为每个故事段落设置显示时间
+  for (let i = 0; i < totalTexts; i++) {
+    setTimeout(() => {
+      currentTextIndex.value = i
+    }, 2000 + (i * baseInterval))
+  }
 
   // 最后隐藏所有文字
   setTimeout(() => {
     currentTextIndex.value = -1
-  }, 70000)
+  }, 2000 + (totalTexts * baseInterval) + fadeTime)
 
   // 语音在动画结束前停止
   setTimeout(() => {
     stopSpeaking()
-  }, 70000)
+  }, 2000 + (totalTexts * baseInterval) + fadeTime)
 }
 
 // 开始第二轮转场
@@ -429,19 +510,28 @@ const startThirdRound = () => {
 
 // 组件挂载后自动开始转场
 onMounted(() => {
+  // 处理接收到的故事内容
+  processStoryContent()
+  
   // 延迟1秒后自动开始，给页面加载一些时间
   setTimeout(() => {
     startTransition()
   }, 1000)
+  
+  // 添加页面可见性变化监听器
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  
+  // 添加全局路由监听
+  addGlobalRouteListener()
 })
 
-// 组件卸载时清理定时器
+// 组件卸载时清理定时器和事件监听器
 onUnmounted(() => {
   if (transitionTimer) {
     clearTimeout(transitionTimer)
   }
-  // 停止语音播放
-  stopSpeaking()
+  // 调用清理函数
+  cleanup()
 })
 </script>
 

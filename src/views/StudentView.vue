@@ -71,9 +71,22 @@ const navbarItems = [
   }
 ]
 
-const handleNavbarItemClick = (item) => {
+const handleNavbarItemClick = async (item) => {
   if (item.route) {
-    router.push(item.route);
+    // 如果是神秘之塔，先检查角色信息
+    if (item.id === 'game-entry') {
+      try {
+        // 这里可以添加角色检查逻辑，如果需要的话
+        // 目前直接跳转，角色检查在Entry.vue中进行
+        router.push(item.route);
+      } catch (error) {
+        console.error('进入神秘之塔失败:', error);
+        // 如果失败，仍然跳转，让Entry.vue处理错误
+        router.push(item.route);
+      }
+    } else {
+      router.push(item.route);
+    }
   }
 };
 

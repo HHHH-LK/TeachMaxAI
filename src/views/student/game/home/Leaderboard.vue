@@ -20,14 +20,14 @@
             </div>
 
             <div
-                v-for="tower in 8"
-                :key="tower"
+                v-for="tower in studentTowers"
+                :key="tower.towerId"
                 class="tower-tab horror-tower"
-                :class="{ active: selectedTower === tower.toString() }"
-                @click="selectTower(tower.toString())"
+                :class="{ active: selectedTower === tower.towerId.toString() }"
+                @click="selectTower(tower.towerId.toString())"
             >
               <div class="tab-icon">💀</div>
-              <div class="tab-text">{{ tower }}塔</div>
+              <div class="tab-text">{{ tower.name.split('_')[0] }}</div>
               <div class="tab-glow"></div>
             </div>
           </div>
@@ -40,8 +40,31 @@
     </div>
 
     <div class="leaderboard-list" ref="leaderboardList">
-      <div class="scroll-container">
-        <div class="scroll-content" :style="{ transform: `translateY(${scrollOffset}px)` }">
+      <div class="scroll-container" :class="{ 'few-data': filteredLeaderboardData.length <= 5 }">
+        <!-- 加载状态 -->
+        <div v-if="isLoading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">正在加载排行榜数据...</div>
+        </div>
+        
+        <!-- 错误状态 -->
+        <div v-else-if="error" class="error-state">
+          <div class="error-icon">⚠️</div>
+          <div class="error-text">{{ error }}</div>
+          <button class="retry-button" @click="fetchTotalRanking">重试</button>
+        </div>
+        
+        <!-- 空数据状态 -->
+        <div v-else-if="filteredLeaderboardData.length === 0" class="empty-state">
+          <div class="empty-icon">📊</div>
+          <div class="empty-text">
+            {{ selectedTower === 'all' ? '暂无总榜数据' : getTowerDisplayName(selectedTower) }}
+          </div>
+          <div class="empty-subtext">请稍后再试或联系管理员</div>
+        </div>
+        
+        <!-- 排行榜数据 -->
+        <div v-else class="scroll-content" :style="{ transform: `translateY(${scrollOffset}px)` }">
           <div
               v-for="player in filteredLeaderboardData"
               :key="`${player.towerLevel}-${player.rank}`"
@@ -60,9 +83,16 @@
               <div class="player-stats">
                 <span class="stat">Lv.{{ player.level }}</span>
                 <span class="stat">塔{{ player.towerLevel }}层</span>
-                <span class="stat">{{ player.exp }}经验</span>
+<!--                <span class="stat">{{ player.exp }}经验</span>-->
               </div>
             </div>
+          </div>
+          
+          <!-- 数据少时的底部装饰 -->
+          <div v-if="filteredLeaderboardData.length <= 5" class="bottom-decoration">
+            <div class="decoration-line"></div>
+            <div class="decoration-text">排行榜</div>
+            <div class="decoration-line"></div>
           </div>
         </div>
       </div>
@@ -72,6 +102,8 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { gameService } from "@/services/game.js";
+import userConfig from "@/config/userConfig.js";
 
 // 响应式变量
 const selectedTower = ref('all');
@@ -82,6 +114,12 @@ const scrollInterval = ref(null);
 const towerTabs = ref(null);
 const leaderboardList = ref(null);
 
+// 新增：数据加载状态和错误处理
+const isLoading = ref(false);
+const error = ref(null);
+const leaderboardData = ref([]);
+const studentTowers = ref([]); // 存储学生的塔信息
+
 // 存储事件监听器的引用，用于清理
 const eventListeners = ref({
   touchstart: null,
@@ -89,67 +127,203 @@ const eventListeners = ref({
   touchend: null
 });
 
-// 排行榜数据
-const leaderboardData = [
-  // 总塔排行榜数据
-  { name: '暗影之王', level: 15, towerLevel: 8, exp: 2500, rank: 1, totalRank: 1 },
-  { name: '血月女巫', level: 14, towerLevel: 7, exp: 2300, rank: 2, totalRank: 2 },
-  { name: '亡灵法师', level: 13, towerLevel: 7, exp: 2100, rank: 3, totalRank: 3 },
-  { name: '深渊领主', level: 12, towerLevel: 6, exp: 1900, rank: 4, totalRank: 4 },
-  { name: '混沌使者', level: 11, towerLevel: 6, exp: 1700, rank: 5, totalRank: 5 },
-  { name: '暗夜行者', level: 10, towerLevel: 5, exp: 1500, rank: 6, totalRank: 6 },
-  { name: '诅咒术士', level: 9, towerLevel: 5, exp: 1300, rank: 7, totalRank: 7 },
-  { name: '恐惧骑士', level: 8, towerLevel: 4, exp: 1100, rank: 8, totalRank: 8 },
-  { name: '阴影刺客', level: 7, towerLevel: 4, exp: 900, rank: 9, totalRank: 9 },
-  { name: '死亡使者', level: 6, towerLevel: 3, exp: 700, rank: 10, totalRank: 10 },
+// 获取学生的塔信息
+const fetchStudentTowers = async () => {
+  try {
+    const studentId = userConfig.studentId;
+    console.log(`开始获取学生${studentId}的塔信息...`);
+    
+    const response = await gameService.tower.getTowerByStudentId(studentId);
+    console.log("获取到学生塔信息:", response);
+    
+    if (response.data && response.data.success && response.data.data) {
+      const towers = response.data.data;
+      
+      // 检查塔信息的完整性
+      const validTowers = towers.filter(tower => {
+        if (!tower.towerId || !tower.courseId || !tower.name) {
+          console.warn(`塔信息不完整:`, tower);
+          return false;
+        }
+        return true;
+      });
+      
+      if (validTowers.length > 0) {
+        studentTowers.value = validTowers;
+        console.log("处理后的有效塔信息:", studentTowers.value);
+      } else {
+        console.warn("没有有效的塔信息，使用默认数据");
+        studentTowers.value = [
+          { towerId: 1, courseId: 1, name: 'Java程序设计_学习塔' },
+          { towerId: 2, courseId: 2, name: '数据结构与算法_学习塔' },
+          { towerId: 3, courseId: 3, name: '高等数学A_学习塔' }
+        ];
+      }
+    } else {
+      console.warn("获取塔信息失败:", response);
+      // 如果获取失败，使用默认的塔信息
+      studentTowers.value = [
+        { towerId: 1, courseId: 1, name: 'Java程序设计_学习塔' },
+        { towerId: 2, courseId: 2, name: '数据结构与算法_学习塔' },
+        { towerId: 3, courseId: 3, name: '高等数学A_学习塔' }
+      ];
+    }
+  } catch (err) {
+    console.error("获取学生塔信息失败:", err);
+    // 使用默认塔信息作为备选
+    studentTowers.value = [
+      { towerId: 1, courseId: 1, name: 'Java程序设计_学习塔' },
+      { towerId: 2, courseId: 2, name: '数据结构与算法_学习塔' },
+      { towerId: 3, courseId: 3, name: '高等数学A_学习塔' }
+    ];
+  }
+};
 
-  // 1塔到8塔数据省略...
-  { name: '新手勇者', level: 5, towerLevel: 1, exp: 300, rank: 1, totalRank: 25 },
-  { name: '见习法师', level: 4, towerLevel: 1, exp: 250, rank: 2, totalRank: 26 },
-  { name: '初级战士', level: 3, towerLevel: 1, exp: 200, rank: 3, totalRank: 27 },
-  { name: '进阶法师', level: 7, towerLevel: 2, exp: 500, rank: 1, totalRank: 20 },
-  { name: '熟练战士', level: 6, towerLevel: 2, exp: 450, rank: 2, totalRank: 21 },
-  { name: '初级射手', level: 5, towerLevel: 2, exp: 400, rank: 3, totalRank: 22 },
-  { name: '高级法师', level: 9, towerLevel: 3, exp: 800, rank: 1, totalRank: 15 },
-  { name: '精英战士', level: 8, towerLevel: 3, exp: 750, rank: 2, totalRank: 16 },
-  { name: '熟练射手', level: 7, towerLevel: 3, exp: 700, rank: 3, totalRank: 17 },
-  { name: '大师法师', level: 11, towerLevel: 4, exp: 1200, rank: 1, totalRank: 12 },
-  { name: '传奇战士', level: 10, towerLevel: 4, exp: 1100, rank: 2, totalRank: 13 },
-  { name: '神射手', level: 9, towerLevel: 4, exp: 1000, rank: 3, totalRank: 14 },
-  { name: '至尊法师', level: 13, towerLevel: 5, exp: 1600, rank: 1, totalRank: 10 },
-  { name: '战神', level: 12, towerLevel: 5, exp: 1500, rank: 2, totalRank: 11 },
-  { name: '箭神', level: 11, towerLevel: 5, exp: 1400, rank: 3, totalRank: 12 },
-  { name: '法神', level: 14, towerLevel: 6, exp: 2000, rank: 1, totalRank: 7 },
-  { name: '武神', level: 13, towerLevel: 6, exp: 1900, rank: 2, totalRank: 8 },
-  { name: '弓神', level: 12, towerLevel: 6, exp: 1800, rank: 3, totalRank: 9 },
-  { name: '法王', level: 15, towerLevel: 7, exp: 2400, rank: 1, totalRank: 3 },
-  { name: '武王', level: 14, towerLevel: 7, exp: 2300, rank: 2, totalRank: 4 },
-  { name: '弓王', level: 13, towerLevel: 7, exp: 2200, rank: 3, totalRank: 5 },
-  { name: '暗影之王', level: 15, towerLevel: 8, exp: 2500, rank: 1, totalRank: 1 },
-  { name: '血月女巫', level: 14, towerLevel: 8, exp: 2400, rank: 2, totalRank: 2 },
-  { name: '亡灵法师', level: 13, towerLevel: 8, exp: 2300, rank: 3, totalRank: 3 }
+// 获取总榜数据的方法
+const fetchTotalRanking = async () => {
+  try {
+    isLoading.value = true;
+    error.value = null;
+    
+    const response = await gameService.towerRanking.getTotalRanking();
+    console.log("获取到总榜数据:", response);
+    
+    if (response.data && response.data.success && response.data.data) {
+      // 处理返回的数据格式
+      const rawData = response.data.data;
+      
+      // 转换数据格式以匹配组件需求
+      const processedData = rawData.map((item, index) => ({
+        name: item.studentName || '未知玩家',
+        level: item.studentLevel || 1,
+        towerLevel: item.maxTowerFloorNo || 0,
+        // exp: Math.floor((item.studentLevel || 1) * 100 + Math.random() * 200), // 根据等级计算经验
+        rank: index + 1,
+        totalRank: index + 1,
+        studentId: item.studentId
+      }));
+      
+      leaderboardData.value = processedData;
+      console.log("处理后的总榜数据:", processedData);
+    } else {
+      console.warn("API 返回数据格式异常:", response);
+      // 如果数据格式异常，使用默认数据
+      leaderboardData.value = getDefaultLeaderboardData();
+    }
+  } catch (err) {
+    console.error("获取总榜数据失败:", err);
+    error.value = "获取排行榜数据失败，请稍后重试";
+    // 使用默认数据作为备选
+    leaderboardData.value = getDefaultLeaderboardData();
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 获取指定塔的排行榜数据
+const fetchTowerRanking = async (towerId) => {
+  try {
+    isLoading.value = true;
+    error.value = null;
+    
+    console.log(`开始获取塔${towerId}的排行榜数据...`);
+    console.log('当前可用的塔信息:', studentTowers.value);
+    
+    // 根据塔ID找到对应的课程ID
+    const towerInfo = studentTowers.value.find(tower => tower.towerId.toString() === towerId);
+    if (!towerInfo) {
+      console.warn(`未找到塔ID ${towerId} 的信息`);
+      error.value = `未找到塔${towerId}的信息`;
+      return;
+    }
+    
+    console.log(`找到塔信息:`, towerInfo);
+    console.log(`使用课程ID: ${towerInfo.courseId} 获取排行榜数据`);
+    
+    const response = await gameService.towerRanking.getTowerRankingByCourse(towerInfo.courseId);
+    console.log(`获取到${towerInfo.name}排行榜数据:`, response);
+    
+    if (response.data && response.data.success && response.data.data) {
+      const rawData = response.data.data;
+      console.log(`原始排行榜数据:`, rawData);
+      
+      const processedData = rawData.map((item, index) => ({
+        name: item.studentName || '未知玩家',
+        level: item.studentLevel || 1,
+        towerLevel: parseInt(towerId),
+        // exp: Math.floor((item.studentLevel || 1) * 100 + Math.random() * 200),
+        rank: index + 1,
+        totalRank: null, // 分榜没有总排名
+        studentId: item.studentId
+      }));
+      
+      console.log(`处理后的排行榜数据:`, processedData);
+      
+      // 更新对应塔的数据
+      updateTowerData(towerId, processedData);
+      console.log(`塔${towerId}数据更新完成`);
+    } else {
+      console.warn(`塔${towerId}排行榜数据格式异常:`, response);
+      error.value = `获取${towerInfo.name}排行榜数据失败`;
+    }
+  } catch (err) {
+    console.error(`获取塔${towerId}数据失败:`, err);
+    error.value = `获取塔${towerId}排行榜失败`;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 更新指定塔的数据
+const updateTowerData = (towerId, towerData) => {
+  console.log(`开始更新塔${towerId}的数据...`);
+  console.log(`更新前的总数据:`, leaderboardData.value);
+  
+  // 过滤掉现有的该塔数据，然后添加新数据
+  const filteredData = leaderboardData.value.filter(item => 
+    !item.towerLevel || item.towerLevel !== parseInt(towerId)
+  );
+  
+  console.log(`过滤后的数据:`, filteredData);
+  console.log(`要添加的新数据:`, towerData);
+  
+  leaderboardData.value = [...filteredData, ...towerData];
+  
+  console.log(`更新后的总数据:`, leaderboardData.value);
+  console.log(`塔${towerId}数据更新完成`);
+};
+
+// 默认排行榜数据（当API失败时使用）
+const getDefaultLeaderboardData = () => [
+  { name: '暂无数据', level: 1, towerLevel: 1, rank: 1, totalRank: 1 }
 ];
 
 // 计算属性：过滤排行榜数据
 const filteredLeaderboardData = computed(() => {
   if (selectedTower.value === 'all') {
-    return leaderboardData
+    return leaderboardData.value
         .filter(player => player.totalRank)
-        .sort((a, b) => a.totalRank - b.totalRank)
-        .slice(0, 10);
+        .sort((a, b) => a.totalRank - b.totalRank);
   } else {
     const towerLevel = parseInt(selectedTower.value);
-    return leaderboardData
+    return leaderboardData.value
         .filter(player => player.towerLevel === towerLevel)
-        .sort((a, b) => a.rank - b.rank)
-        .slice(0, 10);
+        .sort((a, b) => a.rank - b.rank);
   }
 });
 
 // 方法
-const selectTower = (tower) => {
+const selectTower = async (tower) => {
+  console.log(`切换到${tower === 'all' ? '总塔' : `塔${tower}`}排行榜`);
   selectedTower.value = tower;
-  console.log(`切换到${tower === 'all' ? '总塔' : tower + '塔'}排行榜`);
+  
+  // 如果选择的是具体塔，尝试获取该塔的数据
+  if (tower !== 'all') {
+    console.log(`准备获取塔${tower}的排行榜数据...`);
+    await fetchTowerRanking(tower);
+  } else {
+    console.log('切换到总榜，显示总排行榜数据');
+  }
 };
 
 const scrollLeft = () => {
@@ -262,12 +436,21 @@ const stopAutoScroll = () => {
   }
 };
 
+// 获取塔的显示名称
+const getTowerDisplayName = (towerId) => {
+  if (towerId === 'all') return '暂无总榜数据';
+  const tower = studentTowers.value.find(t => t.towerId.toString() === towerId);
+  return tower ? `暂无${tower.name.split('_')[0]}排行榜数据` : `暂无塔${towerId}排行榜数据`;
+};
+
 // 生命周期钩子
 onMounted(() => {
   nextTick(() => {
     updateScrollState();
     addTouchSupport();
     startAutoScroll();
+    fetchTotalRanking(); // 在组件挂载时获取总榜数据
+    fetchStudentTowers(); // 在组件挂载时获取学生塔信息
   });
 });
 
@@ -499,6 +682,11 @@ onBeforeUnmount(() => {
   50% { transform: scale(1.2) rotate(10deg); }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .leaderboard-list {
   max-height: 300px;
   overflow: hidden;
@@ -507,10 +695,132 @@ onBeforeUnmount(() => {
   .scroll-container {
     height: 100%;
     overflow: hidden;
+
+    &.few-data {
+      max-height: 200px; /* 当数据少时，容器高度减小 */
+      
+      .player-row {
+        margin-bottom: 8px; /* 数据少时增加行间距 */
+        
+        &:last-child {
+          margin-bottom: 0; /* 最后一行不需要底部间距 */
+        }
+      }
+    }
   }
 
   .scroll-content {
     transition: transform 0.05s linear;
+  }
+
+  .loading-state,
+  .error-state,
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #e6e6fa;
+    font-size: 14px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    background: rgba(15, 0, 20, 0.5);
+    border-radius: 6px;
+    border: 1px solid rgba(75, 0, 100, 0.6);
+    box-shadow: inset 0 0 10px rgba(75, 0, 100, 0.3);
+    backdrop-filter: blur(10px);
+    margin-bottom: 10px;
+
+    .loading-spinner {
+      border: 4px solid rgba(147, 112, 219, 0.3);
+      border-top: 4px solid #9370db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    .loading-text {
+      font-style: italic;
+    }
+
+    .error-icon,
+    .empty-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .error-text {
+      color: #ff6b6b;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .empty-subtext {
+      color: #9370db;
+      font-size: 12px;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .retry-button {
+      background: linear-gradient(135deg, #9370db, #8a2be2);
+      color: #ffffff;
+      padding: 8px 15px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(75, 0, 100, 0.4);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      filter: drop-shadow(0 0 4px rgba(75, 0, 100, 0.4));
+
+      &:hover {
+        background: linear-gradient(135deg, #8a2be2, #7a00d4);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(75, 0, 100, 0.6);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(75, 0, 100, 0.3);
+      }
+    }
+  }
+
+  .bottom-decoration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    padding: 15px 0;
+    position: relative;
+    z-index: 1;
+
+    .decoration-line {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(147, 112, 219, 0.6), transparent);
+      margin: 0 15px;
+      border-radius: 1px;
+      box-shadow: 0 0 8px rgba(147, 112, 219, 0.3);
+    }
+
+    .decoration-text {
+      color: #9370db;
+      font-size: 11px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      letter-spacing: 2px;
+      opacity: 0.8;
+      background: rgba(15, 0, 20, 0.6);
+      padding: 4px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(147, 112, 219, 0.3);
+    }
   }
 }
 
@@ -528,6 +838,10 @@ onBeforeUnmount(() => {
     background: rgba(45, 0, 60, 0.6);
     transform: translateX(3px);
     box-shadow: 0 2px 8px rgba(75, 0, 100, 0.4);
+  }
+
+  &:last-child {
+    margin-bottom: 0; /* 最后一行不需要底部间距 */
   }
 
   &.rank-gold {

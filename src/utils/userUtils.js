@@ -10,7 +10,7 @@ export function getCurrentUser() {
   
   if (user) {
     return {
-      id: user.id || user.userId || 16, // 兼容不同的用户ID字段
+      id: user.id || user.userId, // 兼容不同的用户ID字段
       name: user.name || user.userName || user.username || "未知用户",
       avatar: user.avatar || user.userAvatar || "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"
     };

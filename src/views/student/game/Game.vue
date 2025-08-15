@@ -27,6 +27,7 @@
         :visible="showProfile"
         :user-profile="userProfile"
         @close="closeProfile"
+        @update:nickname="saveNickname"
     />
 
     <!-- 道具查看框 -->
@@ -60,6 +61,10 @@ import img5 from './assets/斗篷.png';
 import img6 from './assets/斧头.png';
 import img7 from './assets/生命源泉.png';
 import img8 from './assets/靴子.png';
+import {gameService} from "@/services/game.js";
+
+// const res = gameService.tower.getTowerByStudentId('1')
+// console.log(res)
 
 const router = useRouter();
 
@@ -160,6 +165,10 @@ const initGame = () => {
     showProfile.value = false;
     showExitConfirm.value = false;
     selectedItem.value = null;
+
+
+    const res1 = gameService.towerRanking.getTotalRanking()
+    console.log(res1)
 
     console.log('游戏初始化完成');
   } catch (error) {
@@ -275,6 +284,15 @@ const closeProfile = () => {
     handleError(error);
   }
 };
+
+const saveNickname = async (newNickname) => {
+  try {
+    userProfile.nickname = newNickname
+    console.log('昵称已更新为:', newNickname)
+  } catch (error) {
+    console.error('更新昵称失败:', error)
+  }
+}
 
 // 退出游戏
 const exitGame = () => {
