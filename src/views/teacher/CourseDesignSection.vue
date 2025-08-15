@@ -19,19 +19,18 @@
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="搜索课程名称或描述..."
+              placeholder="搜索课程名称..."
               class="search-input"
           >
         </div>
 
         <div class="filter-box">
           <el-icon><Calendar /></el-icon>
-          <select v-model="timeFilter" class="filter-select">
+          <select v-model="semesterFilter" class="filter-select">
             <option value="">全部学期</option>
-            <option value="2025春">2025春季</option>
-            <option value="2024秋">2024秋季</option>
-            <option value="2024春">2024春季</option>
-            <option value="2023秋">2023秋季</option>
+            <option v-for="semester in uniqueSemesters" :value="semester" :key="semester">
+              {{ semester }}
+            </option>
           </select>
         </div>
 
@@ -64,18 +63,13 @@
           </div>
 
           <h3 class="course-title">{{ course.name }}</h3>
-          <!-- <p class="course-description">{{ course.description }}</p> -->
         </div>
 
         <div class="card-footer">
           <div class="course-meta">
-            <!-- <div class="meta-item">
-              <el-icon><User /></el-icon>
-              <span>{{ course.studentCount }} 名学生</span>
-            </div> -->
             <div class="meta-item">
               <el-icon><Calendar /></el-icon>
-              <span>{{ formatDate(course.semester) }}</span>
+              <span>{{ course.semester }}</span>
             </div>
           </div>
         </div>
@@ -101,107 +95,66 @@ import {
   Search,
   Calendar,
   Collection,
-  User,
   Document
 } from '@element-plus/icons-vue'
 import { teacherService } from '@/services/api'
 
 const teacherId = "1";
-
-// 路由实例
 const router = useRouter()
-
-// 响应式数据
 const searchQuery = ref('')
-const timeFilter = ref('')
+const semesterFilter = ref('')
+const courses = ref([])
 
+// 获取所有课程
 const fetchAllClass = async () => {
-  const response = await teacherService.getAllCourse(teacherId);
-  if(response.data){
-    courses.value =  response.data.data.map(item => ({
-      id: item.courseId.toString(),
-      name: item.courseName,
-      semester: item.semester}))
+  try {
+    const response = await teacherService.getAllCourse(teacherId);
+    if(response.data && response.data.data) {
+      courses.value = response.data.data.map(item => ({
+        id: item.courseId.toString(),
+        name: item.courseName,
+        semester: item.semester
+      }))
+    }
+  } catch (error) {
+    console.error('获取课程列表失败:', error)
   }
 }
 
+// 计算所有唯一的学期值
+const uniqueSemesters = computed(() => {
+  const semesters = new Set()
+  courses.value.forEach(course => {
+    if(course.semester) {
+      semesters.add(course.semester)
+    }
+  })
+  return Array.from(semesters).sort().reverse() // 按时间倒序排列
+})
 
-const courses = ref([]);
-// 模拟课程数据
-// const courses = ref([
-//   {
-//     id: 1,
-//     name: '高等数学基础',
-//     description: '深入讲解微积分、线性代数等数学基础知识，为后续专业课程打下坚实基础。',
-//     studentCount: 156,
-//     semester: '2025春'
-//   },
-//   {
-//     id: 2,
-//     name: '数据结构与算法实验',
-//     description: '通过实践项目学习数据结构与算法的实际应用，提升编程能力。',
-//     studentCount: 89,
-//     semester: '2024秋'
-//   },
-//   {
-//     id: 3,
-//     name: '软件工程研讨',
-//     description: '探讨现代软件工程方法，包括敏捷开发、测试驱动开发等最佳实践。',
-//     studentCount: 0,
-//     semester: '2025春'
-//   },
-//   {
-//     id: 4,
-//     name: 'Web开发技术',
-//     description: '学习现代Web开发技术栈，包括前端框架、后端API设计和数据库设计。',
-//     studentCount: 234,
-//     semester: '2024春'
-//   },
-//   {
-//     id: 5,
-//     name: '人工智能导论',
-//     description: '介绍人工智能的基本概念、算法和应用，包括机器学习和深度学习。',
-//     studentCount: 178,
-//     semester: '2024秋'
-//   },
-//   {
-//     id: 6,
-//     name: '数据库系统实验',
-//     description: '通过实际项目学习数据库设计、SQL编程和数据库优化技术。',
-//     studentCount: 67,
-//     semester: '2023秋'
-//   }
-// ])
-
-// 计算属性
+// 筛选课程
 const filteredCourses = computed(() => {
   let filtered = courses.value
 
-  // 搜索过滤
+  // 搜索过滤 - 只搜索课程名称
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(course =>
-            course.name.toLowerCase().includes(query)
-        // course.description.toLowerCase().includes(query)
+    filtered = filtered.filter(course => 
+      course.name.toLowerCase().includes(query)
     )
   }
 
-  // 时间过滤
-  if (timeFilter.value) {
-    filtered = filtered.filter(course => course.semester === timeFilter.value)
+  // 学期过滤
+  if (semesterFilter.value) {
+    filtered = filtered.filter(course => 
+      course.semester === semesterFilter.value
+    )
   }
 
   return filtered
 })
 
-// 方法
-const formatDate = (semester) => {
-  return semester
-}
-
 const selectCourse = (course) => {
-  console.log('选择课程:', course)
-  // 跳转到课程中心页面
   router.push({
     name: 'TeacherCourseCenter',
     params: { courseId: course.id }
@@ -209,10 +162,9 @@ const selectCourse = (course) => {
 }
 
 onMounted(() => {
-  fetchAllClass();
+  fetchAllClass()
 })
 </script>
-
 <style lang="less">
 // 蓝色主题色变量
 @primary-blue: #1a56db;

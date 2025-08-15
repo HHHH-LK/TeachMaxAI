@@ -21,7 +21,7 @@
           >
             <option value="">所有学期</option>
             <option
-                v-for="semester in semesters"
+                v-for="semester in uniqueSemesters"
                 :key="semester"
                 :value="semester"
             >
@@ -117,7 +117,6 @@ const router = useRouter();
 
 const selectedSemester = ref("");
 const searchQuery = ref("");
-const semesters = ref("");
 const allCourses = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
@@ -160,19 +159,22 @@ const defaultCourses = [
   },
 ];
 
+// 获取课程
 const fetchCourses = async () => {
   isLoading.value = true;
   error.value = null;
   try {
     const response = await studentService.getOwnCourses();
-    if (response.data) {
+    if (response.data && response.data.data) {
       allCourses.value = response.data.data.map((course) => ({
         id: course.courseId,
         title: course.courseName,
         description: course.courseDescription,
-        semester: "2024年春季",
+        semester: course.semester || "未知学期",
         imageUrl: course.imageUrl || 'https://tse4-mm.cn.bing.net/th/id/OIP-C.v7JAGdYjVso8nIqmbtN_bAHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
       }));
+      
+      console.log(response.data.data)
     } else {
       allCourses.value = defaultCourses;
       ElMessage.warning("后端没有返回课程数据，已使用默认数据。");
@@ -186,30 +188,38 @@ const fetchCourses = async () => {
   }
 };
 
-const fetchSemester = async () => {
-  const response = await studentService.getSemester();
-  if (response.data) {
-    semesters.value = response.data.data;
-  }
-};
+// 计算唯一的学期列表
+const uniqueSemesters = computed(() => {
+  const semesters = new Set();
+  allCourses.value.forEach(course => {
+    if (course.semester) {
+      semesters.add(course.semester);
+    }
+  });
+  return Array.from(semesters).sort().reverse(); 
+});
 
 onMounted(() => {
   fetchCourses();
-  fetchSemester();
 });
 
 const filteredCourses = computed(() => {
   let courses = [...allCourses.value];
+  
+  // 学期筛选
   if (selectedSemester.value) {
     courses = courses.filter(course => course.semester === selectedSemester.value);
   }
+  
+  // 搜索筛选
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     courses = courses.filter(course =>
-        course.title.toLowerCase().includes(query) ||
-        course.description.toLowerCase().includes(query)
+        (course.title && course.title.toLowerCase().includes(query)) ||
+        (course.description && course.description.toLowerCase().includes(query))
     );
   }
+  
   return courses;
 });
 
@@ -217,7 +227,7 @@ const performSearch = () => {
   document.querySelector(".course-cards-grid")?.scrollIntoView({ behavior: "smooth" });
 };
 
-const handleFilterChange = () => {};
+
 const clearFilters = () => {
   selectedSemester.value = "";
   searchQuery.value = "";
