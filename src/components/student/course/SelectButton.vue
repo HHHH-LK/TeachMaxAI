@@ -43,7 +43,7 @@ function toggleSelect(e) {
   margin-top: -25px;
   margin-left: -100px;
   width: 200px;
-  height: 50px;
+  height: 60px;
   text-align: center;
   box-sizing: border-box;
   -webkit-box-sizing: border-box;

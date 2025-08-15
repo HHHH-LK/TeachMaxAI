@@ -273,7 +273,6 @@ onMounted(() => {
 
 .course-selection-container {
   background-color: @bg-light;
-  padding: 24px;
   border-radius: @radius-md;
 }
 

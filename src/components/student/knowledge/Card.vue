@@ -108,11 +108,11 @@ p {
   }
 }
 
-.container {
-  padding: 40px;
-  display: flex;
-  flex-wrap: wrap;
-}
+//.container {
+//  padding: 40px;
+//  display: flex;
+//  flex-wrap: wrap;
+//}
 
 .card-wrap {
   margin: 10px;
