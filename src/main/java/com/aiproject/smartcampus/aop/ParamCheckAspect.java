@@ -18,12 +18,13 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class ParamCheckAspect {
 
-    @Before("execution(* com.aiproject.smartcampus.service..*(..))")
+    @Before("execution(* com.aiproject.smartcampus.service..*(..)) && " +
+            "!execution(* com.aiproject.smartcampus.service.impl.*.scheduledCheckAndUpdateQuestions(..))")
     public void before(JoinPoint joinPoint) {
 
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {
-            if(arg==null){
+            if (arg == null) {
                 log.error("传入参数为null");
                 throw new RuntimeException("参数为null");
             }

@@ -171,6 +171,10 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         // 查询该课程下所有学生 ID
         List<Integer> studentIdList = teacherMapper.selectAllClassStudentInfo(teacherId, couresId);
 
+        if (studentIdList == null || studentIdList.isEmpty()) {
+            return Result.error("该课程暂无人选");
+        }
+
         for (Integer studentId : studentIdList) {
 
             List<StudentWrongKnowledgeBO> studentWrongKnowledgeByStudentId = knowledgePointMapper.getStudentWrongKnowledgeByStudentId(String.valueOf(studentId));
@@ -1014,8 +1018,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     /**
      * 处理复合知识点拆分（按逗号和顿号）
+     *
      * @param pointName 原始知识点名称
-     * @param stats 知识点统计数据（可能为null）
+     * @param stats     知识点统计数据（可能为null）
      * @param resultMap 结果Map
      */
     private void handleCompositeKnowledgePoint(String pointName,

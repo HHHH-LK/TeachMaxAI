@@ -84,16 +84,7 @@ public class TowerCreateToolUtils {
         List<SimpleKnowledgeAnalysisBO> simpleKnowledgeAnalysis = knowledgePointMapper.getSimpleKnowledgeAnalysis(pointIdList, studentId);
 
         //获取知识点id对应的通过率
-        Map<Integer, Double> POINT_ACCURACYRATE_MAP = simpleKnowledgeAnalysis.stream()
-                .sorted(
-                        (a, b) ->
-                                a.getAccuracyRate().compareTo(b.getAccuracyRate())
-                ).collect(Collectors.toMap(
-                        SimpleKnowledgeAnalysisBO::getPointId,
-                        SimpleKnowledgeAnalysisBO::getAccuracyRate,
-                        (v1, v2) -> (v1 + v2) / 2,
-                        LinkedHashMap::new)
-                );
+        Map<Integer, Double> POINT_ACCURACYRATE_MAP = simpleKnowledgeAnalysis.stream().sorted((a, b) -> a.getAccuracyRate().compareTo(b.getAccuracyRate())).collect(Collectors.toMap(SimpleKnowledgeAnalysisBO::getPointId, SimpleKnowledgeAnalysisBO::getAccuracyRate, (v1, v2) -> (v1 + v2) / 2, LinkedHashMap::new));
 
         //初始化知识图谱节点
         initializationKnowledgeGraph(simpleKnowledgeAnalysis);
@@ -113,24 +104,22 @@ public class TowerCreateToolUtils {
      */
     private void initializationKnowledgeGraph(List<SimpleKnowledgeAnalysisBO> simpleKnowledgeAnalysis) {
 
-        simpleKnowledgeAnalysis.stream().forEach(
-                a -> {
-                    //创建节点
-                    KnowledgePointNode knowledgePointNode = new KnowledgePointNode();
-                    String pointName = a.getPointName();
-                    knowledgePointNode.setPointId(String.valueOf(a.getPointId()));
-                    knowledgePointNode.setPointName(pointName);
-                    knowledgePointNode.setDescription(a.getDescription());
-                    knowledgePointNode.setDifficultyLevel(a.getDifficultyLevel());
-                    knowledgePointNode.setAccuracyRate(a.getAccuracyRate());
+        simpleKnowledgeAnalysis.stream().forEach(a -> {
+            //创建节点
+            KnowledgePointNode knowledgePointNode = new KnowledgePointNode();
+            String pointName = a.getPointName();
+            knowledgePointNode.setPointId(String.valueOf(a.getPointId()));
+            knowledgePointNode.setPointName(pointName);
+            knowledgePointNode.setDescription(a.getDescription());
+            knowledgePointNode.setDifficultyLevel(a.getDifficultyLevel());
+            knowledgePointNode.setAccuracyRate(a.getAccuracyRate());
 
-                    //添加节点映射
-                    POINTNAME_TO_NODE_MAP.put(pointName, knowledgePointNode);
-                    //添加知识图谱节点初始化
-                    KNOWLEDGE_POINT_NODE_MAP.put(knowledgePointNode, new ArrayList<>());
+            //添加节点映射
+            POINTNAME_TO_NODE_MAP.put(pointName, knowledgePointNode);
+            //添加知识图谱节点初始化
+            KNOWLEDGE_POINT_NODE_MAP.put(knowledgePointNode, new ArrayList<>());
 
-                }
-        );
+        });
 
     }
 
@@ -171,34 +160,33 @@ public class TowerCreateToolUtils {
         List<TowerFloor> towerFloors = towerFloorMapper.selectList(lambdaQueryWrapper);
 
         transactionTemplate.execute(status -> {
-                    try {
-                        //为每层创建boss
-                        towerFloors.stream().forEach(floor -> {
-                            Monster monster = new Monster();
-                            String bossName = setBossName(floor.getFloorId());
-                            int bossHp = setBossHp(floor.getFloorNo());
-                            monster.setName(bossName);
-                            monster.setHp(bossHp);
-                            monster.setFloorId(floor.getFloorId());
+            try {
+                //为每层创建boss
+                towerFloors.stream().forEach(floor -> {
+                    Monster monster = new Monster();
+                    String bossName = setBossName(floor.getFloorId());
+                    int bossHp = setBossHp(floor.getFloorNo());
+                    monster.setName(bossName);
+                    monster.setHp(bossHp);
+                    monster.setFloorId(floor.getFloorId());
 
-                            int insert = bossMapper.insert(monster);
-                            if (insert <= 0) {
-                                log.error("boss:[{}]创建失败", bossName);
-                                throw new RuntimeException("<boss>:" + bossName + "创建失败");
-                            }
-
-                            log.info("boss:[{}]<创建成功>", bossName);
-
-                        });
-
-                        return true;
-                    } catch (Exception e) {
-                        // 事务回滚
-                        status.setRollbackOnly();
-                        return false;
+                    int insert = bossMapper.insert(monster);
+                    if (insert <= 0) {
+                        log.error("boss:[{}]创建失败", bossName);
+                        throw new RuntimeException("<boss>:" + bossName + "创建失败");
                     }
-                }
-        );
+
+                    log.info("boss:[{}]<创建成功>", bossName);
+
+                });
+
+                return true;
+            } catch (Exception e) {
+                // 事务回滚
+                status.setRollbackOnly();
+                return false;
+            }
+        });
 
 
     }
@@ -242,44 +230,43 @@ public class TowerCreateToolUtils {
         List<TowerFloor> towerFloors = towerFloorMapper.selectList(lambdaQueryWrapper);
 
         transactionTemplate.execute(status -> {
-                    try {
-                        towerFloors.stream().forEach(towerFloor -> {
-                            Long floorId = towerFloor.getFloorId();
-                            Integer floorNo = towerFloor.getFloorNo();
-                            String points = TOWER_FLOOR_POINTS_MAP.get(floorNo).toString();
-                            //计算塔层的经验
-                            Integer towerFloorExp = getTowerFloorExp(floorNo);
-                            //设置塔层的道具的稀有度
-                            Integer towerFloorRarity = getTowerFloorItem(floorNo);
+            try {
+                towerFloors.stream().forEach(towerFloor -> {
+                    Long floorId = towerFloor.getFloorId();
+                    Integer floorNo = towerFloor.getFloorNo();
+                    String points = TOWER_FLOOR_POINTS_MAP.get(floorNo).toString();
+                    //计算塔层的经验
+                    Integer towerFloorExp = getTowerFloorExp(floorNo);
+                    //设置塔层的道具的稀有度
+                    Integer towerFloorRarity = getTowerFloorItem(floorNo);
 
-                            Task task = new Task();
-                            task.setFloorId(floorId);
-                            task.setPointIds(points);
-                            //默认数量为1
-                            task.setRewardItemQty(1);
-                            task.setRewardExp(towerFloorExp);
-                            task.setRewardItemRarity(towerFloorRarity);
+                    Task task = new Task();
+                    task.setFloorId(floorId);
+                    task.setPointIds(points);
+                    //默认数量为1
+                    task.setRewardItemQty(1);
+                    task.setRewardExp(towerFloorExp);
+                    task.setRewardItemRarity(towerFloorRarity);
 
-                            int insert = taskMapper.insert(task);
-                            if (insert <= 0) {
-                                log.error("任务插入失败");
-                                throw new RuntimeException("<任务插入失败>");
-                            }
-
-                            log.info("<任务插入成功>{}", task.toString());
-
-                        });
-
-                        return true;
-                    } catch (Exception e) {
-                        // 事务回滚
-                        status.setRollbackOnly();
-                        return false;
-
+                    int insert = taskMapper.insert(task);
+                    if (insert <= 0) {
+                        log.error("任务插入失败");
+                        throw new RuntimeException("<任务插入失败>");
                     }
 
-                }
-        );
+                    log.info("<任务插入成功>{}", task.toString());
+
+                });
+
+                return true;
+            } catch (Exception e) {
+                // 事务回滚
+                status.setRollbackOnly();
+                return false;
+
+            }
+
+        });
 
 
     }
@@ -296,13 +283,12 @@ public class TowerCreateToolUtils {
         transactionTemplate.execute(status -> {
             try {
                 for (int i = 1; i <= totalFloors; i++) {
-
+                    //将每个塔的第一层给设置成解锁状态
                     TowerFloor towerFloor = new TowerFloor();
                     towerFloor.setTowerId(towerId);
                     towerFloor.setFloorNo(i);
-                    towerFloor.setUnlocked(false);
                     towerFloor.setIsPass(0);
-
+                    towerFloor.setUnlocked(i == 1);
                     int insert = towerFloorMapper.insert(towerFloor);
                     if (insert <= 0) {
                         log.error("第{}层塔创建失败", i);
@@ -320,6 +306,7 @@ public class TowerCreateToolUtils {
         });
 
         List<Callable<Void>> tasks = new ArrayList<>();
+
         // 获取主塔背景
         LambdaQueryWrapper<Tower> towerQuery = new LambdaQueryWrapper<>();
         towerQuery.eq(Tower::getTowerId, towerId);
@@ -345,22 +332,11 @@ public class TowerCreateToolUtils {
                     return null;
                 }
 
-                List<String> knowledgeNameList = knowledgePoints.stream()
-                        .map(a -> knowledgePointMapper.getPonintNameById(String.valueOf(a)))
-                        .toList();
+                List<String> knowledgeNameList = knowledgePoints.stream().map(a -> knowledgePointMapper.getPonintNameById(String.valueOf(a))).toList();
 
-                String prompt = String.format(
-                        "请结合总塔的故事背景：“%s”，以及该层的知识点列表：%s，生成第%d层的故事背景。\n" +
-                                "要求：\n" +
-                                "- 故事背景应紧扣总塔的整体故事脉络，体现该层知识点的特色和主题。\n" +
-                                "- 内容应富有代入感和情节性，便于引导玩家理解本层关卡。\n" +
-                                "- 只返回故事背景文本，不要包含解释、分析或其他无关内容。",
-                        description, knowledgeNameList, floorNo
-                );
+                String prompt = String.format("请结合总塔的故事背景：“%s”，以及该层的知识点列表：%s，生成第%d层的故事背景。\n" + "要求：\n" + "- 故事背景应紧扣总塔的整体故事脉络，体现该层知识点的特色和主题。\n" + "- 内容应富有代入感和情节性，便于引导玩家理解本层关卡。\n" + "- 只返回故事背景文本，不要包含解释、分析或其他无关内容。", description, knowledgeNameList, floorNo);
 
-                String towerFloorDescription = chatLanguageModel.chat(UserMessage.userMessage(prompt))
-                        .aiMessage()
-                        .text();
+                String towerFloorDescription = chatLanguageModel.chat(UserMessage.userMessage(prompt)).aiMessage().text();
 
                 if (towerFloorDescription == null || towerFloorDescription.trim().isEmpty()) {
                     log.warn("AI返回空背景故事，跳过更新，floorNo={}", floorNo);
@@ -431,8 +407,8 @@ public class TowerCreateToolUtils {
         });
 
         //初始化排行榜(初始值为0)
-        redisSort.addToSortedList(String.valueOf(towerInfo.getTowerId()), studentId, "0");
-        redisSort.addToTotalSortedList(studentId, "0");
+        redisSort.setStudentMaxFloor(String.valueOf(towerInfo.getTowerId()), studentId, "0");
+        redisSort.setStudentTotalScore(studentId, "0");
 
         //异步创建塔的背景故事
         STORY_BACKGROUND_CREATE_EXECUTOR.execute(() -> {
@@ -489,9 +465,7 @@ public class TowerCreateToolUtils {
      */
     private Item getRandomItemByRarity(int rarity) {
         // 这里假设用 MyBatis-Plus 查询
-        List<Item> items = itemMapper.selectList(
-                new QueryWrapper<Item>().eq("rarity", rarity)
-        );
+        List<Item> items = itemMapper.selectList(new QueryWrapper<Item>().eq("rarity", rarity));
 
         if (items.isEmpty()) {
             return null;
@@ -589,9 +563,7 @@ public class TowerCreateToolUtils {
      */
     private void initIndegreeMap() {
 
-        KNOWLEDGE_POINT_NODE_MAP.entrySet().forEach(
-                a -> INDEGREE_MAP.put(a.getKey(), a.getValue().size())
-        );
+        KNOWLEDGE_POINT_NODE_MAP.entrySet().forEach(a -> INDEGREE_MAP.put(a.getKey(), a.getValue().size()));
 
 
     }

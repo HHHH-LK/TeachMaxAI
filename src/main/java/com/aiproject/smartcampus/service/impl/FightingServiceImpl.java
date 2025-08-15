@@ -2,6 +2,7 @@ package com.aiproject.smartcampus.service.impl;
 
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.redis.QuestionRedisCache;
+import com.aiproject.smartcampus.commons.redis.RedisSort;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.AwardVO;
@@ -12,23 +13,23 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 import static com.aiproject.smartcampus.service.impl.GameUserServiceImpl.calculateGameUserHP;
 
 /**
  * @program: TeacherMaxAI
- * @description:
+ * @description: 优化后的战斗服务实现 - 增强健壮性和性能
  * @author: lk_hhh
- * @create: 2025-08-12 16:15
+ * @create: 2025-08-15
  **/
 
 @Slf4j
@@ -48,444 +49,946 @@ public class FightingServiceImpl implements FightingService {
     private final TowerFloorMapper towerFloorMapper;
     private final TaskMapper taskMapper;
     private final ItemMapper itemMapper;
+    private final RedisSort redisSort;
 
+    // 常量定义
+    private static final String REDIS_USER_HP_KEY_TEMPLATE = "game:user:hp:%s:%s:%d";
+    private static final String REDIS_BOSS_HP_KEY_TEMPLATE = "game:boss:hp:%s:%s:%d";
+    private static final int REDIS_TTL_HOURS = 24; // Redis键过期时间
+    private static final int DEFAULT_BASE_DAMAGE = 30;
+    private static final int DAMAGE_PER_FLOOR = 5;
+
+    /**
+     * 战斗结果枚举
+     */
+    public enum BattleResult {
+        PLAYER_WIN(1, "胜利"),
+        PLAYER_LOSE(0, "失败"),
+        CONTINUE(3, "继续");
+
+        private final int code;
+        private final String description;
+
+        BattleResult(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    /**
+     * 难度枚举
+     */
+    public enum Difficulty {
+        EASY("0", "EASY", 1.0),
+        MEDIUM("1", "MEDIUM", 1.5),
+        HARD("2", "HARD", 2.0);
+
+        private final String code;
+        private final String name;
+        private final double factor;
+
+        Difficulty(String code, String name, double factor) {
+            this.code = code;
+            this.name = name;
+            this.factor = factor;
+        }
+
+        public static Difficulty fromCode(String code) {
+            for (Difficulty d : values()) {
+                if (d.code.equals(code)) {
+                    return d;
+                }
+            }
+            throw new IllegalArgumentException("未知难度代码: " + code);
+        }
+
+        public static Difficulty fromName(String name) {
+            for (Difficulty d : values()) {
+                if (d.name.equalsIgnoreCase(name)) {
+                    return d;
+                }
+            }
+            throw new IllegalArgumentException("未知难度名称: " + name);
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public double getFactor() {
+            return factor;
+        }
+    }
 
     @Override
     public Result<BattleLog> getCurrentBattleLog(String floorId, String towerChallengeLogId, String studentId) {
-
-        LambdaQueryWrapper<BattleLog> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BattleLog::getFloorId, floorId);
-        wrapper.eq(BattleLog::getUserId, studentId);
-        wrapper.eq(BattleLog::getTowerChallengeLogId, towerChallengeLogId);
-        wrapper.orderByDesc(BattleLog::getId);
-        wrapper.last("limit 1");
-
-        BattleLog battleLog = fightingMapper.selectOne(wrapper);
-
-        if (battleLog == null) {
-            log.warn("玩家还开始爬塔");
-            throw new RuntimeException("玩家还开始爬塔");
+        if (!validateParams(floorId, towerChallengeLogId, studentId)) {
+            return Result.error("参数不能为空");
         }
 
-        return Result.success(battleLog);
-    }
+        try {
+            LambdaQueryWrapper<BattleLog> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(BattleLog::getFloorId, floorId)
+                    .eq(BattleLog::getUserId, studentId)
+                    .eq(BattleLog::getTowerChallengeLogId, towerChallengeLogId)
+                    .orderByDesc(BattleLog::getId)
+                    .last("LIMIT 1");
 
-    @Override
-    public Result<Long> startFighting(String floorId, String studentId) {
-        //查询用户第几次闯该层了
-        LambdaQueryWrapper<TowerChallengeLog> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TowerChallengeLog::getFloorId, floorId);
-        wrapper.eq(TowerChallengeLog::getUserId, studentId);
-        TowerChallengeLog towerChallengeLog = towerChallengeLogMapper.selectOne(wrapper);
+            BattleLog battleLog = fightingMapper.selectOne(wrapper);
 
-        //设置闯关次数
-        Integer challengeCount = towerChallengeLog.getChallengeCount();
-        Integer currentChallengeCount = (challengeCount == null || challengeCount <= 0) ? 1 : (challengeCount + 1);
+            if (battleLog == null) {
+                log.warn("未找到战斗日志 - floorId: {}, studentId: {}, towerChallengeLogId: {}",
+                        floorId, studentId, towerChallengeLogId);
+                return Result.error("玩家尚未开始爬塔");
+            }
 
-        //加入DB中
-        TowerChallengeLog towerChallengeLogToDB = new TowerChallengeLog();
-        towerChallengeLogToDB.setChallengeCount(currentChallengeCount);
-        towerChallengeLogToDB.setStatus("进行中");
-        towerChallengeLogToDB.setFloorId(Long.valueOf(floorId));
-        towerChallengeLogToDB.setUserId(Long.valueOf(studentId));
-        towerChallengeLogToDB.setLastChallengeTime(LocalDateTime.now());
-        int insert = towerChallengeLogMapper.insert(towerChallengeLogToDB);
-        if (insert <= 0) {
-            log.error("系统错误，开始闯关失败");
-            throw new RuntimeException("系统错误，开始闯关失败");
+            return Result.success(battleLog);
+
+        } catch (Exception e) {
+            log.error("获取战斗日志失败 - floorId: {}, studentId: {}", floorId, studentId, e);
+            return Result.error("获取战斗日志失败");
         }
-
-        //查询boss血量和玩家血量并存入redis中
-        LambdaQueryWrapper<Monster> monsterWrapper = new LambdaQueryWrapper<>();
-        monsterWrapper.eq(Monster::getFloorId, floorId);
-        Monster monster = bossMapper.selectOne(monsterWrapper);
-        if (monster == null) {
-            log.error("怪物不存在");
-            throw new RuntimeException("怪物不存在");
-        }
-        LambdaQueryWrapper<GameUser> gameUserWrapper = new LambdaQueryWrapper<>();
-        gameUserWrapper.eq(GameUser::getUserId, studentId);
-        GameUser gameUser = gameUserMapper.selectOne(gameUserWrapper);
-        Integer GAME_USER_HP = calculateGameUserHP(gameUser.getLevel());
-        Integer BOSS_HP = monster.getHp();
-
-        // 设定Redis存用户血量的Key
-        String SET_USER_HP_KEY = String.format("game:user:hp:%d:%d:%d", studentId, floorId, currentChallengeCount);
-        // 设定Redis存Boss血量的Key
-        String SET_BOSS_HP_KEY = String.format("game:boss:hp:%d:%d:%d", floorId, studentId, currentChallengeCount);
-
-        log.info("开始设置当前boss血量以及用户血量的值到redis中");
-        stringRedisTemplate.opsForValue().set(SET_BOSS_HP_KEY, BOSS_HP.toString());
-        stringRedisTemplate.opsForValue().set(SET_USER_HP_KEY, GAME_USER_HP.toString());
-
-        //返回当前挑战id
-        return Result.success(towerChallengeLogToDB.getId());
-
-    }
-
-    @Override
-    public Result<Map<String, String>> getgetGameUserHPandbossHP(String studentId, String towerChallengeLogId) {
-
-        //用于映射用户与boss的血量
-        Map<String, String> USER_BOSS_HP_MAP = new HashMap<>(2);
-
-        LambdaQueryWrapper<TowerChallengeLog> towerChallengeLogLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        towerChallengeLogLambdaQueryWrapper.eq(TowerChallengeLog::getUserId, studentId);
-        towerChallengeLogLambdaQueryWrapper.eq(TowerChallengeLog::getId, towerChallengeLogId);
-        TowerChallengeLog towerChallengeLog = towerChallengeLogMapper.selectOne(towerChallengeLogLambdaQueryWrapper);
-        Long floorId = towerChallengeLog.getFloorId();
-
-        //设置闯关次数
-        Integer currentChallengeCount = towerChallengeLog.getChallengeCount();
-
-        //从redis中获取用户与boss的血量
-        String SET_USER_HP_KEY = String.format("game:user:hp:%d:%d:%d", studentId, floorId, currentChallengeCount);
-        String SET_BOSS_HP_KEY = String.format("game:boss:hp:%d:%d:%d", floorId, studentId, currentChallengeCount);
-        String BOSS_HP = stringRedisTemplate.opsForValue().get(SET_BOSS_HP_KEY);
-        String GAME_USER_HP = stringRedisTemplate.opsForValue().get(SET_USER_HP_KEY);
-
-        USER_BOSS_HP_MAP.put("GAME_USER_HP", GAME_USER_HP);
-        USER_BOSS_HP_MAP.put("BOSS_HP", BOSS_HP);
-
-        return Result.success(USER_BOSS_HP_MAP);
-
-    }
-
-    @Override
-    public Result<QuestionBank> userAttack(String studentId, String towerChallengeLogId) {
-
-        LambdaQueryWrapper<TowerChallengeLog> towerChallengeLogLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        towerChallengeLogLambdaQueryWrapper.eq(TowerChallengeLog::getId, towerChallengeLogId);
-        TowerChallengeLog towerChallengeLog = towerChallengeLogMapper.selectOne(towerChallengeLogLambdaQueryWrapper);
-        Long floorId = towerChallengeLog.getFloorId();
-
-        //获取问题id（根据难度进行随机抽取）
-        List<String> questionDifficultyListInCacheAndNotPushInCache = questionRedisCache.getQuestionDifficultyListInCacheAndNotPushInCache(Math.toIntExact(floorId));
-        LambdaQueryWrapper<QuestionBank> questionBankLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        questionBankLambdaQueryWrapper.in(QuestionBank::getQuestionId, questionDifficultyListInCacheAndNotPushInCache);
-        List<QuestionBank> questionBanks = questionBankMapper.selectList(questionBankLambdaQueryWrapper);
-
-        //获取难度列表
-        List<String> questionDifficultyListInCache = questionRedisCache.getTotalQuestionDifficultyListInCache(Math.toIntExact(floorId));
-        String diff = questionDifficultyListInCache.getFirst();
-
-        //进行抽取
-        QuestionBank randomQuestion = getRandomQuestion(questionBanks, diff);
-        log.info("抽取到的题目为[{}]", randomQuestion);
-
-        return Result.success(randomQuestion);
-    }
-
-    public QuestionBank getRandomQuestion(List<QuestionBank> questionBanks, String diff) {
-        // 按难度分类
-        List<QuestionBank> easyList = questionBanks.stream()
-                .filter(q -> q.getDifficultyLevel() == QuestionBank.DifficultyLevel.EASY)
-                .toList();
-
-        List<QuestionBank> mediumList = questionBanks.stream()
-                .filter(q -> q.getDifficultyLevel() == QuestionBank.DifficultyLevel.MEDIUM)
-                .toList();
-
-        List<QuestionBank> hardList = questionBanks.stream()
-                .filter(q -> q.getDifficultyLevel() == QuestionBank.DifficultyLevel.HARD)
-                .toList();
-
-        switch (diff) {
-            case "0": // 简单题
-                return getRandomOne(easyList);
-
-            case "1": // 中等题
-                return getRandomOne(mediumList);
-
-            case "2": // 困难题
-                return getRandomOne(hardList);
-
-            default:
-                throw new IllegalArgumentException("未知难度类型: " + diff);
-        }
-    }
-
-    // 随机抽取工具方法
-    private <T> T getRandomOne(List<T> list) {
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-        Random random = new Random();
-        return list.get(random.nextInt(list.size()));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<Map<String, String>> checkAswerIsTure(String studentId, String questionId, String context, String floorId, String towerChallengeCount) {
-        //key 表示扣血的对象 value 表示扣血的血量
-        HashMap<String, String> DE_HP_MAP = new HashMap<>(2);
+    public Result<Long> startFighting(String floorId, String studentId) {
+        if (!validateParams(floorId, studentId)) {
+            return Result.error("参数不能为空");
+        }
+
         try {
-            LambdaQueryWrapper<QuestionBank> questionBankLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            questionBankLambdaQueryWrapper.eq(QuestionBank::getQuestionId, questionId);
-            QuestionBank questionBank = questionBankMapper.selectOne(questionBankLambdaQueryWrapper);
+            // 获取或创建挑战记录
+            TowerChallengeLog existingLog = getTowerChallengeLog(floorId, studentId);
+            int currentChallengeCount = (existingLog != null && existingLog.getChallengeCount() != null)
+                    ? existingLog.getChallengeCount() + 1
+                    : 1;
 
-            //获取题目内容
-            String questionContent = questionBank.getQuestionContent();
-            String questionOptions = questionBank.getQuestionOptions();
-            String correctAnswer = questionBank.getCorrectAnswer();
+            // 创建新的挑战记录
+            TowerChallengeLog newChallengeLog = createTowerChallengeLog(floorId, studentId, currentChallengeCount);
 
-            //构建提示词
-            String JUDGE_PROMPT = buildJudgePrompt(questionContent, questionOptions, correctAnswer, context);
-            log.info("开始进行判题...");
-            String judgeResult = chatLanguageModel.chat(UserMessage.userMessage(JUDGE_PROMPT)).aiMessage().text();
-            String changeJudgeResult = "正确".equalsIgnoreCase(judgeResult.trim()) ? "1" : "0";
-
-            log.info("评判结果是[{}],解析后的结果是[{}]", judgeResult, changeJudgeResult);
-
-            //进行扣减血量操作
-            String difficult = questionBank.getDifficultyLevel().getValue();
-            int damage = calculateDamageByDifficult(floorId, difficult, changeJudgeResult);
-
-            // Redis key
-            String userHpKey = String.format("game:user:hp:%d:%d:%d", studentId, floorId, towerChallengeCount);
-            String bossHpKey = String.format("game:boss:hp:%d:%d:%d", floorId, studentId, towerChallengeCount);
-
-            if ("0".equals(changeJudgeResult)) {
-                // 答错 - 扣玩家血
-                DE_HP_MAP.put("USER_HP", bossHpKey);
-                stringRedisTemplate.opsForValue().decrement(userHpKey, damage);
-                //重新加入题目列表中
-                questionRedisCache.setQuestionIdsInCache(Integer.valueOf(floorId), questionId);
-            } else if ("1".equals(changeJudgeResult)) {
-                // 答对 - 扣 Boss 血
-                DE_HP_MAP.put("BOSS_HP", bossHpKey);
-                stringRedisTemplate.opsForValue().decrement(bossHpKey, damage);
-            } else {
-                throw new RuntimeException("不存在的状态");
+            // 初始化血量
+            boolean hpInitialized = initializeBattleHP(floorId, studentId, currentChallengeCount);
+            if (!hpInitialized) {
+                throw new RuntimeException("初始化战斗血量失败");
             }
 
-            //将用户答案进行入库处理
-            StudentAnswer studentAnswer = new StudentAnswer();
-            studentAnswer.setQuestionId(Integer.valueOf(questionId));
-            studentAnswer.setStudentId(Integer.valueOf(studentId));
-            studentAnswer.setIsCorrect(String.valueOf(changeJudgeResult));
-            studentAnswer.setStudentAnswer(context);
-            int insert = studentAnswerMapper.insert(studentAnswer);
-            if (insert <= 0) {
-                log.error("用户回答入库失败");
-                throw new RuntimeException("用户答题失败");
-            }
-            return Result.success(DE_HP_MAP);
+            log.info("成功开始战斗 - floorId: {}, studentId: {}, challengeCount: {}, logId: {}",
+                    floorId, studentId, currentChallengeCount, newChallengeLog.getId());
+
+            return Result.success(newChallengeLog.getId());
+
         } catch (Exception e) {
-            log.error("用户判题异常");
-            throw new RuntimeException(e.getMessage());
+            log.error("开始战斗失败 - floorId: {}, studentId: {}", floorId, studentId, e);
+            return Result.error("开始战斗失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<Map<String, String>> getgetGameUserHPandbossHP(String studentId, String towerChallengeLogId) {
+        if (!validateParams(studentId, towerChallengeLogId)) {
+            return Result.error("参数不能为空");
+        }
+
+        try {
+            TowerChallengeLog challengeLog = getTowerChallengeLogById(towerChallengeLogId);
+            if (challengeLog == null) {
+                return Result.error("挑战记录不存在");
+            }
+
+            String floorId = String.valueOf(challengeLog.getFloorId());
+            int challengeCount = challengeLog.getChallengeCount();
+
+            // 获取血量信息
+            Map<String, String> hpMap = getCurrentHP(studentId, floorId, challengeCount);
+
+            if (hpMap.isEmpty()) {
+                log.warn("未找到血量信息 - studentId: {}, floorId: {}, challengeCount: {}",
+                        studentId, floorId, challengeCount);
+                return Result.error("血量信息不存在");
+            }
+
+            return Result.success(hpMap);
+
+        } catch (Exception e) {
+            log.error("获取血量信息失败 - studentId: {}, towerChallengeLogId: {}",
+                    studentId, towerChallengeLogId, e);
+            return Result.error("获取血量信息失败");
+        }
+    }
+
+    @Override
+    public Result<QuestionBank> userAttack(String studentId, String towerChallengeLogId) {
+        if (!validateParams(studentId, towerChallengeLogId)) {
+            return Result.error("参数不能为空");
+        }
+
+        try {
+            TowerChallengeLog challengeLog = getTowerChallengeLogById(towerChallengeLogId);
+            if (challengeLog == null) {
+                return Result.error("挑战记录不存在");
+            }
+
+            String floorId = String.valueOf(challengeLog.getFloorId());
+
+            // 获取题目
+            QuestionBank question = getRandomQuestionForFloor(floorId);
+            if (question == null) {
+                return Result.error("暂无可用题目");
+            }
+
+            log.info("为玩家提供题目 - studentId: {}, floorId: {}, questionId: {}, difficulty: {}",
+                    studentId, floorId, question.getQuestionId(), question.getDifficultyLevel());
+
+            return Result.success(question);
+
+        } catch (Exception e) {
+            log.error("获取攻击题目失败 - studentId: {}, towerChallengeLogId: {}",
+                    studentId, towerChallengeLogId, e);
+            return Result.error("获取题目失败");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Map<String, String>> checkAswerIsTure(String studentId, String questionId,
+                                                        String context, String floorId, String towerChallengeCount) {
+
+        if (!validateParams(studentId, questionId, context, floorId, towerChallengeCount)) {
+            return Result.error("参数不能为空");
+        }
+
+        try {
+            // 获取题目信息
+            QuestionBank question = getQuestionById(questionId);
+            if (question == null) {
+                return Result.error("题目不存在");
+            }
+
+            // AI判题
+            boolean isCorrect = judgeAnswerWithAI(question, context);
+            log.info("判题结果 - questionId: {}, studentId: {}, isCorrect: {}",
+                    questionId, studentId, isCorrect);
+
+            // 计算伤害
+            int damage = calculateDamage(floorId, question.getDifficultyLevel().getValue(), isCorrect);
+
+            // 更新血量
+            Map<String, String> damageResult = updateBattleHP(studentId, floorId,
+                    towerChallengeCount, isCorrect, damage);
+
+            // 保存答题记录
+            saveStudentAnswer(studentId, questionId, context, isCorrect);
+
+            // 处理题目状态
+            handleQuestionAfterAnswer(floorId, questionId, isCorrect);
+
+            return Result.success(damageResult);
+
+        } catch (Exception e) {
+            log.error("判题失败 - studentId: {}, questionId: {}", studentId, questionId, e);
+            return Result.error("判题失败: " + e.getMessage());
         }
     }
 
     @Override
     public Result<Integer> getUserChangeCount(String studentId, String floorId) {
+        if (!validateParams(studentId, floorId)) {
+            return Result.error("参数不能为空");
+        }
 
-        //查询用户第几次闯该层了
-        LambdaQueryWrapper<TowerChallengeLog> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TowerChallengeLog::getFloorId, floorId);
-        wrapper.eq(TowerChallengeLog::getUserId, studentId);
-        TowerChallengeLog towerChallengeLog = towerChallengeLogMapper.selectOne(wrapper);
+        try {
+            TowerChallengeLog challengeLog = getTowerChallengeLog(floorId, studentId);
+            int challengeCount = (challengeLog != null && challengeLog.getChallengeCount() != null)
+                    ? challengeLog.getChallengeCount()
+                    : 0;
 
-        //设置闯关次数
-        Integer currentChallengeCount = towerChallengeLog.getChallengeCount();
+            return Result.success(challengeCount);
 
-        return Result.success(currentChallengeCount);
+        } catch (Exception e) {
+            log.error("获取挑战次数失败 - studentId: {}, floorId: {}", studentId, floorId, e);
+            return Result.error("获取挑战次数失败");
+        }
     }
 
     @Override
     public Result<Integer> getDamage(String questionId, String floorId) {
+        if (!validateParams(questionId, floorId)) {
+            return Result.error("参数不能为空");
+        }
 
-        Integer damage = calculateDamageByDifficult(floorId, questionId, "1");
+        try {
+            QuestionBank question = getQuestionById(questionId);
+            if (question == null) {
+                return Result.error("题目不存在");
+            }
 
-        return Result.success(damage);
+            int damage = calculateDamage(floorId, question.getDifficultyLevel().getValue(), true);
+            return Result.success(damage);
 
+        } catch (Exception e) {
+            log.error("计算伤害失败 - questionId: {}, floorId: {}", questionId, floorId, e);
+            return Result.error("计算伤害失败");
+        }
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<Integer> getResult(String floorId, String studentId, String towerChallengeLogId) {
+        if (!validateParams(floorId, studentId, towerChallengeLogId)) {
+            return Result.error("参数不能为空");
+        }
 
-        //查询用户第几次闯该层了
-        LambdaQueryWrapper<TowerChallengeLog> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TowerChallengeLog::getFloorId, floorId);
-        wrapper.eq(TowerChallengeLog::getUserId, studentId);
-        TowerChallengeLog towerChallengeLog = towerChallengeLogMapper.selectOne(wrapper);
-        //设置闯关次数
-        Integer currentChallengeCount = towerChallengeLog.getChallengeCount();
-        //key
-        String SET_USER_HP_KEY = String.format("game:user:hp:%d:%d:%d", studentId, floorId, currentChallengeCount);
-        String SET_BOSS_HP_KEY = String.format("game:boss:hp:%d:%d:%d", floorId, studentId, currentChallengeCount);
-        //获取用户血量和boss血量
-        String USER_HP = stringRedisTemplate.opsForValue().get(SET_USER_HP_KEY);
-        String BOSS_HP = stringRedisTemplate.opsForValue().get(SET_BOSS_HP_KEY);
-
-        //设置本次挑战的状态
-        LambdaUpdateWrapper<TowerChallengeLog> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(TowerChallengeLog::getId, towerChallengeLogId);
-        //根据血量来进行判断
-        if (Integer.valueOf(USER_HP) <= 0) {
-            updateWrapper.set(TowerChallengeLog::getStatus, "失败");
-            towerChallengeLogMapper.update(null, updateWrapper);
-            return Result.success(0);
-        } else if (Integer.valueOf(BOSS_HP) <= 0) {
-            updateWrapper.set(TowerChallengeLog::getStatus, "成功");
-            towerChallengeLogMapper.update(null, updateWrapper);
-            //对应成功业务的处理（解锁下一层，设置成功状态）
-            LambdaUpdateWrapper<TowerFloor> towerFloorUpdateWrapper = new LambdaUpdateWrapper<>();
-            towerFloorUpdateWrapper.eq(TowerFloor::getFloorId, floorId);
-            towerFloorUpdateWrapper.set(TowerFloor::getIsPass, 1);
-            int update = towerFloorMapper.update(towerFloorUpdateWrapper);
-            if (update <= 0) {
-                log.error("设置通过状态失效");
-                throw new RuntimeException("设置通过状态失效");
+        try {
+            TowerChallengeLog challengeLog = getTowerChallengeLogById(towerChallengeLogId);
+            if (challengeLog == null) {
+                return Result.error("挑战记录不存在");
             }
-            return Result.success(1);
 
-        } else {
-            //中间态 表示没有成功也没有失败
-            return Result.success(3);
+            int challengeCount = challengeLog.getChallengeCount();
+
+            // 获取当前血量
+            Map<String, String> hpMap = getCurrentHP(studentId, floorId, challengeCount);
+            if (hpMap.isEmpty()) {
+                return Result.error("血量信息不存在");
+            }
+
+            int userHP = Integer.parseInt(hpMap.get("GAME_USER_HP"));
+            int bossHP = Integer.parseInt(hpMap.get("BOSS_HP"));
+
+            BattleResult result = determineBattleResult(userHP, bossHP);
+
+            // 更新挑战状态
+            updateChallengeStatus(towerChallengeLogId, result);
+
+            // 处理胜利逻辑
+            if (result == BattleResult.PLAYER_WIN) {
+                handlePlayerVictory(floorId, studentId);
+            }
+
+            log.info("战斗结果 - floorId: {}, studentId: {}, result: {}, userHP: {}, bossHP: {}",
+                    floorId, studentId, result.getDescription(), userHP, bossHP);
+
+            return Result.success(result.getCode());
+
+        } catch (Exception e) {
+            log.error("获取战斗结果失败 - floorId: {}, studentId: {}", floorId, studentId, e);
+            return Result.error("获取战斗结果失败");
         }
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<AwardVO> getAward(String studentId, String floorId) {
+        if (!validateParams(studentId, floorId)) {
+            return Result.error("参数不能为空");
+        }
 
-        //增加经验值 增加等级 计算道具获取 返回获取到的道具
+        try {
+            // 获取任务奖励配置
+            Task task = getTaskByFloorId(floorId);
+            if (task == null) {
+                return Result.error("任务不存在");
+            }
 
-        LambdaQueryWrapper<Task> taskQueryWrapper = new LambdaQueryWrapper<>();
-        taskQueryWrapper.eq(Task::getFloorId, floorId);
-        Task task = taskMapper.selectOne(taskQueryWrapper);
+            // 处理物品奖励
+            List<Item> rewardItems = calculateItemRewards(task);
 
-        //获取当前任务奖励信息
-        Integer rewardExp = task.getRewardExp();
-        Integer rewardItemQty = task.getRewardItemQty();
-        Integer rewardItemRarity = task.getRewardItemRarity();
+            // 处理经验奖励
+            boolean expUpdated = updatePlayerExperience(studentId, task.getRewardExp());
+            if (!expUpdated) {
+                log.warn("更新经验失败 - studentId: {}, exp: {}", studentId, task.getRewardExp());
+            }
 
-        LambdaQueryWrapper<Item> itemQueryWrapper = new LambdaQueryWrapper<>();
-        itemQueryWrapper.eq(Item::getRarity, rewardItemRarity);
-        List<Item> items = itemMapper.selectList(itemQueryWrapper);
+            // 构建奖励结果
+            AwardVO award = new AwardVO();
+            award.setExp(String.valueOf(task.getRewardExp()));
+            award.setItem(rewardItems);
 
-        //获取概率并进行抽奖
-        double probability = rewardItemRarity == 0 ? 0.7 : (rewardItemQty == 1 ? 0.3 : 0.1);
-        List<Item> randomItems = new ArrayList<>();
-        if (items != null && items.size() >= rewardItemQty) {
-            // 先判断概率
-            if (ThreadLocalRandom.current().nextDouble() < probability) {
-                // 命中概率 -> 抽奖
-                Collections.shuffle(items); // 打乱顺序
-                randomItems = items.subList(0, rewardItemQty);
-                log.info("抽取到的物品: {}", randomItems);
-            } else {
-                log.info("很遗憾，这次没有抽到任何奖励");
+            log.info("发放奖励成功 - studentId: {}, floorId: {}, exp: {}, items: {}",
+                    studentId, floorId, task.getRewardExp(), rewardItems.size());
+
+            return Result.success(award);
+
+        } catch (Exception e) {
+            log.error("获取奖励失败 - studentId: {}, floorId: {}", studentId, floorId, e);
+            return Result.error("获取奖励失败");
+        }
+    }
+
+    // =================== 私有辅助方法 ===================
+
+    private boolean validateParams(String... params) {
+        for (String param : params) {
+            if (!StringUtils.hasText(param)) {
+                return false;
             }
         }
+        return true;
+    }
 
-        //进行经验的处理
-        LambdaQueryWrapper<GameUser> gameUserQueryWrapper = new LambdaQueryWrapper<>();
-        gameUserQueryWrapper.eq(GameUser::getUserId, studentId);
-        GameUser gameUser = gameUserMapper.selectOne(gameUserQueryWrapper);
-        Integer level = gameUser.getLevel();
-        //计算升级需要的经验值
-        long requireExp = calculateExp(level);
-        //获取当前的经验值
-        Integer currentExp = gameUser.getExp();
-        //进行实现升级扣减经验值业务
-        long totalExp = rewardExp + currentExp;
-        LambdaUpdateWrapper<GameUser> gameUserUpdateWrapper = new LambdaUpdateWrapper<>();
-        gameUserUpdateWrapper.eq(GameUser::getUserId, studentId);
-        int update = 0;
-        if (totalExp <= requireExp) {
-            gameUserUpdateWrapper.set(GameUser::getExp, totalExp);
+    private TowerChallengeLog getTowerChallengeLog(String floorId, String studentId) {
+        LambdaQueryWrapper<TowerChallengeLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TowerChallengeLog::getFloorId, floorId)
+                .eq(TowerChallengeLog::getUserId, studentId)
+                .orderByDesc(TowerChallengeLog::getId)
+                .last("LIMIT 1");
+        return towerChallengeLogMapper.selectOne(wrapper);
+    }
+
+    private TowerChallengeLog getTowerChallengeLogById(String towerChallengeLogId) {
+        return towerChallengeLogMapper.selectById(towerChallengeLogId);
+    }
+
+    private TowerChallengeLog createTowerChallengeLog(String floorId, String studentId, int challengeCount) {
+        TowerChallengeLog challengeLog = new TowerChallengeLog();
+        challengeLog.setChallengeCount(challengeCount);
+        challengeLog.setStatus("进行中");
+        challengeLog.setFloorId(Long.valueOf(floorId));
+        challengeLog.setUserId(Long.valueOf(studentId));
+        challengeLog.setLastChallengeTime(LocalDateTime.now());
+
+        int inserted = towerChallengeLogMapper.insert(challengeLog);
+        if (inserted <= 0) {
+            throw new RuntimeException("创建挑战记录失败");
+        }
+
+        return challengeLog;
+    }
+
+    private boolean initializeBattleHP(String floorId, String studentId, int challengeCount) {
+        try {
+            // 获取怪物信息
+            Monster monster = getMonsterByFloorId(floorId);
+            if (monster == null) {
+                throw new RuntimeException("怪物不存在");
+            }
+
+            // 获取玩家信息
+            GameUser gameUser = getGameUserById(studentId);
+            if (gameUser == null) {
+                throw new RuntimeException("玩家不存在");
+            }
+
+            int userHP = calculateGameUserHP(gameUser.getLevel());
+            int bossHP = monster.getHp();
+
+            // 设置Redis键
+            String userHpKey = String.format(REDIS_USER_HP_KEY_TEMPLATE, studentId, floorId, challengeCount);
+            String bossHpKey = String.format(REDIS_BOSS_HP_KEY_TEMPLATE, floorId, studentId, challengeCount);
+
+            // 保存到Redis并设置过期时间
+            stringRedisTemplate.opsForValue().set(userHpKey, String.valueOf(userHP), REDIS_TTL_HOURS, TimeUnit.HOURS);
+            stringRedisTemplate.opsForValue().set(bossHpKey, String.valueOf(bossHP), REDIS_TTL_HOURS, TimeUnit.HOURS);
+
+            log.info("初始化血量成功 - studentId: {}, floorId: {}, userHP: {}, bossHP: {}",
+                    studentId, floorId, userHP, bossHP);
+
+            return true;
+
+        } catch (Exception e) {
+            log.error("初始化血量失败 - studentId: {}, floorId: {}", studentId, floorId, e);
+            return false;
+        }
+    }
+
+    private Map<String, String> getCurrentHP(String studentId, String floorId, int challengeCount) {
+        Map<String, String> hpMap = new HashMap<>(2);
+
+        try {
+            String userHpKey = String.format(REDIS_USER_HP_KEY_TEMPLATE, studentId, floorId, challengeCount);
+            String bossHpKey = String.format(REDIS_BOSS_HP_KEY_TEMPLATE, floorId, studentId, challengeCount);
+
+            String userHP = stringRedisTemplate.opsForValue().get(userHpKey);
+            String bossHP = stringRedisTemplate.opsForValue().get(bossHpKey);
+
+            if (StringUtils.hasText(userHP) && StringUtils.hasText(bossHP)) {
+                hpMap.put("GAME_USER_HP", userHP);
+                hpMap.put("BOSS_HP", bossHP);
+            }
+
+        } catch (Exception e) {
+            log.error("获取血量失败 - studentId: {}, floorId: {}", studentId, floorId, e);
+        }
+
+        return hpMap;
+    }
+
+    private QuestionBank getRandomQuestionForFloor(String floorId) {
+        try {
+            // 获取题目ID列表
+            List<String> questionIds = questionRedisCache.getQuestionDifficultyListInCacheAndNotPushInCache(
+                    Integer.valueOf(floorId));
+
+            if (questionIds.isEmpty()) {
+                log.warn("塔层{}无可用题目", floorId);
+                return null;
+            }
+
+            // 获取难度分布
+            List<String> difficultyList = questionRedisCache.getTotalQuestionDifficultyListInCache(
+                    Integer.valueOf(floorId));
+
+            if (difficultyList.isEmpty()) {
+                log.warn("塔层{}无难度配置", floorId);
+                return null;
+            }
+
+            String targetDifficulty = difficultyList.get(0);
+
+            // 查询题目
+            LambdaQueryWrapper<QuestionBank> wrapper = new LambdaQueryWrapper<>();
+            wrapper.in(QuestionBank::getQuestionId, questionIds);
+            List<QuestionBank> questions = questionBankMapper.selectList(wrapper);
+
+            return selectQuestionByDifficulty(questions, targetDifficulty);
+
+        } catch (Exception e) {
+            log.error("获取随机题目失败 - floorId: {}", floorId, e);
+            return null;
+        }
+    }
+
+    private QuestionBank selectQuestionByDifficulty(List<QuestionBank> questions, String difficultyCode) {
+        if (questions == null || questions.isEmpty()) {
+            return null;
+        }
+
+        try {
+            Difficulty targetDifficulty = Difficulty.fromCode(difficultyCode);
+
+            List<QuestionBank> filteredQuestions = questions.stream()
+                    .filter(q -> q.getDifficultyLevel().name().equals(targetDifficulty.getName()))
+                    .toList();
+
+            if (filteredQuestions.isEmpty()) {
+                // 如果没有对应难度的题目，随机选择一道
+                return questions.get(ThreadLocalRandom.current().nextInt(questions.size()));
+            }
+
+            return filteredQuestions.get(ThreadLocalRandom.current().nextInt(filteredQuestions.size()));
+
+        } catch (Exception e) {
+            log.warn("按难度筛选题目失败，随机选择 - difficultyCode: {}", difficultyCode, e);
+            return questions.get(ThreadLocalRandom.current().nextInt(questions.size()));
+        }
+    }
+
+    private boolean judgeAnswerWithAI(QuestionBank question, String studentAnswer) {
+        try {
+            String prompt = buildJudgePrompt(
+                    question.getQuestionContent(),
+                    question.getQuestionOptions(),
+                    question.getCorrectAnswer(),
+                    studentAnswer
+            );
+
+            String aiResponse = chatLanguageModel.chat(UserMessage.userMessage(prompt)).aiMessage().text();
+            boolean isCorrect = aiResponse != null && aiResponse.trim().contains("正确");
+
+            log.debug("AI判题 - questionId: {}, studentAnswer: {}, aiResponse: {}, result: {}",
+                    question.getQuestionId(), studentAnswer, aiResponse, isCorrect);
+
+            return isCorrect;
+
+        } catch (Exception e) {
+            log.error("AI判题失败 - questionId: {}", question.getQuestionId(), e);
+            // 默认为错误，避免系统异常导致的不公平
+            return false;
+        }
+    }
+
+    private Map<String, String> updateBattleHP(String studentId, String floorId,
+                                               String challengeCount, boolean isCorrect, int damage) {
+
+        Map<String, String> result = new HashMap<>(2);
+
+        try {
+            int count = Integer.parseInt(challengeCount);
+            String userHpKey = String.format(REDIS_USER_HP_KEY_TEMPLATE, studentId, floorId, count);
+            String bossHpKey = String.format(REDIS_BOSS_HP_KEY_TEMPLATE, floorId, studentId, count);
+
+            if (isCorrect) {
+                // 答对 - 扣Boss血
+                stringRedisTemplate.opsForValue().decrement(bossHpKey, damage);
+                result.put("target", "BOSS_HP");
+                result.put("damage", String.valueOf(damage));
+            } else {
+                // 答错 - 扣玩家血
+                stringRedisTemplate.opsForValue().decrement(userHpKey, damage);
+                result.put("target", "USER_HP");
+                result.put("damage", String.valueOf(damage));
+            }
+
+        } catch (Exception e) {
+            log.error("更新血量失败 - studentId: {}, floorId: {}", studentId, floorId, e);
+        }
+
+        return result;
+    }
+
+    private void saveStudentAnswer(String studentId, String questionId, String answer, boolean isCorrect) {
+        try {
+            StudentAnswer studentAnswer = new StudentAnswer();
+            studentAnswer.setStudentId(Integer.valueOf(studentId));
+            studentAnswer.setQuestionId(Integer.valueOf(questionId));
+            studentAnswer.setStudentAnswer(answer);
+            studentAnswer.setIsCorrect(isCorrect ? "1" : "0");
+
+            int inserted = studentAnswerMapper.insert(studentAnswer);
+            if (inserted <= 0) {
+                log.warn("保存学生答案失败 - studentId: {}, questionId: {}", studentId, questionId);
+            }
+
+        } catch (Exception e) {
+            log.error("保存学生答案异常 - studentId: {}, questionId: {}", studentId, questionId, e);
+        }
+    }
+
+    private void handleQuestionAfterAnswer(String floorId, String questionId, boolean isCorrect) {
+        try {
+            if (!isCorrect) {
+                // 答错了，重新放回题目池
+                questionRedisCache.setQuestionIdsInCache(Integer.valueOf(floorId), questionId);
+            }
+            // 答对了，题目从池中移除，不做额外处理
+        } catch (Exception e) {
+            log.error("处理答题后题目状态失败 - floorId: {}, questionId: {}", floorId, questionId, e);
+        }
+    }
+
+    private BattleResult determineBattleResult(int userHP, int bossHP) {
+        if (userHP <= 0) {
+            return BattleResult.PLAYER_LOSE;
+        } else if (bossHP <= 0) {
+            return BattleResult.PLAYER_WIN;
         } else {
-            long afterDecressExp = totalExp - requireExp;
-            gameUserUpdateWrapper.set(GameUser::getExp, afterDecressExp);
+            return BattleResult.CONTINUE;
         }
-        update = gameUserMapper.update(gameUserUpdateWrapper);
-        //判断是否修改值成功
-        if (update <= 0) {
-            log.error("修改玩家经验值失败");
-            throw new RuntimeException("修改玩家经验值失败");
-        }
-
-        AwardVO awardVO = new AwardVO();
-        awardVO.setExp(String.valueOf(rewardExp));
-        awardVO.setItem(randomItems);
-        log.info("用户闯关所获的奖励为: {}", awardVO);
-
-        return Result.success(awardVO);
-
     }
 
-    /**
-     * 计算用户升级需要的经验
-     *
-     * @param level 当前等级
-     * @return 升级到下一级所需经验
-     */
-    private long calculateExp(int level) {
-        // 基础经验
+    private void updateChallengeStatus(String towerChallengeLogId, BattleResult result) {
+        try {
+            LambdaUpdateWrapper<TowerChallengeLog> wrapper = new LambdaUpdateWrapper<>();
+            wrapper.eq(TowerChallengeLog::getId, towerChallengeLogId)
+                    .set(TowerChallengeLog::getStatus, result.getDescription())
+                    .set(TowerChallengeLog::getLastChallengeTime, LocalDateTime.now());
+
+            towerChallengeLogMapper.update(wrapper);
+
+        } catch (Exception e) {
+            log.error("更新挑战状态失败 - logId: {}, result: {}", towerChallengeLogId, result, e);
+        }
+    }
+
+    private void handlePlayerVictory(String floorId, String studentId) {
+        try {
+            // 设置塔层为通过状态
+            LambdaUpdateWrapper<TowerFloor> wrapper = new LambdaUpdateWrapper<>();
+            wrapper.eq(TowerFloor::getFloorId, floorId)
+                    .set(TowerFloor::getIsPass, 1);
+
+            int updated = towerFloorMapper.update(wrapper);
+            if (updated <= 0) {
+                log.warn("设置塔层通过状态失败 - floorId: {}", floorId);
+            }
+
+            // 更新排行榜 - 使用修复后的RedisSort方法
+            TowerFloor towerFloor = getTowerFloorById(floorId);
+            if (towerFloor != null) {
+                String towerId = String.valueOf(towerFloor.getTowerId());
+                // 使用增量更新而不是绝对设置
+                redisSort.incrementStudentScore(towerId, studentId, "1");
+                redisSort.incrementTotalScore(studentId, "1");
+            }
+
+        } catch (Exception e) {
+            log.error("处理玩家胜利逻辑失败 - floorId: {}, studentId: {}", floorId, studentId, e);
+        }
+    }
+
+    private List<Item> calculateItemRewards(Task task) {
+        List<Item> rewardItems = new ArrayList<>();
+
+        try {
+            Integer rewardItemQty = task.getRewardItemQty();
+            Integer rewardItemRarity = task.getRewardItemRarity();
+
+            if (rewardItemQty == null || rewardItemQty <= 0 || rewardItemRarity == null) {
+                return rewardItems;
+            }
+
+            // 获取对应稀有度的物品
+            LambdaQueryWrapper<Item> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Item::getRarity, rewardItemRarity);
+            List<Item> availableItems = itemMapper.selectList(wrapper);
+
+            if (availableItems == null || availableItems.size() < rewardItemQty) {
+                log.warn("可用物品不足 - rarity: {}, required: {}, available: {}",
+                        rewardItemRarity, rewardItemQty, availableItems != null ? availableItems.size() : 0);
+                return rewardItems;
+            }
+
+            // 计算获得物品的概率
+            double probability = calculateItemProbability(rewardItemRarity, rewardItemQty);
+
+            if (ThreadLocalRandom.current().nextDouble() < probability) {
+                // 命中概率，随机选择物品
+                Collections.shuffle(availableItems);
+                rewardItems = availableItems.subList(0, rewardItemQty);
+                log.info("获得物品奖励 - count: {}, rarity: {}", rewardItemQty, rewardItemRarity);
+            } else {
+                log.info("未命中物品奖励概率 - probability: {}", probability);
+            }
+
+        } catch (Exception e) {
+            log.error("计算物品奖励失败", e);
+        }
+
+        return rewardItems;
+    }
+
+    private double calculateItemProbability(int rarity, int quantity) {
+        // 基于稀有度和数量计算概率
+        double baseProbability = switch (rarity) {
+            case 0 -> 0.7;  // 普通物品70%
+            case 1 -> 0.4;  // 稀有物品40%
+            case 2 -> 0.2;  // 史诗物品20%
+            case 3 -> 0.05; // 传说物品5%
+            default -> 0.1;
+        };
+
+        // 数量越多，概率适当降低
+        double quantityFactor = Math.max(0.1, 1.0 - (quantity - 1) * 0.1);
+
+        return baseProbability * quantityFactor;
+    }
+
+    private boolean updatePlayerExperience(String studentId, int rewardExp) {
+        if (rewardExp <= 0) {
+            return true;
+        }
+
+        try {
+            GameUser gameUser = getGameUserById(studentId);
+            if (gameUser == null) {
+                return false;
+            }
+
+            int currentLevel = gameUser.getLevel();
+            int currentExp = gameUser.getExp() != null ? gameUser.getExp() : 0;
+            long requiredExp = calculateRequiredExp(currentLevel);
+
+            long totalExp = currentExp + rewardExp;
+            int newLevel = currentLevel;
+            long remainingExp = totalExp;
+
+            // 处理升级
+            while (remainingExp >= requiredExp && newLevel < 999) { // 设置最大等级限制
+                remainingExp -= requiredExp;
+                newLevel++;
+                requiredExp = calculateRequiredExp(newLevel);
+            }
+
+            // 更新玩家数据
+            LambdaUpdateWrapper<GameUser> wrapper = new LambdaUpdateWrapper<>();
+            wrapper.eq(GameUser::getUserId, studentId)
+                    .set(GameUser::getExp, (int) remainingExp)
+                    .set(GameUser::getLevel, newLevel);
+
+            int updated = gameUserMapper.update(wrapper);
+
+            if (newLevel > currentLevel) {
+                log.info("玩家升级 - studentId: {}, level: {} -> {}, exp: {}",
+                        studentId, currentLevel, newLevel, remainingExp);
+            }
+
+            return updated > 0;
+
+        } catch (Exception e) {
+            log.error("更新玩家经验失败 - studentId: {}, rewardExp: {}", studentId, rewardExp, e);
+            return false;
+        }
+    }
+
+    private long calculateRequiredExp(int level) {
+        // 优化后的经验计算公式
         final int baseExp = 100;
-        // 增长系数（整体倍数）
-        final double growthRate = 1.5;
-        // 等级指数影响（可调节难度）
-        final double exponent = 2.0;
-        // 计算公式：基础经验 × (等级 ^ 指数) × 增长系数
+        final double growthRate = 1.2;
+        final double exponent = 1.8;
+
         double exp = baseExp * Math.pow(level, exponent) * growthRate;
-        return Math.round(exp);
+        return Math.max(100, Math.round(exp)); // 最少需要100经验
     }
 
+    private int calculateDamage(String floorId, String difficultyLevel, boolean isCorrect) {
+        try {
+            TowerFloor towerFloor = getTowerFloorById(floorId);
+            if (towerFloor == null) {
+                log.warn("塔层不存在 - floorId: {}", floorId);
+                return DEFAULT_BASE_DAMAGE;
+            }
+
+            int floorNo = towerFloor.getFloorNo();
+            double baseDamage = DEFAULT_BASE_DAMAGE + floorNo * DAMAGE_PER_FLOOR;
+
+            // 获取难度系数
+            double difficultyFactor = 1.0;
+            try {
+                Difficulty difficulty = Difficulty.fromName(difficultyLevel.toUpperCase());
+                difficultyFactor = difficulty.getFactor();
+            } catch (IllegalArgumentException e) {
+                log.warn("未知难度等级: {}", difficultyLevel);
+            }
+
+            // 正确与错误的系数
+            double correctnessFactor = isCorrect ? 1.0 : 0.6; // 答错时伤害稍低
+
+            int finalDamage = (int) Math.round(baseDamage * difficultyFactor * correctnessFactor);
+            return Math.max(1, finalDamage); // 最小伤害为1
+
+        } catch (Exception e) {
+            log.error("计算伤害失败 - floorId: {}, difficulty: {}", floorId, difficultyLevel, e);
+            return DEFAULT_BASE_DAMAGE;
+        }
+    }
+
+    // =================== 数据查询辅助方法 ===================
+
+    private QuestionBank getQuestionById(String questionId) {
+        try {
+            return questionBankMapper.selectById(questionId);
+        } catch (Exception e) {
+            log.error("查询题目失败 - questionId: {}", questionId, e);
+            return null;
+        }
+    }
+
+    private Monster getMonsterByFloorId(String floorId) {
+        try {
+            LambdaQueryWrapper<Monster> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Monster::getFloorId, floorId);
+            return bossMapper.selectOne(wrapper);
+        } catch (Exception e) {
+            log.error("查询怪物失败 - floorId: {}", floorId, e);
+            return null;
+        }
+    }
+
+    private GameUser getGameUserById(String studentId) {
+        try {
+            LambdaQueryWrapper<GameUser> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(GameUser::getUserId, studentId);
+            return gameUserMapper.selectOne(wrapper);
+        } catch (Exception e) {
+            log.error("查询游戏用户失败 - studentId: {}", studentId, e);
+            return null;
+        }
+    }
+
+    private TowerFloor getTowerFloorById(String floorId) {
+        try {
+            LambdaQueryWrapper<TowerFloor> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(TowerFloor::getFloorId, floorId);
+            return towerFloorMapper.selectOne(wrapper);
+        } catch (Exception e) {
+            log.error("查询塔层失败 - floorId: {}", floorId, e);
+            return null;
+        }
+    }
+
+    private Task getTaskByFloorId(String floorId) {
+        try {
+            LambdaQueryWrapper<Task> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Task::getFloorId, floorId);
+            return taskMapper.selectOne(wrapper);
+        } catch (Exception e) {
+            log.error("查询任务失败 - floorId: {}", floorId, e);
+            return null;
+        }
+    }
 
     /**
-     * 计算技能伤害
-     * 难度：EASY、MEDIUM、HARD
-     * 正确 → 扣 Boss 血
-     * 错误 → 扣 玩家血
+     * 构建AI判题提示词
+     *
+     * @param questionContent 题目内容
+     * @param questionOptions 题目选项
+     * @param correctAnswer   正确答案
+     * @param studentAnswer   学生答案
+     * @return 判题提示词
      */
-    private Integer calculateDamageByDifficult(String floorId, String difficult, String isCorrect) {
-        TowerFloor towerFloor = towerFloorMapper.selectOne(
-                new LambdaQueryWrapper<TowerFloor>().eq(TowerFloor::getFloorId, floorId)
-        );
-        Integer floorNo = towerFloor.getFloorNo();
+    private String buildJudgePrompt(String questionContent, String questionOptions,
+                                    String correctAnswer, String studentAnswer) {
 
-        // 基础伤害随层数增加
-        double baseDamage = 30 + floorNo * 5;
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("请判断学生答案的正确性。\n\n");
+        prompt.append("题目内容：\n").append(questionContent).append("\n\n");
 
-        // 难度系数
-        double difficultFactor;
-        switch (difficult.toUpperCase()) {
-            case "HARD":
-                difficultFactor = 2.0;
-                break;
-            case "MEDIUM":
-                difficultFactor = 1.5;
-                break;
-            case "EASY":
-            default:
-                difficultFactor = 1.0;
-                break;
+        if (StringUtils.hasText(questionOptions)) {
+            prompt.append("选项：\n").append(questionOptions).append("\n\n");
         }
 
-        // 正确与错误的系数
-        boolean correct = "1".equals(isCorrect) || "正确".equalsIgnoreCase(isCorrect);
-        double resultFactor = correct ? 1.0 : 0.5; // 答错扣玩家血量稍微轻一点
+        prompt.append("标准答案：\n").append(correctAnswer).append("\n\n");
+        prompt.append("学生答案：\n").append(studentAnswer).append("\n\n");
+        prompt.append("请仅回答正确或错误，不要包含其他内容。");
 
-        // 最终伤害
-        return (int) Math.round(baseDamage * difficultFactor * resultFactor);
+        return prompt.toString();
     }
 
     /**
-     * 构建判题提示词
+     * 清理过期的战斗数据（定时任务调用）
+     *
+     * @param hours 保留小时数
+     * @return 清理的键数量
      */
-    public String buildJudgePrompt(String questionContent, String questionOptions, String correctAnswer, String studentAnswer) {
-        return String.format(
-                "请帮我判定学生答案的正确性。\n\n" +
-                        "题目：\n%s\n\n" +
-                        "选项：\n%s\n\n" +
-                        "正确答案：\n%s\n\n" +
-                        "学生回答：\n%s\n\n" +
-                        "请根据正确答案判断学生回答是否正确，回答时只返回“正确”或“错误”，并简要说明理由。",
-                questionContent, questionOptions, correctAnswer, studentAnswer
-        );
+    public int cleanupExpiredBattleData(int hours) {
+        // 这里可以实现清理逻辑，删除过期的Redis键
+        // 由于Redis已经设置了TTL，这个方法主要用于数据库清理
+        log.info("执行战斗数据清理任务 - 保留{}小时内的数据", hours);
+        // TODO: 实现具体的清理逻辑
+        return 0;
     }
 
+    /**
+     * 获取玩家战斗统计信息
+     *
+     * @param studentId 学生ID
+     * @return 战斗统计
+     */
+    public Map<String, Object> getBattleStatistics(String studentId) {
+        Map<String, Object> stats = new HashMap<>();
 
+        try {
+            // 统计挑战次数
+            LambdaQueryWrapper<TowerChallengeLog> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(TowerChallengeLog::getUserId, studentId);
+
+            Long totalChallenges = towerChallengeLogMapper.selectCount(wrapper);
+
+            wrapper.eq(TowerChallengeLog::getStatus, "成功");
+            Long successfulChallenges = towerChallengeLogMapper.selectCount(wrapper);
+
+            stats.put("totalChallenges", totalChallenges);
+            stats.put("successfulChallenges", successfulChallenges);
+            stats.put("successRate", totalChallenges > 0 ?
+                    (double) successfulChallenges / totalChallenges : 0.0);
+
+        } catch (Exception e) {
+            log.error("获取战斗统计失败 - studentId: {}", studentId, e);
+        }
+
+        return stats;
+    }
 }

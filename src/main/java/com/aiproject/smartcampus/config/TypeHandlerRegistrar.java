@@ -1,4 +1,3 @@
-// 🔧 方案4：创建独立的TypeHandler配置类（最推荐）
 package com.aiproject.smartcampus.config;
 
 import com.aiproject.smartcampus.commons.utils.TextTypeHandler;

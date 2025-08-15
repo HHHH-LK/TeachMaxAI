@@ -109,40 +109,19 @@ public class ExamCreaterToolUtils {
             return QuestionBank.QuestionType.valueOf(aiQuestionType.toUpperCase());
         } catch (IllegalArgumentException e) {
             // 如果直接转换失败，进行映射转换
-            switch (aiQuestionType.toLowerCase()) {
-                case "single_choice":
-                case "singlechoice":
-                case "single-choice":
-                    return QuestionBank.QuestionType.SINGLE_CHOICE;
-
-                case "multiple_choice":
-                case "multiplechoice":
-                case "multiple-choice":
-                    return QuestionBank.QuestionType.MULTIPLE_CHOICE;
-
-                case "true_false":
-                case "truefalse":
-                case "true-false":
-                case "judgment":
-                    return QuestionBank.QuestionType.TRUE_FALSE;
-
-                case "fill_blank":
-                case "fillblank":
-                case "fill-blank":
-                case "fill_in_blank":
-                case "fill_in_the_blank":
-                    return QuestionBank.QuestionType.FILL_BLANK;
-
-                case "short_answer":
-                case "shortanswer":
-                case "short-answer":
-                case "essay":
-                    return QuestionBank.QuestionType.SHORT_ANSWER;
-
-                default:
+            return switch (aiQuestionType.toLowerCase()) {
+                case "single_choice", "singlechoice", "single-choice" -> QuestionBank.QuestionType.SINGLE_CHOICE;
+                case "multiple_choice", "multiplechoice", "multiple-choice" ->
+                        QuestionBank.QuestionType.MULTIPLE_CHOICE;
+                case "true_false", "truefalse", "true-false", "judgment" -> QuestionBank.QuestionType.TRUE_FALSE;
+                case "fill_blank", "fillblank", "fill-blank", "fill_in_blank", "fill_in_the_blank" ->
+                        QuestionBank.QuestionType.FILL_BLANK;
+                case "short_answer", "shortanswer", "short-answer", "essay" -> QuestionBank.QuestionType.SHORT_ANSWER;
+                default -> {
                     log.warn("未知的题目类型: {}, 使用默认类型: SINGLE_CHOICE", aiQuestionType);
-                    return QuestionBank.QuestionType.SINGLE_CHOICE;
-            }
+                    yield QuestionBank.QuestionType.SINGLE_CHOICE;
+                }
+            };
         }
     }
 

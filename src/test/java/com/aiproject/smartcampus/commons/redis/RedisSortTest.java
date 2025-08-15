@@ -13,7 +13,7 @@ class RedisSortTest {
     @Test
     void test(){
 
-        redisSort.getSortedList("2");
+        redisSort.getCourseLeaderboard("2");
 
     }
 

@@ -94,19 +94,23 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
         String classSituation = teacherGetSituationDTOResult.toString();
 
         //获取班级高频错误知识点分布
+        StringBuffer sb1 = new StringBuffer();
         List<StudentWrongKnowledgeBO> wrongKnowledgeList = teacherService.getTheMaxUncorrectPoint(courseId).getData();
-        StringBuffer sb = new StringBuffer();
-        sb.append("接下来是班级高频错误知识点\n");
-        for (int i = 1; i < wrongKnowledgeList.size(); i++) {
-            sb.append("班级出错率第" + i + "高的知识点:");
-            sb.append(wrongKnowledgeList.get(i - 1).toString());
-            sb.append("\n");
+        if (wrongKnowledgeList != null && !wrongKnowledgeList.isEmpty()) {
+            sb1.append("接下来是班级高频错误知识点\n");
+            for (int i = 1; i <= wrongKnowledgeList.size(); i++) {
+                sb1.append("班级出错率第").append(i).append("高的知识点:");
+                sb1.append(wrongKnowledgeList.get(i - 1).toString());
+                sb1.append("\n");
+            }
+        } else {
+            sb1.append("暂无班级高频错误知识点数据\n");
         }
 
         StringBuffer sb2 = new StringBuffer();
         sb2.append("班级详细成绩信息情况为" + classSituation);
         sb2.append("\n");
-        sb2.append(sb.toString());
+        sb2.append(sb1.toString());
         String result = sb2.toString();
 
         //基于ai智能生成学情报告
@@ -138,19 +142,22 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
         //获取班级高频错误知识点分布
         StringBuffer sb1 = new StringBuffer();
         List<StudentWrongKnowledgeBO> wrongKnowledgeList = teacherService.getTheMaxUncorrectPoint(courseId).getData();
-        sb1.append("接下来是班级高频错误知识点\n");
-        for (int i = 1; i < wrongKnowledgeList.size(); i++) {
-            sb1.append("班级出错率第" + i + "高的知识点:");
-            sb1.append(wrongKnowledgeList.get(i - 1).toString());
-            sb1.append("\n");
+        if (wrongKnowledgeList != null && !wrongKnowledgeList.isEmpty()) {
+            sb1.append("接下来是班级高频错误知识点\n");
+            for (int i = 1; i <= wrongKnowledgeList.size(); i++) {
+                sb1.append("班级出错率第").append(i).append("高的知识点:");
+                sb1.append(wrongKnowledgeList.get(i - 1).toString());
+                sb1.append("\n");
+            }
+        } else {
+            sb1.append("暂无班级高频错误知识点数据\n");
         }
         String wrongKnowledgeInfo = sb1.toString();
 
 
         //获取教师信息
         //todo 测试数据
-        /*String teacherId = userToTypeUtils.change();*/
-        String teacherId = "1";
+        String teacherId = userToTypeUtils.change();
         TeacherInfoDTO teacherInfoById = teacherMapper.findTeacherInfoById(teacherId);
         String teacerInfo = teacherInfoById.toString();
 
@@ -183,13 +190,13 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
         // 查询课程章节重要知识点
         List<ChapterKnowledgePointDTO> chapterKnowledgePointDTOS = chapterMapper.getallChapterKnowleageByIscore(courseId, chapterId);
         //基于courseId 查询对应点课程名字
-        String courseNameByid = courseMapper.findCourseNameByid(courseId);
+        String courseNameById = courseMapper.findCourseNameByid(courseId);
         //基于章节id查询对应的章节name
         String chapterNameById = chapterMapper.getChapterNameById(chapterId);
         String teacherId = userToTypeUtils.change();
 
         //汇总信息
-        StringBuffer sb = new StringBuffer("课程" + courseNameByid + "对应章节" + chapterNameById + "下有以下知识点");
+        StringBuffer sb = new StringBuffer("课程" + courseNameById + "对应章节" + chapterNameById + "下有以下知识点");
         for (ChapterKnowledgePointDTO chapterKnowledgePointDTO : chapterKnowledgePointDTOS) {
             sb.append(chapterKnowledgePointDTO.toString());
             sb.append("\n");
@@ -199,12 +206,17 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
         //获取班级高频错误知识点分布
         StringBuffer sb1 = new StringBuffer();
         List<StudentWrongKnowledgeBO> wrongKnowledgeList = teacherService.getTheMaxUncorrectPoint(courseId).getData();
-        sb1.append("接下来是班级高频错误知识点\n");
-        for (int i = 1; i < wrongKnowledgeList.size(); i++) {
-            sb1.append("班级出错率第" + i + "高的知识点:");
-            sb1.append(wrongKnowledgeList.get(i - 1).toString());
-            sb1.append("\n");
+        if (wrongKnowledgeList != null && !wrongKnowledgeList.isEmpty()) {
+            sb1.append("接下来是班级高频错误知识点\n");
+            for (int i = 1; i <= wrongKnowledgeList.size(); i++) {
+                sb1.append("班级出错率第").append(i).append("高的知识点:");
+                sb1.append(wrongKnowledgeList.get(i - 1).toString());
+                sb1.append("\n");
+            }
+        } else {
+            sb1.append("暂无班级高频错误知识点数据\n");
         }
+
         String wrongKnowledgeInfo = sb1.toString();
 
         //智能生成章节测试题
