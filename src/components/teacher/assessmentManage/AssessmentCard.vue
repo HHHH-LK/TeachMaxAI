@@ -51,7 +51,7 @@
           size="small"
           type="success"
           @click="$emit('grade', assessment)"
-          v-if="assessment.submittedCount > 0 && assessment.gradedCount < assessment.submittedCount"
+          v-if="assessment.submittedCount > 0"
         >
           智能阅卷
         </el-button>
@@ -99,7 +99,7 @@ const getTypeTagType = (type) => {
 const getStatusTagType = (status) => {
   const statusMap = {
     draft: "info",
-    active: "success",
+    scheduled: "success",
     completed: "warning",
   };
   return statusMap[status] || "info";

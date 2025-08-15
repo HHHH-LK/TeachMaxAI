@@ -83,233 +83,7 @@ const props = defineProps({
 const currentCourseId = computed(() => props.courseId);
 
 // 考核列表数据
-const assessments = ref([
-  {
-    id: "5",
-    title: "Java程序设计（A）",
-    type: "期末考试",
-    status: "draft",
-    totalQuestions: 25,
-    totalScore: 100,
-    totalStudents: 7,
-    submittedCount: 0,
-    gradedCount: 0,
-    createdAt: "2024-03-25T09:15:00Z",
-    lastSubmissionTime: null,
-    chapters: [5],
-    knowledgePoints: ["综合项目实践"],
-    examPaper: {
-      "title": "2025上学期《Java程序设计》期末测验",
-      "questions": [
-        {
-          "id": "q1",
-          "title": "Java程序的三大特性是什么？请按顺序写出名称。",
-          "type": "short",
-          "score": 6
-        },
-        {
-          "id": "q2",
-          "title": "抽象类和接口的区别是？请简要说明。",
-          "type": "short",
-          "score": 6
-        },
-        {
-          "id": "q3",
-          "title": "用于实现多态性的Java机制是____。",
-          "type": "blank",
-          "score": 3
-        },
-        {
-          "id": "q4",
-          "title": "下列哪项不是Java关键字？",
-          "type": "single",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "const"},
-            {"value": "B", "label": "interface"},
-            {"value": "C", "label": "null"}
-          ]
-        },
-        {
-          "id": "q5",
-          "title": "请选择所有访问修饰符。",
-          "type": "multiple",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "public"},
-            {"value": "B", "label": "private"},
-            {"value": "C", "label": "synchronized"}
-          ]
-        },
-        {
-          "id": "q6",
-          "title": "Java中实现线程安全的集合类是____。",
-          "type": "blank",
-          "score": 3
-        },
-        {
-          "id": "q7",
-          "title": "this关键字的作用？",
-          "type": "short",
-          "score": 6
-        },
-        {
-          "id": "q8",
-          "title": "下列哪项不是基本数据类型？",
-          "type": "single",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "int"},
-            {"value": "B", "label": "String"},
-            {"value": "C", "label": "char"}
-          ]
-        },
-        {
-          "id": "q9",
-          "title": "以下哪些属于运行时异常？",
-          "type": "multiple",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "NullPointerException"},
-            {"value": "B", "label": "FileNotFoundException"},
-            {"value": "C", "label": "IOException"},
-            {"value": "D", "label": "ArrayIndexOutOfBoundsException"}
-          ]
-        },
-        {
-          "id": "q10",
-          "title": "JVM的作用是？",
-          "type": "single",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "编译Java代码"},
-            {"value": "B", "label": "执行字节码文件"},
-            {"value": "C", "label": "调试程序"}
-          ]
-        },
-        {
-          "id": "q11",
-          "title": "反射机制主要应用于？",
-          "type": "single",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "动态加载类"},
-            {"value": "B", "label": "内存管理"},
-            {"value": "C", "label": "异常处理"}
-          ]
-        },
-        {
-          "id": "q12",
-          "title": "try-with-resources语法需实现____接口。",
-          "type": "blank",
-          "score": 3
-        },
-        {
-          "id": "q13",
-          "title": "Math.round(11.5)的返回值是____。",
-          "type": "blank",
-          "score": 3
-        },
-        {
-          "id": "q14",
-          "title": "Java中数组是对象。",
-          "type": "judge",
-          "score": 3
-        },
-        {
-          "id": "q15",
-          "title": "简述static关键字的四种应用场景。",
-          "type": "short",
-          "score": 6
-        },
-        {
-          "id": "q16",
-          "title": "Java中用于定义接口的关键字是？",
-          "type": "single",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "class"},
-            {"value": "B", "label": "interface"},
-            {"value": "C", "label": "abstract"},
-            {"value": "D", "label": "extends"}
-          ]
-        },
-        {
-          "id": "q17",
-          "title": "以下哪些是Java集合框架中的接口？",
-          "type": "multiple",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "List"},
-            {"value": "B", "label": "Map"},
-            {"value": "C", "label": "Set"},
-            {"value": "D", "label": "Array"}
-          ]
-        },
-        {
-          "id": "q18",
-          "title": "Java中HashMap允许null键和null值。",
-          "type": "judge",
-          "score": 4
-        },
-        {
-          "id": "q19",
-          "title": "Java中final关键字可以修饰哪些元素？",
-          "type": "multiple",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "类"},
-            {"value": "B", "label": "方法"},
-            {"value": "C", "label": "变量"},
-            {"value": "D", "label": "接口"}
-          ]
-        },
-        {
-          "id": "q20",
-          "title": "Java中String类是可变类。",
-          "type": "judge",
-          "score": 3
-        },
-        {
-          "id": "q21",
-          "title": "Java中实现多线程的方式有哪几种？",
-          "type": "short",
-          "score": 6
-        },
-        {
-          "id": "q22",
-          "title": "Java中用于创建对象的关键字是____。",
-          "type": "blank",
-          "score": 3
-        },
-        {
-          "id": "q23",
-          "title": "Java中super关键字的作用是____。",
-          "type": "blank",
-          "score": 3
-        },
-        {
-          "id": "q24",
-          "title": "Java中Thread类的start()方法用于启动线程。",
-          "type": "judge",
-          "score": 2
-        },
-        {
-          "id": "q25",
-          "title": "Java中异常处理机制使用哪些关键字？",
-          "type": "multiple",
-          "score": 4,
-          "options": [
-            {"value": "A", "label": "try"},
-            {"value": "B", "label": "catch"},
-            {"value": "C", "label": "finally"},
-            {"value": "D", "label": "throw"}
-          ]
-        }
-      ]
-    },
-  },
-]);
+const assessments = ref([]);
 
 // 处理试卷生成成功
 const handleExamGenerated = (newAssessment) => {
@@ -349,6 +123,8 @@ const viewAssessment = (assessment) => {
   selectedAssessment.value = assessment;
   showViewModal.value = true;
 };
+
+let questionNumber;
 
 // 查看考试内容
 const viewExamContent = async (assessment) => {
@@ -406,6 +182,7 @@ const viewExamContent = async (assessment) => {
         };
       });
 
+      questionNumber = response.data.data.length;
       selectedExamPaper.value = {
         title: assessment.title,
         questions: questions
@@ -491,18 +268,22 @@ const loadAssessments = async () => {
     const response = await teacherService.assessment.generateExam(currentCourseId.value);
     console.log("考核列表数据:", response)
 
+    const responseNumber = await teacherService.getAllStudent(currentCourseId.value);
+    const totalCount = responseNumber.data.data.length;
+    console.log("total", totalCount);
+
     if (response.data && response.data.success) {
       // 将API返回的数据转换为组件需要的格式
       assessments.value = response.data.data.map(exam => ({
         id: exam.examId.toString(),
         title: exam.title,
-        type: "期末考试",
+        type: "期末考试",//无此字段
         status: exam.status,
-        totalQuestions: 25, // 默认题目数量
-        totalScore: exam.maxScore,
-        totalStudents: 7, // 默认学生数量
-        submittedCount: 0,
-        gradedCount: 0,
+        totalQuestions: questionNumber || 20, // 默认题目数量
+        totalScore: exam.max_score,
+        totalStudents: totalCount, 
+        submittedCount: exam.questionCount,
+        gradedCount: exam.markingCount,
         createdAt: exam.createdAt,
         lastSubmissionTime: null,
         chapters: [exam.courseId],

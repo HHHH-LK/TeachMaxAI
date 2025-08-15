@@ -49,8 +49,12 @@ const activeTab = ref('all');
 
 // 计算待阅卷的考核
 const pendingAssessments = computed(() => {
+  console.log("assessment",props.assessments)
   return props.assessments.filter(
-    (a) => a.submittedCount > 0 && a.gradedCount < a.submittedCount
+    // (a) => a.submittedCount > 0 && a.gradedCount < a.submittedCount
+    a => {
+    return a.submittedCount > 0;
+  }
   );
 });
 </script>

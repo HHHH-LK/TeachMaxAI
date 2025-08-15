@@ -16,20 +16,20 @@ export const fileService = {
     // }
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
-    return await apiClient.post('/upload', formData, {
+    return await apiClient.post("/upload", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        "Content-Type": "multipart/form-data",
       },
-      onUploadProgress: progressEvent => {
+      onUploadProgress: (progressEvent) => {
         const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
+          (progressEvent.loaded * 100) / progressEvent.total
         );
         onProgress?.(percentCompleted);
-      }
+      },
     });
-  }
+  },
 };
 
 // 教师服务 - 备课与设计、考核内容生成、学情数据分析
@@ -45,8 +45,8 @@ export const teacherService = {
    * @returns {Promise<object>} 章节信息列表
    */
   getChapterByCourseId: async (courseId) => {
-    return await apiClient.get('/chapter/getChapter', {
-      params: { courseId }
+    return await apiClient.get("/chapter/getChapter", {
+      params: { courseId },
     });
   },
 
@@ -56,18 +56,18 @@ export const teacherService = {
    * @returns {Promise<object>} 知识点信息列表
    */
   getKnowledgePointsByChapterId: async (chaptId) => {
-    return await apiClient.get('/chapter/selectAllKnowledgeBychaptId', {
-      params: { chaptId }
+    return await apiClient.get("/chapter/selectAllKnowledgeBychaptId", {
+      params: { chaptId },
     });
   },
 
   // AI学情分析
   generateLearningAnalysis: async (params) => {
-    return await apiClient.post('/teacher/ai/learning-analysis', {
+    return await apiClient.post("/teacher/ai/learning-analysis", {
       studentId: params.studentId,
       courseId: params.courseId,
       classId: params.classId,
-      analysisType: params.analysisType || 'comprehensive'
+      analysisType: params.analysisType || "comprehensive",
     });
   },
 
@@ -93,8 +93,8 @@ export const teacherService = {
 
   // 获取班级学情数据分析
   getClassAnalysis: (courseId) => {
-    return apiClient.post('/teacher/ai/aiclassAiayaisc', null, {
-      params: { courseId } // 放在配置对象的params中
+    return apiClient.post("/teacher/ai/aiclassAiayaisc", null, {
+      params: { courseId }, // 放在配置对象的params中
     });
   },
 
@@ -105,8 +105,8 @@ export const teacherService = {
    * @returns {Promise<object>} 作业信息
    */
   getHomework: async (courseId, chapterId) => {
-    return await apiClient.get('/teacher/getHomework', {
-      params: { courseId, chapterId }
+    return await apiClient.get("/teacher/getHomework", {
+      params: { courseId, chapterId },
     });
   },
 
@@ -118,44 +118,44 @@ export const teacherService = {
    * @returns {Promise<object>} 作业信息列表
    */
   getHomeworkByStudent: async (studentId, courseId, chapterId) => {
-    return await apiClient.get('/teacher/getHomeworkByStudent', {
-      params: { studentId, courseId, chapterId }
+    return await apiClient.get("/teacher/getHomeworkByStudent", {
+      params: { studentId, courseId, chapterId },
     });
   },
 
   // 获取学生个人学情数据分析
   getStudentAnalysis: async (studentId, courseId) => {
-    return await apiClient.get('/teacher/student-analysis', {
-      params: { studentId, courseId }
+    return await apiClient.get("/teacher/student-analysis", {
+      params: { studentId, courseId },
     });
   },
 
   // 获取知识点掌握情况分析
   getKnowledgePointAnalysis: async (courseId, classId) => {
-    return await apiClient.get('/teacher/knowledge-point-analysis', {
-      params: { courseId, classId }
+    return await apiClient.get("/teacher/knowledge-point-analysis", {
+      params: { courseId, classId },
     });
   },
 
   // 教案生成 - 将所有备课资料字段拼成一段话传递给后端
   generateLessonPlan: async (content, courseId, chapterId) => {
-    return await apiClient.get('/teacher/ai/TeacherTextCreate', {
-      params:{
+    return await apiClient.get("/teacher/ai/TeacherTextCreate", {
+      params: {
         content: content,
         courseId: courseId,
-        chapterId: chapterId
-      }
+        chapterId: chapterId,
+      },
     });
   },
 
   // 获取所有课程
-  getAllCourse: async (teacherId) =>{
-    return apiClient.get(`/teacher/getClass/${teacherId}`)
+  getAllCourse: async (teacherId) => {
+    return apiClient.get(`/teacher/getClass/${teacherId}`);
   },
 
   //获取课程下所有学生
-  getAllStudent: async(courseId)=> {
-    return apiClient.get(`/teacher/getStudentInfo/${courseId}`)
+  getAllStudent: async (courseId) => {
+    return apiClient.get(`/teacher/getStudentInfo/${courseId}`);
   },
 
   // 获取学生信息（根据学号）
@@ -166,12 +166,12 @@ export const teacherService = {
   // 考核管理相关接口
   assessment: {
     //获取所有考试
-    generateExam: async(courseId) => {
+    generateExam: async (courseId) => {
       return apiClient.get("/teacher/addPaper", {
-        params:{
-          courseId: courseId
-        }
-      })
+        params: {
+          courseId: courseId,
+        },
+      });
     },
 
     /**
@@ -181,8 +181,8 @@ export const teacherService = {
      * @returns {Promise<object>} 考试创建结果
      */
     createIntelligentExam: async (content, courseId) => {
-      return await apiClient.post('/teacher/ai/createExamByai', null, {
-        params: { content, courseId }
+      return await apiClient.post("/teacher/ai/createExamByai", null, {
+        params: { content, courseId },
       });
     },
 
@@ -192,8 +192,8 @@ export const teacherService = {
      * @returns {Promise<object>} 考试题目信息
      */
     getCourseExamInfo: async (examId) => {
-      return await apiClient.get('/course/getCourseExamInfo', {
-        params: { examId }
+      return await apiClient.get("/course/getCourseExamInfo", {
+        params: { examId },
       });
     },
 
@@ -212,8 +212,8 @@ export const teacherService = {
      * @returns {Promise<object>} 发布结果
      */
     releasePaper: async (examId) => {
-      return await apiClient.post('/teacher/releasePaper', null, {
-        params: { examId }
+      return await apiClient.post("/teacher/releasePaper", null, {
+        params: { examId },
       });
     },
 
@@ -224,24 +224,29 @@ export const teacherService = {
      * @returns {Promise<object>} 阅卷结果
      */
     aiMarkingExam: async (studentId, examId) => {
-      return await apiClient.post('/teacher/aiMarkingExam', null, {
-        params: { studentId, examId }
+      return await apiClient.post("/teacher/aiMarkingExam", null, {
+        params: { studentId, examId },
       });
     },
 
     // 获取考核提交列表
-    getSubmissions: async (assessmentId) => {
-      return await apiClient.get(`/teacher/assessment/${assessmentId}/submissions`);
+    getSubmissions: async (examId) => {
+      return await apiClient.get(`/teacher/getExamStudentInfo/${examId}`);
     },
 
     // 获取单个提交详情
-    getSubmissionDetail: async (assessmentId, submissionId) => {
-      return await apiClient.get(`/teacher/assessment/${assessmentId}/submissions/${submissionId}`);
+    getSubmissionDetail: async (examId, studentId) => {
+      return await apiClient.get("/course/getCourseExamStudent", {
+        params: {
+          examId,
+          studentId,
+        },
+      });
     },
 
     // 保存评分结果
     saveGrading: async (params) => {
-      return await apiClient.post('/teacher/assessment/save-grading', params);
+      return await apiClient.post("/teacher/assessment/save-grading", params);
     },
 
     /**
@@ -251,8 +256,8 @@ export const teacherService = {
      * @returns {Promise<object>} 材料信息
      */
     getAllMaterialsByChapterAndCourse: async (chapterId, courseId) => {
-      return await apiClient.get('/chapter/selectAllMaterialBypointId', {
-        params: { chapterId, courseId }
+      return await apiClient.get("/chapter/selectAllMaterialBypointId", {
+        params: { chapterId, courseId },
       });
     },
   },
@@ -263,8 +268,8 @@ export const teacherService = {
    * @returns {Promise<object>} 课程考试情况数据
    */
   getStudentExam: async (courseId) => {
-    return await apiClient.get('/teacher/getStudentExam', {
-      params: { courseId }
+    return await apiClient.get("/teacher/getStudentExam", {
+      params: { courseId },
     });
   },
 
@@ -274,8 +279,8 @@ export const teacherService = {
    * @returns {Promise<object>} 课程作业情况数据
    */
   getStudentHomework: async (courseId) => {
-    return await apiClient.get('/teacher/getStudentHomework', {
-      params: { courseId }
+    return await apiClient.get("/teacher/getStudentHomework", {
+      params: { courseId },
     });
   },
 
@@ -287,8 +292,8 @@ export const teacherService = {
    * @returns {Promise<object>} 创建结果
    */
   teacherCreateTest: async (content, courseId, chapterId) => {
-    return await apiClient.post('/teacher/ai/teacher/createPractice', null, {
-      params: { content, courseId, chapterId }
+    return await apiClient.post("/teacher/ai/teacher/createPractice", null, {
+      params: { content, courseId, chapterId },
     });
   },
 
@@ -298,8 +303,8 @@ export const teacherService = {
    * @returns {Promise<object>} 班级错误信息数据
    */
   getAllClassNotCorrectInfo: async (couresId) => {
-    return await apiClient.get('/teacher/getAllClassNotCorrectInfo', {
-      params: { couresId }
+    return await apiClient.get("/teacher/getAllClassNotCorrectInfo", {
+      params: { couresId },
     });
   },
 
@@ -309,8 +314,8 @@ export const teacherService = {
    * @returns {Promise<object>} 知识点名称
    */
   getKnowledgeNameById: async (PointId) => {
-    return await apiClient.get('/knowledge/getKonwledgeNameById', {
-      params: { PointId }
+    return await apiClient.get("/knowledge/getKonwledgeNameById", {
+      params: { PointId },
     });
   },
 
@@ -320,8 +325,8 @@ export const teacherService = {
    * @returns {Promise<object>} 高频错误知识点列表
    */
   getTheMaxUncorrectPoint: async (couresId) => {
-    return await apiClient.get('/teacher/getTheMaxUncorrectPoint', {
-      params: { couresId }
+    return await apiClient.get("/teacher/getTheMaxUncorrectPoint", {
+      params: { couresId },
     });
   },
 
@@ -391,8 +396,8 @@ export const adminService = {
     return apiClient.post("/course/createCourse", null, {
       params: {
         courseName: courseData.title,
-        semester: courseData.time
-      }
+        semester: courseData.time,
+      },
     });
   },
 
@@ -400,13 +405,12 @@ export const adminService = {
     return apiClient.post(`/course/autoAssignTeacher?courseId=${courseId}`);
   },
 
-
   /**
    * 获取所有课程(包含教师信息)
    * @returns {Promise<object>} 所有课程数据列表
    */
   getAllCourses: async () => {
-    return await apiClient.get('/course/all');
+    return await apiClient.get("/course/all");
   },
 
   /**
@@ -424,7 +428,7 @@ export const adminService = {
    * @returns {Promise<object>} 修改结果
    */
   updateChapterName: async (chapter) => {
-    return await apiClient.post('/chapter/updateChapterName', chapter);
+    return await apiClient.post("/chapter/updateChapterName", chapter);
   },
 
   /**
@@ -433,8 +437,8 @@ export const adminService = {
    * @returns {Promise<object>} 删除结果
    */
   deleteChapter: async (chapterId) => {
-    return await apiClient.delete('/chapter/deleteChapter', {
-      params: { chapterId }
+    return await apiClient.delete("/chapter/deleteChapter", {
+      params: { chapterId },
     });
   },
 
@@ -444,7 +448,7 @@ export const adminService = {
    * @returns {Promise<object>} 添加结果
    */
   addChapter: async (chapter) => {
-    return await apiClient.post('/chapter/addChapter', chapter);
+    return await apiClient.post("/chapter/addChapter", chapter);
   },
 
   /**
@@ -453,7 +457,10 @@ export const adminService = {
    * @returns {Promise<object>} 修改结果
    */
   updateKnowledgeName: async (knowledgePoint) => {
-    return await apiClient.post('/knowledge/updateKnowledgeName', knowledgePoint);
+    return await apiClient.post(
+      "/knowledge/updateKnowledgeName",
+      knowledgePoint
+    );
   },
 
   /**
@@ -462,8 +469,8 @@ export const adminService = {
    * @returns {Promise<object>} 删除结果
    */
   deleteKnowledgePoint: async (pointId) => {
-    return await apiClient.delete('/knowledge/deleteKnowledgePoint', {
-      params: { pointId }
+    return await apiClient.delete("/knowledge/deleteKnowledgePoint", {
+      params: { pointId },
     });
   },
 
@@ -474,30 +481,51 @@ export const adminService = {
    * @returns {Promise<object>} 添加结果
    */
   addKnowledgePoint: async (knowledgePoint, chapterId) => {
-    return await apiClient.post('/knowledge/addKnowledgePoint', knowledgePoint, {
-      params: { chapterId }
-    });
+    return await apiClient.post(
+      "/knowledge/addKnowledgePoint",
+      knowledgePoint,
+      {
+        params: { chapterId },
+      }
+    );
   },
 };
 
 // 学生服务
 export const studentService = {
+  // 开始学习
+  startStudy: async (data) => {
+    return apiClient.post("/chapter/chapterstudy/start", data);
+  },
+
+  // 结束学习
+  endStudy: async (data) => {
+    return apiClient.post("/chapter/chapterstudy/end", data);
+  },
+
+  // 完成学习
+  finishStudy: async (data) => {
+    return apiClient.post("/chapter/chapter/finsh", data);
+  },
+
   /**
    * 获取在线学习助手的回复
    * @param {string} question 学生提出的问题
    * @returns {Promise<object>} AI助手的回复
    */
-  getLearningAssistantResponse: (question) => apiClient.post('/student/learning-assistant', { question }),
+  getLearningAssistantResponse: (question) =>
+    apiClient.post("/student/learning-assistant", { question }),
 
   /**
    * 生成练习题目
    * @param {object} params 包含学生历史练习情况和练习要求的参数
    * @returns {Promise<object>} 生成的练习题目和纠错信息
    */
-  generatePracticeQuestions: (params) => apiClient.post('/student/practice-evaluation', params),
+  generatePracticeQuestions: (params) =>
+    apiClient.post("/student/practice-evaluation", params),
 
   getStudentAnalysis: async () => {
-    return await apiClient.get('/teacher/student-analysis');
+    return await apiClient.get("/teacher/student-analysis");
   },
 
   /**
@@ -505,7 +533,7 @@ export const studentService = {
    * @returns {Promise<object>} 错题分析数据
    */
   getErrorAnalysis: async () => {
-    return await apiClient.get('/knowledge/checkAllNOtCruuent'); // 假设后端接口为 /student/error-analysis
+    return await apiClient.get("/knowledge/checkAllNOtCruuent"); // 假设后端接口为 /student/error-analysis
   },
 
   /**
@@ -522,7 +550,7 @@ export const studentService = {
    * @returns {Promise<object>} 平均错误率数据
    */
   getAverageErrorRate: async () => {
-    return await apiClient.get('/knowledge/getAver');
+    return await apiClient.get("/knowledge/getAver");
   },
 
   /**
@@ -533,33 +561,31 @@ export const studentService = {
    * //带权重
    */
   generateQuestions: async (knowledgeId, config) => {
-    return await apiClient.post('/knowledge/generate-questions', {
+    return await apiClient.post("/knowledge/generate-questions", {
       knowledgeId,
-      config
+      config,
     });
   },
 
-
   //获取错误知识点的细节
   getKnowlegeById: async (pointId) => {
-    return await apiClient.get('/knowledge/getKnowlegeBypointId', {
-      params: { pointId: pointId }
+    return await apiClient.get("/knowledge/getKnowlegeBypointId", {
+      params: { pointId: pointId },
     });
   },
 
   //根据错误知识点生成题目不选择权重
   generateExamByKnowledgePoints: async (payload, params) => {
     // 注意：这里把pointIds从路径参数移动到请求体
-    return await apiClient.post('/knowledge/ai/createTest', payload, {
-      params: params
+    return await apiClient.post("/knowledge/ai/createTest", payload, {
+      params: params,
     });
   },
 
-
   //根据错误知识点生成带权重
   createTest: async (payload, params) => {
-    return await apiClient.post('/knowledge/ai/t/createTest', payload, {
-      params: params
+    return await apiClient.post("/knowledge/ai/t/createTest", payload, {
+      params: params,
     });
   },
 
@@ -568,12 +594,12 @@ export const studentService = {
    * @returns {Promise<Array>} 课程数据数组
    */
   getCourses: async () => {
-    return await apiClient.get('/course/all');
+    return await apiClient.get("/course/all");
   },
 
   //获取学生现有课程
-  getOwnCourses: async() => {
-    return await apiClient.get('/course/getAllStudentHaveCourse')
+  getOwnCourses: async () => {
+    return await apiClient.get("/course/getAllStudentHaveCourse");
   },
 
   //选课
@@ -587,78 +613,77 @@ export const studentService = {
   },
 
   //获取学期
-  getSemester: async() => {
-    return await apiClient.get('/course/getAllLearnDate');
+  getSemester: async () => {
+    return await apiClient.get("/course/getAllLearnDate");
   },
 
-
   //获取学情分析
-  getCourseAnalysis: async(courseId) => {
-    return await apiClient.get('/stu/academicanalysis',{
-      params: { courseId: courseId }
-    })
+  getCourseAnalysis: async (courseId) => {
+    return await apiClient.get("/stu/academicanalysis", {
+      params: { courseId: courseId },
+    });
   },
 
   //根据课程获取其下的章节信息与完成度
-  getChapterInfo: async(courseId) => {
-    return await apiClient.get("/chapter/selectchapter",{
+  getChapterInfo: async (courseId) => {
+    return await apiClient.get("/chapter/selectchapter", {
       params: {
-        courseId: courseId
-      }
+        courseId: courseId,
+      },
     });
   },
 
   //根据章节获取旗下知识点
-  getChapterKnow: async(chaptId) =>{
-    return await apiClient.get("/chapter/selectAllKnowledgeBychaptId",{
-      params:{
-        chaptId: chaptId
-      }
-    })
+  getChapterKnow: async (chaptId) => {
+    return await apiClient.get("/chapter/selectAllKnowledgeBychaptId", {
+      params: {
+        chaptId: chaptId,
+      },
+    });
   },
 
   //根据课程获取所有错题
-  getAllErrors: async(courseId) =>{
+  getAllErrors: async (courseId) => {
     return await apiClient.get("/chapter/getAllNotcoreectTest", {
-      params:{
-        courseId: courseId
-      }
-    })
+      params: {
+        courseId: courseId,
+      },
+    });
   },
 
   //获取所有课件等资源
-  getAllResources: async(chapterId, courseId) =>{
+  getAllResources: async (chapterId, courseId) => {
     return await apiClient.get("/chapter/selectAllMaterialBypointId", {
-      params:{
+      params: {
         chapterId: chapterId,
-        courseId: courseId
-      }
-    })
+        courseId: courseId,
+      },
+    });
   },
 
   // 获取社区帖子
-  getAllPosts: async() => {
-    return await apiClient.get("/community/all")
+  getAllPosts: async () => {
+    return await apiClient.get("/community/all");
   },
 
   // 获取社区帖子下的评论
-  getAllComments: async(postId) => {
-    return await apiClient.get(`/community/comments/${postId}`)
+  getAllComments: async (postId) => {
+    return await apiClient.get(`/community/comments/${postId}`);
   },
 
   // 根据用户获取社区帖子
-  getOwnPosts: async(userId) => {
-    return await apiClient.get(`/community/all/${userId}`)
+  getOwnPosts: async (userId) => {
+    return await apiClient.get(`/community/all/${userId}`);
   },
 
   // 新建社区帖子
   createPost: async (postDTO) => {
-    return await apiClient.post('/community/post', postDTO);
+    return await apiClient.post("/community/post", postDTO);
   },
 
   // 评论社区
   createComment: async (commentDTO) => {
-    return await apiClient.post('/community/add/comments', commentDTO);
+    return await apiClient.post("/community/add/comments", commentDTO);
   },
 
   // 点赞帖子
@@ -672,13 +697,13 @@ export const studentService = {
   },
 
   //获取作业信息
-  getAllWork: async( chapterId, courseId) => {
+  getAllWork: async (chapterId, courseId) => {
     return await apiClient.get("/chapter/selectAllTextByChapterId", {
-      params:{
+      params: {
         chapterId: chapterId,
-        courseId: courseId
-      }
-    })
+        courseId: courseId,
+      },
+    });
   },
 
   // 在 studentService 中添加以下方法
@@ -690,39 +715,39 @@ export const studentService = {
    * @returns {Promise<object>} 考试题目详情
    */
   getCourseExamInfo: async (examId, studentId) => {
-    return await apiClient.get('/course/getCourseExamStudent', {
+    return await apiClient.get("/course/getCourseExamStudent", {
       params: {
         examId,
-        studentId
-      }
+        studentId,
+      },
     });
   },
 
   //提交学生答案
-  submitStudentAnswer: async(data) =>{
-    return apiClient.post('/chapter/setStudentAwser', data)
+  submitStudentAnswer: async (data) => {
+    return apiClient.post("/chapter/setStudentAwser", data);
   },
 
   //获取所有考试
-  getAllExams: async(courseId) => {
+  getAllExams: async (courseId) => {
     return apiClient.get("/teacher/addPaper", {
-      params:{
-        courseId: courseId
-      }
-    })
+      params: {
+        courseId: courseId,
+      },
+    });
   },
 
   //检测学生答案
-  judgeStudentAnswer: async(studentTextAnswerDTO) => {
+  judgeStudentAnswer: async (studentTextAnswerDTO) => {
     return apiClient.get("/chapter/ju/test", {
       params: {
-        studentTextAnswerDTO: studentTextAnswerDTO
-      }
-    })
+        studentTextAnswerDTO: studentTextAnswerDTO,
+      },
+    });
   },
 
   getTeachers: async () => {
-    return await apiClient.get('/studentteacher/chat/getAllTeacherInfo');
+    return await apiClient.get("/studentteacher/chat/getAllTeacherInfo");
   },
 
   //获取用户信息
@@ -737,11 +762,11 @@ export const studentService = {
      * @returns {Promise<Long>} 接口返回的结果ID
      */
     setConnection: async (studentId, teacherId) => {
-      return await apiClient.post('/studentteacher/chat/setConnection', null, {
+      return await apiClient.post("/studentteacher/chat/setConnection", null, {
         params: {
           studentId: studentId,
-          teacherId: teacherId
-        }
+          teacherId: teacherId,
+        },
       });
     },
 
@@ -750,7 +775,10 @@ export const studentService = {
      * @returns {Promise<Array>} 老师列表
      */
     getTeachers: async (courseIds) => {
-      return await apiClient.post('/studentteacher/chat/getAllTeacherInfo', courseIds);
+      return await apiClient.post(
+        "/studentteacher/chat/getAllTeacherInfo",
+        courseIds
+      );
     },
 
     /**
@@ -758,7 +786,7 @@ export const studentService = {
      * @returns {Promise<Array>} 在线老师列表
      */
     getOnlineTeachers: async () => {
-      return await apiClient.get('/api/teacher-chat/online-teachers');
+      return await apiClient.get("/api/teacher-chat/online-teachers");
     },
 
     /**
@@ -767,7 +795,10 @@ export const studentService = {
      * @returns {Promise<Object>} 发送结果
      */
     sendMessage: async (messageData) => {
-      return await apiClient.post('/api/teacher-chat/send-message', messageData);
+      return await apiClient.post(
+        "/api/teacher-chat/send-message",
+        messageData
+      );
     },
 
     /**
@@ -776,8 +807,8 @@ export const studentService = {
      * @returns {Promise<Object>} 聊天历史
      */
     getChatHistory: async (teacherId) => {
-      return await apiClient.get('/studentteacher/chat/getChatByteacherId', {
-        params: { teacherId }
+      return await apiClient.get("/studentteacher/chat/getChatByteacherId", {
+        params: { teacherId },
       });
     },
 
@@ -786,7 +817,9 @@ export const studentService = {
      * @returns {Promise<Object>} 标记结果
      */
     markMessagesAsRead1: async () => {
-      return await apiClient.get('/studentteacher/chat/getAllChatNotReadInfoBytudent');
+      return await apiClient.get(
+        "/studentteacher/chat/getAllChatNotReadInfoBytudent"
+      );
     },
 
     /**
@@ -794,7 +827,9 @@ export const studentService = {
      * @returns {Promise<Object>} 标记结果
      */
     markMessagesAsRead2: async () => {
-      return await apiClient.get('/studentteacher/chat/getAllChatNotReadInfoByteacher');
+      return await apiClient.get(
+        "/studentteacher/chat/getAllChatNotReadInfoByteacher"
+      );
     },
 
     /**
@@ -803,43 +838,40 @@ export const studentService = {
      * @returns {Promise<Object>} 用户ID信息
      */
     getUserIdByTeacher: async (teacherId) => {
-      return await apiClient.get('teacher/getUserIdByteacher', {
-        params: { teacherId }
+      return await apiClient.get("teacher/getUserIdByteacher", {
+        params: { teacherId },
       });
-    }
-  }
+    },
+  },
 };
 
 // 认证服务
 export const authService = {
   login: async (credentials) => {
-    return await apiClient.post('/common/login', credentials);
+    return await apiClient.post("/common/login", credentials);
   },
   register: async (userData) => {
-    return await apiClient.post('/common/register', userData);
+    return await apiClient.post("/common/register", userData);
   },
   sendVerificationCode: async (type, value) => {
-    return await apiClient.post('/auth/send-code', { type, value });
+    return await apiClient.post("/auth/send-code", { type, value });
   },
   resetPassword: async (resetData) => {
-    return await apiClient.post('/common/password/reset', resetData);
+    return await apiClient.post("/common/password/reset", resetData);
   },
   logout: async (userId) => {
-    return await apiClient.post('/common/logout', null, {
-      params: { userId }
+    return await apiClient.post("/common/logout", null, {
+      params: { userId },
     });
-  }
+  },
 };
 
 export const chatService = {
   sendMessage: async (payload) => {
-    return await apiClient.post('/chat/userchat', payload);
-  }
+    return await apiClient.post("/chat/userchat", payload);
+  },
 };
 
 export const isOnline = async (userId) => {
   return await apiClient.get(`/api/chat/is-online/${userId}`);
 };
-
-
-
