@@ -268,7 +268,6 @@ public class TowerCreateToolUtils {
 
         });
 
-
     }
 
     /**
@@ -428,15 +427,33 @@ public class TowerCreateToolUtils {
     }
 
     /**
-     * 计算第几层能够获得的经验值
+     * 超级优化的塔层经验获取算法 - 极速升级版本
+     * 让每一层都给玩家带来显著的收益和成就感
      */
     private Integer getTowerFloorExp(Integer floorNo) {
-        if (floorNo <= 5) {
-            return 10 + floorNo * 15;
-        } else if (floorNo <= 10) {
-            return 100 + (floorNo - 5) * 30;
-        } else {
-            return 250 + (floorNo - 10) * 50;
+        if (floorNo == null || floorNo <= 0) {
+            return 0;
+        }
+
+        // 第1-10层：新手福利，超高起始奖励
+        if (floorNo <= 10) {
+            return 100 + floorNo * 50;  // 150-600经验
+        }
+        // 第11-25层：进阶层，丰厚递增奖励
+        else if (floorNo <= 25) {
+            return 700 + (floorNo - 10) * 100;  // 800-2200经验
+        }
+        // 第26-50层：困难层，巨额回报
+        else if (floorNo <= 50) {
+            return 2200 + (floorNo - 25) * 150;  // 2350-5950经验
+        }
+        // 第51-75层：专家层，史诗级奖励
+        else if (floorNo <= 75) {
+            return 5950 + (floorNo - 50) * 200;  // 6150-11950经验
+        }
+        // 第76+层：传说层，神话级奖励
+        else {
+            return 11950 + (floorNo - 75) * 300;  // 12250+经验
         }
     }
 

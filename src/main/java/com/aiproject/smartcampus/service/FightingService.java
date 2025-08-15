@@ -26,4 +26,8 @@ public interface FightingService {
     Result<Integer> getResult(String floorId, String studentId, String towerChallengeLogId);
 
     Result<AwardVO> getAward(String studentId, String floorId);
+
+    Result<Long> getRequireExp(String studentLevel);
+
+    Result<Integer> getLevelAdds(String studentLevel,String awardExp);
 }

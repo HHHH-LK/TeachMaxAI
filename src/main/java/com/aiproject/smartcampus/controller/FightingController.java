@@ -101,7 +101,9 @@ public class FightingController {
         return fightingService.getResult(floorId, studentId, towerChallengeLogId);
     }
 
-    //获取奖励（概率事件）
+    /**
+     * 获取奖励（概率事件）
+     * */
     @GetMapping("/get/award")
     public Result<AwardVO> getAward(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "floorId") String floorId) {
 
@@ -109,6 +111,25 @@ public class FightingController {
         return fightingService.getAward(studentId,floorId);
 
     }
+
+    /**
+     * 计算所需要的经验值
+     * */
+    @GetMapping("/get/requireExp")
+    public Result<Long> getRequireExp(@RequestParam(value = "studentLevel") String studentLevel ) {
+
+        return fightingService.getRequireExp(studentLevel);
+    }
+
+    /**
+     * 计算升级的等级数量
+     * */
+    @GetMapping("/get/levelAdds")
+    public Result<Integer> getLevelAdds(@RequestParam(value = "studentLevel") String studentLevel, @RequestParam(value = "awardExp") String awardExp) {
+
+        return fightingService.getLevelAdds(studentLevel,awardExp);
+    }
+
 
 
 }

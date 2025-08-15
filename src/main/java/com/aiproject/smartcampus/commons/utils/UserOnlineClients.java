@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -39,12 +40,12 @@ public class UserOnlineClients {
 
     public static boolean isContainsUserId(StringRedisTemplate stringRedisTemplate, String userId) {
 
-        return Boolean.TRUE.equals(stringRedisTemplate.hasKey("user:online:" + userId));
+        return stringRedisTemplate.hasKey("user:online:" + userId);
     }
 
     public void addUserOnlineToRedis(String userId) {
 
-        stringRedisTemplate.opsForValue().set("user:online:" + userId, userId + ":online");
+        stringRedisTemplate.opsForValue().set("user:online:" + userId, userId + ":online", 3, TimeUnit.HOURS);
 
     }
 

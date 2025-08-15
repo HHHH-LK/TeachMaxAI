@@ -123,7 +123,6 @@ public class CommonServiceImpl implements CommonService {
             return Result.error("两次输入的密码不一致");
         }
 
-
         // 创建用户
         User user = new User();
         user.setUsername(registerDTO.getUsername());

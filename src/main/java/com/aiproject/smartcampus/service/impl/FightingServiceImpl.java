@@ -428,6 +428,37 @@ public class FightingServiceImpl implements FightingService {
         }
     }
 
+    @Override
+    public Result<Long> getRequireExp(String studentLevel) {
+
+        long requiredExp = calculateRequiredExp(Integer.parseInt(studentLevel));
+
+        log.info("玩家从等级[{}]升级到下一级需要[{}]经验值", studentLevel, requiredExp);
+
+        return Result.success(requiredExp);
+    }
+
+    @Override
+    public Result<Integer> getLevelAdds(String studentLevel, String awardExp) {
+        int level = Integer.parseInt(studentLevel);
+        long currentExp = Long.parseLong(awardExp);
+        int levelUpCount = 0;
+
+        while (true) {
+            long requireExp = calculateRequiredExp(level); // 当前等级升到下一等级需要的经验
+            if (currentExp >= requireExp) {
+                currentExp -= requireExp; // 扣掉升级所需经验
+                level++;                  // 升一级
+                levelUpCount++;           // 记录升级次数
+            } else {
+                break; // 经验不够升级了
+            }
+        }
+
+        return Result.success(levelUpCount);
+    }
+
+
     // =================== 私有辅助方法 ===================
 
     private boolean validateParams(String... params) {
@@ -796,7 +827,7 @@ public class FightingServiceImpl implements FightingService {
             long remainingExp = totalExp;
 
             // 处理升级
-            while (remainingExp >= requiredExp && newLevel < 999) { // 设置最大等级限制
+            while (remainingExp >= requiredExp && newLevel < 100) { // 设置最大等级限制
                 remainingExp -= requiredExp;
                 newLevel++;
                 requiredExp = calculateRequiredExp(newLevel);
@@ -823,7 +854,7 @@ public class FightingServiceImpl implements FightingService {
         }
     }
 
-    private long calculateRequiredExp(int level) {
+    public long calculateRequiredExp(int level) {
         // 优化后的经验计算公式
         final int baseExp = 100;
         final double growthRate = 1.2;
