@@ -102,16 +102,16 @@ public interface CourseMapper extends BaseMapper<Course> {
     @Select("SELECT DISTINCT\n" +
             "    c.course_id as courseId,\n" +
             "    c.course_name as courseName,\n" +
-            "    u.real_name as teacherName\n" +
+            "    u.real_name as teacherName,\n" +
+            "    c.semester as semester\n" +
             "FROM courses c\n" +
             "INNER JOIN course_enrollments ce ON c.course_id = ce.course_id\n" +
             "INNER JOIN teachers t ON c.teacher_id = t.teacher_id\n" +
             "INNER JOIN users u ON t.user_id = u.user_id\n" +
-            "WHERE ce.student_id = #{studentId} -- 学生ID参数\n" +
+            "WHERE ce.student_id = #{studentId}\n" +
             "  AND c.status = 'active'\n" +
             "ORDER BY c.course_name;")
     List<CourseVO> findAllCourseByStudentId(@Param(value = "studentId") String studentId);
-
 
     @Select("select courses.course_name\n" +
             "from courses\n" +

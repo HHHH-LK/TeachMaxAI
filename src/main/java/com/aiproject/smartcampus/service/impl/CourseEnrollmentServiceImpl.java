@@ -128,8 +128,8 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 
     @Override
     public Result<String> exitCourse(Integer courseId) {
-//        String studentId = userToTypeUtils.change();
-        String studentId = "1"; // TODO: 替换为实际的学生ID获取方式
+        String studentId = userToTypeUtils.change();
+
         // 校验课程是否存在
         Course course = courseMapper.selectById(courseId);
         if (course == null) {
@@ -149,7 +149,7 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 
         try {
             // 直接删除选课记录
-            int result = courseEnrollmentMapper.deleteById(courseId);
+            int result = courseEnrollmentMapper.deleteBycourseId(courseId);
             if (result > 0) {
                 // 异步记录成功日志
                 ADD_COURSEENROLLMENTS_EXECUTOR.submit(() -> {

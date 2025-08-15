@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.pojo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class StudentStudyDTO {
 
     private String nowmaterialId;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime studyTime;
 
     private String courseId;

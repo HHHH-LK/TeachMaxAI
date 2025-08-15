@@ -30,6 +30,11 @@ public class CourseVO {
     private String courseName;
 
     /**
+     * 学期
+     */
+    private String semester;
+
+    /**
      * 课程描述
      */
     private String courseDescription;
@@ -108,10 +113,11 @@ public class CourseVO {
     /**
      * 构造方法：支持从课程名称自动获取描述
      */
-    public CourseVO(Integer courseId, String courseName, String teacherName) {
+    public CourseVO(Integer courseId, String courseName, String teacherName, String semester) {
         this.courseId = courseId;
         this.courseName = courseName;
         this.teacherName = teacherName;
+        this.semester = semester;
         this.courseDescription = getCourseDescription(courseName);
     }
 
@@ -167,6 +173,7 @@ public class CourseVO {
                 "课程ID=" + courseId +
                 ", 课程名称='" + courseName + '\'' +
                 ", 授课教师='" + teacherName + '\'' +
+                ", 学期='" + semester + '\'' +
                 ", 课程描述='" + (courseDescription != null && courseDescription.length() > 30 ?
                 courseDescription.substring(0, 30) + "..." : courseDescription) + '\'' +
                 '}';

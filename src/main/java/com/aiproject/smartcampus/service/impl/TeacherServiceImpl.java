@@ -315,18 +315,42 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     //获取试卷信息
     @Override
-    public Result<List<Exam>> getPaper(Integer courseId) {
+    public Result<List<ExamInfoVO>> getPaper(Integer courseId) {
         try {
             if (courseId == null) {
                 return Result.error("课程ID不能为空");
             }
-            List<Exam> exam = examMapper.findByCourseId(courseId);
-            if (exam == null || exam.isEmpty()) {
+
+            // 1. 获取基础考试信息
+            List<Exam> exams = examMapper.findByCourseId(courseId);
+            if (exams == null || exams.isEmpty()) {
                 return Result.error("找不到课程ID为 " + courseId + " 的试卷信息");
             }
-            return Result.success(exam);
-        } catch (Exception e) {
 
+            // 2. 转换为VO并填充统计信息
+            List<ExamInfoVO> examInfoVOs = exams.stream().map(exam -> {
+                // 查询该考试的提交总数
+                Integer submittedCount = examScoreMapper.countByExamId(exam.getExamId());
+
+                // 查询该考试的已批改数量（score不为null的记录）
+                Integer gradedCount = examScoreMapper.countGradedByExamId(exam.getExamId());
+
+                return ExamInfoVO.builder()
+                        .examId(exam.getExamId())
+                        .courseId(exam.getCourseId())
+                        .title(exam.getTitle())
+                        .examDate(exam.getExamDate())
+                        .duration(exam.getDurationMinutes())
+                        .max_score(exam.getMaxScore())
+                        .status(exam.getStatus())
+                        .createdAt(exam.getCreatedAt())
+                        .questionCount(submittedCount) // 试题数量
+                        .markingCount(gradedCount) // 已批改数量
+                        .build();
+            }).collect(Collectors.toList());
+
+            return Result.success(examInfoVOs);
+        } catch (Exception e) {
             log.error("获取试卷信息失败", e);
             return Result.error("获取试卷信息失败: " + e.getMessage());
         }

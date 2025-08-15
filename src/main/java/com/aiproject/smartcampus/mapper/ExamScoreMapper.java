@@ -55,4 +55,10 @@ public interface ExamScoreMapper extends BaseMapper<ExamScore> {
 
     @Delete("DELETE FROM exam_scores WHERE exam_id = #{examId}")
     int deleteByExamId(@Param("examId") int examId);
+
+    @Select("SELECT COUNT(*) FROM exam_scores WHERE exam_id = #{examId}")
+    Integer countByExamId(Integer examId);
+
+    @Select("SELECT COUNT(*) FROM exam_scores WHERE exam_id = #{examId} AND score IS NOT NULL")
+    Integer countGradedByExamId(@Param("examId") Integer examId);
 }

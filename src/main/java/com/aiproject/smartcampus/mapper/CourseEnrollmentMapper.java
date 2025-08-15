@@ -4,6 +4,7 @@ import com.aiproject.smartcampus.pojo.dto.TeacherGetStudentDTO;
 import com.aiproject.smartcampus.pojo.po.CourseEnrollment;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -77,4 +78,7 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
             "JOIN course_enrollments ce ON s.student_id = ce.student_id " +
             "WHERE ce.course_id = #{courseId}")
     List<Student> findStudentsByCourseId(@Param("courseId") String courseId);
+
+    @Delete("DELETE FROM course_enrollments WHERE course_id = #{courseId}")
+    int deleteBycourseId(Integer courseId);
 }

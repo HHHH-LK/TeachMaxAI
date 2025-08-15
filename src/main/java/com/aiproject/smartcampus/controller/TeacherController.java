@@ -84,7 +84,7 @@ public class TeacherController {
     //查询试卷
     @GetMapping("/addPaper")
     @Operation(summary = "查询试卷", description = "根据课程ID查询试卷信息")
-    public Result getPaper(@RequestParam("courseId") Integer courseId) {
+    public Result<List<ExamInfoVO>> getPaper(@RequestParam("courseId") Integer courseId) {
         return teacherService.getPaper(courseId);
     }
 

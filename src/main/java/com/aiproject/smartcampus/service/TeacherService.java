@@ -29,7 +29,7 @@ public interface TeacherService extends IService<Teacher> {
 
     Result<List<TeacherGetStudentDTO>> getStudentInfo(Integer courseId);
 
-    Result getPaper(Integer courseId);
+    Result<List<ExamInfoVO>> getPaper(Integer courseId);
 
     Result<List<ChapterQuestionDetailTeacherVO>> getHomework(String courseId, String chapterId);
 

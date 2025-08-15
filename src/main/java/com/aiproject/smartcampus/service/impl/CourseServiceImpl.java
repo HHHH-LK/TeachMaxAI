@@ -4,14 +4,10 @@ import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.exception.StudentExpection;
-import com.aiproject.smartcampus.mapper.CourseEnrollmentMapper;
-import com.aiproject.smartcampus.mapper.CourseMapper;
-import com.aiproject.smartcampus.mapper.ExamPaperMapper;
+import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.model.functioncalling.CourseCreateTool;
 import com.aiproject.smartcampus.model.functioncalling.TeacherAssignTool;
-import com.aiproject.smartcampus.pojo.po.Course;
-import com.aiproject.smartcampus.pojo.po.ExamPaper;
-import com.aiproject.smartcampus.pojo.po.User;
+import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.CourseVO;
 import com.aiproject.smartcampus.pojo.vo.ExamQuestionDetailVO;
 import com.aiproject.smartcampus.service.CourseService;
@@ -39,6 +35,12 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final ExamPaperMapper examPaperMapper;
     private final CourseCreateTool courseCreateTool;
     private final TeacherAssignTool teacherAssignTool;
+    private final KnowledgePointMapper knowledgePointMapper;
+    private final ChapterKnowledgePointMapper chapterKnowledgePointMapper;
+    private final ChapterMapper chapterMapper;
+
+
+
     /**
      * 查询所有课程信息
      *
@@ -82,22 +84,44 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     @Override
     public Result<String> deleteCourse(Integer courseId) {
-        // todo 校验用户权限
-        User.UserType userType = UserLocalThreadUtils.getUserInfo().getUserType();
-        //权限校验
-        if (!"admin".equals(userType)) {
-            return Result.error(NO_PERMISSION_DELETE);
-        }
-
-        //查询课程是否存在
+        // 1. 检查课程是否存在
         Course course = courseMapper.selectById(courseId);
         if (course == null) {
             return Result.error(NO_EXIST_COURSE);
         }
-        //删除课程
+
+        // 2. 删除学生选课记录 (course_enrollments)
+        LambdaQueryWrapper<CourseEnrollment> enrollmentWrapper = new LambdaQueryWrapper<>();
+        enrollmentWrapper.eq(CourseEnrollment::getCourseId, courseId);
+        courseEnrollmentMapper.delete(enrollmentWrapper);
+
+        // 3. 查找课程的所有章节
+        LambdaQueryWrapper<Chapter> chapterWrapper = new LambdaQueryWrapper<>();
+        chapterWrapper.eq(Chapter::getCourseId, courseId);
+        List<Chapter> chapters = chapterMapper.selectList(chapterWrapper);
+
+        // 4. 删除章节关联的知识点关系 (chapter_knowledge_points)
+        if (!chapters.isEmpty()) {
+            // 获取所有章节ID
+            List<Integer> chapterIds = chapters.stream()
+                    .map(Chapter::getChapterId)
+                    .collect(Collectors.toList());
+
+            // 删除关联的知识点关系
+            LambdaQueryWrapper<ChapterKnowledgePoint> ckpWrapper = new LambdaQueryWrapper<>();
+            ckpWrapper.in(ChapterKnowledgePoint::getChapterId, chapterIds);
+            chapterKnowledgePointMapper.delete(ckpWrapper);
+        }
+
+        // 5. 删除课程的所有章节 (chapters)
+        chapterMapper.delete(chapterWrapper);
+
+        // 6. 删除课程 (courses)
         courseMapper.deleteById(courseId);
+
         return Result.success(SUCCESS_DELETE_COURSE);
     }
+
 
     @Override
     public Result<String> addCourse(Course course) {
@@ -140,15 +164,13 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     @Override
     public Result<List<CourseVO>> getAllStudentHaveCourse() {
-
         String studentId = userToTypeUtils.change();
-
         List<CourseVO> allCourseByByStudent = courseMapper.findAllCourseByStudentId(studentId);
+
         for (CourseVO course : allCourseByByStudent) {
-            //添加课程描述
-            String courseDescription = CourseVO.getCourseDescription(course.getCourseName());
-            log.info("获取课程{}描述{}", course.getCourseName(), courseDescription);
-            course.setCourseDescription(courseDescription);
+            if (course.getSemester() == null || course.getSemester().isEmpty()) {
+                course.setSemester("未知学期");
+            }
         }
 
         return Result.success(allCourseByByStudent);
