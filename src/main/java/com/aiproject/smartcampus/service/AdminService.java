@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface AdminService   {
 
     //根据学号获取学生信息
-    public Result getStudentBystudentNumber(String studentNumber);
+     Result<Student> getStudentBystudentNumber(String studentNumber);
 
     Result deleteStudentBystudentNumber(String studentNumber);
 

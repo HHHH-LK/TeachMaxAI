@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * @program: TeacherMaxAI
- * @description: 优化后的塔服务实现类
+ * @description: 优化后的塔服务实现类（修复重复执行与日志可见性）
  */
 @Service
 @Slf4j
@@ -81,12 +81,17 @@ public class TowerServiceImpl implements TowerService {
 
     // 常量
     private static final int INITIAL_QUESTION_COUNT = 5;
-    private static final int MIN_QUESTION_COUNT = 2;
-    private static final int UPDATE_QUESTION_COUNT = 3;
+    private static final int MIN_QUESTION_COUNT = 3;
+    private static final int UPDATE_QUESTION_COUNT = 2;
     private static final String QUESTION_TASK_KEY_PREFIX = "question_task:";
 
-    // 任务队列
+    // 最小处理间隔（秒）避免短时间重复执行
+    private static final int PROCESS_MIN_INTERVAL_SEC = 5;
+
+    // 任务队列（任务上下文）
     private final ConcurrentHashMap<String, QuestionTaskInfo> activeQuestionTasks = new ConcurrentHashMap<>();
+    // 执行中的 key（并发防重的二次防线）
+    private final ConcurrentHashMap<String, Boolean> processingKeys = new ConcurrentHashMap<>();
 
     static {
         initObjectMapper();
@@ -123,6 +128,7 @@ public class TowerServiceImpl implements TowerService {
                 }
             }
         });
+
         objectMapper.registerModule(module);
     }
 
@@ -176,7 +182,6 @@ public class TowerServiceImpl implements TowerService {
     public Result<List<Tower>> getTowerByStudentId(String studentId) {
         try {
             LambdaQueryWrapper<Tower> queryWrapper = new LambdaQueryWrapper<>();
-            // 建议与数据库类型一致
             queryWrapper.eq(Tower::getStudentId, Long.valueOf(studentId));
             List<Tower> towers = towerMapper.selectList(queryWrapper);
             return Result.success(Objects.requireNonNullElseGet(towers, ArrayList::new));
@@ -294,6 +299,7 @@ public class TowerServiceImpl implements TowerService {
             log.info("开始初始化测试 - towerId: {}, floorId: {}, courseId: {}, studentId: {}",
                     towerId, floorId, courseId, studentId);
 
+            // 注册任务（就地更新，不替换对象；记录时间，避免短时间重复执行）
             registerQuestionTask(towerId, floorId, courseId, studentId);
 
             Task task = getTaskByFloorId(floorId);
@@ -343,22 +349,56 @@ public class TowerServiceImpl implements TowerService {
         }
     }
 
+    /**
+     * 定时批处理所有任务（带并发防重与限流）
+     */
     @Scheduled(fixedDelay = 10000)
     public void scheduledCheckAndUpdateQuestions() {
-        if (activeQuestionTasks.isEmpty()) return;
+        if (activeQuestionTasks.isEmpty()) {
+            return;
+        }
 
-        log.debug("定时任务触发，检查 {} 个活跃任务", activeQuestionTasks.size());
+        List<Map.Entry<String, QuestionTaskInfo>> entries = new ArrayList<>(activeQuestionTasks.entrySet());
+        log.info("定时任务触发，本轮检查 {} 个活跃任务", entries.size());
 
-        List<CompletableFuture<Void>> futures = activeQuestionTasks.values().parallelStream()
-                .filter(task -> !task.isProcessing())
-                .map(task -> CompletableFuture.runAsync(() -> {
-                    try {
-                        checkAndUpdateQuestionForTask(task);
-                    } catch (Exception e) {
-                        log.error("处理任务异常 - task: {}", task, e);
-                    }
-                }, updateQuestionExecutor))
-                .toList();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Map.Entry<String, QuestionTaskInfo> entry : entries) {
+            String key = entry.getKey();
+            QuestionTaskInfo task = entry.getValue();
+
+            // 限流：最小处理间隔内跳过
+            if (task.getLastUpdateTime() != null &&
+                    java.time.Duration.between(task.getLastUpdateTime(), now).getSeconds() < PROCESS_MIN_INTERVAL_SEC) {
+                log.info("跳过任务(限流) - key={}, lastUpdateTime={}", key, task.getLastUpdateTime());
+                continue;
+            }
+
+            // 并发防重：同 key 正在执行则跳过
+            if (Boolean.TRUE.equals(processingKeys.putIfAbsent(key, true))) {
+                log.info("跳过任务(正在执行) - key={}", key);
+                continue;
+            }
+
+            CompletableFuture<Void> f = CompletableFuture.runAsync(() -> {
+                try {
+                    task.setProcessing(true);
+                    log.info("开始处理任务 - key={}, floorId={}, studentId={}",
+                            key, task.getFloorId(), task.getStudentId());
+                    checkAndUpdateQuestion(task.getTowerId(), task.getFloorId(), task.getCourseId(), task.getStudentId());
+                    task.setLastUpdateTime(LocalDateTime.now());
+                    log.info("完成处理任务 - key={}", key);
+                } catch (Exception e) {
+                    log.error("处理任务异常 - key=" + key, e);
+                } finally {
+                    task.setProcessing(false);
+                    processingKeys.remove(key);
+                }
+            }, updateQuestionExecutor);
+
+            futures.add(f);
+        }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .orTimeout(30, TimeUnit.SECONDS)
@@ -368,35 +408,25 @@ public class TowerServiceImpl implements TowerService {
                 });
     }
 
-    private void checkAndUpdateQuestionForTask(QuestionTaskInfo taskInfo) {
-        if (taskInfo.isProcessing()) return;
-
-        taskInfo.setProcessing(true);
-        try {
-            checkAndUpdateQuestion(taskInfo.getTowerId(), taskInfo.getFloorId(),
-                    taskInfo.getCourseId(), taskInfo.getStudentId());
-            taskInfo.setLastUpdateTime(LocalDateTime.now());
-        } finally {
-            taskInfo.setProcessing(false);
-        }
-    }
-
+    /**
+     * 主业务逻辑：检查缓存题目数量，不足则补题
+     */
     private void checkAndUpdateQuestion(String towerId, String floorId, String courseId, String studentId) {
         try {
             if (towerId == null || floorId == null || courseId == null || studentId == null) {
-                log.debug("缺少必要参数，跳过任务执行");
+                log.info("缺少必要参数，跳过任务执行");
                 return;
             }
 
             String createTag = questionRedisCache.isCreateTagInCache(Integer.valueOf(floorId));
             if (!"1".equals(createTag)) {
-                log.debug("塔层【{}】未初始化题库，跳过更新", floorId);
+                log.info("塔层【{}】未初始化题库，跳过更新", floorId);
                 return;
             }
 
             int currentQuestionCount = getCurrentQuestionCount(floorId);
             if (currentQuestionCount > MIN_QUESTION_COUNT) {
-                log.debug("塔【{}】塔层【{}】题目充足({})，无需更新", towerId, floorId, currentQuestionCount);
+                log.info("塔【{}】塔层【{}】题目充足({})，无需更新", towerId, floorId, currentQuestionCount);
                 return;
             }
 
@@ -424,6 +454,29 @@ public class TowerServiceImpl implements TowerService {
         } catch (Exception e) {
             log.error("检查更新题目异常 - towerId: {}, floorId: {}", towerId, floorId, e);
         }
+    }
+
+    /**
+     * 注册或更新任务（不替换对象，保留 processing 状态）
+     */
+    private void registerQuestionTask(String towerId, String floorId, String courseId, String studentId) {
+        String taskKey = generateTaskKey(floorId, studentId);
+        LocalDateTime now = LocalDateTime.now();
+
+        activeQuestionTasks.compute(taskKey, (k, old) -> {
+            if (old == null) {
+                log.info("注册题目任务 - 新增 key={}", taskKey);
+                return new QuestionTaskInfo(towerId, floorId, courseId, studentId, now, false);
+            } else {
+                old.setTowerId(towerId);
+                old.setFloorId(floorId);
+                old.setCourseId(courseId);
+                old.setStudentId(studentId);
+                old.setLastUpdateTime(now);
+                log.info("注册题目任务 - 更新 key={}", taskKey);
+                return old;
+            }
+        });
     }
 
     private CompletableFuture<List<Integer>> generateQuestionsAsync(
@@ -478,7 +531,7 @@ public class TowerServiceImpl implements TowerService {
         String prompt = createQuestionPrompts(difficulties, pointAccessRateMap,
                 pointIdMap, difficulties.size(), courseName);
 
-        log.debug("调用AI生成题目 - 难度数量: {}", difficulties.size());
+        log.info("调用AI生成题目 - 难度数量: {}", difficulties.size());
         var resp = chatLanguageModel.chat(UserMessage.userMessage(prompt));
         String aiResponse = (resp == null || resp.aiMessage() == null) ? null : resp.aiMessage().text();
         if (aiResponse == null || aiResponse.trim().isEmpty()) {
@@ -496,7 +549,6 @@ public class TowerServiceImpl implements TowerService {
             questionBank.setUpdatedAt(now);
         });
 
-        // 你们的 Mapper 若不支持批量 insert，请改成 for-each
         questionBankMapper.insert(questionBanks);
         log.info("成功插入{}道题目到数据库", questionBanks.size());
 
@@ -548,18 +600,11 @@ public class TowerServiceImpl implements TowerService {
                 .collect(Collectors.toList());
     }
 
-    private void registerQuestionTask(String towerId, String floorId, String courseId, String studentId) {
-        String taskKey = generateTaskKey(floorId, studentId);
-        QuestionTaskInfo taskInfo = new QuestionTaskInfo(towerId, floorId, courseId, studentId,
-                LocalDateTime.now(), false);
-        activeQuestionTasks.put(taskKey, taskInfo);
-        log.debug("注册题目任务 - key: {}", taskKey);
-    }
-
     private void removeQuestionTask(String floorId, String studentId) {
         String taskKey = generateTaskKey(floorId, studentId);
         activeQuestionTasks.remove(taskKey);
-        log.debug("注销题目任务 - key: {}", taskKey);
+        processingKeys.remove(taskKey);
+        log.info("注销题目任务 - key: {}", taskKey);
     }
 
     private String generateTaskKey(String floorId, String studentId) {
@@ -581,12 +626,12 @@ public class TowerServiceImpl implements TowerService {
         // 写入总列表（用于查看/调试）
         questionRedisCache.setTotalQuestionDifficultyInCache(fid, difficultyStrings);
 
-        log.debug("缓存塔层【{}】难度分布: {}", floorId, difficultyStrings);
+        log.info("缓存塔层【{}】难度分布: {}", floorId, difficultyStrings);
     }
 
     private void initializeQuestionCache(String floorId) {
         questionRedisCache.setQuestionNumToCache(Integer.valueOf(floorId), 0);
-        log.debug("初始化塔层【{}】题目缓存", floorId);
+        log.info("初始化塔层【{}】题目缓存", floorId);
     }
 
     private int getCurrentQuestionCount(String floorId) {
@@ -624,12 +669,12 @@ public class TowerServiceImpl implements TowerService {
         // 增加题目计数 + 写入题目ID队列
         questionRedisCache.incrQuestionNumInCache(Integer.valueOf(floorId), questionIds.size());
         questionRedisCache.setQuestionToCache(Integer.valueOf(floorId), questionIds);
-        log.debug("更新塔层【{}】题目缓存，新增{}道题目", floorId, questionIds.size());
+        log.info("更新塔层【{}】题目缓存，新增{}道题目", floorId, questionIds.size());
     }
 
     private void markAsInitialized(String floorId) {
         questionRedisCache.setCreateTagToCache(Integer.valueOf(floorId), "1");
-        log.debug("标记塔层【{}】为已初始化", floorId);
+        log.info("标记塔层【{}】为已初始化", floorId);
     }
 
     public static List<QuestionBank> parseQuestionBanks(String json) throws IOException {
@@ -687,13 +732,6 @@ public class TowerServiceImpl implements TowerService {
         prompt.append("5. 填空题和简答题的选项字段应设置为 null。\n");
         prompt.append("6. 正确答案字段必须是 JSON 格式，格式应与题型相符。\n");
         prompt.append("7. 所有 JSON 格式必须有效，不能包含注释、尾随逗号或多余内容。\n\n");
-        prompt.append("质量控制：\n");
-        prompt.append("- 题目不得重复或过于相似。\n");
-        prompt.append("- 题干必须紧扣知识点，不得偏题。\n");
-        prompt.append("- 选项应清晰且有区分度，避免含糊选项。\n");
-        prompt.append("- 不得使用以上都是、以上都不对等无效答案。\n");
-        prompt.append("- 单选题正确答案唯一，多选题正确答案必须完全匹配。\n");
-        prompt.append("- 不得生成未定义知识点或超范围内容。\n\n");
         prompt.append("请严格生成 ").append(questionCount).append(" 道题目，整体以纯 JSON 数组格式输出，示例如下：\n");
         prompt.append("[\n");
         prompt.append("  {\n");
@@ -726,7 +764,7 @@ public class TowerServiceImpl implements TowerService {
                 })
                 .collect(Collectors.toList());
 
-        List<String> studentIds = sortedUsers.stream().map(SortedUser::getStudentId).distinct().toList();
+        List<String> studentIds = sortedUsers.stream().map(SortedUser::getStudentId).distinct().collect(Collectors.toList());
         if (studentIds.isEmpty()) return sortedUsers;
 
         try {
@@ -845,6 +883,7 @@ public class TowerServiceImpl implements TowerService {
             QuestionTaskInfo task = entry.getValue();
             if (task.getLastUpdateTime().isBefore(expireTime)) {
                 log.info("清理过期任务 - key: {}", entry.getKey());
+                processingKeys.remove(entry.getKey());
                 return true;
             }
             return false;
@@ -857,6 +896,7 @@ public class TowerServiceImpl implements TowerService {
         shutdownExecutor(createQuestionExecutor, "CreateQuestion");
         shutdownExecutor(updateQuestionExecutor, "UpdateQuestion");
         activeQuestionTasks.clear();
+        processingKeys.clear();
         log.info("TowerService资源清理完成");
     }
 

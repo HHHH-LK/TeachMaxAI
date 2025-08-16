@@ -55,6 +55,7 @@ public class FightingServiceImpl implements FightingService {
     private static final int REDIS_TTL_HOURS = 24;
     private static final int DEFAULT_BASE_DAMAGE = 30;
     private static final int DAMAGE_PER_FLOOR = 5;
+    private final UserItemMapper userItemMapper;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -69,18 +70,23 @@ public class FightingServiceImpl implements FightingService {
         HP_DECR_CLAMP_SCRIPT = new DefaultRedisScript<>();
         HP_DECR_CLAMP_SCRIPT.setResultType(Long.class);
         HP_DECR_CLAMP_SCRIPT.setScriptText(
-                "local key = KEYS[1]\n" +
-                        "local damage = tonumber(ARGV[1])\n" +
-                        "local ttl = tonumber(ARGV[2])\n" +
-                        "local cur = redis.call('GET', key)\n" +
-                        "if not cur then return nil end\n" +
-                        "local n = tonumber(cur) or 0\n" +
-                        "n = n - damage\n" +
-                        "if n < 0 then n = 0 end\n" +
-                        "redis.call('SETEX', key, ttl, tostring(n))\n" +
-                        "return n\n"
+                """
+                        local key = KEYS[1]
+                        local damage = tonumber(ARGV[1])
+                        local ttl = tonumber(ARGV[2])
+                        local cur = redis.call('GET', key)
+                        if not cur then return nil end
+                        local n = tonumber(cur) or 0
+                        n = n - damage
+                        if n < 0 then n = 0 end
+                        redis.call('SETEX', key, ttl, tostring(n))
+                        return n
+                        """
         );
     }
+
+    private final BattleLogMapper battleLogMapper;
+
 
     public enum BattleResult {
         PLAYER_WIN(1, "成功"),
@@ -131,15 +137,42 @@ public class FightingServiceImpl implements FightingService {
     public Result<BattleLog> getCurrentBattleLog(String floorId, String towerChallengeLogId, String studentId) {
         if (!validateParams(floorId, towerChallengeLogId, studentId)) return Result.error("参数不能为空");
         try {
-            LambdaQueryWrapper<BattleLog> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(BattleLog::getFloorId, Long.valueOf(floorId))
-                    .eq(BattleLog::getUserId, Long.valueOf(studentId))
-                    .eq(BattleLog::getTowerChallengeLogId, Long.valueOf(towerChallengeLogId))
-                    .orderByDesc(BattleLog::getId)
-                    .last("LIMIT 1");
-            BattleLog battleLog = fightingMapper.selectOne(wrapper);
-            if (battleLog == null) return Result.error("玩家尚未开始爬塔");
+            // 查询最新的战斗日志
+            BattleLog lastLog = battleLogMapper.selectOne(
+                    new LambdaQueryWrapper<BattleLog>()
+                            .eq(BattleLog::getFloorId, Long.valueOf(floorId))
+                            .eq(BattleLog::getUserId, Long.valueOf(studentId))
+                            .eq(BattleLog::getTowerChallengeLogId, Long.valueOf(towerChallengeLogId))
+                            .orderByDesc(BattleLog::getId)
+                            .last("LIMIT 1")
+            );
+
+            // 计算当前回合数
+            int currentTurns = Optional.ofNullable(lastLog)
+                    .map(log -> log.getTotalTurns() + 1)
+                    .orElse(1);
+
+            // 获取怪物信息
+            Monster monster = getMonsterByFloorId(floorId);
+            if (monster == null) {
+                return Result.error("未找到对应层的怪物");
+            }
+
+            // 构建并保存战斗日志
+            BattleLog battleLog = new BattleLog();
+            battleLog.setUserId(Long.valueOf(studentId));
+            battleLog.setFloorId(Long.valueOf(floorId));
+            battleLog.setMonsterId(monster.getMonsterId());
+            battleLog.setTotalTurns(currentTurns);
+            battleLog.setTowerChallengeLogId(currentTurns);
+
+            battleLogMapper.insert(battleLog);
+
+            //缓存towerChallengeLogId到redis中
+            stringRedisTemplate.opsForValue().set("current:battleLogId:", String.valueOf(battleLog.getId()));
+
             return Result.success(battleLog);
+
         } catch (Exception e) {
             log.error("获取战斗日志失败 - floorId: {}, studentId: {}", floorId, studentId, e);
             return Result.error("获取战斗日志失败");
@@ -192,6 +225,7 @@ public class FightingServiceImpl implements FightingService {
             String floorId = String.valueOf(logRow.getFloorId());
             QuestionBank question = getOneQuestionForFloor(floorId);
             if (question == null) return Result.error("暂无可用题目");
+
             log.info("出题 - studentId: {}, floorId: {}, questionId: {}, difficulty: {}",
                     studentId, floorId, question.getQuestionId(), question.getDifficultyLevel());
             return Result.success(question);
@@ -216,6 +250,25 @@ public class FightingServiceImpl implements FightingService {
             Boolean localResult = judgeAnswerLocal(question, context);
             boolean isCorrect = (localResult != null) ? localResult : judgeAnswerWithAI(question, context);
 
+            //进行回合处理（入库处理）
+            String result = isCorrect ? "成功" : "失败";
+            String battleLogId = stringRedisTemplate.opsForValue().get("current:battleLogId:");
+            String description = question.getDifficultyLevel().getDescription();
+            String detail = switch (description) {
+                case "简单" -> "普通攻击";
+                case "中等" -> "技能";
+                case "困难" -> "必杀技";
+                default -> throw new IllegalStateException("Unexpected value: " + description);
+            };
+
+            LambdaUpdateWrapper<BattleLog> battleLogUpdateWrapper = new LambdaUpdateWrapper<>();
+            battleLogUpdateWrapper.eq(BattleLog::getId, battleLogId);
+            battleLogUpdateWrapper.set(BattleLog::getQuestionId, questionId);
+            battleLogUpdateWrapper.set(BattleLog::getResult, result);
+            battleLogUpdateWrapper.set(BattleLog::getDetail, detail);
+
+            battleLogMapper.update(null, battleLogUpdateWrapper);
+
             log.info("判题 - questionId: {}, studentId: {}, correct: {}", questionId, studentId, isCorrect);
 
             String diffName = question.getDifficultyLevel() == null ? "MEDIUM" : question.getDifficultyLevel().name();
@@ -231,6 +284,7 @@ public class FightingServiceImpl implements FightingService {
             return Result.error("判题失败: " + e.getMessage());
         }
     }
+
 
     @Override
     public Result<Integer> getUserChangeCount(String studentId, String floorId) {
@@ -292,11 +346,13 @@ public class FightingServiceImpl implements FightingService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<AwardVO> getAward(String studentId, String floorId) {
+        //设置每个道具获取的数量默认为1;
+        final Integer AWARD_NUM = 1;
+
         if (!validateParams(studentId, floorId)) return Result.error("参数不能为空");
         try {
             Task task = getTaskByFloorId(floorId);
             if (task == null) return Result.error("任务不存在");
-
             List<Item> rewardItems = calculateItemRewards(task);
             boolean expUpdated = updatePlayerExperience(studentId, task.getRewardExp());
             if (!expUpdated) log.warn("更新经验失败 - studentId: {}, exp: {}", studentId, task.getRewardExp());
@@ -304,6 +360,15 @@ public class FightingServiceImpl implements FightingService {
             AwardVO award = new AwardVO();
             award.setExp(String.valueOf(task.getRewardExp()));
             award.setItem(rewardItems);
+            //将用户获得的奖励存储到到DB中
+            List<UserItem> list = rewardItems.stream().map(a -> {
+                UserItem userItem = new UserItem();
+                userItem.setItemId(a.getItemId());
+                userItem.setUserId(Long.valueOf(studentId));
+                userItem.setQuantity(AWARD_NUM);
+                return userItem;
+            }).toList();
+            userItemMapper.insert(list);
 
             log.info("发放奖励 - studentId: {}, floorId: {}, exp: {}, items: {}", studentId, floorId, task.getRewardExp(), rewardItems.size());
             return Result.success(award);
@@ -452,7 +517,7 @@ public class FightingServiceImpl implements FightingService {
     private Boolean judgeAnswerLocal(QuestionBank question, String studentAnswer) {
         try {
             if (question.getQuestionType() == null) return null;
-            String type = question.getQuestionType().getValue(); // 比如 "single_choice" / "multiple_choice" / "true_false" / "fill_blank" / "short_answer"
+            String type = question.getQuestionType().getValue();
             String correct = question.getCorrectAnswer();
             if (!StringUtils.hasText(correct)) return null;
 

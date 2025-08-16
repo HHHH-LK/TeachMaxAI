@@ -37,7 +37,7 @@ public class FightingController {
     }
 
     /**
-     * 获取当前回合
+     * 获取当前回合（新建当前回合并返回）
      */
     @GetMapping("/get/currentBattleLog")
     public Result<BattleLog> getCurrentBattleLog(@RequestParam(value = "floorId") String floorId, @RequestParam(value = "towerChallengeLogId") String towerChallengeLogId
@@ -65,8 +65,8 @@ public class FightingController {
     }
 
     /**
-     * 当前回合结果（扣血）
-     * */
+     * 当前回合结果（扣血）并对回合结果信息进行处理
+     */
     @PostMapping("/user/answerquestion")
     public Result<Map<String, String>> checkAswerIsTure(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "questionId") String questionId
             , @RequestParam(value = "context") String context, @RequestParam(value = "floorId") String floorId, @RequestParam(value = "changeCount") String changeCount) {
@@ -94,7 +94,7 @@ public class FightingController {
 
     /**
      * 战斗结果（并修改下层解锁状态）
-     * */
+     */
     @GetMapping("/get/result")
     public Result<Integer> getResult(@RequestParam(value = "floorId") String floorId, @RequestParam(value = "studentId") String studentId, @RequestParam(value = "towerChallengeLogId") String towerChallengeLogId) {
 
@@ -103,33 +103,32 @@ public class FightingController {
 
     /**
      * 获取奖励（概率事件）
-     * */
+     */
     @GetMapping("/get/award")
     public Result<AwardVO> getAward(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "floorId") String floorId) {
 
 
-        return fightingService.getAward(studentId,floorId);
+        return fightingService.getAward(studentId, floorId);
 
     }
 
     /**
      * 计算所需要的经验值
-     * */
+     */
     @GetMapping("/get/requireExp")
-    public Result<Long> getRequireExp(@RequestParam(value = "studentLevel") String studentLevel ) {
+    public Result<Long> getRequireExp(@RequestParam(value = "studentLevel") String studentLevel) {
 
         return fightingService.getRequireExp(studentLevel);
     }
 
     /**
      * 计算升级的等级数量
-     * */
+     */
     @GetMapping("/get/levelAdds")
     public Result<Integer> getLevelAdds(@RequestParam(value = "studentLevel") String studentLevel, @RequestParam(value = "awardExp") String awardExp) {
 
-        return fightingService.getLevelAdds(studentLevel,awardExp);
+        return fightingService.getLevelAdds(studentLevel, awardExp);
     }
-
 
 
 }
