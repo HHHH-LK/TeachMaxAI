@@ -327,7 +327,7 @@ public class FightingServiceImpl implements FightingService {
             int nextFloorNo = floorNo + 1;
             //获取下一层的towerfloorId
             LambdaQueryWrapper<TowerFloor> towerFloorLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            towerFloorLambdaQueryWrapper.eq(TowerFloor::getFloorNo, floorNo);
+            towerFloorLambdaQueryWrapper.eq(TowerFloor::getFloorNo, nextFloorNo);
             towerFloorLambdaQueryWrapper.eq(TowerFloor::getTowerId, towerFloorById.getTowerId());
             TowerFloor towerFloor = towerFloorMapper.selectOne(towerFloorLambdaQueryWrapper);
 
@@ -361,8 +361,8 @@ public class FightingServiceImpl implements FightingService {
     private void updateNextTowerNoLockStatus(Long nextFloorId) {
 
         LambdaUpdateWrapper<TowerFloor> towerFloorLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        towerFloorLambdaUpdateWrapper.eq(TowerFloor::getTowerId, nextFloorId);
-        towerFloorLambdaUpdateWrapper.set(TowerFloor::getUnlocked, "1");
+        towerFloorLambdaUpdateWrapper.eq(TowerFloor::getFloorId, nextFloorId);
+        towerFloorLambdaUpdateWrapper.set(TowerFloor::getUnlocked, true);
         towerFloorMapper.update(null, towerFloorLambdaUpdateWrapper);
 
     }

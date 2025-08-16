@@ -38,21 +38,18 @@ public class WebInit implements WebMvcConfigurer {
             "/error"
     };
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        //todo 取消拦截器做测试
-        registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(excludePathPatternList)
-                .order(0);
-        registry.addInterceptor(refreashInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(excludePathPatternList)
-                .order(1);
-    }
-
-
-
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        //todo 取消拦截器做测试
+//        registry.addInterceptor(loginInterceptor)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(excludePathPatternList)
+//                .order(0);
+//        registry.addInterceptor(refreashInterceptor)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(excludePathPatternList)
+//                .order(1);
+//    }
 
 }
 
