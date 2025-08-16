@@ -109,11 +109,12 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from "vue";
-import { Clock, Ship } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
+import {ref, watch, computed} from "vue";
+import {Clock, Ship} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
 import TeacherSelection from "./TeacherSelection.vue";
 import ChapterManagement from "./ChapterManagement.vue";
+import {adminService, teacherService} from "@/services/api";
 
 const props = defineProps({
   visible: {
@@ -222,8 +223,11 @@ const handleClose = () => {
 };
 
 // 确认分配教师
-const confirmAssignTeacher = () => {
-  if (selectedTeacherIds.value.length === 0) return;
+const confirmAssignTeacher = async () => {
+  if (selectedTeacherIds.value.length === 0) {
+    ElMessage.error('请选择至少一名教师');
+    return;
+  }
 
   // 获取选中的教师对象列表
   const selectedTeachers = props.teachers.filter((t) =>
@@ -231,17 +235,25 @@ const confirmAssignTeacher = () => {
   );
 
   if (selectedTeachers.length > 0) {
-    emit("assign-teachers", selectedTeachers);
+    try {
+      // 调用API更新课程的教师信息
+      for (const teacher of selectedTeachers) {
+        await adminService.changeTeacher(props.currentCourse.id, teacher.id);
+      }
 
-    ElMessage({
-      message: `已成功将${props.currentCourse.title}分配给${selectedTeachers
+      ElMessage.success(`已成功将${props.currentCourse.title}分配给${selectedTeachers
           .map((t) => t.name)
-          .join("、")}`,
-      type: "success",
-      duration: 2000,
-    });
+          .join("、")}`);
 
-    selectedTeacherIds.value = [];
+      // 通知父组件教师分配完成
+      emit("assign-teachers", selectedTeachers);
+
+      // 清空选中的教师ID
+      selectedTeacherIds.value = [];
+    } catch (error) {
+      console.error('教师分配失败:', error);
+      ElMessage.error('教师分配失败，请重试');
+    }
   }
 };
 

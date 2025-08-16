@@ -157,7 +157,7 @@ const fetchPost = async() => {
       user:{
         id: item.userId,
         name: item.userName,
-        avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+        avatar: "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"
       },
       likes: item.likeCount,
       liked: false,
@@ -175,7 +175,7 @@ const fetchPost = async() => {
           user: {
             id: item.userId,
             name: item.userName,
-            avatar: "https://randomuser.me/api/portraits/men/22.jpg"
+            avatar: "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"
           },
           createAt: item.createdTime
         }))

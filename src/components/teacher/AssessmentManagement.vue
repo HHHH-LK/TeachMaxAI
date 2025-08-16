@@ -17,13 +17,13 @@
       @view-exam="viewExamContent"
       @grade="startGrading"
       @delete="deleteAssessment"
-      @view-submissions="viewSubmissions"
     />
 
     <!-- 智能生成试卷模态框 -->
     <GenerateExamModal
       v-model="showGenerateModal"
       @close="showGenerateModal = false"
+      :courseId="currentCourseId"
       @generated="handleExamGenerated"
     />
 

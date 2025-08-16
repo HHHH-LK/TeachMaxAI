@@ -97,6 +97,69 @@
         </div>
       </div>
     </div>
+    <!-- 我的总榜信息栏（仅在总塔时显示） -->
+    <div class="my-info-bar" v-if="selectedTower === 'all'">
+      <div class="my-info-title">我的总榜</div>
+
+      <div v-if="myInfoLoading" class="my-info-loading">
+        <span class="spinner"></span>
+        <span>正在获取我的总榜信息...</span>
+      </div>
+
+      <div v-else-if="myInfoError" class="my-info-error">
+        <span class="error-text">获取失败：{{ myInfoError }}</span>
+        <button class="retry-button" @click="fetchUserTotalInfo">重试</button>
+      </div>
+
+      <div v-else-if="myTotalInfo" class="my-info-content">
+        <div class="my-info-row">
+          <div class="my-rank">
+            <span class="label">排名</span>
+            <span class="value">#{{ myTotalInfo.rank ?? '-' }}</span>
+          </div>
+          <div class="my-name" :title="myTotalInfo.name">{{ myTotalInfo.name || '—' }}</div>
+        </div>
+        <div class="my-meta-row">
+          <span class="meta">最高塔层 {{ myTotalInfo.maxFloor ?? 0 }}</span>
+        </div>
+      </div>
+
+      <div v-else class="my-info-empty">
+        暂无我的总榜数据
+      </div>
+    </div>
+
+    <!-- 我的该塔排行信息栏（仅在具体塔时显示） -->
+    <div class="my-info-bar" v-if="selectedTower !== 'all'">
+      <div class="my-info-title">我的{{ currentTowerName }}排行</div>
+
+      <div v-if="myTowerLoading" class="my-info-loading">
+        <span class="spinner"></span>
+        <span>正在获取我的该塔排行信息...</span>
+      </div>
+
+      <div v-else-if="myTowerError" class="my-info-error">
+        <span class="error-text">获取失败：{{ myTowerError }}</span>
+        <button class="retry-button" @click="fetchUserTowerInfo(selectedTower)">重试</button>
+      </div>
+
+      <div v-else-if="myTowerInfo" class="my-info-content">
+        <div class="my-info-row">
+          <div class="my-rank">
+            <span class="label">排名</span>
+            <span class="value">#{{ myTowerInfo.rank ?? '-' }}</span>
+          </div>
+          <div class="my-name" :title="myTowerInfo.name">{{ myTowerInfo.name || '—' }}</div>
+        </div>
+        <div class="my-meta-row">
+          <span class="meta">该塔层数 {{ myTowerInfo.floor ?? 0 }}</span>
+        </div>
+      </div>
+
+      <div v-else class="my-info-empty">
+        暂无我的该塔排行数据
+      </div>
+    </div>
   </div>
 </template>
 
@@ -119,6 +182,24 @@ const isLoading = ref(false);
 const error = ref(null);
 const leaderboardData = ref([]);
 const studentTowers = ref([]); // 存储学生的塔信息
+
+// 我的总榜信息
+const myTotalInfo = ref(null);
+const myInfoLoading = ref(false);
+const myInfoError = ref(null);
+
+// 塔内排行信息
+const myTowerInfo = ref(null);
+const myTowerLoading = ref(false);
+const myTowerError = ref(null);
+
+// 当前塔显示名（用于标题）
+const currentTowerName = computed(() => {
+  if (selectedTower.value === 'all') return '总塔';
+  const t = studentTowers.value.find(x => x.towerId.toString() === selectedTower.value);
+  return t ? t.name.split('_')[0] : `塔${selectedTower.value}`;
+});
+
 
 // 存储事件监听器的引用，用于清理
 const eventListeners = ref({
@@ -220,6 +301,73 @@ const fetchTotalRanking = async () => {
   }
 };
 
+// 获取“我的总榜”信息
+const fetchUserTotalInfo = async () => {
+  try {
+    myInfoLoading.value = true;
+    myInfoError.value = null;
+    const studentId = userConfig.studentId;
+
+    // 如果方法挂在别处，请按实际命名空间调整：
+    // 例如：gameService.ranking.getUserTotalTowerInfo
+    const res = await gameService.towerRanking.getUserTotalTowerInfo(studentId);
+    console.log("获取到“我的总榜”信息:", res);
+
+    // 兼容 success/code 两种返回
+    const ok = res?.data?.success === true || res?.data?.code === 0;
+    if (!ok || !res?.data?.data) {
+      throw new Error(res?.data?.msg || '接口返回异常');
+    }
+
+    const d = res.data.data;
+    myTotalInfo.value = {
+      name: d.gameUserName || '我',
+      maxFloor: d.grade || 0,
+      rank: d.sortNumber ?? null,
+      studentId: d.studentId
+    };
+  } catch (e) {
+    console.error('获取我的总榜信息失败:', e);
+    myInfoError.value = e?.message || '获取失败，请稍后重试';
+    myTotalInfo.value = null;
+  } finally {
+    myInfoLoading.value = false;
+  }
+};
+
+// 获取“我的该塔排行”信息
+const fetchUserTowerInfo = async (towerId) => {
+  try {
+    myTowerLoading.value = true;
+    myTowerError.value = null;
+    myTowerInfo.value = null;
+
+    const studentId = userConfig.studentId;
+    const res = await gameService.towerRanking.getUserTowerSortUserInfo(studentId, towerId);
+    console.log('获取到“我的该塔排行”信息:', res);
+
+    const ok = res?.data?.success === true || res?.data?.code === 0;
+    if (!ok || !res?.data?.data) {
+      throw new Error(res?.data?.msg || '接口返回异常');
+    }
+
+    const d = res.data.data;
+    // 字段命名参考：gameUserName、grade（层数/成绩）、sortNumber（排名）
+    myTowerInfo.value = {
+      name: d.gameUserName || '我',
+      floor: d.grade ?? 0,
+      rank: d.sortNumber ?? null,
+      studentId: d.studentId
+    };
+  } catch (e) {
+    console.error('获取我的该塔排行失败:', e);
+    myTowerError.value = e?.message || '获取失败，请稍后重试';
+    myTowerInfo.value = null;
+  } finally {
+    myTowerLoading.value = false;
+  }
+};
+
 // 获取指定塔的排行榜数据
 const fetchTowerRanking = async (towerId) => {
   try {
@@ -316,12 +464,12 @@ const filteredLeaderboardData = computed(() => {
 const selectTower = async (tower) => {
   console.log(`切换到${tower === 'all' ? '总塔' : `塔${tower}`}排行榜`);
   selectedTower.value = tower;
-  
-  // 如果选择的是具体塔，尝试获取该塔的数据
+
   if (tower !== 'all') {
-    console.log(`准备获取塔${tower}的排行榜数据...`);
-    await fetchTowerRanking(tower);
+    console.log(`准备获取塔${tower}的排行榜与我的排行信息...`);
+    await Promise.all([fetchTowerRanking(tower), fetchUserTowerInfo(tower)]);
   } else {
+    await fetchUserTotalInfo();
     console.log('切换到总榜，显示总排行榜数据');
   }
 };
@@ -449,8 +597,9 @@ onMounted(() => {
     updateScrollState();
     addTouchSupport();
     startAutoScroll();
-    fetchTotalRanking(); // 在组件挂载时获取总榜数据
-    fetchStudentTowers(); // 在组件挂载时获取学生塔信息
+    fetchTotalRanking();     // 总榜
+    fetchStudentTowers();    // 塔信息
+    fetchUserTotalInfo();    // 我的总榜
   });
 });
 
@@ -946,5 +1095,110 @@ onBeforeUnmount(() => {
       }
     }
   }
+}
+.my-info-bar {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(15, 0, 20, 0.5);
+  border: 1px solid rgba(75, 0, 100, 0.6);
+  border-radius: 6px;
+  box-shadow: inset 0 0 10px rgba(75, 0, 100, 0.3);
+  color: #e6e6fa;
+}
+
+.my-info-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #8a2be2;
+  margin-bottom: 8px;
+  text-shadow: 0 0 6px rgba(147, 112, 219, 0.4);
+}
+
+.my-info-loading,
+.my-info-error,
+.my-info-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.my-info-loading .spinner {
+  border: 3px solid rgba(147, 112, 219, 0.3);
+  border-top: 3px solid #9370db;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+}
+
+.my-info-error .error-text {
+  color: #ff6b6b;
+}
+
+.my-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.my-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.my-rank .label {
+  font-size: 12px;
+  color: #9370db;
+  margin-right: 6px;
+}
+
+.my-rank .value {
+  font-weight: 800;
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+}
+
+.my-name {
+  color: #d8bfd8;
+  font-weight: 600;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.my-meta-row {
+  display: flex;
+  gap: 8px;
+}
+
+.my-meta-row .meta {
+  color: #e6e6fa;
+  font-size: 12px;
+  background: rgba(45, 0, 60, 0.7);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(75, 0, 100, 0.6);
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #9370db, #8a2be2);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(75, 0, 100, 0.4);
+}
+
+.retry-button:hover {
+  background: linear-gradient(135deg, #8a2be2, #7a00d4);
+  transform: translateY(-1px);
 }
 </style>

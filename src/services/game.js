@@ -19,7 +19,30 @@ export const gameService = {
          */
         getTotalRanking: async () => {
             return await apiClient.get('/rankinglist/getTotleSort');
-        }
+        },
+
+        /**
+         * 获取玩家在总榜中的详细信息
+         * @param {string} studentId - 学生ID
+         * @returns {Promise<object>} 玩家总榜详细信息
+         */
+        getUserTotalTowerInfo: async (studentId) => {
+            return await apiClient.get('/rankinglist/getUserTotalTowerInfo', {
+                params: { studentId }
+            });
+        },
+
+        /**
+         * 获取玩家在指定塔中的排行榜信息
+         * @param {string} studentId - 学生ID
+         * @param {string} towerId - 塔ID
+         * @returns {Promise<object>} 玩家在指定塔中的排行信息
+         */
+        getUserTowerSortUserInfo: async (studentId, towerId) => {
+            return await apiClient.get('/rankinglist/getUserTowerSortUserInfo', {
+                params: { studentId, towerId }
+            });
+        },
     },
 
     gameUser: {

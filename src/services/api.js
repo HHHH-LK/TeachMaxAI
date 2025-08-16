@@ -337,10 +337,13 @@ export const teacherService = {
   /**
    * 获取课程整体情况
    * @param {number} courseId - 课程ID
+   * @param {number} examId - 考试ID
    * @returns {Promise<object>} 课程整体情况数据
    */
-  getAllSituation: async (courseId) => {
-    return await apiClient.get(`/teacher/getAllSituation/${courseId}`);
+  getAllSituation: async (courseId, examId) => {
+    return await apiClient.get(`/teacher/getAllSituation/${courseId}`, {
+      params: { examId }
+    });
   },
 };
 
@@ -409,6 +412,28 @@ export const adminService = {
     return apiClient.post(`/course/autoAssignTeacher?courseId=${courseId}`);
   },
 
+  /**
+   * 更新考试状态
+   * @param {string} examId - 考试ID
+   * @returns {Promise<object>} 更新结果
+   */
+  updateExamStatusById: async (examId) => {
+    return await apiClient.post('/teacher/updateExamStatus', null, {
+      params: { examId }
+    });
+  },
+
+  /**
+   * 更换课程教师
+   * @param {number} courseId - 课程ID
+   * @param {string} teacherId - 教师ID
+   * @returns {Promise<object>} 更换结果
+   */
+  changeTeacher: async (courseId, teacherId) => {
+    return await apiClient.put('/course/changeTeacher', null, {
+      params: { courseId, teacherId }
+    });
+  },
 
   /**
    * 获取所有课程(包含教师信息)
@@ -600,6 +625,16 @@ export const studentService = {
     return await apiClient.get('/course/getAllLearnDate');
   },
 
+  /**
+   * 根据年份查询课程信息
+   * @param {string} date - 年份/学期
+   * @returns {Promise<object>} 课程信息列表
+   */
+  getCoursesByDate: async (date) => {
+    return await apiClient.get('/course/getAllCourse', {
+      params: { date }
+    });
+  },
 
   //获取学情分析
   getCourseAnalysis: async(courseId) => {

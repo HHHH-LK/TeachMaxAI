@@ -70,6 +70,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
 import { teacherService } from '@/services/api.js'
+import {getCurrentUserId} from "@/utils/userUtils.js";
 
 // 响应式数据
 const selectedClass = ref('')
@@ -77,9 +78,11 @@ const loading = ref(false)
 const studentList = ref([])
 const classList = ref([])
 
-const teacherId = "1"
 
 const fetchCourseList = async() =>{
+  const userId = getCurrentUserId()
+  const res = await teacherService.getTeacherInfo(userId);
+  const teacherId = res.data.data.teacherId;
   const response = await teacherService.getAllCourse(teacherId);
   classList.value = response.data.data.map(item => ({
     id: item.courseId,

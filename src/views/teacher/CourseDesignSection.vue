@@ -98,8 +98,8 @@ import {
   Document
 } from '@element-plus/icons-vue'
 import { teacherService } from '@/services/api'
+import {getCurrentUserId} from "@/utils/userUtils.js";
 
-const teacherId = "1";
 const router = useRouter()
 const searchQuery = ref('')
 const semesterFilter = ref('')
@@ -108,6 +108,9 @@ const courses = ref([])
 // 获取所有课程
 const fetchAllClass = async () => {
   try {
+    const userId = getCurrentUserId()
+    const res = await teacherService.getTeacherInfo(userId)
+    const teacherId = res.data.data.teacherId;
     const response = await teacherService.getAllCourse(teacherId);
     if(response.data && response.data.data) {
       courses.value = response.data.data.map(item => ({

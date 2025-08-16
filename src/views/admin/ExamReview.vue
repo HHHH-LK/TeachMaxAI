@@ -69,7 +69,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import ExamAttempt from '@/components/ExamAttempt.vue';
-import { adminService, studentService } from '@/services/api';
+import { adminService, studentService, teacherService } from '@/services/api';
 
 const exams = ref([]);
 const search = ref('');
@@ -130,15 +130,23 @@ function confirmPublish(row) {
 
 function handleDialogConfirm() {
   if (dialogAction === 'review') {
-    updateExamStatus(dialogRow.id, 'completed')
-        .then(() => {
+    teacherService.assessment.releasePaper(dialogRow.id)
+        .then((res) => {
+          const ok = res?.data?.code === 0 || res?.data?.success === true;
+          if (!ok) {
+            throw new Error(res?.data?.msg || '审核失败');
+          }
           dialogRow.status = '已审核';
           ElMessage.success('审核通过！');
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('审核失败:', error);
-          ElMessage.error('审核操作失败');
+          ElMessage.error(error?.message || '审核操作失败');
+        })
+        .finally(() => {
+          dialogVisible.value = false;
         });
+    return;
   } else if (dialogAction === 'publish') {
     updateExamStatus(dialogRow.id, 'scheduled')
         .then(() => {
@@ -148,26 +156,24 @@ function handleDialogConfirm() {
         .catch(error => {
           console.error('发布失败:', error);
           ElMessage.error('发布操作失败');
+        })
+        .finally(() => {
+          dialogVisible.value = false;
         });
+    return;
   }
+
   dialogVisible.value = false;
 }
 
-// 修复3：添加状态更新API函数
-async function updateExamStatus(examId, status) {
+// 添加状态更新API函数
+async function updateExamStatus(examId) {
   try {
-    const response = await adminService.updateExamStatus({
-      examId: examId,
-      status: status
-    });
-
-    if (response.data && response.data.code === 0) {
-      return response.data;
-    }
-
-    throw new Error(response.data?.msg || '状态更新失败');
+    const response = await adminService.updateExamStatusById(examId);
+    if (response?.data?.code === 0) return response.data;
+    throw new Error(response?.data?.msg || '状态更新失败');
   } catch (error) {
-    console.error(`更新试卷状态失败 (examId: ${examId}, status: ${status}):`, error);
+    console.error(`更新试卷状态失败 (examId: ${examId}):`, error);
     throw error;
   }
 }

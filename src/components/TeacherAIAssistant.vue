@@ -1,13 +1,9 @@
 <script setup>
-import {ref, onMounted, watch, nextTick} from 'vue'
+import {ref, onMounted, nextTick} from 'vue'
 import Live2DComponent from './Live2DComponent.vue'
 import VoiceRecognition from './VoiceRecognition.vue'
-import {chatService, fileService} from '@/services/api'
-import MarkdownIt from 'markdown-it';
-import hljs from 'highlight.js';
+import {fileService} from '@/services/api'
 import 'highlight.js/styles/github.min.css';
-
-
 import { useSSEChat } from '@/services/useSSEChat';
 
 
@@ -27,6 +23,18 @@ const live2dConfig = ref({
   scale: 0.128,
   position: { x: 100, y: 50 }
 })
+
+// 添加等待动画状态
+const showThinkingAnimation = ref(false)
+
+// 语音朗读相关状态
+const isSpeaking = ref(false)
+const speechRate = ref(1.0)
+const speechVolume = ref(1.0)
+const currentSpeechUtterance = ref(null)
+const isVoiceEnabled = ref(true)
+const speechQueue = ref([])
+const isProcessingSpeech = ref(false)
 
 const toggleAssistant = () => {
   if (!isDragging.value) {
@@ -139,11 +147,13 @@ const sendMessage = async () => {
   });
 
   isResponding.value = true;
+  showThinkingAnimation.value = true; // 显示等待动画
 
   let assistantMsg = {
     type: 'assistant',
     content: '', // 初始为空
-    timestamp: new Date().toLocaleTimeString()
+    timestamp: new Date().toLocaleTimeString(),
+    isThinking: true // 标记为思考状态
   };
   messages.value.push(assistantMsg);
 
@@ -170,9 +180,16 @@ const sendMessage = async () => {
       onMessage: (chunk) => {
         console.log('📨 收到消息块:', chunk);
 
-        // 如果是"正在思考..."状态，直接显示
+        // 收到第一个有效内容时，隐藏等待动画
+        if (chunk !== '🤔 正在思考...' && showThinkingAnimation.value) {
+          showThinkingAnimation.value = false;
+          assistantMsg.isThinking = false;
+        }
+
+        // 如果是"正在思考..."状态，保持等待动画
         if (chunk === '🤔 正在思考...') {
-          assistantMsg.content = chunk; // 仅在思考时显示这个
+          assistantMsg.content = '';
+          assistantMsg.isThinking = true;
         } else {
           // 逐字处理：如果遇到 ¥ 符号，替换为两次换行并删除原符号
           if (chunk === '¥') {
@@ -181,8 +198,18 @@ const sendMessage = async () => {
             currentStreamContent += chunk; // 正常累积字符
           }
 
-          // 实时显示的内容可以简单地就是累积的内容，或者加上一个指示符
-          assistantMsg.content = currentStreamContent + '...'; // 可以加个...表示还在输入
+          // 实时显示的内容
+          assistantMsg.content = currentStreamContent;
+          assistantMsg.isThinking = false;
+
+          // 语音朗读（流式输出时实时朗读）
+          if (isVoiceEnabled.value && chunk.trim() && !chunk.includes('¥')) {
+            // 对于流式输出，我们只朗读完整的句子或短语
+            const cleanChunk = chunk.replace(/[。！？.!?]/g, '');
+            if (cleanChunk.length > 2) { // 只朗读有意义的文本片段
+              speakText(cleanChunk);
+            }
+          }
         }
 
         // 仅更新Vue响应式数据以显示累积的文本
@@ -192,6 +219,8 @@ const sendMessage = async () => {
       },
       onComplete: () => {
         console.log('✅ 消息发送完成');
+        showThinkingAnimation.value = false; // 隐藏等待动画
+
         // ====== 最终的换行处理逻辑 START ======
         const punctuationRegex = /[。！？.!?]/g; // 匹配中文句号、英文句号、中文问号、英文问号、中文叹号、英文叹号
 
@@ -200,9 +229,15 @@ const sendMessage = async () => {
           return match + '\n';
         });
 
-        // 移除显示时的 "..." 标记，显示最终内容
+        // 显示最终内容
         assistantMsg.content = formattedContent;
+        assistantMsg.isThinking = false;
         // ====== 最终的换行处理逻辑 END ======
+
+        // 完成时朗读完整内容
+        if (isVoiceEnabled.value && formattedContent.trim()) {
+          speakText(formattedContent);
+        }
 
         isResponding.value = false;
         const lastIndex = messages.value.length - 1;
@@ -211,7 +246,9 @@ const sendMessage = async () => {
       },
       onError: (err) => {
         console.error('❌ 发送错误:', err);
+        showThinkingAnimation.value = false; // 隐藏等待动画
         assistantMsg.content = `[错误: ${err.message}]`;
+        assistantMsg.isThinking = false;
         const lastIndex = messages.value.length - 1;
         messages.value.splice(lastIndex, 1, { ...assistantMsg, type: 'error' });
         isResponding.value = false;
@@ -220,7 +257,9 @@ const sendMessage = async () => {
 
   } catch (error) {
     console.error('💥 发送失败:', error);
+    showThinkingAnimation.value = false; // 隐藏等待动画
     assistantMsg.content = `[发送失败: ${error.message}]`;
+    assistantMsg.isThinking = false;
     const lastIndex = messages.value.length - 1;
     messages.value.splice(lastIndex, 1, { ...assistantMsg, type: 'error' });
     isResponding.value = false;
@@ -262,6 +301,96 @@ const loadChat = (index) => {
   });
 };
 
+// 语音朗读方法
+const speakText = (text) => {
+  if (!isVoiceEnabled.value || !text.trim()) return;
+
+  // 将文本添加到队列
+  speechQueue.value.push(text);
+
+  // 如果没有在处理语音，开始处理
+  if (!isProcessingSpeech.value) {
+    processSpeechQueue();
+  }
+};
+
+const processSpeechQueue = () => {
+  if (speechQueue.value.length === 0 || !isVoiceEnabled.value) {
+    isProcessingSpeech.value = false;
+    return;
+  }
+
+  isProcessingSpeech.value = true;
+  const text = speechQueue.value.shift();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = speechRate.value;
+  utterance.volume = speechVolume.value;
+  utterance.lang = 'zh-CN';
+
+  utterance.onstart = () => {
+    isSpeaking.value = true;
+  };
+
+  utterance.onend = () => {
+    isSpeaking.value = false;
+    currentSpeechUtterance.value = null;
+    // 继续处理队列中的下一个
+    setTimeout(() => {
+      processSpeechQueue();
+    }, 100);
+  };
+
+  utterance.onerror = (event) => {
+    console.error('语音朗读错误:', event);
+    isSpeaking.value = false;
+    currentSpeechUtterance.value = null;
+    // 继续处理队列中的下一个
+    setTimeout(() => {
+      processSpeechQueue();
+    }, 100);
+  };
+
+  currentSpeechUtterance.value = utterance;
+  speechSynthesis.speak(utterance);
+};
+
+const stopSpeaking = () => {
+  if (currentSpeechUtterance.value) {
+    speechSynthesis.cancel();
+    isSpeaking.value = false;
+    currentSpeechUtterance.value = null;
+  }
+  // 清空语音队列
+  speechQueue.value = [];
+  isProcessingSpeech.value = false;
+};
+
+const toggleVoice = () => {
+  isVoiceEnabled.value = !isVoiceEnabled.value;
+  if (!isVoiceEnabled.value) {
+    stopSpeaking();
+  }
+};
+
+const updateSpeechRate = (rate) => {
+  speechRate.value = rate;
+  if (isSpeaking.value && currentSpeechUtterance.value) {
+    stopSpeaking();
+    speakText(currentSpeechUtterance.value.text);
+  }
+};
+
+const updateSpeechVolume = (volume) => {
+  speechVolume.value = volume;
+  if (isSpeaking.value && currentSpeechUtterance.value) {
+    stopSpeaking();
+    speakText(currentSpeechUtterance.value.text);
+  }
+};
+
+
+
 </script>
 
 <template>
@@ -286,6 +415,36 @@ const loadChat = (index) => {
         <h3>小T</h3>
       </div>
       <div class="sidebar-actions">
+        <!-- 语音控制区域 -->
+        <div class="voice-controls">
+          <div class="control-header">
+            <h4>语音设置</h4>
+            <button @click="toggleVoice" class="voice-toggle-btn" :class="{ 'active': isVoiceEnabled }">
+              <span class="icon">{{ isVoiceEnabled ? '🔊' : '🔇' }}</span>
+            </button>
+          </div>
+
+          <div class="control-item">
+            <label>语速</label>
+            <input type="range" min="0.5" max="2.0" step="0.1"
+                   v-model="speechRate" @input="updateSpeechRate($event.target.value)"
+                   class="control-slider">
+            <span class="control-value">{{ speechRate }}</span>
+          </div>
+
+          <div class="control-item">
+            <label>音量</label>
+            <input type="range" min="0" max="1" step="0.1"
+                   v-model="speechVolume" @input="updateSpeechVolume($event.target.value)"
+                   class="control-slider">
+            <span class="control-value">{{ speechVolume }}</span>
+          </div>
+          <button v-if="isSpeaking" @click="stopSpeaking" class="action-btn stop-voice-btn">
+            <span class="icon">⏹️</span>
+            <span class="btn-text">停止朗读</span>
+          </button>
+        </div>
+
         <button @click="startNewChat" class="action-btn new-chat-btn">
           <span class="icon">＋</span>
           <span class="btn-text">新对话</span>
@@ -325,7 +484,56 @@ const loadChat = (index) => {
       <div class="messages">
         <div v-for="(msg, index) in messages" :key="index"
              :class="['message', msg.type]">
-          <div class="message-content">{{ msg.content }}</div>
+          <!-- 等待动画组件 -->
+          <div v-if="msg.isThinking" class="thinking-animation">
+            <div class="thinking-container">
+              <!-- 粒子效果 -->
+              <div class="particles">
+                <div class="particle particle-1"></div>
+                <div class="particle particle-2"></div>
+                <div class="particle particle-3"></div>
+                <div class="particle particle-4"></div>
+                <div class="particle particle-5"></div>
+                <div class="particle particle-6"></div>
+              </div>
+              <!-- 旋转齿轮 -->
+              <div class="gear-container">
+                <div class="gear gear-1">
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                </div>
+                <div class="gear gear-2">
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                  <div class="gear-tooth"></div>
+                </div>
+              </div>
+              <!-- 波浪效果 -->
+              <div class="wave-container">
+                <div class="wave wave-1"></div>
+                <div class="wave wave-2"></div>
+                <div class="wave wave-3"></div>
+              </div>
+              <!-- 中心光晕 -->
+              <div class="center-glow"></div>
+            </div>
+            <div class="thinking-text">小V正在思考中...</div>
+            <!-- 进度条 -->
+            <div class="progress-container">
+              <div class="progress-bar-thinking"></div>
+            </div>
+          </div>
+          <!-- 正常消息内容 -->
+          <div v-else class="message-content">{{ msg.content }}</div>
           <div class="message-time">{{ msg.timestamp }}</div>
         </div>
       </div>
@@ -337,10 +545,10 @@ const loadChat = (index) => {
         </div>
         <input type="file" id="file-upload" @change="handleFileUpload" style="display: none">
         <label for="file-upload" class="upload-btn">📎</label>
-        
+
         <!-- 语音识别组件 -->
         <VoiceRecognition @text-recognized="handleVoiceText" />
-        
+
         <input v-model="newMessage" @keyup.enter="sendMessage"
                placeholder="输入消息..." type="text">
         <button @click="sendMessage">发送</button>
@@ -495,6 +703,104 @@ const loadChat = (index) => {
   text-overflow: ellipsis;
 }
 
+/* 语音控制样式 */
+.voice-controls {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(76, 175, 80, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.control-header h4 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 14px;
+}
+
+.voice-toggle-btn {
+  background: none;
+  border: 1px solid var(--light-green);
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.voice-toggle-btn.active {
+  background: var(--primary-green);
+  color: white;
+}
+
+.voice-toggle-btn:hover {
+  background: var(--light-green);
+}
+
+.control-item {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.control-item label {
+  font-size: 12px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.control-slider {
+  width: 100%;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.control-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--primary-green);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.control-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--primary-green);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.control-value {
+  font-size: 11px;
+  color: #6b7280;
+  text-align: right;
+}
+
+.stop-voice-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  margin-top: 10px;
+}
+
+.stop-voice-btn:hover {
+  background: #dc2626;
+}
+
 .chat-history {
   flex: 1;
   overflow-y: auto;
@@ -630,6 +936,297 @@ const loadChat = (index) => {
   color: var(--text-dark);
 }
 
+/* 等待动画样式 */
+.thinking-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(76, 175, 80, 0.1));
+  border-radius: 16px;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.thinking-animation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.1), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.thinking-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 80px;
+}
+
+/* 粒子效果 */
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--primary-green);
+  border-radius: 50%;
+  animation: particle-float 3s ease-in-out infinite;
+}
+
+.particle-1 {
+  top: 10%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.particle-2 {
+  top: 20%;
+  right: 15%;
+  animation-delay: 0.5s;
+}
+
+.particle-3 {
+  bottom: 30%;
+  left: 10%;
+  animation-delay: 1s;
+}
+
+.particle-4 {
+  bottom: 20%;
+  right: 25%;
+  animation-delay: 1.5s;
+}
+
+.particle-5 {
+  top: 50%;
+  left: 5%;
+  animation-delay: 2s;
+}
+
+.particle-6 {
+  top: 40%;
+  right: 5%;
+  animation-delay: 2.5s;
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* 中心光晕 */
+.center-glow {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, transparent 70%);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* 齿轮动画 */
+.gear-container {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.gear {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gear-1 {
+  animation: rotate 3s linear infinite;
+  position: absolute;
+  top: 10px;
+  left: -40px;
+}
+
+.gear-2 {
+  animation: rotate-reverse 2s linear infinite;
+  position: absolute;
+  top: 20px;
+  right: -40px;
+}
+
+.gear-tooth {
+  position: absolute;
+  width: 4px;
+  height: 12px;
+  background: white;
+  border-radius: 2px;
+  transform-origin: 50% 20px;
+}
+
+.gear-1 .gear-tooth:nth-child(1) { transform: rotate(0deg) translateY(-20px); }
+.gear-1 .gear-tooth:nth-child(2) { transform: rotate(45deg) translateY(-20px); }
+.gear-1 .gear-tooth:nth-child(3) { transform: rotate(90deg) translateY(-20px); }
+.gear-1 .gear-tooth:nth-child(4) { transform: rotate(135deg) translateY(-20px); }
+.gear-1 .gear-tooth:nth-child(5) { transform: rotate(180deg) translateY(-20px); }
+.gear-1 .gear-tooth:nth-child(6) { transform: rotate(225deg) translateY(-20px); }
+.gear-1 .gear-tooth:nth-child(7) { transform: rotate(270deg) translateY(-20px); }
+.gear-1 .gear-tooth:nth-child(8) { transform: rotate(315deg) translateY(-20px); }
+
+.gear-2 .gear-tooth:nth-child(1) { transform: rotate(0deg) translateY(-18px); }
+.gear-2 .gear-tooth:nth-child(2) { transform: rotate(60deg) translateY(-18px); }
+.gear-2 .gear-tooth:nth-child(3) { transform: rotate(120deg) translateY(-18px); }
+.gear-2 .gear-tooth:nth-child(4) { transform: rotate(180deg) translateY(-18px); }
+.gear-2 .gear-tooth:nth-child(5) { transform: rotate(240deg) translateY(-18px); }
+.gear-2 .gear-tooth:nth-child(6) { transform: rotate(300deg) translateY(-18px); }
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* 波浪效果 */
+.wave-container {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+
+.wave {
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to top, var(--primary-green), var(--dark-green));
+  border-radius: 2px;
+  animation: wave 1.5s ease-in-out infinite;
+}
+
+.wave-1 {
+  animation-delay: 0s;
+}
+
+.wave-2 {
+  animation-delay: 0.2s;
+}
+
+.wave-3 {
+  animation-delay: 0.4s;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 20px;
+    opacity: 0.6;
+  }
+  50% {
+    height: 40px;
+    opacity: 1;
+  }
+}
+
+.thinking-text {
+  font-size: 14px;
+  color: var(--text-dark);
+  font-weight: 500;
+  opacity: 0.8;
+  animation: thinking-pulse 2s ease-in-out infinite;
+  text-align: center;
+}
+
+@keyframes thinking-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 进度条样式 */
+.progress-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(76, 175, 80, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar-thinking {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-green), var(--dark-green));
+  border-radius: 2px;
+  animation: progress-loading 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+@keyframes progress-loading {
+  0% {
+    width: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    width: 70%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+
 /* 流式输出 */
 .message.assistant-streaming {
   position: relative;
@@ -695,6 +1292,8 @@ const loadChat = (index) => {
 .upload-btn:hover {
   opacity: 1;
 }
+
+
 
 .icon {
   font-size: 16px;

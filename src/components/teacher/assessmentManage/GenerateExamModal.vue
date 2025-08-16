@@ -1,27 +1,27 @@
 <template>
   <el-dialog
-    :model-value="visible"
-    @update:model-value="$emit('update:modelValue', $event)"
-    title="按章节智能生成试卷"
-    width="700px"
-    :close-on-click-modal="!generating"
-    :close-on-press-escape="!generating"
-    @close="$emit('close')"
+      :model-value="visible"
+      @update:model-value="$emit('update:modelValue', $event)"
+      title="按章节智能生成试卷"
+      width="700px"
+      :close-on-click-modal="!generating"
+      :close-on-press-escape="!generating"
+      @close="$emit('close')"
   >
     <el-form
-      :model="generateForm"
-      :rules="generateRules"
-      ref="generateFormRef"
-      label-width="120px"
+        :model="generateForm"
+        :rules="generateRules"
+        ref="generateFormRef"
+        label-width="120px"
     >
       <el-form-item label="试卷标题" prop="title">
         <el-input v-model="generateForm.title" placeholder="请输入试卷标题" />
       </el-form-item>
       <el-form-item label="考核类型" prop="type">
         <el-select
-          v-model="generateForm.type"
-          placeholder="请选择考核类型"
-          style="width: 100%"
+            v-model="generateForm.type"
+            placeholder="请选择考核类型"
+            style="width: 100%"
         >
           <el-option label="期中考试" value="期中考试" />
           <el-option label="期末考试" value="期末考试" />
@@ -29,45 +29,52 @@
           <el-option label="随堂测试" value="随堂测试" />
         </el-select>
       </el-form-item>
-      <el-form-item label="课程" prop="courseId">
-        <el-select
-          v-model="generateForm.courseId"
-          placeholder="请选择课程"
-          style="width: 100%"
-        >
-          <el-option label="数据结构与算法" :value="2" />
-          <el-option label="Java程序设计" :value="1" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="章节范围" prop="chapters">
         <el-select
-          v-model="generateForm.chapters"
-          multiple
-          placeholder="请选择章节"
-          style="width: 100%"
+            v-model="generateForm.chapters"
+            multiple
+            placeholder="请选择章节"
+            style="width: 100%"
+            @change="loadKnowledgePoints"
         >
-          <el-option label="第一章：Java基础语法" value="1" />
-          <el-option label="第二章：面向对象编程" value="2" />
-          <el-option label="第三章：异常处理" value="3" />
-          <el-option label="第四章：集合框架" value="4" />
-          <el-option label="第五章：IO流操作" value="5" />
+          <el-option
+              v-for="chapter in chapters"
+              :key="chapter.id"
+              :label="chapter.title"
+              :value="chapter.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="知识点范围" prop="knowledgePoints">
+        <el-select
+            v-model="generateForm.knowledgePoints"
+            multiple
+            placeholder="请选择知识点"
+            style="width: 100%"
+        >
+          <el-option
+              v-for="point in knowledgePoints"
+              :key="point.id"
+              :label="point.title"
+              :value="point.id"
+          />
         </el-select>
       </el-form-item>
       <el-form-item label="题目数量" prop="totalQuestions">
         <el-input-number
-          v-model="generateForm.totalQuestions"
-          :min="1"
-          :max="100"
+            v-model="generateForm.totalQuestions"
+            :min="1"
+            :max="100"
         />
         <span style="margin-left: 8px">道题</span>
       </el-form-item>
     </el-form>
 
     <el-dialog
-      v-model="showPaper"
-      title="生成试卷"
-      width="800px"
-      :close-on-click-modal="false"
+        v-model="showPaper"
+        title="生成试卷"
+        width="800px"
+        :close-on-click-modal="false"
     >
       <div v-if="generating" class="cool-loading-wrapper">
         <div class="cool-spinner">
@@ -78,7 +85,7 @@
         </div>
       </div>
       <ExamPaperTeacher
-        v-else
+          v-else
           :examContent="generatedExamContent"
       />
       <template #footer>
@@ -93,9 +100,9 @@
       <span class="dialog-footer">
         <el-button @click="$emit('close')" :disabled="generating">取消</el-button>
         <el-button
-          type="primary"
-          @click="generateAssessment"
-          :loading="generating"
+            type="primary"
+            @click="generateAssessment"
+            :loading="generating"
         >
           {{ generating ? "正在生成中..." : "按章节生成" }}
         </el-button>
@@ -114,17 +121,21 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue';
-import { ElMessage } from 'element-plus';
-import { teacherService } from '@/services/api';
+import {ref, reactive, computed, watch, onMounted} from 'vue';
+import {ElMessage} from 'element-plus';
+import {teacherService} from '@/services/api';
 import ExamPaperTeacher from '../ExamPaperTeacher.vue';
-import { marked } from 'marked';
+import {marked} from 'marked';
 import DOMPurify from 'dompurify';
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
     default: false
+  },
+  courseId: {
+    type: [String, Number],
+    default: 1
   }
 });
 
@@ -141,47 +152,109 @@ const showPaper = ref(false);
 const showReport = ref(false);
 const generatedExamContent = ref();
 const rawReportContent = ref('');
+const chapters = ref([]); // 动态章节列表
+const knowledgePoints = ref([]); // 动态知识点列表
 
 // 智能生成表单
 const generateForm = reactive({
   title: "",
   type: "",
-  courseId: 1,
+  courseId: props.courseId,
   chapters: [],
+  knowledgePoints: [],
   totalQuestions: 20,
 });
 
 // 生成表单验证规则
 const generateRules = {
-  title: [{ required: true, message: "请输入试卷标题", trigger: "blur" }],
-  type: [{ required: true, message: "请选择考核类型", trigger: "change" }],
-  courseId: [{ required: true, message: "请选择课程", trigger: "change" }],
-  chapters: [{ required: true, message: "请选择章节", trigger: "change" }],
+  title: [{required: true, message: "请输入试卷标题", trigger: "blur"}],
+  type: [{required: true, message: "请选择考核类型", trigger: "change"}],
+  courseId: [{required: true, message: "请选择课程", trigger: "change"}],
+  chapters: [{required: true, message: "请选择章节", trigger: "change"}],
+  knowledgePoints: [{required: true, message: "请选择知识点", trigger: "change"}],
   totalQuestions: [
-    { required: true, message: "请输入题目数量", trigger: "blur" },
+    {required: true, message: "请输入题目数量", trigger: "blur"},
   ],
 };
 
 const generateDescription = computed(() => {
   const typeTag = getTypeTagType(generateForm.type);
   const formattedChapters = generateForm.chapters
-    .map((chapterId) => {
-      const chapterName = getChapterName(chapterId);
-      const knowledgePoints = chapterKnowledgePoints[chapterId] || [];
-      return knowledgePoints.length > 0
-        ? `${chapterName}（${knowledgePoints.join("、")}）`
-        : chapterName;
-    })
-    .join("、");
+      .map((chapterId) => {
+        const chapterName = getChapterName(chapterId);
+        const knowledgePoints = generateForm.knowledgePoints
+            .map(pointId => getKnowledgePointName(pointId))
+            .join("、");
+        return knowledgePoints.length > 0
+            ? `${chapterName}（${knowledgePoints}）`
+            : chapterName;
+      })
+      .join("、");
 
   return (
-    `试卷标题：${generateForm.title} \n` +
-    `考试类型：${generateForm.type} \n` +
-    `包含章节：${formattedChapters || "无"} \n` +
-    `题目数量：${generateForm.totalQuestions}题` +
-    `总分值为100分`
+      `试卷标题：${generateForm.title} \n` +
+      `考试类型：${generateForm.type} \n` +
+      `包含章节：${formattedChapters || "无"} \n` +
+      `题目数量：${generateForm.totalQuestions}题` +
+      `总分值为100分`
   );
 });
+
+const loadChapters = async () => {
+  if (!props.courseId) return;
+
+  try {
+    const response = await teacherService.getChapterByCourseId(props.courseId);
+    if (response.data.success) {
+      // 将后端数据格式转换为组件需要的格式
+      chapters.value = response.data.data.map(chapter => ({
+        id: chapter.chapterId,
+        title: chapter.chapterName,
+        description: chapter.description,
+        expanded: false,
+        // 保留原始数据以备后用
+        originalData: chapter
+      }));
+    } else {
+      ElMessage.error('获取章节数据失败');
+    }
+  } catch (error) {
+    // 如果后端没有数据，使用模拟数据
+    console.warn('后端章节数据获取失败，使用模拟数据:', error.message);
+    const mockResponse = getMockChapters(props.courseId);
+    chapters.value = mockResponse.data;
+  }
+};
+
+const loadKnowledgePoints = async () => {
+  if (!generateForm.chapters.length) return;
+
+  try {
+    const promises = generateForm.chapters.map(async (chapterId) => {
+      const response = await teacherService.getKnowledgePointsByChapterId(chapterId);
+      if (response.data.success) {
+        return response.data.data.map(point => ({
+          id: point.pointId,
+          title: point.pointName,
+          description: point.description,
+          // 保留原始数据以备后用
+          originalData: point
+        }));
+      } else {
+        ElMessage.error(`获取章节${chapterId}的知识点数据失败`);
+        return [];
+      }
+    });
+
+    const results = await Promise.all(promises);
+    knowledgePoints.value = results.flat();
+  } catch (error) {
+    // 如果后端没有数据，使用模拟数据
+    console.warn('后端知识点数据获取失败，使用模拟数据:', error.message);
+    const mockResponse = getMockKnowledgePoints(props.courseId, generateForm.chapters);
+    knowledgePoints.value = mockResponse.data;
+  }
+};
 
 const renderedMarkdown = computed(() => {
   if (!rawReportContent.value) return '';
@@ -215,23 +288,15 @@ const getTypeTagType = (type) => {
 
 // 获取课程章节
 const getChapterName = (chapterId) => {
-  const chapterNames = {
-    1: "第一章：课程介绍",
-    2: "第二章：基础知识",
-    3: "第三章：核心概念",
-    4: "第四章：实践应用",
-    5: "第五章：项目实战",
-  };
-  return chapterNames[chapterId] || `第${chapterId}章`;
+  console.log("chapter", chapterId);
+  const chapter = chapters.value.find(ch => ch.id === chapterId);
+  return chapter ? chapter.title : `第${chapterId}章`;
 };
 
-// 章节知识点映射
-const chapterKnowledgePoints = {
-  1: ["数据结构概述", "算法复杂度分析"],
-  2: ["线性表", "栈与队列", "字符串"],
-  3: ["树", "图"],
-  4: ["查找算法", "排序算法"],
-  5: ["综合项目实践"],
+// 获取知识点名称
+const getKnowledgePointName = (pointId) => {
+  const point = knowledgePoints.value.find(p => p.id === pointId);
+  return point ? point.title : `知识点${pointId}`;
 };
 
 // 生成试卷
@@ -239,15 +304,15 @@ const generateAssessment = async () => {
   if (!generateFormRef.value) return;
   showPaper.value = true;
   generating.value = true;
-  
+
   try {
     await generateFormRef.value.validate();
 
-    ElMessage.info("正在根据选择的章节生成试卷内容...");
+    ElMessage.info("正在根据选择的章节和知识点生成试卷内容...");
 
     const response = await teacherService.assessment.createIntelligentExam(
-      generateDescription.value, 
-      generateForm.courseId
+        generateDescription.value,
+        generateForm.courseId
     );
 
     if (response.data && response.data.success) {
@@ -264,7 +329,7 @@ const generateAssessment = async () => {
         title: generateForm.title,
         questions: convertQuestions(examPaperJson.questions || [])
       };
-      
+
       const newAssessment = {
         id: response.data.data.examId || Date.now().toString(),
         title: generateForm.title,
@@ -278,7 +343,7 @@ const generateAssessment = async () => {
         createdAt: now.toISOString(),
         lastSubmissionTime: null,
         chapters: [...generateForm.chapters],
-        knowledgePoints: [],
+        knowledgePoints: [...generateForm.knowledgePoints],
         examPaper,
       };
 
@@ -303,12 +368,12 @@ function convertQuestions(questions) {
     else if (type === 'true_false') type = 'judge';
     else if (type === 'fill_blank') type = 'blank';
     else if (type === 'short_answer') type = 'short';
-    
+
     let options = q.options?.map(opt => ({
       value: opt.label || opt.value,
       label: opt.content || opt.label || opt.value
     })) || [];
-    
+
     return {
       id: q.questionOrder || q.id || idx + 1,
       type,
@@ -325,58 +390,58 @@ const generateRealExamContent = (examData) => {
   if (!examData || !examData.questions) return "试卷数据格式错误";
 
   return examData.questions
-    .map((q, idx) => {
-      let content = `${idx + 1}. `;
+      .map((q, idx) => {
+        let content = `${idx + 1}. `;
 
-      let questionType = "";
-      switch (q.questionType) {
-        case "single_choice":
-          questionType = "single-choice";
-          break;
-        case "multiple_choice":
-          questionType = "multiple-choice";
-          break;
-        case "true_false":
-          questionType = "true-false";
-          break;
-        case "fill_blank":
-          questionType = "fill-blank";
-          break;
-        case "short_answer":
-          questionType = "short-answer";
-          break;
-        default:
-          questionType = "未知题型";
-      }
+        let questionType = "";
+        switch (q.questionType) {
+          case "single_choice":
+            questionType = "single-choice";
+            break;
+          case "multiple_choice":
+            questionType = "multiple-choice";
+            break;
+          case "true_false":
+            questionType = "true-false";
+            break;
+          case "fill_blank":
+            questionType = "fill-blank";
+            break;
+          case "short_answer":
+            questionType = "short-answer";
+            break;
+          default:
+            questionType = "未知题型";
+        }
 
-      content += `[${questionType}] ${q.questionContent}\n`;
+        content += `[${questionType}] ${q.questionContent}\n`;
 
-      if (q.options && q.options.length > 0) {
-        q.options.forEach((opt) => {
-          content += `${opt.label}. ${opt.content}\n`;
-        });
-      }
+        if (q.options && q.options.length > 0) {
+          q.options.forEach((opt) => {
+            content += `${opt.label}. ${opt.content}\n`;
+          });
+        }
 
-      if (q.questionType === "fill_blank") {
-        content += `答案: ${
-          Array.isArray(q.correctAnswer)
-            ? q.correctAnswer.join(", ")
-            : q.correctAnswer
-        }\n`;
-      } else if (q.questionType === "multiple_choice") {
-        content += `正确答案: ${q.correctAnswer.join(", ")}\n`;
-      } else {
-        content += `正确答案: ${
-          Array.isArray(q.correctAnswer)
-            ? q.correctAnswer.join(", ")
-            : q.correctAnswer
-        }\n`;
-      }
+        if (q.questionType === "fill_blank") {
+          content += `答案: ${
+              Array.isArray(q.correctAnswer)
+                  ? q.correctAnswer.join(", ")
+                  : q.correctAnswer
+          }\n`;
+        } else if (q.questionType === "multiple_choice") {
+          content += `正确答案: ${q.correctAnswer.join(", ")}\n`;
+        } else {
+          content += `正确答案: ${
+              Array.isArray(q.correctAnswer)
+                  ? q.correctAnswer.join(", ")
+                  : q.correctAnswer
+          }\n`;
+        }
 
-      content += `解析: ${q.explanation}\n\n`;
-      return content;
-    })
-    .join("");
+        content += `解析: ${q.explanation}\n\n`;
+        return content;
+      })
+      .join("");
 };
 
 // 解析学情报告内容
@@ -394,6 +459,7 @@ watch(() => props.modelValue, (newVal) => {
       type: "",
       courseId: 1,
       chapters: [],
+      knowledgePoints: [],
       totalQuestions: 20,
     });
     showPaper.value = false;
@@ -413,6 +479,7 @@ function handleSaveAndClose() {
     type: "",
     courseId: 1,
     chapters: [],
+    knowledgePoints: [],
     totalQuestions: 20,
   });
   showReport.value = false;
@@ -425,6 +492,12 @@ function handleRegenerate() {
   showPaper.value = false;
   // 保留表单内容，允许用户修改参数后再次生成
 }
+
+onMounted(() => {
+  if (props.courseId) {
+    loadChapters();
+  }
+});
 </script>
 
 <style scoped>
@@ -433,6 +506,7 @@ function handleRegenerate() {
   justify-content: flex-end;
   gap: 12px;
 }
+
 .cool-loading-wrapper {
   display: flex;
   flex-direction: column;
@@ -440,22 +514,26 @@ function handleRegenerate() {
   justify-content: center;
   min-height: 300px;
 }
+
 .cool-spinner {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .cool-spinner svg {
   width: 80px;
   height: 80px;
   animation: rotate 2s linear infinite;
   margin-bottom: 16px;
 }
+
 .cool-spinner .path {
   stroke: #409eff;
   stroke-linecap: round;
   animation: dash 1.5s ease-in-out infinite;
 }
+
 .cool-text {
   font-size: 18px;
   color: #409eff;
@@ -463,11 +541,13 @@ function handleRegenerate() {
   letter-spacing: 2px;
   margin-top: 8px;
 }
+
 @keyframes rotate {
   100% {
     transform: rotate(360deg);
   }
 }
+
 @keyframes dash {
   0% {
     stroke-dasharray: 1, 150;
@@ -483,4 +563,3 @@ function handleRegenerate() {
   }
 }
 </style>
-

@@ -42,7 +42,23 @@
     <!-- 班级整体情况和高频错误分析并排 -->
     <div class="analysis-row">
       <div class="analysis-card class-card">
-        <h3>整体情况</h3>
+        <div class="card-header">
+          <h3>整体情况</h3>
+          <div class="exam-filter">
+            <label>考试:</label>
+            <select
+                v-model="selectedExamId"
+                @change="onExamChange"
+                :disabled="!selectedCourse || examLoading || examList.length === 0"
+            >
+<!--              <option value="">{{ examLoading ? '加载中...' : '全部考试' }}</option>-->
+              <option v-for="exam in examList" :key="exam.id" :value="exam.id">
+                {{ exam.date ? (exam.name + '（' + exam.date + '）') : exam.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
         <div class="stats">
           <div class="stat-item">
             <div class="stat-value">{{ analysisData.averageScore || '0' }}</div>
@@ -105,7 +121,71 @@ import { ref, computed, onMounted } from 'vue';
 import VChart from 'vue-echarts';
 import * as echarts from 'echarts';
 import { getCurrentUserId } from "@/utils/userUtils";
+import AILearningAnalysis from '@/components/teacher/AILearningAnalysis.vue';
+import {teacherService, adminService} from "@/services/api.js";
+import { ElMessage } from 'element-plus';
 
+// 历史考试下拉相关
+const examList = ref([]);
+const selectedExamId = ref('');
+const examLoading = ref(false);
+const props = defineProps({
+  // selectedClass: String, // 删除
+  selectedCourse: String,
+  courses: {
+    type: Array,
+    default: () => [],
+  },
+  analysisData: {
+    type: Object,
+    default: () => ({
+      averageScore: 0,
+      passRate: '0%',
+      excellentRate: '0%',
+    }),
+  },
+  knowledgePoints: {
+    type: Array,
+    default: () => [],
+  },
+  commonErrors: {
+    type: Array,
+    default: () => [],
+  },
+});
+
+const emit = defineEmits(['update:selectedClass', 'update:selectedCourse', 'fetchAnalysisData']);
+
+// 获取课程对应的历史考试列表
+const fetchExamList = async (courseId) => {
+  examLoading.value = true;
+  try {
+    const res = await adminService.getAllPaper(courseId);
+    console.log("获取课程对应的历史考试列表", res)
+    if (res?.data?.success) {
+      examList.value = (res.data.data || []).map(exam => ({
+        id: exam.examId,
+        name: exam.title,
+        date: exam.examDate || exam.createTime || ''
+      }));
+    } else {
+      examList.value = [];
+    }
+  } catch (err) {
+    console.error('获取考试列表失败:', err);
+    ElMessage.error('获取考试列表失败');
+    examList.value = [];
+  } finally {
+    examLoading.value = false;
+  }
+};
+
+// 选择考试时，仅更新“整体情况”数据与柱状图
+const onExamChange = async () => {
+  const courseId = selectedCourse.value;
+  await fetchAnalysisData(courseId, selectedExamId.value);
+  console.log('[onExamChange] examId =', selectedExamId.value);
+};
 const currentUserId = getCurrentUserId();
 
 // 获取教师信息和课程列表
@@ -167,40 +247,6 @@ const loadTeacherInfoAndCourses = async () => {
   }
 };
 
-// 组件挂载时加载数据
-onMounted(() => {
-  loadTeacherInfoAndCourses();
-});
-
-// 其他API调用可以根据需要添加
-
-const props = defineProps({
-  // selectedClass: String, // 删除
-  selectedCourse: String,
-  courses: {
-    type: Array,
-    default: () => [],
-  },
-  analysisData: {
-    type: Object,
-    default: () => ({
-      averageScore: 0,
-      passRate: '0%',
-      excellentRate: '0%',
-    }),
-  },
-  knowledgePoints: {
-    type: Array,
-    default: () => [],
-  },
-  commonErrors: {
-    type: Array,
-    default: () => [],
-  },
-});
-
-const emit = defineEmits(['update:selectedClass', 'update:selectedCourse', 'fetchAnalysisData']);
-
 const getColorByRate = (rate) => {
   if (rate < 60) return '#e74c3c'; // Red
   if (rate < 80) return '#f39c12'; // Orange
@@ -248,21 +294,6 @@ const createScoreChartOption = (data) => {
   };
 };
 
-onMounted(() => {
-  if (scoreChartRef.value) {
-    scoreChart.value = echarts.init(scoreChartRef.value);
-    // 初始化时使用默认数据
-    scoreChart.value.setOption(createScoreChartOption({
-      excellentNumber: 0,
-      goodNumber: 0,
-      normalNumber: 0,
-      passNumber: 0,
-      failNumber: 0
-    }));
-    window.addEventListener('resize', () => scoreChart.value.resize());
-  }
-});
-
 // 知识点掌握率环形图
 const masteryChartOption = computed(() => {
   return {
@@ -283,10 +314,6 @@ const masteryChartOption = computed(() => {
     ]
   };
 });
-
-import AILearningAnalysis from '@/components/teacher/AILearningAnalysis.vue';
-import {teacherService} from "@/services/api.js";
-import { ElMessage } from 'element-plus';
 
 const showAIAnalysis = ref(false);
 
@@ -309,7 +336,7 @@ const fetchKnowledgePoints = async (courseId) => {
         try {
           // 获取知识点名称
           const nameResponse = await teacherService.getKnowledgeNameById(pointId);
-          console.log(`知识点${pointId}名称响应:`, nameResponse);
+          // console.log(`知识点${pointId}名称响应:`, nameResponse);
           
           if (nameResponse.data && nameResponse.data.success) {
             knowledgePointsData.push({
@@ -333,13 +360,24 @@ const fetchKnowledgePoints = async (courseId) => {
 };
 
 // 获取整体情况数据
-const fetchAnalysisData = async (courseId) => {
+const fetchAnalysisData = async (courseId, examId) => {
+  // 定义默认空数据结构（全零）
+  const defaultEmptyData = {
+    averageScore: 0,
+    passRate: 0,
+    excellentRate: 0,
+    failNumber: 0,
+    goodNumber: 0,
+    normalNumber: 0,
+    passNumber: 0,
+    excellentNumber: 0
+  };
+
   try {
-    const response = await teacherService.getAllSituation(courseId);
-    console.log('整体情况数据响应:', response);
-    
-    if (response.data && response.data.success) {
-      const data = response.data.data;
+    const res = await teacherService.getAllSituation(courseId, examId);
+    if (res.data && res.data.success) {
+      // 若后端返回数据为空，使用默认空数据
+      const data = res.data.data || defaultEmptyData;
       analysisData.value = {
         averageScore: data.averageScore || 0,
         passRate: `${data.passRate || 0}%`,
@@ -350,15 +388,29 @@ const fetchAnalysisData = async (courseId) => {
         passNumber: data.passNumber || 0,
         excellentNumber: data.excellentNumber || 0
       };
-      
-      // 更新柱状图数据
-      if (scoreChart.value) {
-        scoreChart.value.setOption(createScoreChartOption(data));
-      }
+      // 强制图表使用当前数据（即使为空）
+      scoreChart.value?.setOption(createScoreChartOption(data));
+    } else {
+      // 接口成功但返回失败标识，重置为默认空数据
+      analysisData.value = {
+        averageScore: 0,
+        passRate: '0%',
+        excellentRate: '0%',
+        ...defaultEmptyData
+      };
+      scoreChart.value?.setOption(createScoreChartOption(defaultEmptyData));
     }
-  } catch (error) {
-    console.error('获取整体情况数据失败:', error);
+  } catch (e) {
+    console.error('获取整体情况数据失败:', e);
     ElMessage.error('获取整体情况数据失败');
+    // 接口失败时，强制重置为默认空数据
+    analysisData.value = {
+      averageScore: 0,
+      passRate: '0%',
+      excellentRate: '0%',
+      ...defaultEmptyData
+    };
+    scoreChart.value?.setOption(createScoreChartOption(defaultEmptyData));
   }
 };
 
@@ -387,26 +439,40 @@ const onCourseChange = async () => {
   const selectedCourseId = selectedCourse.value;
   console.log('下拉框选择变化，当前值:', selectedCourseId);
   emit('update:selectedCourse', selectedCourseId);
-  
-  // 打印选中的课程ID和名称
+
   if (selectedCourseId) {
     const selectedCourseObj = courses.value.find(course => course.id == selectedCourseId);
     if (selectedCourseObj) {
       console.log('选中的课程ID:', selectedCourseObj.id);
       console.log('选中的课程名称:', selectedCourseObj.name);
-      
-      // 并行获取该课程的整体情况数据、高频错误数据和知识点掌握情况
+
+      // 切换课程时重置考试筛选
+      selectedExamId.value = '';
+
+      // 获取课程对应的历史考试列表
+      await fetchExamList(selectedCourseObj.id);
+
+      // 如果有历史考试，默认选择第一个考试
+      if (examList.value.length > 0) {
+        selectedExamId.value = examList.value[0].id;
+        console.log('默认选择考试ID:', selectedExamId.value);
+      }
+
+      // 调用 fetchAnalysisData 时确保 examId 有值
+      await fetchAnalysisData(selectedCourseObj.id, selectedExamId.value);
+
+      // 获取高频错误数据和知识点掌握情况数据
       await Promise.all([
-        fetchAnalysisData(selectedCourseObj.id),
         fetchCommonErrors(selectedCourseObj.id),
         fetchKnowledgePoints(selectedCourseObj.id)
       ]);
     }
   } else {
     console.log('未选择课程');
-    commonErrors.value = []; // 清空错误数据
-    knowledgePoints.value = []; // 清空知识点数据
-    // 重置整体情况数据
+    selectedExamId.value = '';
+    examList.value = [];
+    commonErrors.value = [];
+    knowledgePoints.value = [];
     analysisData.value = {
       averageScore: 0,
       passRate: '0%',
@@ -417,8 +483,6 @@ const onCourseChange = async () => {
       passNumber: 0,
       excellentNumber: 0
     };
-    
-    // 重置柱状图数据
     if (scoreChart.value) {
       scoreChart.value.setOption(createScoreChartOption({
         excellentNumber: 0,
@@ -429,9 +493,25 @@ const onCourseChange = async () => {
       }));
     }
   }
-  
+
   emit('fetchAnalysisData');
 };
+
+onMounted(() => {
+  loadTeacherInfoAndCourses();
+  if (scoreChartRef.value) {
+    scoreChart.value = echarts.init(scoreChartRef.value);
+    // 初始化时使用默认数据
+    scoreChart.value.setOption(createScoreChartOption({
+      excellentNumber: 0,
+      goodNumber: 0,
+      normalNumber: 0,
+      passNumber: 0,
+      failNumber: 0
+    }));
+    window.addEventListener('resize', () => scoreChart.value.resize());
+  }
+});
 </script>
 
 <style scoped>
@@ -679,5 +759,38 @@ const onCourseChange = async () => {
   .el-dialog__headerbtn .el-dialog__close {
     color: white;
   }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.exam-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exam-filter label {
+  font-weight: bold;
+  color: #555;
+}
+
+.exam-filter select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 160px;
+  background-color: #fff;
+  outline: none;
+}
+
+.exam-filter select:focus {
+  border-color: #0096ff;
+  box-shadow: 0 0 0 2px rgba(0, 150, 255, 0.15);
 }
 </style>

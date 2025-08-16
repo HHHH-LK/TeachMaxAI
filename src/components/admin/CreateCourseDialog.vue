@@ -27,7 +27,7 @@
       <el-form-item label="课程时间" prop="time">
         <el-input
             v-model="courseForm.time"
-            placeholder="例如：2025春"
+            placeholder="例如：2025春季"
             clearable
         ></el-input>
       </el-form-item>
@@ -64,6 +64,7 @@ const courseForm = reactive({
 });
 
 // 表单验证规则
+// 表单验证规则
 const rules = reactive({
   title: [
     { required: true, message: "请输入课程名称", trigger: "blur" },
@@ -77,12 +78,13 @@ const rules = reactive({
   time: [
     { required: true, message: "请输入课程时间", trigger: "blur" },
     {
-      pattern: /^\d{4}[春夏秋冬]$/,
-      message: "请输入正确的时间格式，例如：2025春",
+      pattern: /^\d{4}[春夏秋冬]季$/,
+      message: "请输入正确的时间格式，例如：2024春季",
       trigger: "blur",
     },
   ],
 });
+
 
 // 监听visible属性变化
 watch(

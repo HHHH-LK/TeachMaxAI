@@ -119,6 +119,7 @@ import LessonPlanGenerator from "@/components/teacher/LessonPlanGenerator.vue";
 import AssessmentManagement from "@/components/teacher/AssessmentManagement.vue";
 import GradeStatistics from "@/components/teacher/GradeStatistics.vue";
 import { teacherService } from "@/services/api";
+import {getCurrentUserId} from "@/utils/userUtils.js";
 
 // 路由参数
 const route = useRoute();
@@ -143,13 +144,18 @@ const navItems = ref([
 ]);
 
 const activeNavItem = ref("章节目录");
-const teacherId = "1";
+// const teacherId = "1";
 
 // 根据课程ID加载课程信息
 const loadCourseInfo = async () => {
   // 这里可以根据courseId从API获取课程信息
   // console.log("加载课程信息:", courseId);
 
+  const userId = getCurrentUserId()
+  const response1 = await teacherService.getTeacherInfo(userId)
+  const teacherId = response1.data.data.teacherId
+
+  // console.log({ userId, teacherId })
   const response = await teacherService.getAllCourse(teacherId);
   // console.log("获取课程成功", response)
   if (response.data) {

@@ -21,7 +21,7 @@
           >
             <option value="">所有学期</option>
             <option
-                v-for="semester in uniqueSemesters"
+                v-for="semester in semesters"
                 :key="semester"
                 :value="semester"
             >
@@ -81,6 +81,9 @@
 
     <!-- 课程卡片网格 -->
     <div class="course-cards-grid">
+      <p v-if="courseLoading" class="loading-results">
+        正在加载课程...
+      </p>
       <Card
           v-for="course in filteredCourses"
           :key="course.id"
@@ -106,11 +109,6 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Card from "@/components/student/knowledge/Card.vue";
 import { ElMessage } from "element-plus";
-import img1 from "@/assets/img_1.png";
-import img2 from "@/assets/img_2.png";
-import img3 from "@/assets/img_3.png";
-import img4 from "@/assets/img.png";
-import img5 from "@/assets/img_4.png";
 import { studentService } from "@/services/api";
 
 const router = useRouter();
@@ -120,6 +118,9 @@ const searchQuery = ref("");
 const allCourses = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
+const semesters = ref([]);
+const semesterLoading = ref(false);
+const courseLoading = ref(false);
 
 const defaultCourses = [
   {
@@ -143,21 +144,76 @@ const defaultCourses = [
     semester: "2024秋",
     imageUrl: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.v7JAGdYjVso8nIqmbtN_bAHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
   },
-  {
-    id: 4,
-    title: "计算机网络",
-    description: "深入理解网络协议、网络架构和网络安全。",
-    semester: "2024秋",
-    imageUrl: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.v7JAGdYjVso8nIqmbtN_bAHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
-  },
-  {
-    id: 5,
-    title: "操作系统原理",
-    description: "探讨操作系统的设计原理、进程管理、内存管理等。",
-    semester: "2024春",
-    imageUrl: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.v7JAGdYjVso8nIqmbtN_bAHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
-  },
 ];
+
+const fetchSemesters = async () => {
+  semesterLoading.value = true;
+  try {
+    const response = await studentService.getSemester();
+    if (response.data && response.data.success && response.data.data) {
+      console.log("获取学期列表成功:", response.data.data);
+      // 假设接口返回格式为 { data: ["2025春", "2024秋", ...] }
+      semesters.value = response.data.data;
+      // 保持原逻辑的排序（倒序，最新学期在前）
+      semesters.value.sort().reverse();
+    } else {
+      // 接口返回异常时，使用默认学期数据
+      semesters.value = ["2025春", "2024秋", "2024春"];
+      ElMessage.warning("学期数据获取异常，使用默认数据");
+    }
+  } catch (err) {
+    console.error("获取学期列表失败:", err);
+    semesters.value = ["2025春", "2024秋", "2024春"]; // 兜底默认值
+    ElMessage.error("获取学期列表失败，使用默认数据");
+  } finally {
+    semesterLoading.value = false;
+  }
+};
+
+const fetchCoursesByDate = async (date = "") => {
+  courseLoading.value = true;
+  error.value = null;
+  try {
+    // 如果 date 参数为空，表示“所有学期”，循环调用每个学期的课程数据
+    if (!date) {
+      const allSemestersCourses = [];
+      for (const semester of semesters.value) {
+        const response = await studentService.getCoursesByDate(semester);
+        if (response.data && response.data.success && response.data.data) {
+          allSemestersCourses.push(...response.data.data.map(course => ({
+            id: course.courseId,
+            title: course.courseName,
+            description: course.courseDescription,
+            semester: course.semester || "未知学期",
+            imageUrl: course.imageUrl || "https://tse4-mm.cn.bing.net/th/id/OIP-C.v7JAGdYjVso8nIqmbtN_bAHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7",
+          })));
+        }
+      }
+      allCourses.value = allSemestersCourses;
+    } else {
+      // 调用 getCoursesByDate 接口，传入学期参数
+      const response = await studentService.getCoursesByDate(date);
+      if (response.data && response.data.success && response.data.data) {
+        allCourses.value = response.data.data.map(course => ({
+          id: course.courseId,
+          title: course.courseName,
+          description: course.courseDescription,
+          semester: course.semester || "未知学期",
+          imageUrl: course.imageUrl || "https://tse4-mm.cn.bing.net/th/id/OIP-C.v7JAGdYjVso8nIqmbtN_bAHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7",
+        }));
+      } else {
+        allCourses.value = [];
+        ElMessage.info("当前学期暂无课程数据");
+      }
+    }
+  } catch (err) {
+    error.value = "获取课程数据失败：" + err.message;
+    allCourses.value = [];
+    ElMessage.error("获取课程数据失败，请重试");
+  } finally {
+    courseLoading.value = false;
+  }
+};
 
 // 获取课程
 const fetchCourses = async () => {
@@ -173,7 +229,6 @@ const fetchCourses = async () => {
         semester: course.semester || "未知学期",
         imageUrl: course.imageUrl || 'https://tse4-mm.cn.bing.net/th/id/OIP-C.v7JAGdYjVso8nIqmbtN_bAHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
       }));
-      
       console.log(response.data.data)
     } else {
       allCourses.value = defaultCourses;
@@ -188,6 +243,11 @@ const fetchCourses = async () => {
   }
 };
 
+const handleFilterChange = () => {
+  // 传入选中的学期（空字符串表示“所有学期”，由接口处理）
+  fetchCoursesByDate(selectedSemester.value);
+};
+
 // 计算唯一的学期列表
 const uniqueSemesters = computed(() => {
   const semesters = new Set();
@@ -199,17 +259,14 @@ const uniqueSemesters = computed(() => {
   return Array.from(semesters).sort().reverse(); 
 });
 
-onMounted(() => {
-  fetchCourses();
+onMounted(async () => {
+  await fetchCourses();
+  await fetchSemesters();
+  await fetchCoursesByDate("")
 });
 
 const filteredCourses = computed(() => {
   let courses = [...allCourses.value];
-  
-  // 学期筛选
-  if (selectedSemester.value) {
-    courses = courses.filter(course => course.semester === selectedSemester.value);
-  }
   
   // 搜索筛选
   if (searchQuery.value) {
@@ -231,6 +288,7 @@ const performSearch = () => {
 const clearFilters = () => {
   selectedSemester.value = "";
   searchQuery.value = "";
+  fetchCoursesByDate("");
 };
 
 const goToCourseCenter = (courseId) => {
@@ -452,6 +510,16 @@ const goToCourseCenter = (courseId) => {
   align-items: stretch;
 
   .no-results {
+    text-align: center;
+    font-size: 1.3em;
+    color: @text-secondary;
+    font-weight: 500;
+    grid-column: 1 / -1;
+    margin-top: 60px;
+    opacity: 0.85;
+  }
+
+  .loading-results {
     text-align: center;
     font-size: 1.3em;
     color: @text-secondary;
