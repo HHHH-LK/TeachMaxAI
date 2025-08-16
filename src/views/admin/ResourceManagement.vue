@@ -1,15 +1,19 @@
 <template>
   <div class="resource-management">
     <div class="toolbar">
-
       <el-select v-model="selectedSubject" placeholder="按学科筛选" @change="filterResources" style="margin-left: 10px;">
         <el-option label="全部学科" value=""></el-option>
         <el-option v-for="subject in subjects" :key="subject" :label="subject" :value="subject"></el-option>
       </el-select>
       <el-button type="primary" @click="exportAllResources" style="margin: 10px;">导出全部</el-button>
-      <!-- <el-button type="primary" @click="addResource">新增课件</el-button> -->
     </div>
-    <el-table :data="filteredResources" stripe style="width: 100%">
+    
+    <!-- 数据统计信息 -->
+    <div class="data-info">
+      <span>共找到 {{ totalCount }} 条资源记录</span>
+    </div>
+    
+    <el-table :data="paginatedResources" stripe style="width: 100%" v-loading="loading">
       <el-table-column prop="title" label="标题" />
       <el-table-column prop="subject" label="学科" width="180" />
       <el-table-column prop="teacher" label="教师" width="180" />
@@ -23,51 +27,57 @@
       </el-table-column>
     </el-table>
 
-    <!-- <el-dialog :title="dialogTitle" v-model="dialogVisible">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="标题">
-          <el-input v-model="form.title"></el-input>
-        </el-form-item>
-        <el-form-item label="学科">
-          <el-select v-model="form.subject" placeholder="请选择学科">
-            <el-option v-for="subject in subjects" :key="subject" :label="subject" :value="subject"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="教师">
-          <el-input v-model="form.teacher"></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="cancelForm">取消</el-button>
-          <el-button type="primary" @click="saveResource">保存</el-button>
-        </span>
-      </template>
-    </el-dialog> -->
+    <!-- 分页组件 -->
+    <div class="pagination-container">
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[15, 20, 50, 100]"
+        :total="totalCount"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        background
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { adminService, studentService } from '@/services/api';
 
-const subjects = ref(['数学', '物理', '英语', '语文', '化学', '生物', '历史', '地理', '政治']);
+const subjects = ref([]);
 const selectedSubject = ref('');
 
-// const resources = ref([
-//   { id: 1, title: '函数与导数课件', subject: '数学', teacher: '李老师', createdAt: '2023-03-15' },
-//   { id: 2, title: '力学基础练习', subject: '物理', teacher: '王老师', createdAt: '2023-03-20' },
-//   { id: 3, title: '时态语法总结', subject: '英语', teacher: '赵老师', createdAt: '2023-03-25' },
-//   { id: 4, title: '解析几何初步', subject: '数学', teacher: '李老师', createdAt: '2023-04-01' },
-//   { id: 5, title: '元素周期表', subject: '化学', teacher: '钱老师', createdAt: '2023-04-05' },
-//   { id: 6, title: '细胞结构', subject: '生物', teacher: '孙老师', createdAt: '2023-04-10' },
-// ]);
+// 分页相关状态
+const currentPage = ref(1);
+const pageSize = ref(15);
+const loading = ref(false);
 
 const resources = ref([]);
 
+// 获取课程列表用于学科筛选
+const getCourses = async () => {
+  try {
+    const response = await adminService.getAllCourses();
+    
+    if (response.data && response.data.success && response.data.data) {
+      // 从课程数据中提取课程名称作为学科选项
+      const courseNames = response.data.data.map(course => course.courseName);
+      subjects.value = courseNames;
+    }
+  } catch (error) {
+    console.error('获取课程列表失败:', error);
+    // 如果获取失败，使用默认学科列表
+    subjects.value = ['数学', '物理', '英语', '语文', '化学', '生物', '历史', '地理', '政治'];
+  }
+};
+
 const getResource = async() => {
   try {
+    loading.value = true;
     // 1. 获取资源数据
     const resourceResponse = await adminService.getResource();
 
@@ -122,21 +132,54 @@ const getResource = async() => {
     // 5. 更新资源列表 - 这是关键步骤
     resources.value = processedResources;
 
+    // 6. 重置分页到第一页
+    currentPage.value = 1;
+
     return processedResources;
 
   } catch (error) {
     console.error('获取资源失败:', error);
     // 返回空数组或根据业务需求处理错误
     return [];
+  } finally {
+    loading.value = false;
   }
 };
 
-
+// 过滤后的资源
 const filteredResources = computed(() => {
   if (!selectedSubject.value) {
     return resources.value;
   }
   return resources.value.filter(r => r.subject === selectedSubject.value);
+});
+
+// 分页后的资源
+const paginatedResources = computed(() => {
+  const startIndex = (currentPage.value - 1) * pageSize.value;
+  const endIndex = startIndex + pageSize.value;
+  return filteredResources.value.slice(startIndex, endIndex);
+});
+
+// 总数量
+const totalCount = computed(() => {
+  return filteredResources.value.length;
+});
+
+// 分页大小改变处理
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  currentPage.value = 1; // 重置到第一页
+};
+
+// 当前页改变处理
+const handleCurrentChange = (newPage) => {
+  currentPage.value = newPage;
+};
+
+// 监听筛选条件变化，重置分页
+watch(selectedSubject, () => {
+  currentPage.value = 1;
 });
 
 const dialogVisible = ref(false);
@@ -149,7 +192,8 @@ const form = ref({
 });
 
 const filterResources = () => {
-  // The computed property will automatically update the table
+  // 筛选后自动重置到第一页
+  currentPage.value = 1;
 };
 
 // const addResource = () => {
@@ -170,7 +214,7 @@ const cancelForm = () => {
 };
 
 const deleteResource = (resource) => {
-  ElMessageBox.confirm(`确定要删除课件 “${resource.title}” 吗?`, '提示', {
+  ElMessageBox.confirm(`确定要删除课件 "${resource.title}" 吗?`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -193,6 +237,11 @@ const deleteResource = (resource) => {
       if (response.data && response.data.code === 0) {
         resources.value = (resources.value || []).filter(r => r.id !== resource.id);
         ElMessage.success('删除成功');
+        
+        // 删除后检查当前页是否还有数据，如果没有则跳转到上一页
+        if (paginatedResources.value.length === 0 && currentPage.value > 1) {
+          currentPage.value--;
+        }
       } else {
         throw new Error(response.data?.msg || '删除操作失败');
       }
@@ -223,11 +272,13 @@ const exportAllResources = () => {
 
 const exportSingleResource = (resource) => {
   console.log('Exporting single resource:', resource);
-  ElMessage.success(`课件 “${resource.title}” 已导出`);
+  ElMessage.success(`课件 "${resource.title}" 已导出`);
 };
 
 onMounted(async() => {
-  getResource();
+  // 先获取课程列表，再获取资源数据
+  await getCourses();
+  await getResource();
 })
 </script>
 
@@ -240,5 +291,17 @@ onMounted(async() => {
 
 .toolbar {
   margin-bottom: 16px;
+}
+
+.data-info {
+  margin-bottom: 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
 </style>

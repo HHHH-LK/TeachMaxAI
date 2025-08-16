@@ -38,8 +38,14 @@
       <div class="students-list">
         <el-table :data="submissions" style="width: 100%" v-loading="loading">
           <el-table-column prop="studentName" label="学生姓名" width="120" />
-          <el-table-column prop="studentId" label="学号" width="120" />
-          <el-table-column prop="submitTime" label="提交时间" width="180" />
+          <el-table-column prop="studentNumber" label="学号" width="120" />
+          <el-table-column label="提交状态" width="120">
+            <template #default="scope">
+              <el-tag type="success">
+                已提交
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="阅卷状态" width="120">
             <template #default="scope">
               <el-tag :type="getGradingStatusType(scope.row)">
@@ -49,10 +55,22 @@
           </el-table-column>
           <el-table-column label="总分" width="100">
             <template #default="scope">
-              <span v-if="scope.row.totalScore !== undefined">
-                {{ scope.row.totalScore }}/{{ assessment.totalScore }}
+              <span>
+                {{ scope.row.score !== null ? scope.row.score : 0 }}/{{ assessment.totalScore }}
               </span>
-              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="AI报告" width="120">
+            <template #default="scope">
+              <el-button 
+                v-if="scope.row.aiReport" 
+                size="small" 
+                type="info" 
+                @click="showAIReport(scope.row)"
+              >
+                查看报告
+              </el-button>
+              <span v-else class="text-muted">暂无报告</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="120" fixed="right">
@@ -97,10 +115,27 @@
       <el-button @click="showReportDialog = false">关闭</el-button>
     </template>
   </el-dialog>
+
+  <!-- AI阅卷报告对话框 -->
+  <el-dialog v-model="showAIDialog" :title="`${currentAIStudent} - AI阅卷报告`" width="800px" :show-close="true">
+    <div class="ai-report-content">
+      <div class="ai-report-header">
+        <el-tag type="info">AI智能阅卷结果</el-tag>
+        <el-tag type="success">实时生成</el-tag>
+      </div>
+      <div class="ai-report-body">
+        <pre style="white-space: pre-wrap;word-break: break-all;font-family: 'Courier New', monospace;background: #f5f5f5;padding: 15px;border-radius: 4px;">{{ currentAIText }}</pre>
+      </div>
+    </div>
+    <template #footer>
+      <el-button @click="showAIDialog = false">关闭</el-button>
+      <el-button type="primary" @click="copyAIReport">复制报告</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Star, Check } from '@element-plus/icons-vue';
 import { ElDialog } from 'element-plus';
@@ -126,52 +161,68 @@ const visible = computed({
 });
 
 const loading = ref(false);
-const submissions = ref([]);
 const showSubmissionDetail = ref(false);
 const selectedSubmissionDetail = ref(null);
 const autoGradingLoading = ref(false);
 const savingLoading = ref(false);
 const showReportDialog = ref(false);
 const currentReportText = ref('');
+const showAIDialog = ref(false);
+const currentAIText = ref('');
+const currentAIStudent = ref('');
 
 // 计算属性
-const totalSubmissions = computed(() => submissions.value.length);
+const totalSubmissions = computed(() => {
+  if (!props.assessment || !props.assessment.studentsWithAnswers) return 0;
+  return props.assessment.studentsWithAnswers.length;
+});
 
 const pendingGradingCount = computed(() => {
-  if (!props.assessment) return 0;
-  return props.assessment.submittedCount - props.assessment.gradedCount;
+  if (!props.assessment || !props.assessment.studentsWithAnswers) return 0;
+  // 待阅卷：没有AI阅卷报告的学生
+  return props.assessment.studentsWithAnswers.filter(s => !s.aiReport).length;
 });
 
 const gradedCount = computed(() => {
-  if (!props.assessment) return 0;
-  return props.assessment.gradedCount;
+  if (!props.assessment || !props.assessment.studentsWithAnswers) return 0;
+  // 已阅卷：有AI阅卷报告的学生
+  return props.assessment.studentsWithAnswers.filter(s => s.aiReport).length;
 });
 
 const gradingProgress = computed(() => {
   if (totalSubmissions.value === 0) return 0;
-  const gradedSubmissions = submissions.value.filter(s => s.isGraded).length;
-  return Math.round((gradedSubmissions / totalSubmissions.value) * 100);
+  // 计算已阅卷的百分比（已阅卷 / 总学生数）
+  const gradedSubmissions = props.assessment?.studentsWithAnswers?.filter(s => s.aiReport) || [];
+  return Math.round((gradedSubmissions.length / totalSubmissions.value) * 100);
+});
+
+// 获取学生列表数据
+const submissions = computed(() => {
+  if (!props.assessment || !props.assessment.studentsWithAnswers) return [];
+  return props.assessment.studentsWithAnswers;
 });
 
 // 获取阅卷状态类型
 const getGradingStatusType = (submission) => {
-  if (submission.isGraded && submission.gradedCount >= submission.totalQuestions) {
-    return 'success';
-  } else if (submission.gradedCount > 0) {
-    return 'warning';
+  // 如果有AI阅卷报告，说明已经阅卷完成，无论分数多少都显示为已阅卷
+  if (submission.aiReport) {
+    return 'success'; // 已阅卷
+  } else if (submission.score !== null && submission.score > 0) {
+    return 'success'; // 已阅卷且有分数
   } else {
-    return 'info';
+    return 'warning'; // 已提交但未阅卷
   }
 };
 
 // 获取阅卷状态文本
 const getGradingStatusText = (submission) => {
-  if (submission.isGraded && submission.gradedCount >= submission.totalQuestions) {
+  // 如果有AI阅卷报告，说明已经阅卷完成，无论分数多少都显示为已阅卷
+  if (submission.aiReport) {
     return '已阅卷';
-  } else if (submission.gradedCount > 0) {
-    return '部分阅卷';
+  } else if (submission.score !== null && submission.score > 0) {
+    return '已阅卷';
   } else {
-    return '待阅卷';
+    return '已提交';
   }
 };
 
@@ -185,54 +236,100 @@ const viewSubmissionDetail = (submission) => {
 const aiGradeSingleStudent = async (submission) => {
   submission.aiLoading = true;
   try {
-    // 模拟AI阅卷过程
-    await new Promise(resolve => setTimeout(resolve, 8000)); // 8秒
-
-    submission.answers.forEach((answer, index) => {
-      // 根据题型生成中等评分
-      const baseScore = answer.score;
-
-      if (answer.type === '单选题') {
-        const score = Math.floor(baseScore * (0.6 + Math.random() * 0.2)); // 60%~80%
-        answer.aiScore = score;
-        answer.aiComment = `AI评语：选择${answer.studentAnswer}，${score > baseScore * 0.7 ? '答案正确' : '答案部分正确'}`;
-        answer.manualScore = answer.aiScore;
-        answer.manualComment = answer.aiComment;
-      } else if (answer.type === '多选题') {
-        const score = Math.floor(baseScore * (0.5 + Math.random() * 0.3)); // 50%~80%
-        answer.aiScore = score;
-        answer.aiComment = `AI评语：选择${answer.studentAnswer}，${score > baseScore * 0.6 ? '答案基本正确' : '答案有误'}`;
-        answer.manualScore = answer.aiScore;
-        answer.manualComment = answer.aiComment;
-      } else if (answer.type === '填空题') {
-        const score = Math.floor(baseScore * (0.5 + Math.random() * 0.3)); // 50%~80%
-        answer.aiScore = score;
-        answer.aiComment = `AI评语：填写"${answer.studentAnswer}"，${score > baseScore * 0.6 ? '答案正确' : '答案不完整'}`;
-        answer.manualScore = answer.aiScore;
-        answer.manualComment = answer.aiComment;
-      } else if (answer.type === '简答题') {
-        const score = Math.floor(baseScore * (0.4 + Math.random() * 0.4)); // 40%~80%
-        answer.aiScore = score;
-        answer.aiComment = `AI评语：回答较为${score > baseScore * 0.6 ? '完整' : '简单'}，${score > baseScore * 0.7 ? '思路清晰' : '需要进一步阐述'}`;
-        answer.manualScore = answer.aiScore;
-        answer.manualComment = answer.aiComment;
-      } else if (answer.type === '判断题') {
-        const score = Math.random() > 0.5 ? baseScore : 0;
-        answer.aiScore = score;
-        answer.aiComment = `AI评语：判断${answer.studentAnswer}，${score > 0 ? '答案正确' : '答案错误'}`;
-        answer.manualScore = answer.aiScore;
-        answer.manualComment = answer.aiComment;
+    console.log(`开始智能阅卷 - 学生: ${submission.studentName}, ID: ${submission.studentId}, 考试ID: ${props.assessment.id}`);
+    console.log('学生提交数据:', submission);
+    
+    // 调用真实的AI阅卷API
+    const response = await teacherService.assessment.aiMarkingExam(
+      submission.studentId, 
+      props.assessment.id
+    );
+    
+    console.log(`AI阅卷API响应 - 学生: ${submission.studentName}:`, response);
+    
+    if (response.data && response.data.success) {
+      // 解析AI阅卷报告
+      const aiReport = response.data.data;
+      console.log('AI阅卷原始报告:', aiReport);
+      
+      // 尝试从报告中提取分数信息
+      let extractedScore = 0;
+      let totalPossibleScore = 0;
+      
+      // 解析报告中的分数信息
+      if (typeof aiReport === 'string') {
+        // 尝试从文本报告中提取分数
+        const scoreMatch = aiReport.match(/总分:\s*([\d.]+)\/([\d.]+)/);
+        if (scoreMatch) {
+          extractedScore = parseFloat(scoreMatch[1]) || 0;
+          totalPossibleScore = parseFloat(scoreMatch[2]) || 0;
+          console.log(`从报告中提取分数: ${extractedScore}/${totalPossibleScore}`);
+        }
+        
+        // 尝试从报告中提取题目统计
+        const questionMatch = aiReport.match(/题目总数:\s*(\d+)题/);
+        const answeredMatch = aiReport.match(/已作答:\s*(\d+)题/);
+        const correctMatch = aiReport.match(/正确:\s*(\d+)/);
+        
+        if (questionMatch && answeredMatch && correctMatch) {
+          const totalQuestions = parseInt(questionMatch[1]);
+          const answeredQuestions = parseInt(answeredMatch[1]);
+          const correctQuestions = parseInt(correctMatch[1]);
+          
+          console.log('题目统计信息:', {
+            totalQuestions,
+            answeredQuestions,
+            correctQuestions,
+            accuracy: totalQuestions > 0 ? (correctQuestions / totalQuestions * 100).toFixed(2) + '%' : '0%'
+          });
+        }
+      } else if (aiReport && typeof aiReport === 'object') {
+        // 如果是对象格式，直接使用
+        extractedScore = aiReport.score || 0;
+        totalPossibleScore = aiReport.totalScore || 0;
+        console.log('对象格式分数:', { extractedScore, totalPossibleScore });
       }
-    });
-
-    submission.isGraded = true;
-    submission.gradedCount = submission.totalQuestions;
-    submission.totalScore = submission.answers.reduce((sum, answer) => sum + (answer.manualScore || 0), 0);
-
-    ElMessage.success(`${submission.studentName} 智能阅卷完成`);
+      
+      // 更新学生分数
+      const oldScore = submission.score;
+      submission.score = extractedScore;
+      
+      // 保存AI阅卷报告到学生数据中
+      submission.aiReport = aiReport;
+      submission.totalPossibleScore = totalPossibleScore;
+      
+      console.log(`阅卷完成 - 学生: ${submission.studentName}`);
+      console.log('分数变化:', {
+        oldScore: oldScore,
+        newScore: submission.score,
+        totalPossibleScore: totalPossibleScore,
+        percentage: totalPossibleScore > 0 ? ((submission.score / totalPossibleScore) * 100).toFixed(2) + '%' : '0%'
+      });
+      
+      // 输出详细的AI阅卷结果
+      console.log('AI阅卷完整结果:', {
+        studentName: submission.studentName,
+        studentId: submission.studentId,
+        examId: props.assessment.id,
+        score: submission.score,
+        totalPossibleScore: totalPossibleScore,
+        aiReport: aiReport,
+        timestamp: new Date().toISOString()
+      });
+      
+      ElMessage.success(`${submission.studentName} 智能阅卷完成，得分：${submission.score}分`);
+    } else {
+      console.error(`AI阅卷失败 - 学生: ${submission.studentName}, 响应:`, response);
+      ElMessage.error(response.data?.message || '智能阅卷失败');
+    }
   } catch (error) {
-    console.error('智能阅卷失败:', error);
-    ElMessage.error('智能阅卷失败');
+    console.error(`智能阅卷异常 - 学生: ${submission.studentName}:`, error);
+    console.error('错误详情:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response
+    });
+    ElMessage.error('智能阅卷失败，请重试');
   } finally {
     submission.aiLoading = false;
   }
@@ -245,34 +342,92 @@ const aiGradeSingleQuestion = async (submission, qIndex) => {
   const answer = submission.answers[qIndex];
   answer.aiLoading = true;
   try {
-    // 模拟AI评分
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    console.log(`开始单题智能评分 - 学生: ${submission.studentName}, 题目索引: ${qIndex}`);
+    console.log('题目信息:', answer);
+    
+    // 调用真实的AI阅卷API进行单题评分
+    const response = await teacherService.assessment.aiMarkingExam(
+      submission.studentId, 
+      props.assessment.id
+    );
 
-    // 根据题型生成智能评分
-    if (answer.type === '单选题') {
-      const score = Math.random() > 0.3 ? answer.score : 0;
-      answer.aiScore = score;
-      answer.aiComment = `AI评语：选择${answer.studentAnswer}，${score > 0 ? '答案正确' : '答案错误'}`;
-    } else if (answer.type === '多选题') {
-      const score = Math.floor(Math.random() * answer.score) + 1;
-      answer.aiScore = score;
-      answer.aiComment = `AI评语：选择${answer.studentAnswer}，${score > answer.score / 2 ? '答案基本正确' : '答案有误'}`;
-    } else if (answer.type === '填空题') {
-      const score = Math.floor(Math.random() * answer.score) + 1;
-      answer.aiScore = score;
-      answer.aiComment = `AI评语：填写"${answer.studentAnswer}"，${score > answer.score / 2 ? '答案正确' : '答案不完整'}`;
-    } else if (answer.type === '简答题') {
-      const score = Math.floor(Math.random() * answer.score) + 1;
-      answer.aiScore = score;
-      answer.aiComment = `AI评语：回答较为${score > answer.score / 2 ? '完整' : '简单'}，${score > answer.score * 0.8 ? '思路清晰' : '需要进一步阐述'}`;
-    } else if (answer.type === '判断题') {
-      const score = Math.random() > 0.5 ? answer.score : 0;
-      answer.aiScore = score;
-      answer.aiComment = `AI评语：判断${answer.studentAnswer}，${score > 0 ? '答案正确' : '答案错误'}`;
-    }
+    console.log(`单题评分API响应 - 学生: ${submission.studentName}, 题目: ${qIndex}:`, response);
+    
+    if (response.data && response.data.success) {
+      // 解析AI阅卷报告
+      const aiReport = response.data.data;
+      console.log(`学生 ${submission.studentName} 题目 ${qIndex} 的AI阅卷报告:`, aiReport);
+      
+      // 更新单题评分结果
+      const oldAiScore = answer.aiScore;
+      const oldAiComment = answer.aiComment;
+      
+      // 尝试从报告中提取单题信息
+      if (typeof aiReport === 'string') {
+        // 从文本报告中提取题目信息
+        const questionPattern = new RegExp(`第${qIndex + 1}题\\(ID:(\\d+),[^)]+\\): ([\\d.]+)/([\\d.]+)`);
+        const questionMatch = aiReport.match(questionPattern);
+        
+        if (questionMatch) {
+          const questionId = questionMatch[1];
+          const questionScore = parseFloat(questionMatch[2]) || 0;
+          const questionMaxScore = parseFloat(questionMatch[3]) || 0;
+          
+          answer.aiScore = questionScore;
+          answer.aiComment = `AI评分: ${questionScore}/${questionMaxScore}`;
+          
+          console.log(`题目 ${qIndex} 评分提取:`, {
+            questionId,
+            score: questionScore,
+            maxScore: questionMaxScore
+          });
+        } else {
+          // 如果没有找到具体题目，使用默认值
+          answer.aiScore = 0;
+          answer.aiComment = 'AI评分完成';
+          console.log(`题目 ${qIndex} 未找到具体评分信息，使用默认值`);
+        }
+        
+        // 尝试提取题型统计信息
+        const questionTypeMatch = aiReport.match(/分题型得分情况/);
+        if (questionTypeMatch) {
+          console.log(`学生 ${submission.studentName} 分题型得分情况已包含在报告中`);
+        }
+      } else if (aiReport && typeof aiReport === 'object') {
+        // 如果是对象格式，尝试使用questionScores和questionComments
+        answer.aiScore = aiReport.questionScores?.[qIndex] || 0;
+        answer.aiComment = aiReport.questionComments?.[qIndex] || 'AI评分完成';
+      }
+      
+      console.log(`单题评分完成 - 学生: ${submission.studentName}, 题目: ${qIndex}`);
+      console.log('评分变化:', {
+        oldScore: oldAiScore,
+        newScore: answer.aiScore,
+        oldComment: oldAiComment,
+        newComment: answer.aiComment
+      });
+      
+      // 输出题目评分的详细结果
+      console.log(`题目 ${qIndex} 评分结果:`, {
+        studentName: submission.studentName,
+        questionIndex: qIndex,
+        aiScore: answer.aiScore,
+        aiComment: answer.aiComment,
+        aiReport: aiReport
+      });
 
     ElMessage.success('AI评分完成');
+    } else {
+      console.error(`单题评分失败 - 学生: ${submission.studentName}, 题目: ${qIndex}, 响应:`, response);
+      ElMessage.error(response.data?.message || 'AI评分失败');
+    }
   } catch (error) {
+    console.error(`单题评分异常 - 学生: ${submission.studentName}, 题目: ${qIndex}:`, error);
+    console.error('错误详情:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response
+    });
     ElMessage.error('AI评分失败');
   } finally {
     answer.aiLoading = false;
@@ -283,25 +438,52 @@ const aiGradeSingleQuestion = async (submission, qIndex) => {
 const saveAllGrading = async () => {
   savingLoading.value = true;
   try {
-    // 批量保存所有评分
-    for (const submission of submissions.value) {
-      if (submission.answers.some(answer => answer.manualScore !== undefined)) {
-        submission.totalScore = submission.answers.reduce((sum, answer) => sum + (answer.manualScore || 0), 0);
-        submission.isGraded = true;
-        submission.gradedCount = submission.totalQuestions;
-      }
+    console.log('开始保存所有评分...');
+    console.log('当前所有学生数据:', submissions.value);
+    
+    // 保存所有已阅卷的评分结果
+    const gradedSubmissions = submissions.value.filter(s => s.aiReport);
+    const pendingSubmissions = submissions.value.filter(s => !s.aiReport);
+    
+    console.log('评分统计:', {
+      totalStudents: submissions.value.length,
+      gradedStudents: gradedSubmissions.length,
+      pendingStudents: pendingSubmissions.length
+    });
+    
+    if (gradedSubmissions.length === 0) {
+      console.warn('没有已阅卷的提交需要保存');
+      ElMessage.warning('没有已阅卷的提交需要保存');
+      return;
     }
     
-    ElMessage.success('所有评分已保存');
+    console.log('准备保存的已阅卷学生:', gradedSubmissions.map(s => ({
+      name: s.studentName,
+      id: s.studentId,
+      score: s.score
+    })));
+    
+    // 这里可以调用API保存评分结果到后端
+    // const response = await teacherService.assessment.saveGrading({
+    //   examId: props.assessment.id,
+    //   submissions: gradedSubmissions
+    // });
+    
+    console.log('评分保存完成');
+    ElMessage.success(`成功保存 ${gradedSubmissions.length} 个学生的评分结果`);
   } catch (error) {
     console.error('保存评分失败:', error);
+    console.error('错误详情:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response
+    });
     ElMessage.error('保存评分失败');
   } finally {
     savingLoading.value = false;
   }
 };
 
-// 一键批阅
 // 一键批阅
 const autoGradeAll = async () => {
   try {
@@ -320,61 +502,132 @@ const autoGradeAll = async () => {
 
     // 计算待阅卷的学生数量
     const pendingSubmissions = submissions.value.filter(
-        submission => !submission.isGraded || submission.gradedCount < submission.totalQuestions
+        submission => !submission.aiReport
     );
 
-    // 模拟批量AI阅卷过程
+    console.log(`开始批量智能阅卷 - 总学生数: ${submissions.value.length}, 待阅卷数: ${pendingSubmissions.length}`);
+    console.log('待阅卷学生列表:', pendingSubmissions.map(s => ({ name: s.studentName, id: s.studentId, score: s.score })));
+
+    // 批量AI阅卷过程
     for (let i = 0; i < pendingSubmissions.length; i++) {
       const submission = pendingSubmissions[i];
+      console.log(`批量阅卷进度: ${i + 1}/${pendingSubmissions.length} - 学生: ${submission.studentName}`);
 
-      // 为每个学生模拟AI阅卷过程
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      try {
+        // 调用真实的AI阅卷API
+        const response = await teacherService.assessment.aiMarkingExam(
+          submission.studentId, 
+          props.assessment.id
+        );
 
-      submission.answers.forEach((answer, index) => {
-        const baseScore = answer.score;
-
-        if (answer.type === '单选题') {
-          const score = Math.floor(baseScore * (0.6 + Math.random() * 0.2)); // 60%~80%
-          answer.aiScore = score;
-          answer.aiComment = `AI评语：选择${answer.studentAnswer}，${score > baseScore * 0.7 ? '答案正确' : '答案部分正确'}`;
-        } else if (answer.type === '多选题') {
-          const score = Math.floor(baseScore * (0.5 + Math.random() * 0.3)); // 50%~80%
-          answer.aiScore = score;
-          answer.aiComment = `AI评语：选择${answer.studentAnswer}，${score > baseScore * 0.6 ? '答案基本正确' : '答案有误'}`;
-        } else if (answer.type === '填空题') {
-          const score = Math.floor(baseScore * (0.4 + Math.random() * 0.3)); // 40%~70%
-          answer.aiScore = score;
-          answer.aiComment = `AI评语：填写"${answer.studentAnswer}"，${score > baseScore * 0.5 ? '答案正确' : '答案不完整'}`;
-        } else if (answer.type === '简答题') {
-          const score = Math.floor(baseScore * (0.3 + Math.random() * 0.4)); // 30%~70%
-          answer.aiScore = score;
-          answer.aiComment = `AI评语：回答较为${score > baseScore * 0.5 ? '完整' : '简单'}，${score > baseScore * 0.6 ? '思路清晰' : '需要进一步阐述'}`;
-        } else if (answer.type === '判断题') {
-          const score = Math.random() > 0.6 ? baseScore * 0.5 : 0; // 60%概率给一半分
-          answer.aiScore = score;
-          answer.aiComment = `AI评语：判断${answer.studentAnswer}，${score > 0 ? '答案基本正确' : '答案错误'}`;
-        }
-
-        // 同步到手动评分
-        answer.manualScore = answer.aiScore;
-        answer.manualComment = answer.aiComment;
-      });
-
-
-      submission.isGraded = true;
-      submission.gradedCount = submission.totalQuestions;
-      submission.totalScore = submission.answers.reduce((sum, answer) => sum + (answer.manualScore || 0), 0);
+        console.log(`批量阅卷API响应 - 学生: ${submission.studentName}:`, response);
+        
+        if (response.data && response.data.success) {
+          // 解析AI阅卷报告
+          const aiReport = response.data.data;
+          console.log(`学生 ${submission.studentName} 的AI阅卷报告:`, aiReport);
+          
+          // 提取分数信息
+          let extractedScore = 0;
+          let totalPossibleScore = 0;
+          
+          if (typeof aiReport === 'string') {
+            // 从文本报告中提取分数
+            const scoreMatch = aiReport.match(/总分:\s*([\d.]+)\/([\d.]+)/);
+            if (scoreMatch) {
+              extractedScore = parseFloat(scoreMatch[1]) || 0;
+              totalPossibleScore = parseFloat(scoreMatch[2]) || 0;
+              console.log(`学生 ${submission.studentName} 分数提取: ${extractedScore}/${totalPossibleScore}`);
+            }
+            
+            // 提取题目统计
+            const questionMatch = aiReport.match(/题目总数:\s*(\d+)题/);
+            const answeredMatch = aiReport.match(/已作答:\s*(\d+)题/);
+            const correctMatch = aiReport.match(/正确:\s*(\d+)/);
+            
+            if (questionMatch && answeredMatch && correctMatch) {
+              const totalQuestions = parseInt(questionMatch[1]);
+              const answeredQuestions = parseInt(answeredMatch[1]);
+              const correctQuestions = parseInt(correctMatch[1]);
+              
+              console.log(`学生 ${submission.studentName} 题目统计:`, {
+                totalQuestions,
+                answeredQuestions,
+                correctQuestions,
+                accuracy: totalQuestions > 0 ? (correctQuestions / totalQuestions * 100).toFixed(2) + '%' : '0%'
+              });
+            }
+          } else if (aiReport && typeof aiReport === 'object') {
+            extractedScore = aiReport.score || 0;
+            totalPossibleScore = aiReport.totalScore || 0;
+          }
+          
+          // 更新学生分数
+          const oldScore = submission.score;
+          submission.score = extractedScore;
+          submission.isGraded = true;
+          
+          // 保存AI阅卷报告
+          submission.aiReport = aiReport;
+          submission.totalPossibleScore = totalPossibleScore;
+          
+          console.log(`批量阅卷完成 - 学生: ${submission.studentName}, 原分数: ${oldScore}, 新分数: ${submission.score}`);
+          console.log(`学生 ${submission.studentName} 阅卷详情:`, {
+            score: submission.score,
+            totalPossibleScore: totalPossibleScore,
+            percentage: totalPossibleScore > 0 ? ((submission.score / totalPossibleScore) * 100).toFixed(2) + '%' : '0%',
+            aiReport: aiReport
+          });
 
       // 更新进度提示
       if (i < pendingSubmissions.length - 1) {
         ElMessage.info(`已完成 ${i + 1}/${pendingSubmissions.length} 个学生的阅卷`);
+          }
+        } else {
+          console.error(`批量阅卷失败 - 学生: ${submission.studentName}, 响应:`, response);
+        }
+      } catch (error) {
+        console.error(`批量阅卷异常 - 学生: ${submission.studentName}:`, error);
+        console.error('错误详情:', {
+          message: error.message,
+          stack: error.stack,
+          response: error.response
+        });
+        ElMessage.error(`学生${submission.studentName}阅卷失败`);
       }
     }
+
+    // 批量阅卷完成后的统计
+    const finalGradedStudents = submissions.value.filter(s => s.aiReport);
+    const finalPendingStudents = submissions.value.filter(s => !s.aiReport);
+    
+    console.log('批量智能阅卷完成 - 最终统计信息:', {
+      totalStudents: submissions.value.length,
+      gradedStudents: finalGradedStudents.length,
+      pendingStudents: finalPendingStudents.length,
+      averageScore: finalGradedStudents.length > 0 
+        ? (finalGradedStudents.reduce((sum, s) => sum + s.score, 0) / finalGradedStudents.length).toFixed(2)
+        : 0
+    });
+    
+    // 输出每个学生的最终分数
+    console.log('所有学生最终分数:', submissions.value.map(s => ({
+      name: s.studentName,
+      id: s.studentId,
+      score: s.score,
+      totalPossibleScore: s.totalPossibleScore,
+      percentage: s.totalPossibleScore > 0 ? ((s.score || 0) / s.totalPossibleScore * 100).toFixed(2) + '%' : '0%'
+    })));
 
     ElMessage.success(`智能阅卷完成！共阅卷 ${pendingSubmissions.length} 个学生`);
   } catch (error) {
     if (error !== "cancel") {
-      console.error("智能阅卷失败:", error);
+      console.error("批量智能阅卷失败:", error);
+      console.error('错误详情:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response
+      });
       ElMessage.error("智能阅卷失败，请重试");
     }
   } finally {
@@ -389,7 +642,35 @@ const generateReport = async (submission) => {
   try {
     // 模拟生成报告过程
     await new Promise(resolve => setTimeout(resolve, 8000));
-    submission.report = `【智能报告】${submission.studentName}的答题分析：\n- 总分：${submission.totalScore || 0}分\n- 答题情况良好，部分题目有提升空间。`;
+    
+    let reportContent = `【智能报告】${submission.studentName}的答题分析：\n`;
+    reportContent += `- 总分：${submission.score !== null ? submission.score : 0}分\n`;
+    
+    if (submission.questions && submission.questions.length > 0) {
+      const totalQuestions = submission.questions.length;
+      const answeredQuestions = Object.keys(submission.userAnswers).length;
+      const correctAnswers = submission.questions.filter(q => {
+        const studentAnswer = submission.userAnswers[q.id];
+        return studentAnswer === q.correctAnswer;
+      }).length;
+      
+      reportContent += `- 答题数量：${answeredQuestions}/${totalQuestions}\n`;
+      reportContent += `- 正确题目：${correctAnswers}题\n`;
+      reportContent += `- 正确率：${totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0}%\n`;
+      
+      const currentScore = submission.score !== null ? submission.score : 0;
+      if (currentScore === 0) {
+        reportContent += `- 分析：学生已提交试卷，但得分较低，建议重点复习相关知识点\n`;
+      } else if (currentScore < assessment.totalScore * 0.6) {
+        reportContent += `- 分析：学生答题情况一般，有较大提升空间\n`;
+      } else if (currentScore < assessment.totalScore * 0.8) {
+        reportContent += `- 分析：学生答题情况良好，部分题目有提升空间\n`;
+      } else {
+        reportContent += `- 分析：学生答题情况优秀，继续保持\n`;
+      }
+    }
+    
+    submission.report = reportContent;
     ElMessage.success(`${submission.studentName} 报告生成成功`);
     // 展示报告弹窗
     currentReportText.value = submission.report;
@@ -401,262 +682,35 @@ const generateReport = async (submission) => {
   }
 };
 
-// 生成模拟提交数据
-const generateMockSubmissions = (assessment) => {
-  const mockStudents = [
-    { studentId: '2023001', studentName: '陈小明' },
-    { studentId: '2023002', studentName: '刘小红' },
-    { studentId: '2023003', studentName: '张小华' },
-    { studentId: '2023006', studentName: '孙小亮' },
-    { studentId: '2023007', studentName: '周小雯' },
-    { studentId: '2022001', studentName: '冯小琴' },
-    { studentId: '2021001', studentName: '韩小慧' }
-  ];
-
-
-  // 生成一致的提交时间（最近7天内）
-  const baseTime = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const timeIncrements = Array.from({length: 28}, (_, i) => i * 0.5); // 30分钟间隔
-
-  return mockStudents.map((student, index) => {
-    // 生成一致的阅卷状态
-    const isGraded = index < 3; // 前15个学生已阅卷
-    const gradedCount = isGraded ? assessment.totalQuestions : Math.floor((index - 3) / 2); // 部分阅卷的学生
-    
-    // 生成一致的提交时间
-    const submitTime = new Date(baseTime + timeIncrements[index] * 60 * 60 * 1000).toLocaleString();
-    
-    // 生成一致的答案和评分
-    const answers = assessment.examPaper?.questions?.map((q, qIndex) => {
-      const questionType = q.type === 'single' ? '单选题' : 
-                          q.type === 'multiple' ? '多选题' : 
-                          q.type === 'blank' ? '填空题' : 
-                          q.type === 'short' ? '简答题' : '判断题';
-      
-      // 根据题型生成一致的答案
-      let studentAnswer = '';
-      let manualScore = undefined;
-      let manualComment = '';
-      let aiScore = undefined;
-      let aiComment = '';
-      // 新增：标准答案
-      let correctAnswer = q.correctAnswer || q.answer || '';
-      
-      if (questionType === '单选题') {
-        const options = ['A', 'B', 'C', 'D'];
-        studentAnswer = options[Math.floor(Math.random() * options.length)];
-        if (isGraded) {
-          manualScore = Math.floor(Math.random() * q.score) + 1;
-          manualComment = `选择${studentAnswer}，${manualScore > q.score / 2 ? '答案正确' : '答案错误'}`;
-        }
-      } else if (questionType === '多选题') {
-        const options = ['A', 'B', 'C', 'D'];
-        const selectedCount = Math.floor(Math.random() * 3) + 1;
-        studentAnswer = options.slice(0, selectedCount).join(', ');
-        if (isGraded) {
-          manualScore = Math.floor(Math.random() * q.score) + 1;
-          manualComment = `选择${studentAnswer}，${manualScore > q.score / 2 ? '答案基本正确' : '答案有误'}`;
-        }
-      } else if (questionType === '填空题') {
-        const fillWords = ['正确', '错误', '重要', '关键', '核心'];
-        studentAnswer = fillWords[Math.floor(Math.random() * fillWords.length)];
-        if (isGraded) {
-          manualScore = Math.floor(Math.random() * q.score) + 1;
-          manualComment = `填写"${studentAnswer}"，${manualScore > q.score / 2 ? '答案正确' : '答案不完整'}`;
-        }
-      } else if (questionType === '简答题') {
-        const answers = [
-          '这是一个很好的问题，我认为...',
-          '根据我的理解，这个问题涉及...',
-          '从理论角度来看，这个问题可以这样分析...',
-          '基于实践经验，我认为应该...',
-          '这个问题比较复杂，需要从多个角度来考虑...'
-        ];
-        studentAnswer = answers[Math.floor(Math.random() * answers.length)];
-        if (isGraded) {
-          manualScore = Math.floor(Math.random() * q.score) + 1;
-          manualComment = `回答较为${manualScore > q.score / 2 ? '完整' : '简单'}，${manualScore > q.score * 0.8 ? '思路清晰' : '需要进一步阐述'}`;
-        }
-      } else if (questionType === '判断题') {
-        studentAnswer = Math.random() > 0.5 ? '正确' : '错误';
-        if (isGraded) {
-          manualScore = Math.random() > 0.5 ? q.score : 0;
-          manualComment = `判断${studentAnswer}，${manualScore > 0 ? '答案正确' : '答案错误'}`;
-        }
-      }
-      
-      // 生成AI评分（如果已阅卷）
-      if (isGraded) {
-        aiScore = manualScore;
-        aiComment = manualComment.replace(/^[^，]*，/, 'AI评语：');
-      }
-      
-      return {
-        question: q.title,
-        type: questionType,
-        score: q.score,
-        studentAnswer,
-        correctAnswer, // 新增字段
-        manualScore,
-        manualComment,
-        aiScore,
-        aiComment,
-        aiLoading: false
-      };
-    }) || [];
-    
-    // 计算总分
-    const totalScore = isGraded ? 
-      answers.reduce((sum, answer) => sum + (answer.manualScore || 0), 0) : 
-      undefined;
-    
-    return {
-      id: `submission_${index + 1}`,
-      studentId: student.studentId,
-      studentName: student.studentName,
-      submitTime,
-      isGraded,
-      gradedCount,
-      totalQuestions: assessment.totalQuestions,
-      totalScore,
-      aiLoading: false,
-      answers
-    };
-  });
+// 显示AI阅卷报告
+const showAIReport = (submission) => {
+  currentAIStudent.value = submission.studentName;
+  if (submission.aiReport) {
+    if (typeof submission.aiReport === 'string') {
+      currentAIText.value = submission.aiReport;
+    } else {
+      currentAIText.value = JSON.stringify(submission.aiReport, null, 2);
+    }
+  } else {
+    currentAIText.value = '暂无AI阅卷报告';
+  }
+  showAIDialog.value = true;
 };
 
-// 加载提交数据
-const loadSubmissions = async () => {
-  if (!props.assessment) return;
-  
+// 复制AI报告
+const copyAIReport = () => {
+  const textArea = document.createElement('textarea');
+  textArea.value = currentAIText.value;
+  document.body.appendChild(textArea);
+  textArea.select();
   try {
-    loading.value = true;
-
-    // 从后端获取所有提交
-    const response = await teacherService.assessment.getSubmissions(
-      props.assessment.id
-    );
-
-    if (response.data && response.data.success) {
-      const allSubmissions = response.data.submissions || [];
-      submissions.value = allSubmissions;
-    } else {
-      // 使用模拟数据
-      // 新增：如果assessment.examPaper不存在，补充标准模拟examPaper
-      if (!props.assessment.examPaper) {
-        props.assessment.examPaper = {
-          questions: [
-            {
-              type: 'single',
-              title: '下列哪个是Java的关键字？',
-              score: 5,
-              options: [
-                { value: 'A', label: 'class' },
-                { value: 'B', label: 'define' },
-                { value: 'C', label: 'function' },
-                { value: 'D', label: 'var' }
-              ],
-              correctAnswer: 'A',
-              explanation: 'class是Java的关键字，其他不是。'
-            },
-            {
-              type: 'multiple',
-              title: '以下哪些属于面向对象的特性？',
-              score: 8,
-              options: [
-                { value: 'A', label: '封装' },
-                { value: 'B', label: '继承' },
-                { value: 'C', label: '多态' },
-                { value: 'D', label: '递归' }
-              ],
-              correctAnswer: 'A,B,C',
-              explanation: '封装、继承、多态是面向对象三大特性。'
-            },
-            {
-              type: 'blank',
-              title: 'Java中用于输出的语句是______。',
-              score: 5,
-              correctAnswer: 'System.out.println',
-              explanation: 'System.out.println用于输出。'
-            },
-            {
-              type: 'judge',
-              title: 'Java支持多继承。',
-              score: 3,
-              correctAnswer: '错误',
-              explanation: 'Java类不支持多继承。'
-            },
-            {
-              type: 'short',
-              title: '简述JVM的作用。',
-              score: 10,
-              correctAnswer: 'JVM用于执行Java字节码，实现跨平台。',
-              explanation: 'JVM是Java虚拟机，负责字节码的解释执行。'
-            }
-          ]
-        };
-      }
-      submissions.value = generateMockSubmissions(props.assessment);
-    }
-  } catch (error) {
-    console.error("获取提交数据失败:", error);
-    // 使用模拟数据
-    if (!props.assessment.examPaper) {
-      props.assessment.examPaper = {
-        questions: [
-          {
-            type: 'single',
-            title: '下列哪个是Java的关键字？',
-            score: 5,
-            options: [
-              { value: 'A', label: 'class' },
-              { value: 'B', label: 'define' },
-              { value: 'C', label: 'function' },
-              { value: 'D', label: 'var' }
-            ],
-            correctAnswer: 'A',
-            explanation: 'class是Java的关键字，其他不是。'
-          },
-          {
-            type: 'multiple',
-            title: '以下哪些属于面向对象的特性？',
-            score: 8,
-            options: [
-              { value: 'A', label: '封装' },
-              { value: 'B', label: '继承' },
-              { value: 'C', label: '多态' },
-              { value: 'D', label: '递归' }
-            ],
-            correctAnswer: 'A,B,C',
-            explanation: '封装、继承、多态是面向对象三大特性。'
-          },
-          {
-            type: 'blank',
-            title: 'Java中用于输出的语句是______。',
-            score: 5,
-            correctAnswer: 'System.out.println',
-            explanation: 'System.out.println用于输出。'
-          },
-          {
-            type: 'judge',
-            title: 'Java支持多继承。',
-            score: 3,
-            correctAnswer: '错误',
-            explanation: 'Java类不支持多继承。'
-          },
-          {
-            type: 'short',
-            title: '简述JVM的作用。',
-            score: 10,
-            correctAnswer: 'JVM用于执行Java字节码，实现跨平台。',
-            explanation: 'JVM是Java虚拟机，负责字节码的解释执行。'
-          }
-        ]
-      };
-    }
-    submissions.value = generateMockSubmissions(props.assessment);
+    document.execCommand('copy');
+    ElMessage.success('AI报告已复制到剪贴板');
+  } catch (err) {
+    console.error('复制失败:', err);
+    ElMessage.error('复制AI报告失败');
   } finally {
-    loading.value = false;
+    document.body.removeChild(textArea);
   }
 };
 
@@ -664,13 +718,6 @@ const handleClose = () => {
   emit('update:modelValue', false);
   emit('close');
 };
-
-// 监听visible变化，加载数据
-watch(() => props.modelValue, (newVal) => {
-  if (newVal && props.assessment) {
-    loadSubmissions();
-  }
-});
 </script>
 
 <style scoped>
@@ -708,6 +755,64 @@ watch(() => props.modelValue, (newVal) => {
 
 .grading-progress {
   margin-bottom: 24px;
+}
+
+.ai-report-content {
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.ai-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.ai-report-header .el-tag {
+  font-size: 14px;
+}
+
+.ai-report-body pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: 'Courier New', monospace;
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.text-muted {
+  color: #909399;
+  font-size: 12px;
+}
+
+/* 调试信息样式 */
+.debug-info {
+  background-color: #f0f9ff;
+  border: 1px solid #b3d8ff;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.debug-info .debug-title {
+  font-weight: bold;
+  color: #409eff;
+  margin-bottom: 5px;
+}
+
+.debug-info .debug-content {
+  color: #606266;
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {

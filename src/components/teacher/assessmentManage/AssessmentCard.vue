@@ -31,11 +31,11 @@
       </div>
       <div class="info-row">
         <span class="label">已提交:</span>
-        <span class="value">{{ assessment.submittedCount }}/{{ assessment.totalStudents }}</span>
+        <span class="value">{{ assessment.totalStudents }}/{{ assessment.totalStudents }}</span>
       </div>
       <div class="info-row">
         <span class="label">已阅卷:</span>
-        <span class="value">{{ assessment.gradedCount }}/{{ assessment.submittedCount }}</span>
+        <span class="value">{{ assessment.gradedCount }}/{{ assessment.totalStudents }}</span>
       </div>
     </div>
 
@@ -51,16 +51,10 @@
           size="small"
           type="success"
           @click="$emit('grade', assessment)"
-          v-if="assessment.submittedCount > 0 && assessment.gradedCount < assessment.submittedCount"
+          v-if="assessment.status === 'scheduled'"
         >
           智能阅卷
         </el-button>
-        <el-button
-          size="small"
-          type="primary"
-          v-if="assessment.status === 'draft'"
-          @click="$emit('publish', assessment)"
-        >发布</el-button>
         <el-button
           size="small"
           type="danger"
@@ -81,7 +75,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['view', 'view-exam', 'grade', 'delete', 'publish']);
+const emit = defineEmits(['view', 'view-exam', 'grade', 'delete']);
 
 // 考试类型标签颜色
 const getTypeTagType = (type) => {
@@ -99,7 +93,7 @@ const getTypeTagType = (type) => {
 const getStatusTagType = (status) => {
   const statusMap = {
     draft: "info",
-    active: "success",
+    scheduled: "success",
     completed: "warning",
   };
   return statusMap[status] || "info";
@@ -109,7 +103,7 @@ const getStatusTagType = (status) => {
 const getStatusText = (status) => {
   const statusMap = {
     draft: "草稿",
-    active: "进行中",
+    scheduled: "进行中",
     completed: "已完成",
   };
   return statusMap[status] || status;

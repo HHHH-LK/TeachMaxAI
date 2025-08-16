@@ -220,18 +220,18 @@ const getAllPapers = async () => {
     const courseIds = Object.keys(courseMap);
 
     const paperPromises = courseIds.map(courseId =>
-        adminService.getAllPaper(courseId)
-            .then(response => {
-              if (response.data && response.data.code === 0 && Array.isArray(response.data.data)) {
-                return response.data.data;
-              }
-              console.warn(`课程 ${courseId} 的试卷获取失败:`, response.data?.message);
-              return [];
-            })
-            .catch(error => {
-              console.error(`获取课程 ${courseId} 的试卷失败:`, error);
-              return [];
-            })
+      adminService.getAllPaper(courseId)
+          .then(response => {
+            if (response.data && response.data.code === 0 && Array.isArray(response.data.data)) {
+              return response.data.data;
+            }
+            console.warn(`课程 ${courseId} 的试卷获取失败:`, response.data?.message);
+            return [];
+          })
+          .catch(error => {
+            console.error(`获取课程 ${courseId} 的试卷失败:`, error);
+            return [];
+          })
     );
 
     const papersResults = await Promise.all(paperPromises);
@@ -240,7 +240,6 @@ const getAllPapers = async () => {
 
     // 4. 处理试卷数据
     const processedPapers = allPapers
-        .filter(paper => paper?.status !== 'draft')
         .map(paper => {
           if (!paper || typeof paper !== 'object') {
             console.warn('无效的试卷数据:', paper);
@@ -254,12 +253,12 @@ const getAllPapers = async () => {
 
           const statusMap = {
             'draft': '待审核',
-            'completed': '已结束',
+            'completed': '已审核',
             'scheduled': '已发布'
           };
 
-          const status = paper.status || 'unknown';
-          const statusText = statusMap[status] || '未知';
+          const status = paper.status || 'draft';
+          const statusText = statusMap[status] || '待审核';
 
           const formatDate = (dateStr) => {
             if (!dateStr) return '';
@@ -282,7 +281,7 @@ const getAllPapers = async () => {
         })
         .filter(paper => paper !== null);
 
-    console.log('处理后的试卷数据（已跳过草稿状态）:', processedPapers);
+    console.log('处理后的试卷数据:', processedPapers);
 
     // 5. 更新exams ref
     exams.value = processedPapers;

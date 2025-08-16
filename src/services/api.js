@@ -224,7 +224,7 @@ export const teacherService = {
      * @returns {Promise<object>} 阅卷结果
      */
     aiMarkingExam: async (studentId, examId) => {
-      return await apiClient.post('/teacher/aiMarkingExam', null, {
+      return await apiClient.post('/teacher/ai/aiMarkingExam', null, {
         params: { studentId, examId }
       });
     },
@@ -312,6 +312,15 @@ export const teacherService = {
     return await apiClient.get('/knowledge/getKonwledgeNameById', {
       params: { PointId }
     });
+  },
+
+  /**
+   * 获取考试学生信息
+   * @param {string} examId - 考试ID
+   * @returns {Promise<object>} 考试学生信息列表
+   */
+  getExamStudentInfo: async (examId) => {
+    return await apiClient.get(`/teacher/getExamStudentInfo/${examId}`);
   },
 
   /**

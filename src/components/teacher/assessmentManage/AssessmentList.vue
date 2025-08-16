@@ -50,7 +50,7 @@ const activeTab = ref('all');
 // 计算待阅卷的考核
 const pendingAssessments = computed(() => {
   return props.assessments.filter(
-    (a) => a.submittedCount > 0 && a.gradedCount < a.submittedCount
+    (a) => a.status === 'scheduled' || a.gradedCount < a.totalStudents
   );
 });
 </script>

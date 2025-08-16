@@ -53,39 +53,17 @@ const visible = computed({
 
 // 构造ExamAttempt所需的paper结构
 const paper = computed(() => {
-  if (!props.submission || !props.submission.answers) return { title: '', questions: [] };
+  if (!props.submission || !props.submission.questions) return { title: '', questions: [] };
   return {
     title: props.assessment?.title || '试卷',
-    questions: props.submission.answers.map((a, idx) => {
-      // 题型映射
-      let type = '';
-      if (a.type.includes('单选')) type = 'single';
-      else if (a.type.includes('多选')) type = 'multiple';
-      else if (a.type.includes('判断')) type = 'judge';
-      else if (a.type.includes('简答')) type = 'short';
-      else if (a.type.includes('填空')) type = 'blank';
-      else type = 'unknown';
-      return {
-        id: idx + 1,
-        title: a.question,
-        type,
-        score: a.score,
-        options: a.options || [],
-        correctAnswer: a.correctAnswer,
-        explanation: a.explanation
-      };
-    })
+    questions: props.submission.questions
   };
 });
 
 // 构造userAnswers用于ExamAttempt回显
 const userAnswers = computed(() => {
-  if (!props.submission || !props.submission.answers) return {};
-  const result = {};
-  props.submission.answers.forEach((a, idx) => {
-    result[idx + 1] = a.studentAnswer;
-  });
-  return result;
+  if (!props.submission || !props.submission.userAnswers) return {};
+  return props.submission.userAnswers;
 });
 </script>
 

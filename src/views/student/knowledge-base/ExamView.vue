@@ -30,6 +30,7 @@
 
 <script setup>
 import { ref, defineProps, watch } from 'vue';
+import { ElMessage } from 'element-plus';
 import ExamAttempt from '@/components/ExamAttempt.vue';
 import {studentService, teacherService} from '@/services/api';
 const props = defineProps({
@@ -43,6 +44,7 @@ const exams = ref([]);
 
 const showExamDialog = ref(false);
 const currentExamPaper = ref(null);
+const currentExamId = ref(null);
 const examReadonly = ref(false);
 const examDialogTitle = ref('');
 const examWrongAnalysis = ref({});
@@ -50,7 +52,7 @@ const examWrongAnalysis = ref({});
 async function openExam(row, readonly) {
   try {
     // 从后端获取试卷详情
-    const response = await studentService.getCourseExamInfo(row.examId, '16'); // 这里的'16'应该是当前用户ID
+    const response = await studentService.getCourseExamInfo(row.examId, '16');
     console.log('试卷详情:', response);
     
     if (response.data && response.data.data) {
@@ -109,6 +111,7 @@ async function openExam(row, readonly) {
         questions: questions
       };
       
+      currentExamId.value = row.examId;
       examReadonly.value = readonly;
       examDialogTitle.value = readonly ? '试卷回顾' : '考试答题';
       examWrongAnalysis.value = wrongAnalysis;
@@ -132,10 +135,30 @@ function convertQuestionType(type) {
   return typeMap[type] || type
 }
 
-function onSubmitExam({ answers }) {
-  showExamDialog.value = false;
-  // 这里可提交到后端或本地存储
-  // 提交后可刷新考试状态等
+async function onSubmitExam({ answers }) {
+  try {
+    // 提交试卷答案到后端
+    console.log('提交的答案:', answers);
+    
+    // 需要从当前行数据中获取examId，因为currentExamPaper不包含这个信息
+    const currentExamIndex = exams.value.findIndex(exam => exam.examId === currentExamId.value);
+    if (currentExamIndex !== -1) {
+      exams.value[currentExamIndex].status = '已提交';
+      exams.value[currentExamIndex].myPaper = '已提交';
+    }
+    
+    showExamDialog.value = false;
+    
+    // 显示成功提示
+    ElMessage.success('试卷提交成功！');
+    
+    // 刷新考试列表
+    await fetchAllExam();
+    
+  } catch (error) {
+    console.error('提交试卷失败:', error);
+    ElMessage.error('提交试卷失败，请重试');
+  }
 }
 
 const fetchAllExam = async()=> {
@@ -145,9 +168,9 @@ const fetchAllExam = async()=> {
     exams.value = response.data.data.filter(item => item.status !== "draft").map(item => ({
       id: item.examId,
       name: item.title,
-      startTime: item.examDate,
+      startTime: formatDateTime(item.examDate),
       endTime: item.examDate, // 可以根据实际需要计算结束时间
-      durationMinutes: item.durationMinutes + 'min',
+      durationMinutes: item.duration + 'min',
       status: getStatusText(item.status),
       myPaper: item.status === 'completed' ? '已提交' : '未提交',
       score: item.score || null,
@@ -156,11 +179,28 @@ const fetchAllExam = async()=> {
   }
 }
 
+// 时间格式化函数
+function formatDateTime(dateTimeString) {
+  if (!dateTimeString) return '';
+  try {
+    const date = new Date(dateTimeString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  } catch (e) {
+    console.error('时间格式化失败:', e);
+    return dateTimeString;
+  }
+}
+
 // 状态文本转换函数
 function getStatusText(status) {
   const statusMap = {
     'draft': '草稿',
-    'published': '进行中',
+    'scheduled': '进行中',
     'completed': '已结束',
     'expired': '已过期'
   }

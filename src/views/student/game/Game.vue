@@ -167,8 +167,17 @@ const initGame = () => {
     selectedItem.value = null;
 
 
-    const res1 = gameService.towerRanking.getTotalRanking()
-    console.log(res1)
+    // const res1 = gameService.towerRanking.getTotalRanking()
+    // console.log(res1)
+
+    // const res1 = gameService.tower.createTowerByAgent('1', '5')
+    // console.log(res1)
+
+    const res = gameService.tower.getTowerFloorByTowerId('44')
+    console.log(res)
+
+    // const res2 = gameService.tower.loadTest('44', '197', '5', '1')
+    // console.log(res2)
 
     console.log('游戏初始化完成');
   } catch (error) {

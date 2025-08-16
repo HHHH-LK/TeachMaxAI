@@ -15,10 +15,10 @@
           {{ assessment.totalScore }}
         </el-descriptions-item>
         <el-descriptions-item label="已提交">
-          {{ assessment.submittedCount }}/{{ assessment.totalStudents }}
+          {{ assessment.totalStudents }}/{{ assessment.totalStudents }}
         </el-descriptions-item>
         <el-descriptions-item label="已阅卷">
-          {{ assessment.gradedCount }}/{{ assessment.submittedCount }}
+          {{ assessment.gradedCount }}/{{ assessment.totalStudents }}
         </el-descriptions-item>
         <el-descriptions-item label="创建时间">
           {{ assessment.createdAt }}
@@ -90,7 +90,7 @@ const visible = computed({
 const getStatusTagType = (status) => {
   const statusMap = {
     draft: "info",
-    active: "success",
+    scheduled: "success",
     completed: "warning",
   };
   return statusMap[status] || "info";
@@ -100,7 +100,7 @@ const getStatusTagType = (status) => {
 const getStatusText = (status) => {
   const statusMap = {
     draft: "草稿",
-    active: "进行中",
+    scheduled: "进行中",
     completed: "已完成",
   };
   return statusMap[status] || status;

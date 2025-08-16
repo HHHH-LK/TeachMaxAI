@@ -10,7 +10,7 @@
     <div class="card-content">
       <div class="info-row">
         <span class="label">待阅卷数量:</span>
-        <span class="value">{{ assessment.submittedCount - assessment.gradedCount }}</span>
+        <span class="value">{{ assessment.totalStudents - assessment.gradedCount }}</span>
       </div>
       <div class="info-row">
         <span class="label">提交时间:</span>

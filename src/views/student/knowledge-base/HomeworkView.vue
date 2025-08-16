@@ -165,20 +165,6 @@ const backToList = () => {
   doingHomework.value = false;
 };
 
-//提交作业
-const submitHomework = () => {
-  let correctCount = 0;
-  selectedHomework.value.questions.forEach((question, index) => {
-    if (userAnswers.value[index] === question.answer) {
-      correctCount++;
-    }
-  });
-  alert(
-      `您答对了 ${correctCount} 题，共 ${selectedHomework.value.questions.length} 题。`
-  );
-  // 这里可以添加提交答案到后端的逻辑
-};
-
 watch(
     () => props.courseId,
     (newCourseId) => {
