@@ -110,6 +110,17 @@ public class LessonPlan implements Serializable {
     }
 
     /**
+     * 验证状态值是否有效
+     */
+    public static boolean isValidStatus(String status) {
+        return status != null &&
+                (status.equals("draft") ||
+                        status.equals("pending") ||
+                        status.equals("approved") ||
+                        status.equals("rejected"));
+    }
+
+    /**
      * 检查是否可以提交审核
      */
     public boolean canSubmitForAudit() {

@@ -129,7 +129,9 @@ public class CourseMaterial {
         EASY("easy"),
         MEDIUM("medium"),
         HARD("hard");
-        
+
+        @JsonValue
+        @EnumValue
         private final String value;
         
         DifficultyLevel(String value) {
@@ -154,7 +156,9 @@ public class CourseMaterial {
         ACTIVE("active"),
         INACTIVE("inactive"),
         DRAFT("draft");
-        
+
+        @JsonValue
+        @EnumValue
         private final String value;
         
         MaterialStatus(String value) {

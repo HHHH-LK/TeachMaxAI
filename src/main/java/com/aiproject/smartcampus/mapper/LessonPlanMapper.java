@@ -3,9 +3,7 @@ package com.aiproject.smartcampus.mapper;
 
 import com.aiproject.smartcampus.pojo.po.LessonPlan;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -51,4 +49,34 @@ public interface LessonPlanMapper extends BaseMapper<LessonPlan> {
             "LEFT JOIN users u2 ON a.user_id = u2.user_id " +
             "WHERE lp.plan_id = #{planId}")
     LessonPlan findDetailById(@Param("planId") Long planId);
+
+    @Select("SELECT * FROM lesson_plans WHERE course_id = #{courseId} ORDER BY created_at DESC")
+    List<LessonPlan> getLessonPlanByCourseId(String courseId);
+
+    /**
+     * 更新教案状态
+     * @param lessonPlanId 教案ID
+     * @param status 新状态
+     * @return 更新的行数
+     */
+    @Update("UPDATE lesson_plans SET " +
+            "audit_status = #{status}, " +
+            "audit_admin_id = #{adminId}, " +
+            "audit_time = NOW(), " +
+            "updated_at = NOW() " +
+            "WHERE plan_id = #{planId}")
+    int updateStatusById(
+            @Param("planId") String lessonPlanId,
+            @Param("status") String status,
+            @Param("adminId") String adminId);
+
+    @Update("UPDATE lesson_plans SET " +
+            "audit_status = 'pending', " +
+            "updated_at = NOW() " +
+            "WHERE plan_id = #{lessonPlanId}")
+    int updateStatusToPending( @Param("lessonPlanId") String lessonPlanId);
+
+
+    @Delete("DELETE FROM lesson_plans WHERE plan_id = #{lessonPlanId}")
+    int deletePlan(String lessonPlanId);
 }

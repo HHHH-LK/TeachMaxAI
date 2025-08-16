@@ -3,10 +3,9 @@ package com.aiproject.smartcampus.mapper;
 import com.aiproject.smartcampus.pojo.dto.ChapterMaterialStats;
 import com.aiproject.smartcampus.pojo.dto.CourseMaterialStats;
 import com.aiproject.smartcampus.pojo.po.CourseMaterial;
+import com.aiproject.smartcampus.pojo.po.LessonPlan;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,6 +14,12 @@ import java.util.List;
 @Mapper
 @Repository
 public interface CourseMaterialMapper extends BaseMapper<CourseMaterial> {
+
+    /**
+     * 删除课程资料
+     */
+    @Delete("DELETE FROM course_materials WHERE material_id = #{materialId}")
+    int deleteMaterialById(@Param("materialId") String materialId);
 
     /**
      * 根据课程ID查询所有资料，按显示顺序排列
@@ -92,4 +97,13 @@ public interface CourseMaterialMapper extends BaseMapper<CourseMaterial> {
             "WHERE course_id = #{courseId} AND status = 'active' " +
             "GROUP BY chapter_id ORDER BY chapter_id")
     List<ChapterMaterialStats> getMaterialStatsByChapter(@Param("courseId") Integer courseId);
+
+
+    /**
+     * 根据课程ID和章节ID查询资料
+     */
+@Select("SELECT * FROM course_materials WHERE course_id = #{courseId} AND status = 'active'")
+    List<CourseMaterial> selectByCourseId(@Param("courseId") Integer courseId);
+
+
 }
