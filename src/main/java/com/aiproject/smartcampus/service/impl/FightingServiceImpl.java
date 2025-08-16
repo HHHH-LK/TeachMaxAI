@@ -86,6 +86,7 @@ public class FightingServiceImpl implements FightingService {
     }
 
     private final BattleLogMapper battleLogMapper;
+    private final TowerMapper towerMapper;
 
 
     public enum BattleResult {
@@ -320,6 +321,18 @@ public class FightingServiceImpl implements FightingService {
         if (!validateParams(floorId, studentId, towerChallengeLogId)) return Result.error("参数不能为空");
         try {
             TowerChallengeLog logRow = getTowerChallengeLogById(towerChallengeLogId);
+            TowerFloor towerFloorById = getTowerFloorById(floorId);
+            //获取当前层数
+            Integer floorNo = towerFloorById.getFloorNo();
+            int nextFloorNo = floorNo + 1;
+            //获取下一层的towerfloorId
+            LambdaQueryWrapper<TowerFloor> towerFloorLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            towerFloorLambdaQueryWrapper.eq(TowerFloor::getFloorNo, floorNo);
+            towerFloorLambdaQueryWrapper.eq(TowerFloor::getTowerId, towerFloorById.getTowerId());
+            TowerFloor towerFloor = towerFloorMapper.selectOne(towerFloorLambdaQueryWrapper);
+
+            if (towerFloor == null) return Result.error("不存在下一层，这已经是最后一层了");
+            Long nextFloorId = towerFloor.getFloorId();
             if (logRow == null) return Result.error("挑战记录不存在");
 
             int challengeCount = logRow.getChallengeCount();
@@ -331,8 +344,10 @@ public class FightingServiceImpl implements FightingService {
             BattleResult result = determineBattleResult(userHP, bossHP);
 
             updateChallengeStatus(towerChallengeLogId, result);
+
             if (result == BattleResult.PLAYER_WIN) {
                 handlePlayerVictory(floorId, studentId);
+                updateNextTowerNoLockStatus(nextFloorId);
             }
             log.info("战斗结果 - floorId: {}, studentId: {}, result: {}, userHP: {}, bossHP: {}",
                     floorId, studentId, result.getDescription(), userHP, bossHP);
@@ -341,6 +356,22 @@ public class FightingServiceImpl implements FightingService {
             log.error("获取战斗结果失败 - floorId: {}, studentId: {}", floorId, studentId, e);
             return Result.error("获取战斗结果失败");
         }
+    }
+
+    private void updateNextTowerNoLockStatus(Long nextFloorId) {
+
+        LambdaUpdateWrapper<TowerFloor> towerFloorLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        towerFloorLambdaUpdateWrapper.eq(TowerFloor::getTowerId, nextFloorId);
+        towerFloorLambdaUpdateWrapper.set(TowerFloor::getUnlocked, "1");
+        towerFloorMapper.update(null, towerFloorLambdaUpdateWrapper);
+
+    }
+
+    private Tower getTowerByFloorId(String floorId) {
+
+        TowerFloor towerFloorById = getTowerFloorById(floorId);
+        return towerMapper.selectById(towerFloorById.getTowerId());
+
     }
 
     @Override
@@ -685,9 +716,10 @@ public class FightingServiceImpl implements FightingService {
 
     private void updateChallengeStatus(String towerChallengeLogId, BattleResult result) {
         try {
+            String description = result.getDescription();
             LambdaUpdateWrapper<TowerChallengeLog> wrapper = new LambdaUpdateWrapper<>();
             wrapper.eq(TowerChallengeLog::getId, Long.valueOf(towerChallengeLogId))
-                    .set(TowerChallengeLog::getStatus, result.getDescription())
+                    .set(TowerChallengeLog::getStatus, description)
                     .set(TowerChallengeLog::getLastChallengeTime, LocalDateTime.now());
             towerChallengeLogMapper.update(null, wrapper);
         } catch (Exception e) {
