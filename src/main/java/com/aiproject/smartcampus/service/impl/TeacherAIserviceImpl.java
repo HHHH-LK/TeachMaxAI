@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: ss
@@ -90,8 +91,8 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
     public Result<String> aiclassAiayaisc(String courseId) {
 
         //获取班级详细情况
-        TeacherGetSituationDTO teacherGetSituationDTOResult = teacherService.GetAllSituation(Integer.valueOf(courseId)).getData();
-        String classSituation = teacherGetSituationDTOResult.toString();
+        Map<String, TeacherGetSituationDTO> allExamSituation = teacherService.getAllExamSituation(courseId);
+        String classSituation = createClassInfo(allExamSituation);
 
         //获取班级高频错误知识点分布
         StringBuffer sb1 = new StringBuffer();
@@ -117,6 +118,24 @@ public class TeacherAIserviceImpl implements TeacherAIservice {
         String classInfoAsic = classInfoAsicToolUtils.createClassInfoAsic(result);
 
         return Result.success(classInfoAsic);
+    }
+
+    private String createClassInfo(Map<String, TeacherGetSituationDTO> allExamSituation) {
+
+        if (allExamSituation == null || allExamSituation.isEmpty()) {
+            return "暂无考试信息";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("【课程考试情况汇总】\n");
+
+        allExamSituation.forEach((examName, situationDTO) -> {
+            sb.append("考试名称：").append(examName).append("\n")
+                    .append(situationDTO.toString());
+        });
+
+        return sb.toString();
+
     }
 
     @Override

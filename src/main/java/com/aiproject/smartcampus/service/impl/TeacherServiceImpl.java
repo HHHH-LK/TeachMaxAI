@@ -13,6 +13,7 @@ import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.*;
 import com.aiproject.smartcampus.service.TeacherService;
 import com.aliyun.core.utils.StringUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -234,9 +235,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     // 获取课程整体情况
     @Override
-    public Result<TeacherGetSituationDTO> GetAllSituation(Integer courseId) {
+    public Result<TeacherGetSituationDTO> GetAllSituation(Integer courseId, Integer examId) {
         try {
-            List<Double> scoreList = courseEnrollmentMapper.getStudentScores(courseId);
+            List<Double> scoreList = courseEnrollmentMapper.getStudentScores(examId);
             if (scoreList == null || scoreList.isEmpty()) {
                 return Result.error("课程ID为 " + courseId + " 的成绩信息为空");
             }
@@ -1144,4 +1145,84 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         });
         return questions;
     }
+
+    public Map<String, TeacherGetSituationDTO> getAllExamSituation(String courseId) {
+        // 1. 查询课程名称（避免多次查库）
+        String courseName = courseMapper.findCourseNameByid(courseId);
+        if (courseName == null) {
+            courseName = "未知课程";
+        }
+
+        // 2. 查询该课程下所有考试
+        List<Exam> exams = examMapper.selectList(
+                new LambdaQueryWrapper<Exam>().eq(Exam::getCourseId, courseId)
+        );
+
+        // 3. 组装统计信息
+        String finalCourseName = courseName;
+        return exams.stream().collect(Collectors.toMap(
+                Exam::getTitle, // key: 考试标题
+                exam -> {
+                    // 查询成绩
+                    List<Double> scoreList = courseEnrollmentMapper.getStudentScores(exam.getExamId());
+
+                    if (scoreList == null || scoreList.isEmpty()) {
+                        // 没有成绩数据，也返回一个空统计对象
+                        TeacherGetSituationDTO emptyDTO = new TeacherGetSituationDTO();
+                        emptyDTO.setCourseId(Integer.valueOf(courseId));
+                        emptyDTO.setCourseName(finalCourseName);
+                        emptyDTO.setAverageScore(0.0);
+                        emptyDTO.setPassRate(0.0);
+                        emptyDTO.setExcellentRate(0.0);
+                        return emptyDTO;
+                    }
+
+                    // 转换空分数为 0
+                    List<Double> validScores = scoreList.stream()
+                            .map(score -> score == null ? 0.0 : score)
+                            .toList();
+
+                    int totalStudents = validScores.size();
+                    double averageScore = validScores.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+
+                    // 统计分布
+                    int failCount = 0, passCount = 0, normalCount = 0, goodCount = 0, excellentCount = 0;
+                    for (Double score : validScores) {
+                        if (score >= 90) {
+                            excellentCount++;
+                        } else if (score >= 80) {
+                            goodCount++;
+                        } else if (score >= 70) {
+                            normalCount++;
+                        } else if (score >= 60) {
+                            passCount++;
+                        } else {
+                            failCount++;
+                        }
+                    }
+
+                    // 计算比率
+                    double passRate = totalStudents > 0 ? (100.0 * (totalStudents - failCount) / totalStudents) : 0.0;
+                    double excellentRate = totalStudents > 0 ? (100.0 * excellentCount / totalStudents) : 0.0;
+
+                    // 构造 DTO
+                    TeacherGetSituationDTO situationDTO = new TeacherGetSituationDTO();
+                    situationDTO.setCourseId(Integer.valueOf(courseId));
+                    situationDTO.setCourseName(finalCourseName);
+                    situationDTO.setAverageScore(RoundingUtils.round(averageScore));
+                    situationDTO.setPassRate(RoundingUtils.round(passRate));
+                    situationDTO.setExcellentRate(RoundingUtils.round(excellentRate));
+                    situationDTO.setFailNumber(failCount);
+                    situationDTO.setPassNumber(passCount);
+                    situationDTO.setNormalNumber(normalCount);
+                    situationDTO.setGoodNumber(goodCount);
+                    situationDTO.setExcellentNumber(excellentCount);
+
+                    return situationDTO;
+                }
+        ));
+    }
+
+
+
 }

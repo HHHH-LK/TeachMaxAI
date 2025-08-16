@@ -70,8 +70,8 @@ public class TeacherController {
     //获取对应课程的整体成绩情况
     @GetMapping("/getAllSituation/{courseId}")
     @Operation(summary = "获取课程整体情况", description = "根据课程ID获取该课程的整体情况")
-    public Result<TeacherGetSituationDTO> getAllSituation(@PathVariable Integer courseId) {
-        return teacherService.GetAllSituation(courseId);
+    public Result<TeacherGetSituationDTO> getAllSituation(@PathVariable Integer courseId,@RequestParam Integer examId) {
+        return teacherService.GetAllSituation(courseId,examId);
     }
 
     //获取对应学生信息

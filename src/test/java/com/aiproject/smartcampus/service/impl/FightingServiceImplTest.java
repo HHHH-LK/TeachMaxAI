@@ -51,7 +51,7 @@ class FightingServiceImplTest {
     @Test
     void setFightingService(){
 
-        Result<BattleLog> currentBattleLog = fightingService.getCurrentBattleLog("207", "2", "1");
+        Result<BattleLog> currentBattleLog = fightingService.getCurrentBattleLog("207", "5", "1");
         log.info("currentBattleLog: {}", currentBattleLog.getData());
 
     }
@@ -59,7 +59,7 @@ class FightingServiceImplTest {
     @Test
     void getRequireExp4() {
 
-        Result<Map<String, String>> aa = fightingService.checkAswerIsTure("1", "296", "aa", "207", "1");
+        Result<Map<String, String>> aa = fightingService.checkAswerIsTure("1", "296", "aa", "207", "3");
 
         log.info("aa: {}", aa.getData());
 

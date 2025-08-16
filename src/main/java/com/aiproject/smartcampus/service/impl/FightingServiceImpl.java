@@ -164,7 +164,7 @@ public class FightingServiceImpl implements FightingService {
             battleLog.setFloorId(Long.valueOf(floorId));
             battleLog.setMonsterId(monster.getMonsterId());
             battleLog.setTotalTurns(currentTurns);
-            battleLog.setTowerChallengeLogId(currentTurns);
+            battleLog.setTowerChallengeLogId(Integer.valueOf(towerChallengeLogId));
 
             battleLogMapper.insert(battleLog);
 

@@ -23,7 +23,7 @@ public interface TeacherService extends IService<Teacher> {
 
     Result<List<StudentWrongKnowledgeBO>> getTheMaxUncorrectPoint(String couresId);
 
-    Result<TeacherGetSituationDTO> GetAllSituation(Integer courseId);
+    Result<TeacherGetSituationDTO> GetAllSituation(Integer courseId,Integer examId);
 
     Result<List<Course>> GetAllCourse(Integer teacherId);
 
@@ -50,4 +50,7 @@ public interface TeacherService extends IService<Teacher> {
     Result<ExamSummaryVO> getStudentExam(String courseId);
 
     Result<Map<String, KnowledgePointMasteryVO>> getKnowledgePointMastery(String courseId);
+
+    Map<String, TeacherGetSituationDTO> getAllExamSituation(String courseId);
+
 }

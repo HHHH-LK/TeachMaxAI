@@ -44,9 +44,10 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
     /**
      * 仅查询成绩
      */
-    @Select("SELECT ce.final_grade FROM course_enrollments ce " +
-            "WHERE ce.course_id = #{courseId}")
-    List<Double> getStudentScores(@Param("courseId") Integer courseId);
+    @Select("select score\n" +
+            "from exam_scores\n" +
+            "where exam_id=#{examId}")
+    List<Double> getStudentScores(@Param("examId") Integer examId);
 
     /**
      * 查询学生全部信息
