@@ -737,6 +737,17 @@ public class FightingServiceImpl implements FightingService {
 
             TowerFloor tf = getTowerFloorById(floorId);
             if (tf != null) {
+                //查询通关次数
+                LambdaQueryWrapper<TowerChallengeLog> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.eq(TowerChallengeLog::getFloorId, Long.valueOf(floorId));
+                queryWrapper.eq(TowerChallengeLog::getUserId, studentId);
+                queryWrapper.eq(TowerChallengeLog::getStatus, "成功");
+                Long count = towerChallengeLogMapper.selectCount(queryWrapper);
+
+                if (count > 1) {
+                    return;
+                }
+                //没有通关才进行增加排行榜
                 String towerId = String.valueOf(tf.getTowerId());
                 redisSort.incrementStudentScore(towerId, studentId, "1");
                 redisSort.incrementTotalScore(studentId, "1");

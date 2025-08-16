@@ -197,7 +197,7 @@ public class TowerCreateToolUtils {
                 log.info("开始生成主塔故事背景");
                 try {
                     String desc = generateTowerBackground(tower.getName(), new ArrayList<>(idToName.values()), totalFloors);
-                    if (desc == null || desc.isBlank()) {
+                    if (desc.isBlank()) {
                         desc = "在远古遗迹之巅，知识化作阶梯，探路者循着微光——每一层都是一次理解的突破。";
                     }
                     LambdaUpdateWrapper<Tower> uw = new LambdaUpdateWrapper<>();
