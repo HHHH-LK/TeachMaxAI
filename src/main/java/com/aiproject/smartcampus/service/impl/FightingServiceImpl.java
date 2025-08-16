@@ -346,37 +346,64 @@ public class FightingServiceImpl implements FightingService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<AwardVO> getAward(String studentId, String floorId) {
-        //设置每个道具获取的数量默认为1;
+        // 每个道具默认奖励数量
         final Integer AWARD_NUM = 1;
 
         if (!validateParams(studentId, floorId)) return Result.error("参数不能为空");
         try {
             Task task = getTaskByFloorId(floorId);
             if (task == null) return Result.error("任务不存在");
-            List<Item> rewardItems = calculateItemRewards(task);
-            boolean expUpdated = updatePlayerExperience(studentId, task.getRewardExp());
-            if (!expUpdated) log.warn("更新经验失败 - studentId: {}, exp: {}", studentId, task.getRewardExp());
 
+            // 计算奖励物品
+            List<Item> rewardItems = calculateItemRewards(task);
+
+            // 更新经验
+            boolean expUpdated = updatePlayerExperience(studentId, task.getRewardExp());
+            if (!expUpdated) {
+                log.warn("更新经验失败 - studentId: {}, exp: {}", studentId, task.getRewardExp());
+            }
+
+            // 封装奖励结果
             AwardVO award = new AwardVO();
             award.setExp(String.valueOf(task.getRewardExp()));
             award.setItem(rewardItems);
-            //将用户获得的奖励存储到到DB中
-            List<UserItem> list = rewardItems.stream().map(a -> {
-                UserItem userItem = new UserItem();
-                userItem.setItemId(a.getItemId());
-                userItem.setUserId(Long.valueOf(studentId));
-                userItem.setQuantity(AWARD_NUM);
-                return userItem;
-            }).toList();
-            userItemMapper.insert(list);
 
-            log.info("发放奖励 - studentId: {}, floorId: {}, exp: {}, items: {}", studentId, floorId, task.getRewardExp(), rewardItems.size());
+            // 发放物品奖励（先查再更新/插入）
+            for (Item rewardItem : rewardItems) {
+                Long userId = Long.valueOf(studentId);
+                Long itemId = rewardItem.getItemId();
+
+                // 查询是否已存在该用户的该道具
+                LambdaQueryWrapper<UserItem> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.eq(UserItem::getUserId, userId)
+                        .eq(UserItem::getItemId, itemId);
+
+                UserItem exist = userItemMapper.selectOne(queryWrapper);
+
+                if (exist != null) {
+                    // 已有 → 叠加数量
+                    exist.setQuantity(exist.getQuantity() + AWARD_NUM);
+                    userItemMapper.updateById(exist);
+                } else {
+                    // 没有 → 新插入
+                    UserItem newItem = new UserItem();
+                    newItem.setUserId(userId);
+                    newItem.setItemId(itemId);
+                    newItem.setQuantity(AWARD_NUM);
+                    userItemMapper.insert(newItem);
+                }
+            }
+
+            log.info("发放奖励 - studentId: {}, floorId: {}, exp: {}, items: {}",
+                    studentId, floorId, task.getRewardExp(), rewardItems.size());
             return Result.success(award);
+
         } catch (Exception e) {
             log.error("获取奖励失败 - studentId: {}, floorId: {}", studentId, floorId, e);
             return Result.error("获取奖励失败");
         }
     }
+
 
     @Override
     public Result<Long> getRequireExp(String studentLevel) {
