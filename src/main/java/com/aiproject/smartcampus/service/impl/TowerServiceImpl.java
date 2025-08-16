@@ -747,6 +747,7 @@ public class TowerServiceImpl implements TowerService {
         prompt.append("    \"score_points\": 1.0\n");
         prompt.append("  }\n");
         prompt.append("]\n");
+        prompt.append("请严格保证题目内容与题目类型(question_type)的对应\n");
         prompt.append("请只输出 JSON 数组，切勿输出任何解释性文字、注释或多余内容。");
         return prompt.toString();
     }
