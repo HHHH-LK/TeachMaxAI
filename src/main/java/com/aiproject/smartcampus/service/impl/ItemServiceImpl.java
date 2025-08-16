@@ -78,7 +78,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Result<T> userUseItem(Integer itemId, Integer studentId, Integer floorId, Integer changeCount) {
+    public Result<T> userUseItem(Integer itemId, Integer studentId, Integer floorId, Integer changeCount, Integer max_HP) {
 
         LambdaQueryWrapper<UserItem> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserItem::getItemId, itemId);
@@ -101,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
 
         //key
         String SET_USER_HP_KEY = String.format("game:user:hp:%d:%d:%d", studentId, floorId, changeCount);
-        String SET_BOSS_HP_KEY = String.format("game:boss:hp:%d:%d:%d", floorId, studentId, changeCount);
+        //  String SET_BOSS_HP_KEY = String.format("game:boss:hp:%d:%d:%d", floorId, studentId, changeCount);
         //获取用户血量和boss血量
         String USER_HP = stringRedisTemplate.opsForValue().get(SET_USER_HP_KEY);
 
@@ -116,10 +116,14 @@ public class ItemServiceImpl implements ItemService {
             case "defense":
                 break;
             case "heal":
-                stringRedisTemplate.opsForValue().increment(SET_USER_HP_KEY, item.getEffectValue());
+                Integer effectValue = item.getEffectValue();
+                if (effectValue + Integer.parseInt(USER_HP) >= max_HP) {
+                    stringRedisTemplate.opsForValue().set(SET_USER_HP_KEY, String.valueOf(max_HP));
+                } else {
+                    stringRedisTemplate.opsForValue().increment(SET_USER_HP_KEY, effectValue);
+                }
                 break;
         }
-
 
         return Result.success();
 

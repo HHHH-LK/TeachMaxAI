@@ -60,9 +60,9 @@ public class ItemController {
      * 使用道具
      */
     @PostMapping("/User/useitem")
-    public Result<T> useItem(@RequestParam Integer itemId, @RequestParam Integer studentId,@RequestParam Integer floorId, @RequestParam Integer changeCount)  {
+    public Result<T> useItem(@RequestParam Integer itemId, @RequestParam Integer studentId,@RequestParam Integer floorId, @RequestParam Integer changeCount,@RequestParam Integer max_HP)  {
 
-        return itemService.userUseItem(itemId, studentId,floorId,changeCount);
+        return itemService.userUseItem(itemId, studentId,floorId,changeCount,max_HP);
     }
 
 

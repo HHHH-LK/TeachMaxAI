@@ -69,7 +69,7 @@ public class StudentController {
     }
 
     /**
-     * 学生学情分析//todo 基于课程的所有错误知识进行学情分析
+     * 学生学情分析
      */
     @ApiOperation(value = "ai智能生成学情分析", notes = "学情情况分析")
     @GetMapping("/academicanalysis")

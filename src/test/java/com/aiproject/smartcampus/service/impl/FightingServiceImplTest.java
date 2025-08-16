@@ -65,6 +65,14 @@ class FightingServiceImplTest {
 
     }
 
+    @Test
+    void getRequireExp5() {
+
+        Result<Integer> result = fightingService.getResult("235", "1", "1");
+        log.info("result: {}", result.getData());
+
+    }
+
 
 
 }

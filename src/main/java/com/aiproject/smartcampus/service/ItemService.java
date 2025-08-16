@@ -13,5 +13,5 @@ public interface ItemService {
 
     Result<Integer> getUserItemNum(Integer itemId, Integer studentId);
 
-    Result<T> userUseItem(Integer itemId, Integer studentId, Integer floorId, Integer changeCount);
+    Result<T> userUseItem(Integer itemId, Integer studentId, Integer floorId, Integer changeCount, Integer max_HP);
 }

@@ -692,22 +692,29 @@ public class TowerServiceImpl implements TowerService {
                                         Map<String, Integer> pointIdMap,
                                         Integer questionCount,
                                         String courseName) {
+
         StringBuilder prompt = new StringBuilder();
-        prompt.append("你是一名专业的出题专家，请根据以下信息为学生生成个性化定制化练习题。\n");
-        prompt.append("请严格按照以下字段和格式生成题目，方便程序直接解析。\n\n");
+        prompt.append("你是一名严格的出题专家，请根据以下信息为学生生成个性化练习题。\n")
+                .append("输出必须严格符合字段与题型约束，以便程序直接解析。\n\n");
+
+        // 基本信息
         prompt.append("总共需要生成 ").append(questionCount).append(" 道题目。\n");
         prompt.append("课程名称：").append(courseName).append("\n\n");
+
+        // 难度分布
         Map<Difficulty, Long> diffCountMap = difficulties.stream()
                 .collect(Collectors.groupingBy(d -> d, Collectors.counting()));
-        prompt.append("题目难度分布如下：\n");
+        prompt.append("题目难度分布如下（必须严格遵守）：\n");
         for (Difficulty diff : Difficulty.values()) {
             long count = diffCountMap.getOrDefault(diff, 0L);
             if (count > 0) {
-                prompt.append("- ").append(diff.name()).append(" 难度：").append(count).append(" 道\n");
+                prompt.append("- ").append(diff.name().toLowerCase()).append("：").append(count).append(" 道\n");
             }
         }
         prompt.append("\n");
-        prompt.append("知识点掌握情况（通过率低的优先出题，并结合场景个性化出题）：\n");
+
+        // 学生掌握情况
+        prompt.append("知识点掌握情况（通过率低的优先出题，并结合应用情境设计题干）：\n");
         pointAccessRateMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .forEach(e -> {
@@ -718,39 +725,81 @@ public class TowerServiceImpl implements TowerService {
                             .append("\n");
                 });
         prompt.append("\n");
-        prompt.append("请结合知识点设计真实应用情境，使题目贴近实际生活或职业场景。\n\n");
-        prompt.append("生成规则：\n");
-        prompt.append("1. 题目必须紧密结合上述知识点内容，并根据通过率个性化设计情境和题干。\n");
-        prompt.append("2. \"point_id\" 字段必须严格使用上方对应的整数 ID。\n");
-        prompt.append("3. 难度分布必须严格遵守上述统计。\n");
-        prompt.append("4. 选择题选项必须使用如下 JSON 数组格式，且至少一个选项 is_correct 为 true：\n");
-        prompt.append("[\n");
-        prompt.append("  {\"label\": \"A\", \"content\": \"选项内容\", \"is_correct\": false},\n");
-        prompt.append("  {\"label\": \"B\", \"content\": \"选项内容\", \"is_correct\": true},\n");
-        prompt.append("  {\"label\": \"C\", \"content\": \"选项内容\", \"is_correct\": false}\n");
-        prompt.append("]\n");
-        prompt.append("5. 填空题和简答题的选项字段应设置为 null。\n");
-        prompt.append("6. 正确答案字段必须是 JSON 格式，格式应与题型相符。\n");
-        prompt.append("7. 所有 JSON 格式必须有效，不能包含注释、尾随逗号或多余内容。\n\n");
-        prompt.append("请严格生成 ").append(questionCount).append(" 道题目，整体以纯 JSON 数组格式输出，示例如下：\n");
-        prompt.append("[\n");
-        prompt.append("  {\n");
-        prompt.append("    \"question_id\": null,\n");
-        prompt.append("    \"course_id\": -1,\n");
-        prompt.append("    \"point_id\": 1,\n");
-        prompt.append("    \"question_type\": \"single_choice\",\n");
-        prompt.append("    \"question_content\": \"这里是题目描述\",\n");
-        prompt.append("    \"question_options\": \"[{\\\"label\\\": \\\"A\\\", \\\"content\\\": \\\"选项1\\\", \\\"is_correct\\\": false}, {\\\"label\\\": \\\"B\\\", \\\"content\\\": \\\"选项2\\\", \\\"is_correct\\\": true}]\",\n");
-        prompt.append("    \"correct_answer\": \"[\\\"B\\\"]\",\n");
-        prompt.append("    \"explanation\": \"答案解析\",\n");
-        prompt.append("    \"difficulty_level\": \"easy\",\n");
-        prompt.append("    \"score_points\": 1.0\n");
-        prompt.append("  }\n");
-        prompt.append("]\n");
-        prompt.append("请严格保证题目内容与题目类型(question_type)的对应\n");
-        prompt.append("请只输出 JSON 数组，切勿输出任何解释性文字、注释或多余内容。");
+
+        // 题型与字段强约束
+        prompt.append("题型说明与字段规范（必须严格遵守；question_type 只能取以下值）：\n")
+                .append("1) single_choice（单选题）\n")
+                .append("   - question_options: 字符串，值为 JSON 数组字符串，3-6 个选项，每个元素为 {\"label\":\"A|B|C...\",\"content\":\"文本\",\"is_correct\":true|false}\n")
+                .append("   - 选项标签必须按 A,B,C... 递增；恰好且仅有1个 is_correct=true\n")
+                .append("   - correct_answer: 字符串，值为 JSON 数组字符串，如 \"[\\\"B\\\"]\"；内容与 is_correct=true 的选项标签一致\n")
+                .append("   - explanation: 简要解析\n")
+                .append("2) multiple_choice（多选题）\n")
+                .append("   - question_options: 字符串，值为 JSON 数组字符串，4-6 个选项，至少2个 is_correct=true，禁止“以上都是/都不对”等模糊选项\n")
+                .append("   - correct_answer: 字符串，值为 JSON 数组字符串，示例 \"[\\\"A\\\",\\\"C\\\"]\"；必须与所有 is_correct=true 的标签集合完全一致（按字母升序）\n")
+                .append("   - explanation: 简要解析\n")
+                .append("3) true_false（判断题）\n")
+                .append("   - question_options: 必须为 null\n")
+                .append("   - correct_answer: 字符串，值为 JSON 布尔字面量的字符串：\"true\" 或 \"false\"\n")
+                .append("   - explanation: 简要解析\n")
+                .append("4) fill_blank（填空题）\n")
+                .append("   - question_options: 必须为 null\n")
+                .append("   - correct_answer: 字符串，值为 JSON 数组字符串，按空格顺序给出期望答案，如 \"[\\\"二次函数\\\",\\\"顶点\\\"]\"\n")
+                .append("   - explanation: 简要解析\n")
+                .append("5) short_answer（简答题）\n")
+                .append("   - question_options: 必须为 null\n")
+                .append("   - correct_answer: 字符串，值为 JSON 对象字符串，至少包含关键字与示例，如\n")
+                .append("     \"{\\\"keywords\\\":[\\\"时间复杂度\\\",\\\"可读性权衡\\\"],\\\"sample\\\":\\\"合理示例答案\\\"}\"\n")
+                .append("   - explanation: 简要解析\n\n");
+
+        // 全局字段与取值约束
+        prompt.append("全局字段约束（必须全部满足）：\n")
+                .append("- 每个题目对象必须包含以下字段（snake_case）：\n")
+                .append("  question_id=null, course_id=-1, point_id=整数(来自上方列表), question_type=字符串,\n")
+                .append("  question_content=字符串, question_options=字符串或null, correct_answer=字符串,\n")
+                .append("  explanation=字符串, difficulty_level={easy|medium|hard}, score_points=数字\n")
+                .append("- point_id 必须严格从上方给出的映射中选择；不得使用未给定的 point_id。\n")
+                .append("- difficulty_level 只能为 easy / medium / hard（小写），并严格按照上方难度分布数量生成。\n")
+                .append("- question_content 必须与 question_type 语义一致：\n")
+                .append("  · single_choice / multiple_choice：题干需明确“单选/多选”语义\n")
+                .append("  · true_false：题干为判断陈述对错，不要出现选择项\n")
+                .append("  · fill_blank：题干出现空格（____）或用括号标明空格位置\n")
+                .append("  · short_answer：题干为开放性问题，要求简要说明或比较\n")
+                .append("- question_options 在需要时（单选/多选）必须是“字符串类型的JSON数组”；其他题型必须为 null。\n")
+                .append("- correct_answer 必须是“字符串类型的JSON”（注意外层是字符串），格式与题型严格对应：\n")
+                .append("  · 单选: \"[\\\"B\\\"]\"；多选: \"[\\\"A\\\",\\\"C\\\"]\"；判断: \"true\"/\"false\"；填空: \"[\\\"ans1\\\",\\\"ans2\\\"]\"；简答: \"{...}\"\n")
+                .append("- 严禁出现未转义的换行/引号导致 JSON 无法解析；不得出现注释、代码块标记或多余文本。\n")
+                .append("- 同一批次题目不得重复或高度相似；选项内容需有区分度。\n\n");
+
+        // 质量与校验
+        prompt.append("质量与校验清单（你在输出前必须自查）：\n")
+                .append("1) question_type 与字段结构一一对应（见上文）。\n")
+                .append("2) 单选/多选的 correct_answer 与 question_options 的 is_correct 完全一致。\n")
+                .append("3) 所有题目字段齐全；point_id 合法；difficulty_level 合法；JSON 严格可解析。\n")
+                .append("4) 题干紧扣对应知识点，具备情境化；解释简洁但有效。\n\n");
+
+        // 输出格式要求与示例
+        prompt.append("输出格式要求：\n")
+                .append("- 只输出“JSON 数组”，不要任何解释、标题或额外文本。\n")
+                .append("- 所有题目均使用 snake_case 命名。\n\n")
+                .append("单题示例（仅示例结构；请按要求生成完整数组）：\n")
+                .append("[\n")
+                .append("  {\n")
+                .append("    \"question_id\": null,\n")
+                .append("    \"course_id\": -1,\n")
+                .append("    \"point_id\": 1,\n")
+                .append("    \"question_type\": \"single_choice\",\n")
+                .append("    \"question_content\": \"这里是题目描述，明确单选语义。\",\n")
+                .append("    \"question_options\": \"[{\\\"label\\\":\\\"A\\\",\\\"content\\\":\\\"选项1\\\",\\\"is_correct\\\":false},{\\\"label\\\":\\\"B\\\",\\\"content\\\":\\\"选项2\\\",\\\"is_correct\\\":true},{\\\"label\\\":\\\"C\\\",\\\"content\\\":\\\"选项3\\\",\\\"is_correct\\\":false}]\",\n")
+                .append("    \"correct_answer\": \"[\\\"B\\\"]\",\n")
+                .append("    \"explanation\": \"简要解释理由\",\n")
+                .append("    \"difficulty_level\": \"easy\",\n")
+                .append("    \"score_points\": 1.0\n")
+                .append("  }\n")
+                .append("]\n");
+
         return prompt.toString();
     }
+
 
     public List<SortedUser> toSortedUserList(Set<ZSetOperations.TypedTuple<String>> sortedList) {
         if (sortedList == null || sortedList.isEmpty()) {
