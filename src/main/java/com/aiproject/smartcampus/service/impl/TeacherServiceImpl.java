@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @program: SmartCampus
@@ -130,8 +131,10 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             if (wrongList == null) {
                 continue;
             }
+            List<StudentWrongKnowledgeBO> list = wrongList.stream()
+                    .filter(a -> a.getCourseName().equals(courseMapper.findCourseNameByid(courseId))).toList();
 
-            for (StudentWrongKnowledgeBO bo : wrongList) {
+            for (StudentWrongKnowledgeBO bo : list) {
                 Integer pointId = bo.getPointId();
                 Double accuracyRate = bo.getAccuracyRate();
 
