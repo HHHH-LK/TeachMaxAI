@@ -331,11 +331,6 @@ const deleteAssessment = async (id) => {
   }
 };
 
-// 查看学生提交情况
-const viewSubmissions = (assessment) => {
-  ElMessage.info("查看提交功能开发中...");
-};
-
 // 初始化加载考核列表
 const loadAssessments = async () => {
   try {
@@ -359,22 +354,28 @@ const loadAssessments = async () => {
               const students = studentResponse.data.data;
               // 所有学生都默认已提交
               submittedCount = students.length;
-              // 计算已阅卷数量（分数大于0的学生）
-              gradedCount = students.filter(student => student.score !== null && student.score > 0).length;
+              // 计算已阅卷数量（分数不为null且大于等于0的学生）
+              gradedCount = students.filter(student => student.score !== null && student.score >= 0).length;
+            }
+            
+            // 根据考试状态和阅卷情况确定显示状态
+            let displayStatus = exam.status;
+            if (exam.status === 'scheduled' && gradedCount >= submittedCount && submittedCount > 0) {
+              displayStatus = 'completed'; // 如果所有提交的学生都已阅卷，则标记为已完成
             }
             
             return {
               id: exam.examId.toString(),
               title: exam.title,
               type: "期末考试",
-              status: exam.status,
+              status: displayStatus,
               totalQuestions: exam.questionCount || 0,
               totalScore: exam.max_score || 0,
               totalStudents: 6, // 根据API返回的学生数量
               submittedCount: submittedCount,
               gradedCount: gradedCount,
               createdAt: exam.createdAt,
-              lastSubmissionTime: null,
+              lastSubmissionTime: exam.lastSubmissionTime || null,
               chapters: [exam.courseId],
               knowledgePoints: ["综合项目实践"],
               examPaper: {

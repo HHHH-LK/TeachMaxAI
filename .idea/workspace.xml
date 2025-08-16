@@ -5,26 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="更新重提交">
-      <change afterPath="$PROJECT_DIR$/public/Image/Anim01.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Image/Anim02.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Image/Anim03.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Image/Anim03.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Image/Anim04.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Image/Anim05.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Video/Anim05.mp4" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/fight/Animation.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/fight/StartBattleAnimation.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CourseDetailDialog.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/CreateCourseDialog.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/fight/Bag.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/Bag.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/fight/CharacterHead.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/CharacterHead.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/router/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/admin/CourseAssignment.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/tower/Fight.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/tower/Fight.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/AssessmentManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/AssessmentManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentList.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/assessmentManage/PendingAssessmentCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/assessmentManage/PendingAssessmentCard.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

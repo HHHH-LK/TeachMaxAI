@@ -9,12 +9,24 @@
 
     <div class="card-content">
       <div class="info-row">
-        <span class="label">待阅卷数量:</span>
-        <span class="value">{{ assessment.totalStudents - assessment.gradedCount }}</span>
+        <span class="label">总学生数:</span>
+        <span class="value">{{ assessment.totalStudents }}</span>
       </div>
       <div class="info-row">
-        <span class="label">提交时间:</span>
-        <span class="value">{{ assessment.lastSubmissionTime }}</span>
+        <span class="label">已提交:</span>
+        <span class="value">{{ assessment.submittedCount }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">已阅卷:</span>
+        <span class="value">{{ assessment.gradedCount }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">待阅卷:</span>
+        <span class="value highlight">{{ assessment.submittedCount - assessment.gradedCount }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">创建时间:</span>
+        <span class="value">{{ formatDate(assessment.createdAt) }}</span>
       </div>
     </div>
 
@@ -26,9 +38,6 @@
           @click="$emit('grade', assessment)"
         >
           开始智能阅卷
-        </el-button>
-        <el-button size="small" @click="$emit('view-submissions', assessment)">
-          查看提交
         </el-button>
       </div>
     </template>
@@ -45,7 +54,18 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['grade', 'view-submissions']);
+const emit = defineEmits(['grade']);
+
+// 格式化日期
+const formatDate = (dateString) => {
+  if (!dateString) return '未知';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN');
+  } catch (e) {
+    return dateString;
+  }
+};
 </script>
 
 <style scoped>
@@ -95,6 +115,12 @@ const emit = defineEmits(['grade', 'view-submissions']);
   color: #303133;
   font-size: 14px;
   font-weight: 500;
+}
+
+.value.highlight {
+  color: #e6a23c;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .card-actions {
