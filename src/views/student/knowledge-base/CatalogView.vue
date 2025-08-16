@@ -155,34 +155,46 @@
     </el-dialog>
 
     <el-dialog
-        v-model="learningPreviewVisible"
-        :title="`学习：${learningPointName || '知识点'}`"
-        width="900px"
-        class="learning-preview-dialog"
+      v-model="learningPreviewVisible"
+      :title="`学习：${learningPointName || '知识点'}`"
+      width="900px"
+      class="learning-preview-dialog"
     >
       <!-- 简化的工具栏，只保留状态提示 -->
       <div class="preview-toolbar">
         <span v-if="frameLoading" class="loading-text">加载中...</span>
-        <span v-if="frameError" class="error-text">无法加载内容，可能受浏览器安全限制</span>
+        <span v-if="frameError" class="error-text"
+          >无法加载内容，可能受浏览器安全限制</span
+        >
       </div>
 
       <div class="preview-container">
         <iframe
-            v-if="learningUrl"
-            :src="learningUrl"
-            class="preview-iframe"
-            @load="handleFrameLoad"
-            @error="handleFrameError"
-            frameborder="0"
+          v-if="learningUrl"
+          :src="learningUrl"
+          class="preview-iframe"
+          @load="handleFrameLoad"
+          @error="handleFrameError"
+          frameborder="0"
         ></iframe>
       </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="learningPreviewVisible = false"
+            >退出学习</el-button
+          >
+          <el-button type="primary" @click="handleLearningFinish"
+            >完成学习</el-button
+          >
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
-import { descriptionProps, ElMessage } from "element-plus";
+import { ElMessage } from "element-plus";
 import { studentService } from "@/services/api";
 
 // 接收父组件传递的courseId
@@ -193,23 +205,27 @@ const props = defineProps({
   },
 });
 
-
-// 新增：学习预览相关变量（简化版）
-const learningPreviewVisible = ref(false); // 预览框显示状态
-const learningUrl = ref(''); // 学习链接
-const learningPointName = ref(''); // 知识点名称
-const frameLoading = ref(false); // 加载状态
-const frameError = ref(false); // 加载错误状态
-
+// 学习预览相关变量
+const learningPreviewVisible = ref(false);
+const learningUrl = ref("");
+const learningPointName = ref("");
+const frameLoading = ref(false);
+const frameError = ref(false);
 
 // 组件状态
 const loading = ref(false);
 const error = ref(null);
-const chapters = ref([]); //存储全部信息
+const chapters = ref([]);
 
 // 知识点详情弹窗
 const detailDialogVisible = ref(false);
 const selectedKnowledgePoint = ref(null);
+
+// 学习记录相关变量
+const currentLearningPoint = ref(null);
+const learningStartTime = ref(null);
+const learningTimer = ref(null);
+const elapsedTime = ref(0); // 学习时长（秒）
 
 // 计算总知识点数量
 const totalKnowledgePoints = computed(() => {
@@ -230,27 +246,155 @@ const showKnowledgePointDetail = (knowledgePoint) => {
 };
 
 // 开始学习
-const startLearning = (point) => {
-  // 设置学习链接和知识点名称
-  learningUrl.value = `https://www.runoob.com/java/java-tutorial.html`;
-  learningPointName.value = point.name;
+const startLearning = async (point) => {
+  try {
+    // 记录当前学习知识点
+    currentLearningPoint.value = point;
 
-  // 重置加载状态
-  frameLoading.value = true;
-  frameError.value = false;
+    // 记录开始时间
+    learningStartTime.value = new Date();
+    elapsedTime.value = 0;
 
-  // 显示预览框并关闭详情弹窗
-  learningPreviewVisible.value = true;
-  detailDialogVisible.value = false;
+    // 调用开始学习API
+    const response = await studentService.startStudy({
+      chapterId: point.chapterId.toString(), 
+      nowmaterialId: point.id.toString(),   
+      studyTime: new Date().toISOString(),    
+      courseId: props.courseId.toString() 
+    });
+
+    if (response.data.code === 0) {
+      ElMessage.success("学习已开始，系统将自动记录学习时间");
+    } else {
+      ElMessage.warning(response.data.msg || "学习开始记录失败");
+    }
+
+    // 设置学习链接和知识点名称
+    learningUrl.value = `https://www.runoob.com/java/java-tutorial.html`;
+    learningPointName.value = point.name;
+
+    // 重置加载状态
+    frameLoading.value = true;
+    frameError.value = false;
+
+    // 显示预览框并关闭详情弹窗
+    learningPreviewVisible.value = true;
+    detailDialogVisible.value = false;
+
+    // 启动计时器
+    startLearningTimer();
+  } catch (err) {
+    console.error("开始学习失败:", err);
+    ElMessage.error("开始学习失败，请重试");
+  }
+};
+
+// 启动学习计时器
+const startLearningTimer = () => {
+  learningTimer.value = setInterval(() => {
+    elapsedTime.value++;
+  }, 1000);
+};
+
+// 停止学习计时器
+const stopLearningTimer = () => {
+  if (learningTimer.value) {
+    clearInterval(learningTimer.value);
+    learningTimer.value = null;
+  }
+};
+
+// 处理学习结束
+const handleLearningEnd = async () => {
+  try {
+    // 停止计时器
+    stopLearningTimer();
+
+    if (!currentLearningPoint.value) return;
+
+    // 调用结束学习API
+    const response = await studentService.endStudy({
+      chapterId: currentLearningPoint.value.chapterId.toString(),
+      nowmaterialId: currentLearningPoint.value.id.toString(),
+      studyTime: formatTimeForBackend(),
+      courseId: props.courseId.toString()
+    });
+
+    if (response.data.code === 0) {
+      ElMessage.success(
+        `学习结束，本次学习时长: ${formatTime(elapsedTime.value)}`
+      );
+    } else {
+      ElMessage.warning(response.data.msg || "学习结束记录失败");
+    }
+
+    // 重置学习状态
+    currentLearningPoint.value = null;
+    learningStartTime.value = null;
+    elapsedTime.value = 0;
+  } catch (err) {
+    console.error("结束学习失败:", err);
+    ElMessage.error("结束学习失败，请重试");
+  }
+};
+
+// 创建格式化时间函数
+const formatTimeForBackend = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ` +
+         `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+};
+
+// 处理学习完成
+const handleLearningFinish = async () => {
+  try {
+    // 停止计时器
+    stopLearningTimer();
+
+    if (!currentLearningPoint.value) return;
+
+    // 调用完成学习API
+    const response = await studentService.finishStudy({
+      chapterId: currentLearningPoint.value.chapterId.toString(),
+      nowmaterialId: currentLearningPoint.value.id.toString(),
+      studyTime: formatTimeForBackend(), // 完成时间
+      courseId: props.courseId.toString()
+    });
+
+    
+
+    if (response.data.code === 0) {
+      ElMessage.success(`学习完成！总时长: ${formatTime(elapsedTime.value)}`);
+      // 刷新课程目录以更新进度
+      await fetchCourseCatalog();
+    } else {
+      ElMessage.warning(response.data.msg || "学习完成记录失败");
+    }
+
+    // 重置学习状态
+    currentLearningPoint.value = null;
+    learningStartTime.value = null;
+    elapsedTime.value = 0;
+  } catch (err) {
+    console.error("完成学习失败:", err);
+    ElMessage.error("完成学习失败，请重试");
+  }
+};
+
+// 格式化时间（秒 -> 分:秒）
+const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
 };
 
 const handleFrameLoad = () => {
-  // 加载完成后关闭加载提示
   frameLoading.value = false;
 };
 
 const handleFrameError = () => {
-  // 加载失败显示错误提示
   frameLoading.value = false;
   frameError.value = true;
 };
@@ -277,18 +421,13 @@ const getDifficultyText = (difficulty) => {
 
 // 获取课程目录数据
 const fetchCourseCatalog = async () => {
-  // const chapter = ref([]);
-
-  const knowledge =ref([]); //存储知识点信息
   const allKnowledge = [];
   try {
     loading.value = true;
     error.value = null;
 
-    console.log(props.courseId);
     // 调用API获取课程目录
     const responseChapter = await studentService.getChapterInfo(props.courseId);
-    // console.log(response.data.data)
     if (responseChapter.data) {
       chapters.value = responseChapter.data.data.map((chapter) => ({
         id: chapter.chapterId,
@@ -296,29 +435,30 @@ const fetchCourseCatalog = async () => {
         description: chapter.description,
         progress: chapter.progressRate,
         expanded: false,
-        knowledgePoints: []
+        knowledgePoints: [],
       }));
-    } 
-    console.log("chapter", chapters.value[0].id)
-    console.log("length",chapters.value.length)
-    for(var i = 0; i < chapters.value.length; i++){
-      const responseKnw = await studentService.getChapterKnow(chapters.value[i].id);
-      if(responseKnw.data){
-        const chapterKnowledge = responseKnw.data.data.map((knowledge) =>({
-        id: knowledge.pointId,
-        chapterId: chapters.value[i].id,
-        name: knowledge.pointName,
-        description: knowledge.description,
-        difficulty: knowledge.difficultyLevel,
-        isCore: knowledge.isCore,
-        objectives: knowledge.keywords,
-        prerequisites:['无']
-        }))
+    }
+
+    // 获取每个章节的知识点
+    for (let i = 0; i < chapters.value.length; i++) {
+      const responseKnw = await studentService.getChapterKnow(
+        chapters.value[i].id
+      );
+      if (responseKnw.data) {
+        const chapterKnowledge = responseKnw.data.data.map((knowledge) => ({
+          id: knowledge.pointId,
+          chapterId: chapters.value[i].id,
+          name: knowledge.pointName,
+          description: knowledge.description,
+          difficulty: knowledge.difficultyLevel,
+          isCore: knowledge.isCore,
+          objectives: knowledge.keywords,
+          prerequisites: ["无"],
+        }));
         chapters.value[i].knowledgePoints = chapterKnowledge;
-        allKnowledge.push(...chapterKnowledge)
+        allKnowledge.push(...chapterKnowledge);
       }
     }
-    knowledge.value = allKnowledge;
   } catch (err) {
     console.error("获取课程目录失败:", err);
     error.value = "加载课程目录失败";
@@ -336,7 +476,15 @@ watch(
     }
   },
   { immediate: true }
-); // 立即执行一次
+);
+
+// 监听学习预览弹窗状态
+watch(learningPreviewVisible, (newVal) => {
+  if (!newVal) {
+    // 弹窗关闭时处理学习结束
+    handleLearningEnd();
+  }
+});
 </script>
 
 <style lang="less" scoped>
