@@ -5,24 +5,56 @@
         <el-option label="全部学科" value=""></el-option>
         <el-option v-for="subject in subjects" :key="subject" :label="subject" :value="subject"></el-option>
       </el-select>
-      <el-button type="primary" @click="exportAllResources" style="margin: 10px;">导出全部</el-button>
     </div>
-    
+
     <!-- 数据统计信息 -->
     <div class="data-info">
       <span>共找到 {{ totalCount }} 条资源记录</span>
     </div>
-    
+
     <el-table :data="paginatedResources" stripe style="width: 100%" v-loading="loading">
       <el-table-column prop="title" label="标题" />
       <el-table-column prop="subject" label="学科" width="180" />
       <el-table-column prop="teacher" label="教师" width="180" />
       <el-table-column prop="createdAt" label="创建日期" />
-      <el-table-column label="操作" width="240">
+      <el-table-column prop="status" label="状态" width="120">
         <template #default="scope">
-          <!-- <el-button size="small" @click="editResource(scope.row)">编辑</el-button> -->
-          <el-button size="small" type="danger" @click="deleteResource(scope.row)">删除</el-button>
-          <el-button size="small" @click="exportSingleResource(scope.row)">导出</el-button>
+          <el-tag
+              :type="getStatusTagType(scope.row.status)"
+              size="small"
+          >
+            {{ getStatusText(scope.row.status) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="320">
+        <template #default="scope">
+          <!-- 查看按钮 -->
+          <el-button
+              size="small"
+              type="primary"
+              @click="handleView(scope.row)"
+          >
+            查看
+          </el-button>
+          <!-- 审核通过按钮 -->
+          <el-button
+              size="small"
+              type="success"
+              @click="handleApprove(scope.row)"
+              :disabled="scope.row.status === 'approved'"
+          >
+            审核通过
+          </el-button>
+          <!-- 审核退回按钮 -->
+          <el-button
+              size="small"
+              type="danger"
+              @click="handleReject(scope.row)"
+              :disabled="scope.row.status === 'rejected'"
+          >
+            审核退回
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -30,23 +62,41 @@
     <!-- 分页组件 -->
     <div class="pagination-container">
       <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[15, 20, 50, 100]"
-        :total="totalCount"
-        layout="total, sizes, prev, pager, next, jumper"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        background
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[15, 20, 50, 100]"
+          :total="totalCount"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          background
       />
     </div>
+
+    <!-- 简化的资源详情查看对话框 -->
+    <el-dialog
+        v-model="viewDialogVisible"
+        :title="selectedResource ? selectedResource.title : '资源详情'"
+        width="60%"
+    >
+      <div v-if="selectedResource" class="resource-detail">
+        <el-descriptions column="1" border>
+          <!-- 只保留标题、老师和内容（描述） -->
+          <el-descriptions-item label="标题">{{ selectedResource.title }}</el-descriptions-item>
+          <el-descriptions-item label="教师">{{ selectedResource.teacher }}</el-descriptions-item>
+          <el-descriptions-item label="内容" :span="1">
+            <p class="resource-content">{{ selectedResource.description || '无内容' }}</p>
+          </el-descriptions-item>
+        </el-descriptions>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { ElMessageBox, ElMessage } from 'element-plus';
-import { adminService, studentService } from '@/services/api';
+import { ElMessageBox, ElMessage, ElDescriptions, ElDescriptionsItem, ElTag } from 'element-plus';
+import {adminService, teacherService} from '@/services/api';
 
 const subjects = ref([]);
 const selectedSubject = ref('');
@@ -57,12 +107,16 @@ const pageSize = ref(15);
 const loading = ref(false);
 
 const resources = ref([]);
+// 查看详情相关状态
+const viewDialogVisible = ref(false);
+const selectedResource = ref(null);
 
 // 获取课程列表用于学科筛选
 const getCourses = async () => {
   try {
     const response = await adminService.getAllCourses();
-    
+    console.log('获取课程列表成功', response)
+
     if (response.data && response.data.success && response.data.data) {
       // 从课程数据中提取课程名称作为学科选项
       const courseNames = response.data.data.map(course => course.courseName);
@@ -75,72 +129,51 @@ const getCourses = async () => {
   }
 };
 
-const getResource = async() => {
+const getResource = async () => {
+  loading.value = true;
   try {
-    loading.value = true;
-    // 1. 获取资源数据
-    const resourceResponse = await adminService.getResource();
+    // 2.1 课程列表
+    const { data: courseRes } = await adminService.getAllCourses();
+    if (!courseRes || courseRes.code !== 0) throw new Error(courseRes?.msg || '课程列表获取失败');
+    const courseList = courseRes.data;
 
-    // 检查响应是否成功
-    if (!resourceResponse.data || resourceResponse.data.code !== 0) {
-      throw new Error(resourceResponse.data?.msg || '获取资源失败');
-    }
+    // 2.2 逐个课程拉教案
+    const plansAll = [];
+    await Promise.all(
+        courseList.map(async (c) => {
+          try {
+            const { data: planRes } = await teacherService.getLessonPlanByCourseId(c.courseId);
+            if (planRes?.code === 0 && Array.isArray(planRes.data)) {
+              planRes.data.forEach((p) => {
+                if (p.auditStatus === 'draft') return;
 
-    // 2. 获取所有课程数据
-    const courseResponse = await studentService.getCourses();
+                let st = 'pending';
+                if (p.auditStatus === 'approved') st = 'approved';
+                else if (p.auditStatus === 'rejected') st = 'rejected';
+                else if (p.auditStatus === 'draft') st = 'draft';
 
-    // 检查响应是否成功
-    if (!courseResponse.data || courseResponse.data.code !== 0) {
-      throw new Error(courseResponse.data?.msg || '获取课程失败');
-    }
+                plansAll.push({
+                  id: p.planId,
+                  title: p.planTitle,
+                  subject: c.courseName,
+                  teacher: c.teacher?.user?.realName || '未知教师',
+                  createdAt: p.createdAt?.split('T')[0] || '',
+                  description: p.planContent,          // 教案正文
+                  status: st
+                });
+              });
+            }
+          } catch (e) {
+            console.warn(`课程 ${c.courseId} 教案拉取失败`, e);
+          }
+        })
+    );
 
-    // 3. 创建课程ID到课程信息的映射
-    const courseMap = {};
-    courseResponse.data.data.forEach(course => {
-      courseMap[course.courseId] = {
-        courseName: course.courseName,
-        teacherName: course.teacher.user.realName || '未知教师'
-      };
-    });
-
-    // 4. 处理资源数据，添加课程名称和教师信息
-    const processedResources = resourceResponse.data.data.map(resource => {
-      const courseInfo = courseMap[resource.courseId] || {
-        courseName: '未知课程',
-        teacherName: '未知教师'
-      };
-
-      return {
-        id: resource.resourceId,
-        title: resource.resourceTitle,
-        subject: courseInfo.courseName,
-        teacher: courseInfo.teacherName,
-        createdAt: resource.createdAt.split('T')[0], // 提取日期部分
-        description: resource.resourceDescription,
-        type: resource.resourceType,
-        file: {
-          name: resource.fileName,
-          url: resource.fileUrl,
-          size: resource.fileSizeMb
-        },
-        tags: resource.tags,
-        downloadCount: resource.downloadCount,
-        isPublic: resource.isPublic
-      };
-    });
-
-    // 5. 更新资源列表 - 这是关键步骤
-    resources.value = processedResources;
-
-    // 6. 重置分页到第一页
+    resources.value = plansAll;
     currentPage.value = 1;
-
-    return processedResources;
-
-  } catch (error) {
-    console.error('获取资源失败:', error);
-    // 返回空数组或根据业务需求处理错误
-    return [];
+  } catch (e) {
+    console.error('获取资源失败:', e);
+    resources.value = [];
   } finally {
     loading.value = false;
   }
@@ -182,97 +215,125 @@ watch(selectedSubject, () => {
   currentPage.value = 1;
 });
 
-const dialogVisible = ref(false);
-const dialogTitle = ref('');
-const form = ref({
-  id: null,
-  title: '',
-  subject: '',
-  teacher: '',
-});
-
 const filterResources = () => {
   // 筛选后自动重置到第一页
   currentPage.value = 1;
 };
 
-// const addResource = () => {
-//   dialogTitle.value = '新增课件';
-//   form.value = { id: null, title: '', subject: '', teacher: '' };
-//   dialogVisible.value = true;
-// };
-
-// const editResource = (resource) => {
-//   dialogTitle.value = '编辑课件';
-//   form.value = { ...resource };
-//   dialogVisible.value = true;
-// };
-
-
-const cancelForm = () => {
-  dialogVisible.value = false;
+// 查看资源详情（只展示标题、老师和内容）
+const handleView = (resource) => {
+  selectedResource.value = { ...resource }; // 复制资源对象
+  viewDialogVisible.value = true;
 };
 
-const deleteResource = (resource) => {
-  ElMessageBox.confirm(`确定要删除课件 "${resource.title}" 吗?`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-    center: true,
-    customClass: 'delete-confirm-dialog'
-  }).then(async () => {
-    // 显示加载消息
+// 审核通过处理
+const handleApprove = async (resource) => {
+  try {
+    await ElMessageBox.confirm(
+        `确定要审核通过资源 "${resource.title}" 吗?`,
+        '审核确认',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }
+    );
+
+    // 显示加载状态
     const loadingMessage = ElMessage({
-      message: '正在删除资源...',
+      message: '正在处理审核...',
       type: 'info',
       duration: 0,
-      icon: 'el-icon-loading', // 使用加载图标
+      icon: 'el-icon-loading'
     });
 
-    try {
-      const response = await adminService.deleteResource(resource.id);
+    // 调用审核通过API
+    const response = await teacherService.updateLessonPlanStatus(resource.id, 'approved');
 
-      loadingMessage.close();
+    loadingMessage.close();
 
-      if (response.data && response.data.code === 0) {
-        resources.value = (resources.value || []).filter(r => r.id !== resource.id);
-        ElMessage.success('删除成功');
-        
-        // 删除后检查当前页是否还有数据，如果没有则跳转到上一页
-        if (paginatedResources.value.length === 0 && currentPage.value > 1) {
-          currentPage.value--;
-        }
-      } else {
-        throw new Error(response.data?.msg || '删除操作失败');
+    if (response.data && response.data.code === 0) {
+      // 更新本地资源状态
+      const index = resources.value.findIndex(r => r.id === resource.id);
+      if (index !== -1) {
+        resources.value[index].status = 'approved';
       }
-    } catch (error) {
-      // 关闭加载消息
-      loadingMessage.close();
-      console.error('删除资源失败:', error);
-
-      let errorMsg = '删除失败';
-      if (error.response) {
-        errorMsg += ` (状态码: ${error.response.status})`;
-      } else if (error.message) {
-        errorMsg += `: ${error.message}`;
-      }
-
-      ElMessage.error(errorMsg);
+      ElMessage.success('审核通过成功');
+    } else {
+      throw new Error(response.data?.msg || '审核通过失败');
     }
-  }).catch(() => {
-    // 用户取消操作
-    ElMessage.info('已取消删除');
-  });
+  } catch (error) {
+    if (error !== 'cancel') { // 排除用户取消的情况
+      console.error('审核通过失败:', error);
+      ElMessage.error(error.message || '审核通过操作失败');
+    }
+  }
 };
 
-const exportAllResources = () => {
-  console.log('Exporting all filtered resources:', filteredResources.value);
-  ElMessage.success('所有筛选资源已导出');
+// 审核退回处理（无需理由）
+const handleReject = async (resource) => {
+  try {
+    await ElMessageBox.confirm(
+        `确定要审核退回资源 "${resource.title}" 吗?`,
+        '审核确认',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+    );
+
+    // 显示加载状态
+    const loadingMessage = ElMessage({
+      message: '正在处理审核...',
+      type: 'info',
+      duration: 0,
+      icon: 'el-icon-loading'
+    });
+
+    // 调用审核退回API（无需传递理由）
+    const response = await teacherService.updateLessonPlanStatus(resource.id, 'rejected');
+
+    loadingMessage.close();
+
+    if (response.data && response.data.code === 0) {
+      // 更新本地资源状态
+      const index = resources.value.findIndex(r => r.id === resource.id);
+      if (index !== -1) {
+        resources.value[index].status = 'rejected';
+      }
+      ElMessage.success('审核退回成功');
+    } else {
+      throw new Error(response.data?.msg || '审核退回失败');
+    }
+  } catch (error) {
+    if (error !== 'cancel') { // 排除用户取消的情况
+      console.error('审核退回失败:', error);
+      ElMessage.error(error.message || '审核退回操作失败');
+    }
+  }
 };
 
-const exportSingleResource = (resource) => {
-  console.log('Exporting single resource:', resource);
-  ElMessage.success(`课件 "${resource.title}" 已导出`);
+// 状态文本映射
+const getStatusText = (status) => {
+  const statusMap = {
+    'draft': '草稿',
+    'pending': '待审核',
+    'approved': '已通过',
+    'rejected': '已退回'
+  };
+  return statusMap[status] || '未知';
+};
+
+// 状态标签样式映射
+const getStatusTagType = (status) => {
+  const typeMap = {
+    'draft': 'info',
+    'pending': 'warning',
+    'approved': 'success',
+    'rejected': 'danger'
+  };
+  return typeMap[status] || 'info';
 };
 
 onMounted(async() => {
@@ -291,6 +352,8 @@ onMounted(async() => {
 
 .toolbar {
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
 }
 
 .data-info {
@@ -303,5 +366,35 @@ onMounted(async() => {
   margin-top: 20px;
   display: flex;
   justify-content: center;
+}
+
+/* 操作按钮样式调整 */
+:deep(.el-button--primary) {
+  margin-right: 8px;
+}
+
+:deep(.el-button--success) {
+  margin-right: 8px;
+}
+
+/* 详情对话框样式 */
+.resource-detail {
+  padding: 10px 0;
+}
+
+:deep(.el-descriptions__cell) {
+  padding: 12px 16px;
+}
+
+:deep(.el-descriptions__label) {
+  font-weight: 500;
+}
+
+/* 内容样式优化 */
+.resource-content {
+  white-space: pre-wrap; /* 保留换行和空格 */
+  line-height: 1.6;
+  margin: 0;
+  padding: 8px 0;
 }
 </style>

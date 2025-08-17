@@ -258,6 +258,91 @@ export const teacherService = {
   },
 
   /**
+   * 创建课程资源
+   * @param {object} createMaterialDTO - 课程资源创建数据
+   * @returns {Promise<object>} 创建结果
+   */
+  createMaterial: async (createMaterialDTO) => {
+    return await apiClient.post('/material/create', createMaterialDTO);
+  },
+
+  /**
+   * 根据课程ID获取课程资源
+   * @param {string} courseId - 课程ID
+   * @returns {Promise<object>} 课程资源列表
+   */
+  getMaterialByCourseId: async (courseId) => {
+    return await apiClient.get('/material/get', {
+      params: { courseId }
+    });
+  },
+
+  /**
+   * 删除课程资源
+   * @param {string} materialId - 资源ID
+   * @returns {Promise<object>} 删除结果
+   */
+  deleteMaterial: async (materialId) => {
+    return await apiClient.delete('/material/delete', {
+      params: { materialId }
+    });
+  },
+
+  /**
+   * 根据课程ID获取教案信息
+   * @param {string} courseId - 课程ID
+   * @returns {Promise<object>} 教案信息列表
+   */
+  getLessonPlanByCourseId: async (courseId) => {
+    return await apiClient.get('/material/getLessonPlan', {
+      params: { courseId }
+    });
+  },
+
+  /**
+   * 更新教案内容
+   * @param {object} lessonPlan - 教案对象
+   * @returns {Promise<object>} 更新结果
+   */
+  updateLessonPlan: async (lessonPlan) => {
+    return await apiClient.put('/material/updateLessonPlan', lessonPlan);
+  },
+
+  /**
+   * 更新教案状态
+   * @param {string} lessonPlanId - 教案ID
+   * @param {string} status - 状态值
+   * @returns {Promise<object>} 更新结果
+   */
+  updateLessonPlanStatus: async (lessonPlanId, status) => {
+    return await apiClient.get('/material/updateLessonPlanStatus', {
+      params: { lessonPlanId, status }
+    });
+  },
+
+  /**
+   * 更新教案状态为待审核
+   * @param {string} lessonPlanId - 教案ID
+   * @returns {Promise<object>} 更新结果
+   */
+  updateLessonPlanToPending: async (lessonPlanId) => {
+    return await apiClient.put('/material/updateLessonPlanToPending', null, {
+      params: { lessonPlanId }
+    });
+  },
+
+  /**
+   * 删除教案
+   * @param {string} lessonPlanId - 教案ID
+   * @returns {Promise<object>} 删除结果
+   */
+  deleteLessonPlan: async (lessonPlanId) => {
+    return await apiClient.delete('/material/deleteLessonPlan', {
+      params: { lessonPlanId }
+    });
+  },
+
+  /**
    * 获取课程考试情况
    * @param {string} courseId - 课程ID
    * @returns {Promise<object>} 课程考试情况数据
@@ -517,11 +602,27 @@ export const adminService = {
 // 学生服务
 export const studentService = {
   /**
-   * 获取在线学习助手的回复
-   * @param {string} question 学生提出的问题
-   * @returns {Promise<object>} AI助手的回复
+   * 根据userId获取student信息
+   * @param {string} userId - 用户ID
+   * @returns {Promise<object>} 学生信息
    */
-  getLearningAssistantResponse: (question) => apiClient.post('/student/learning-assistant', { question }),
+  getStudentIdByUserId: async (userId) => {
+    return await apiClient.get('/stu/get/studentIdByUserId', {
+      params: { userId }
+    });
+  },
+
+  /**
+   * 根据agent获取对应的学习资源
+   * @param {string} studentId - 学生ID
+   * @param {string} pointId - 知识点ID
+   * @returns {Promise<object>} 学习资源链接
+   */
+  getStudyByAgent: async (studentId, pointId) => {
+    return await apiClient.get('/stu/get/studyByAgent', {
+      params: { studentId, pointId }
+    });
+  },
 
   /**
    * 生成练习题目

@@ -196,6 +196,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { studentService } from "@/services/api";
+import {getCurrentUserId} from "@/utils/userUtils.js";
 
 // 接收父组件传递的courseId
 const props = defineProps({
@@ -256,21 +257,30 @@ const startLearning = async (point) => {
     elapsedTime.value = 0;
 
     // 调用开始学习API
-    const response = await studentService.startStudy({
-      chapterId: point.chapterId.toString(), 
-      nowmaterialId: point.id.toString(),   
-      studyTime: new Date().toISOString(),    
-      courseId: props.courseId.toString() 
-    });
+    // const response = await studentService.startStudy({
+    //   chapterId: point.chapterId.toString(),
+    //   nowmaterialId: point.id.toString(),
+    //   studyTime: new Date().toISOString(),
+    //   courseId: props.courseId.toString()
+    // });
+    //
+    // if (response.data.code === 0) {
+    //   ElMessage.success("学习已开始，系统将自动记录学习时间");
+    // } else {
+    //   ElMessage.warning(response.data.msg || "学习开始记录失败");
+    // }
 
-    if (response.data.code === 0) {
-      ElMessage.success("学习已开始，系统将自动记录学习时间");
-    } else {
-      ElMessage.warning(response.data.msg || "学习开始记录失败");
-    }
+    const userId = getCurrentUserId();
+    const res = await studentService.getStudentIdByUserId(userId)
+    const studentId = res.data.data.studentId;
+
+    const url = await studentService.getStudyByAgent(studentId, point.id)
+    const originalUrl = url.data.data;
+    const pointId = originalUrl.replace(/^["']|["']$/g, '');
+    // console.log("获取到url", pointId)
 
     // 设置学习链接和知识点名称
-    learningUrl.value = `https://www.runoob.com/java/java-tutorial.html`;
+    learningUrl.value = pointId;
     learningPointName.value = point.name;
 
     // 重置加载状态
