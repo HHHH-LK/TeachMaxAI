@@ -155,6 +155,7 @@ import userConfig from "@/config/userConfig";
 import img1 from "/Image/Attach.png";
 import img2 from "/Image/Defense.png";
 import img3 from "/Image/Blood.png";
+import { ElMessage } from "element-plus";
 
 // 动画控制状态
 const showStartAnimation = ref(true); // 开场动画显示状态
@@ -621,25 +622,20 @@ const handleRewardNextLevel = async () => {
         console.log("获取处理数据为", resultData);
       }
     } else {
-      console.error("获取楼层结果失败:", response.data?.message);
-      // 即使失败也继续进入下一层
-      showExpAnimation.value = true;
-      playerExp.value += expGainValue.value;
 
-      setTimeout(() => {
-        enterNextLevel();
-      }, 5000);
-      //测试所以注释
+      showExpAnimation.value = true;
+      console.error("获取楼层结果失败:", response.data?.message);
+      fetchPlayerInfo();
+      ElMessage.error(response.data?.message);
+      router.push("/game");
+      window.location.reload();
     }
   } catch (error) {
     console.error("获取楼层结果异常:", error);
     // 即使异常也继续进入下一层
     showExpAnimation.value = true;
     fetchPlayerInfo();
-
-    setTimeout(() => {
-      enterNextLevel();
-    }, 3000);
+    ElMessage.error(response.data?.message);
   }
 };
 

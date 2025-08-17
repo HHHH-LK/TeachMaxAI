@@ -248,7 +248,7 @@ const startChallenge = () => {
 
     // 根据难度调整时间限制
     switch (props.difficulty) {
-      case "eeasy":
+      case "easy":
         timeLimit.value = 150;
         break;
       case "medium":

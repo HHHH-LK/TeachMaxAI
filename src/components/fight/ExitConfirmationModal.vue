@@ -1,7 +1,7 @@
 <template>
   <transition name="modal">
-    <div class="exit-confirmation-modal" v-if="show">
-      <div class="modal-overlay"></div>
+    <div class="exit-confirmation-modal" v-if="visible">
+      <div class="modal-overlay" @click="cancelExit"></div>
 
       <div class="modal-container">
         <!-- 符文装饰 -->
@@ -56,7 +56,7 @@
 export default {
   name: "ExitConfirmationModal",
   props: {
-    show: {
+    visible: { // 修改属性名为visible
       type: Boolean,
       default: false,
     },
@@ -71,7 +71,7 @@ export default {
   },
 };
 </script>
-
+主要修复点
 <style scoped>
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=MedievalSharp&display=swap");
