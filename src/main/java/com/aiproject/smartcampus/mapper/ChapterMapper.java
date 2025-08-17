@@ -515,5 +515,8 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
             "         c.course_name, c.semester\n" +
             "ORDER BY ch.chapter_order ASC;")
     List<ChapterTeacherVO> getChapterByCourseId(@Param("courseId") String courseId);
+
+    @Select("SELECT * FROM chapters WHERE course_id = #{courseId}")
+    List<Chapter> selectByCourseId(String courseId);
 }
 
