@@ -138,9 +138,8 @@ const captionsArray = computed(() => {
 
 const handleSpaceKey = (event) => {
   // 防止空格键滚动页面
-  event.preventDefault();
-  
-  if (!animationStarted.value) {
+  if (!animationStarted.value && event.code === 'Space') {
+    event.preventDefault();
     startAnimation();
   }
 };

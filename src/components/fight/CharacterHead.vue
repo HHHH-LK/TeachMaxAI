@@ -55,7 +55,7 @@
   </div>
 
   <ExitConfirmationModal
-    v-model:visible="showExpProgress"
+    v-model:visible="showExitModal"
     @confirm="handleConfirmExit"
     @cancel="handleCancelExit"
   />
@@ -100,7 +100,6 @@ const currentExp = ref(0);
 const maxExp = ref(100);
 const turnCount = ref(0);
 const floorLevel = ref(0);
-const emit = defineEmits(["exp-update"]);
 
 // 状态控制
 const loading = ref(true);
@@ -126,6 +125,7 @@ watch(
   }
 );
 
+const emit = defineEmits(['exit-click']);
 // 计算经验百分比
 const expPercentage = computed(() => {
   return props.maxExp > 0
@@ -819,7 +819,7 @@ onMounted(() => {
   }
   100% {
     box-shadow: 0 0 5px rgba(180, 150, 50, 0.5),
-      inset 极0 0 5px rgba(180, 150, 50, 0.3);
+      inset 0 0 5px rgba(180, 150, 50, 0.3);
   }
 }
 </style>

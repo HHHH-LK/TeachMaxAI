@@ -22,9 +22,9 @@
             <div class="problem">{{ question }}</div>
 
             <!-- 判断题专用界面 -->
-            <div v-if="isTrueFalse" class="true-false-container">
+            <div v-if="isTrueFalse" class="choice-options">
               <div
-                class="true-option"
+                class="option true-option"
                 :class="{
                   selected: selectedOption === '正确',
                   correct: showExplanation && isAnswerCorrect('正确'),
@@ -38,7 +38,7 @@
                 </div>
               </div>
               <div
-                class="false-option"
+                class="option false-option"
                 :class="{
                   selected: selectedOption === '错误',
                   correct: showExplanation && isAnswerCorrect('错误'),
@@ -92,7 +92,7 @@
                 v-model="userAnswer"
                 placeholder="请输入您的答案"
                 @keydown.enter="submitAnswer"
-                 @input="logInput"
+                :disabled="isSubmitting"
               />
               <button
                 class="submit-button"
@@ -243,9 +243,6 @@ for (let i = 0; i < 30; i++) {
   });
 }
 
-
-
-
 // 计算属性
 const isChoiceQuestion = computed(() => {
   return ["single_choice", "multiple_choice", "true_false"].includes(
@@ -304,9 +301,15 @@ const isSelected = (option) => {
 // 检查选项是否正确（用于样式）
 const isAnswerCorrect = (option) => {
   if (!props.correctAnswers || props.correctAnswers.length === 0) return false;
-
-  const correctAnswer = props.correctAnswers[0] ? "正确" : "错误";
-  return option === correctAnswer;
+  
+  // 获取正确答案的布尔值
+  const correctAnswer = props.correctAnswers[0];
+  
+  // 将用户选择的选项转换为布尔值
+  const userChoice = option === "正确";
+  
+  // 比较用户选择与正确答案
+  return userChoice === correctAnswer;
 };
 
 // 选择选项
@@ -336,13 +339,13 @@ const selectOption = (option) => {
 const submitAnswer = async () => {
   if (isSubmitting.value) return;
   isSubmitting.value = true;
-  isChecking.value = true; 
-  
+  isChecking.value = true;
+
   // 添加3秒延迟模拟网络延迟
   // console.log("开始3秒延迟...");
   // await new Promise(resolve => setTimeout(resolve, 3000));
   // console.log("3秒延迟结束，开始处理答案");
-  
+
   let userAnswerContext = "";
 
   if (isChoiceQuestion.value) {
@@ -402,7 +405,7 @@ const submitAnswer = async () => {
 
     if (response.data?.success) {
       const result = response.data.data;
-      
+
       showExplanation.value = true;
       explanation.value = props.explanation;
       correctAnswerDisplay.value = formatCorrectAnswers();
@@ -703,106 +706,6 @@ onBeforeUnmount(() => {
   }
 }
 
-.true-false-container {
-  display: flex;
-  justify-content: space-around;
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.true-option,
-.false-option {
-  flex: 1;
-  min-height: 120px;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 3px solid transparent;
-  background: rgba(43, 25, 18, 0.5);
-}
-
-.true-option {
-  border-color: #5d4037;
-}
-
-.false-option {
-  border-color: #5d4037;
-}
-
-.true-option:hover,
-.false-option:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-}
-
-.true-option:hover {
-  background: rgba(0, 100, 0, 0.2);
-}
-
-.false-option:hover {
-  background: rgba(139, 0, 0, 0.2);
-}
-
-.true-option.selected {
-  background: rgba(0, 100, 0, 0.3);
-  border-color: #90ee90;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-}
-
-.false-option.selected {
-  background: rgba(139, 0, 0, 0.3);
-  border-color: #ff416c;
-  box-shadow: 0 0 20px rgba(255, 65, 108, 0.5);
-}
-
-.true-option.correct {
-  background: rgba(0, 128, 0, 0.4) !important;
-  border-color: #90ee90 !important;
-  box-shadow: 0 0 25px rgba(0, 255, 0, 0.7) !important;
-}
-
-.false-option.correct {
-  background: rgba(0, 128, 0, 0.4) !important;
-  border-color: #90ee90 !important;
-  box-shadow: 0 0 25px rgba(0, 255, 0, 0.7) !important;
-}
-
-.true-option.incorrect {
-  background: rgba(255, 0, 0, 0.3) !important;
-  border-color: #ff416c !important;
-}
-
-.false-option.incorrect {
-  background: rgba(255, 0, 0, 0.3) !important;
-  border-color: #ff416c !important;
-}
-
-.option-content {
-  text-align: center;
-  padding: 15px;
-}
-
-.option-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-}
-
-.true-option .option-icon {
-  color: #90ee90;
-}
-
-.false-option .option-icon {
-  color: #ff416c;
-}
-
-.option-text {
-  font-size: 22px;
-  font-weight: bold;
-}
-
 .choice-options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -860,6 +763,81 @@ onBeforeUnmount(() => {
 .option.incorrect {
   background: rgba(255, 0, 0, 0.3) !important;
   border-color: #ff416c !important;
+}
+
+/* 判断题选项共用普通选项的样式 */
+.true-option,
+.false-option {
+  padding: 15px;
+  border: 2px solid #5d4037;
+  border-radius: 10px;
+  background: rgba(43, 25, 18, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.true-option:hover,
+.false-option:hover {
+  background: rgba(139, 0, 0, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
+}
+
+/* 确保选中的选项总是绿色 */
+.true-option.selected,
+.false-option.selected {
+  background: rgba(0, 100, 0, 0.3);
+  border-color: #90ee90;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+/* 修复样式优先级 */
+.true-option.selected.correct,
+.false-option.selected.correct {
+  background: rgba(0, 128, 0, 0.4) !important;
+  border-color: #90ee90 !important;
+  box-shadow: 0 0 25px rgba(0, 255, 0, 0.7) !important;
+}
+
+/* 选中的错误选项也保持绿色 */
+.true-option.selected.incorrect,
+.false-option.selected.incorrect {
+  background: rgba(0, 100, 0, 0.3) !important;
+  border-color: #90ee90 !important;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5) !important;
+}
+
+/* 未选中的错误选项显示红色 */
+.true-option.incorrect:not(.selected),
+.false-option.incorrect:not(.selected) {
+  background: rgba(255, 0, 0, 0.3) !important;
+  border-color: #ff416c !important;
+}
+
+/* 判断题图标样式 */
+.option-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.true-option .option-icon {
+  color: #90ee90;
+}
+
+.false-option .option-icon {
+  color: #ff416c;
+}
+
+/* 判断题文字样式 */
+.option-text {
+  font-size: 22px;
+  font-weight: bold;
 }
 
 .explanation {
@@ -1080,7 +1058,8 @@ textarea:disabled {
 }
 
 @keyframes pulse-border {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 15px rgba(249, 200, 14, 0.3);
     border-color: rgba(249, 200, 14, 0.3);
   }
@@ -1100,8 +1079,12 @@ textarea:disabled {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .checking-text {
@@ -1114,12 +1097,13 @@ textarea:disabled {
 }
 
 @keyframes pulse {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0.8;
     transform: scale(1);
   }
-  50% { 
-    opacity: 1; 
+  50% {
+    opacity: 1;
     text-shadow: 0 0 12px rgba(249, 200, 14, 0.8);
     transform: scale(1.05);
   }
@@ -1160,8 +1144,9 @@ textarea:disabled {
     gap: 10px;
   }
 
-  .true-false-container {
-    flex-direction: column;
+  .option {
+    padding: 12px;
+    font-size: 14px;
   }
 
   .option-icon {
@@ -1170,11 +1155,6 @@ textarea:disabled {
 
   .option-text {
     font-size: 18px;
-  }
-
-  .option {
-    padding: 12px;
-    font-size: 14px;
   }
 
   .answer-input textarea {
