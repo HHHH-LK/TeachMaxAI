@@ -1,357 +1,248 @@
 import { useAuthStore } from "@/store/authStore.js";
 
-/**
- * 通用聊天SSE服务
- * 使用fetch API建立SSE连接，支持认证token
- */
 class ChatSSEService {
   constructor() {
-    this.controllers = new Map(); // 存储AbortController实例
-    this.messageHandlers = new Map(); // 存储消息处理器
-    this.reconnectAttempts = new Map(); // 存储重连次数
-    this.maxReconnectAttempts = 3; // 最大重连次数
-    this.reconnectDelay = 1000; // 重连延迟（毫秒）
-    this.baseURL = 'http://localhost:8108'; // 后端API基础URL
+    this.controllers = new Map();       // userId -> AbortController
+    this.handlers = new Map();          // userId -> handlers
+    this.reconnectAttempts = new Map(); // userId -> number
+    this.maxReconnectAttempts = 3;
+    this.reconnectDelay = 1000; // ms
+    this.baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8108";
   }
 
-  /**
-   * 建立SSE连接
-   * @param {string} userId - 用户ID
-   * @param {Object} handlers - 事件处理器
-   * @param {Function} handlers.onConnected - 连接成功时的回调
-   * @param {Function} handlers.onAiStreamMessage - 收到AI流式消息时的回调
-   * @param {Function} handlers.onChatMessage - 收到聊天消息时的回调
-   * @param {Function} handlers.onError - 错误处理回调
-   * @param {Function} handlers.onReconnect - 重连时的回调
-   * @returns {Promise} 连接Promise
-   */
-  async connect(userId, handlers = {}) {
-    // 如果已经连接，先断开
-    this.disconnect(userId);
-
-    // 获取认证token
+  getAuthToken() {
     const authStore = useAuthStore();
-    const token = authStore.getToken;
+    return authStore.getToken;
+  }
 
-    if (!token) {
-      const error = new Error('未找到认证token');
-      handlers.onError && handlers.onError(error);
-      throw error;
+  buildSSEUrl(userId) {
+    return `${this.baseURL}/api/chat/events/${encodeURIComponent(userId)}`;
+  }
+
+  isConnected(userId) {
+    return this.controllers.has(String(userId));
+  }
+
+  getConnectedUsers() {
+    return Array.from(this.controllers.keys());
+  }
+
+  async connect(userId, handlers = {}) {
+    userId = String(userId);
+
+    // 如果已连接，只更新处理器即可（避免重复连接/断开）
+    if (this.isConnected(userId)) {
+      this.handlers.set(userId, handlers);
+      return;
     }
 
-    // 存储事件处理器
-    this.messageHandlers.set(userId, handlers);
+    const token = this.getAuthToken();
+    if (!token) {
+      const err = new Error("未找到认证token");
+      handlers.onError && handlers.onError(err);
+      throw err;
+    }
 
-    // 创建AbortController用于取消连接
+    this.handlers.set(userId, handlers);
     const controller = new AbortController();
     this.controllers.set(userId, controller);
 
     try {
       const url = this.buildSSEUrl(userId);
-      console.log(`正在建立SSE连接: ${url}`);
-
-      const response = await fetch(url, {
-        method: 'GET',
+      const resp = await fetch(url, {
+        method: "GET",
         headers: {
-          'token': token, // 发送认证token
-          'Accept': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive'
+          Accept: "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+          token
         },
         signal: controller.signal,
+        mode: "cors"
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
       }
 
-      console.log(`SSE连接已建立: 用户${userId}`);
+      // 注意：真正的“连接成功”以服务端 event: connected 为准
+      // 这里不提前回调，以免造成重复
       this.reconnectAttempts.set(userId, 0);
 
-      // 调用连接成功回调
-      handlers.onConnected && handlers.onConnected({ userId });
-
-      // 开始读取流数据
-      this.readSSEStream(userId, response.body, handlers);
-
+      this.readSSEStream(userId, resp.body, handlers);
     } catch (error) {
-      console.error(`SSE连接失败: 用户${userId}`, error);
       this.handleError(userId, error);
       throw error;
     }
   }
 
-  /**
-   * 读取SSE流数据
-   * @param {string} userId - 用户ID
-   * @param {ReadableStream} stream - 响应流
-   * @param {Object} handlers - 事件处理器
-   */
   async readSSEStream(userId, stream, handlers) {
     const reader = stream.getReader();
     const decoder = new TextDecoder();
-    let buffer = '';
+    let buffer = "";
+    let currentEvent = "";
+    let currentDataLines = [];
+
+    const flushEvent = () => {
+      if (!currentEvent) return;
+      const dataStr = currentDataLines.join("\n");
+      this.handleSSEEvent(userId, currentEvent, dataStr, handlers);
+      currentEvent = "";
+      currentDataLines = [];
+    };
 
     try {
       while (true) {
         const { value, done } = await reader.read();
+        if (done) break;
 
-        if (done) {
-          console.log(`SSE流结束: 用户${userId}`);
-          break;
-        }
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
 
-        if (value) {
-          const chunk = decoder.decode(value, { stream: true });
-          buffer += chunk;
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
-          // 按行分割并处理SSE事件
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || ''; // 保留不完整的行
+        for (const rawLine of lines) {
+          const line = rawLine.trimEnd();
 
-          let currentEvent = '';
-          let currentData = '';
-
-          for (const line of lines) {
-            const trimmedLine = line.trim();
-
-            if (trimmedLine.startsWith('event:')) {
-              currentEvent = trimmedLine.substring(6).trim();
-            } else if (trimmedLine.startsWith('data:')) {
-              currentData = trimmedLine.substring(5).trim();
-            } else if (trimmedLine === '') {
-              // 空行表示事件结束，处理当前事件
-              if (currentEvent && currentData) {
-                this.handleSSEEvent(userId, currentEvent, currentData, handlers);
-              }
-              currentEvent = '';
-              currentData = '';
-            }
+          if (line.startsWith("event:")) {
+            // 新事件，先冲洗上一次
+            flushEvent();
+            currentEvent = line.substring(6).trim();
+          } else if (line.startsWith("data:")) {
+            currentDataLines.push(line.substring(5).trim());
+          } else if (line === "") {
+            // 事件结束
+            flushEvent();
           }
+          // 其他字段忽略（id:, retry:）
         }
       }
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error(`读取SSE流错误: 用户${userId}`, error);
+      if (error.name !== "AbortError") {
         this.handleError(userId, error);
       }
     } finally {
       try {
         reader.releaseLock();
-      } catch (e) {
-        // 忽略释放锁的错误
-      }
+      } catch (_) {}
     }
   }
 
-  /**
-   * 处理SSE事件
-   * @param {string} userId - 用户ID
-   * @param {string} eventType - 事件类型
-   * @param {string} eventData - 事件数据
-   * @param {Object} handlers - 事件处理器
-   */
   handleSSEEvent(userId, eventType, eventData, handlers) {
-    console.log(`收到SSE事件: ${eventType} -> ${eventData}`);
-
+    // console.log(`[SSE] ${eventType} -> ${eventData}`);
+    let data = eventData;
     try {
-      let data;
+      data = JSON.parse(eventData);
+    } catch (_) {
+      // 非JSON，保持原样字符串
+    }
 
-      // 尝试解析为JSON，如果失败则使用原始数据
-      try {
-        data = JSON.parse(eventData);
-      } catch (parseError) {
-        // 如果不是JSON格式，使用原始文本数据
-        data = eventData;
-        console.log(`事件数据不是JSON格式，使用原始数据: ${eventData}`);
-      }
-
-      switch (eventType) {
-        case 'connected':
-          handlers.onConnected && handlers.onConnected(data);
-          break;
-        case 'ai_stream_message':
-          handlers.onAiStreamMessage && handlers.onAiStreamMessage(data);
-          break;
-        case 'chat_message':
-          handlers.onChatMessage && handlers.onChatMessage(data);
-          break;
-        default:
-          console.log(`未处理的事件类型: ${eventType}`);
-      }
-    } catch (error) {
-      console.error('处理SSE事件失败:', error);
+    switch (eventType) {
+      case "connected":
+        handlers.onConnected && handlers.onConnected(data);
+        break;
+      case "heartbeat":
+        handlers.onHeartbeat && handlers.onHeartbeat(data);
+        break;
+      case "ai_stream_message":
+        handlers.onAiStreamMessage && handlers.onAiStreamMessage(data);
+        break;
+      case "chat_message":
+        handlers.onChatMessage && handlers.onChatMessage(data);
+        break;
+      default:
+        // console.log(`[SSE] 未处理的事件: ${eventType}`);
+        break;
     }
   }
 
-  /**
-   * 构建SSE URL
-   * @param {string} userId - 用户ID
-   * @returns {string} SSE URL
-   */
-  buildSSEUrl(userId) {
-    return `${this.baseURL}/api/chat/events/${userId}`;
-  }
-
-  /**
-   * 处理连接错误
-   * @param {string} userId - 用户ID
-   * @param {Error} error - 错误对象
-   */
   handleError(userId, error) {
-    const handlers = this.messageHandlers.get(userId);
-    const currentAttempts = this.reconnectAttempts.get(userId) || 0;
+    const handlers = this.handlers.get(userId);
+    handlers && handlers.onError && handlers.onError(error);
 
-    if (handlers && handlers.onError) {
-      handlers.onError(error);
-    }
-
-    // 尝试重连
-    if (currentAttempts < this.maxReconnectAttempts) {
-      this.reconnectAttempts.set(userId, currentAttempts + 1);
-
-      setTimeout(() => {
-        console.log(`尝试重连: 用户${userId}, 第${currentAttempts + 1}次`);
-        this.reconnect(userId);
-      }, this.reconnectDelay * (currentAttempts + 1));
+    const attempts = this.reconnectAttempts.get(userId) || 0;
+    if (attempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts.set(userId, attempts + 1);
+      setTimeout(() => this.reconnect(userId), this.reconnectDelay * (attempts + 1));
     } else {
-      console.error(`SSE连接失败，已达到最大重连次数: 用户${userId}`);
       this.disconnect(userId);
     }
   }
 
-  /**
-   * 重连到指定用户
-   * @param {string} userId - 用户ID
-   */
   reconnect(userId) {
-    const handlers = this.messageHandlers.get(userId);
-    if (handlers && handlers.onReconnect) {
-      handlers.onReconnect();
-    }
+    userId = String(userId);
+    const handlers = this.handlers.get(userId);
+    handlers && handlers.onReconnect && handlers.onReconnect();
 
-    // 取消当前连接
+    // 取消旧连接
     const controller = this.controllers.get(userId);
     if (controller) {
-      controller.abort();
+      try { controller.abort(); } catch (_) {}
       this.controllers.delete(userId);
     }
 
-    // 重新建立连接
-    this.connect(userId, handlers);
+    // 重新连接
+    this.connect(userId, handlers).catch(() => {});
   }
 
-  /**
-   * 断开与指定用户的SSE连接
-   * @param {string} userId - 用户ID
-   */
   disconnect(userId) {
+    userId = String(userId);
     const controller = this.controllers.get(userId);
     if (controller) {
-      controller.abort();
+      try { controller.abort(); } catch (_) {}
       this.controllers.delete(userId);
     }
-
-    this.messageHandlers.delete(userId);
+    this.handlers.delete(userId);
     this.reconnectAttempts.delete(userId);
-    console.log(`SSE连接已断开: 用户${userId}`);
+    // console.log(`[SSE] 断开: ${userId}`);
   }
 
-  /**
-   * 断开所有SSE连接
-   */
   disconnectAll() {
-    this.controllers.forEach((controller, userId) => {
-      controller.abort();
-    });
-
+    for (const [userId, controller] of this.controllers.entries()) {
+      try { controller.abort(); } catch (_) {}
+    }
     this.controllers.clear();
-    this.messageHandlers.clear();
+    this.handlers.clear();
     this.reconnectAttempts.clear();
-    console.log('所有SSE连接已断开');
   }
 
-  /**
-   * 检查用户是否已连接
-   * @param {string} userId - 用户ID
-   * @returns {boolean} 是否已连接
-   */
-  isConnected(userId) {
-    return this.controllers.has(userId);
-  }
-
-  /**
-   * 获取所有已连接的用户ID
-   * @returns {Array} 用户ID数组
-   */
-  getConnectedUsers() {
-    return Array.from(this.controllers.keys());
-  }
-
-  /**
-   * 获取在线用户数
-   * @returns {Promise<number>} 在线用户数
-   */
   async getOnlineCount() {
     try {
-      const authStore = useAuthStore();
-      const token = authStore.getToken;
-
-      const response = await fetch(`${this.baseURL}/api/chat/online-count`, {
-        method: 'GET',
-        headers: {
-          'token': token
-        }
+      const token = this.getAuthToken();
+      const resp = await fetch(`${this.baseURL}/api/chat/online-count`, {
+        headers: { token }
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.data || 0;
-    } catch (error) {
-      console.error('获取在线用户数失败:', error);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const json = await resp.json();
+      return json.data || 0;
+    } catch (e) {
+      console.error("获取在线人数失败:", e);
       return 0;
     }
   }
 
-  /**
-   * 检查用户是否在线
-   * @param {string} userId - 用户ID
-   * @returns {Promise<boolean>} 是否在线
-   */
   async isUserOnline(userId) {
     try {
-      const authStore = useAuthStore();
-      const token = authStore.getToken;
-
-      const response = await fetch(`${this.baseURL}/api/chat/is-online/${userId}`, {
-        method: 'GET',
-        headers: {
-          'token': token
-        }
+      const token = this.getAuthToken();
+      const resp = await fetch(`${this.baseURL}/api/chat/is-online/${encodeURIComponent(userId)}`, {
+        headers: { token }
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.data || false;
-    } catch (error) {
-      console.error('检查用户在线状态失败:', error);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const json = await resp.json();
+      return json.data === true;
+    } catch (e) {
+      console.error("检查用户在线状态失败:", e);
       return false;
     }
   }
 }
 
-// 创建单例实例
 const chatSSEService = new ChatSSEService();
 
-// 在页面卸载时清理所有连接
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', () => {
+// 页面卸载时清理所有连接
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
     chatSSEService.disconnectAll();
   });
 }

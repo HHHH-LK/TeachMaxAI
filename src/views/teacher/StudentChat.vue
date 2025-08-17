@@ -62,9 +62,9 @@
               <h3 class="header-name">{{ selectedStudent.name }}</h3>
               <p class="header-status">
                 {{ selectedStudent.isOnline ? '在线' : '离线' }}
-                <span v-if="connectionStatusMap.get(selectedStudent.id)"
-                      :class="'connection-indicator ' + connectionStatusMap.get(selectedStudent.id)">
-                  {{ getConnectionStatusText(connectionStatusMap.get(selectedStudent.id)) }}
+                <span v-if="connectionStatus"
+                      :class="'connection-indicator ' + connectionStatus">
+                  {{ getConnectionStatusText(connectionStatus) }}
                 </span>
               </p>
             </div>
@@ -133,12 +133,10 @@
       <el-button @click="showHistoryDialog = false">关闭</el-button>
     </template>
   </el-dialog>
-
-
 </template>
 
 <script setup>
-import { ref, watch, nextTick, computed, onUnmounted } from 'vue';
+import { ref, watch, nextTick, computed, onMounted, onUnmounted } from 'vue';
 import { ElContainer, ElAside, ElMain, ElAvatar, ElScrollbar, ElInput, ElButton, ElEmpty, ElTag, ElDropdown, ElDropdownMenu, ElDropdownItem, ElIcon, ElSkeleton, ElDescriptions, ElDescriptionsItem } from 'element-plus';
 import {
   Search as ElIconSearch,
@@ -147,17 +145,22 @@ import {
   MoreFilled,
   Refresh as ElIconRefresh,
 } from '@element-plus/icons-vue';
-import { useStudentChat } from '@/composables/useStudentChat.js';
 import teacherAvatar from '@/assets/teacher-avatar.png';
 import {teacherService, isOnline, studentService} from "@/services/api.js";
 import chatSSEService from '@/services/chatSSEService.js';
 import teacherChatApiService from '@/services/teacherChatApiService.js';
 import { getCurrentUser } from '@/utils/userUtils.js';
 import { ElMessage } from 'element-plus';
+import { useAuthStore } from '@/store/authStore.js';
 
 // 学生数据状态
 const students = ref([]);
 const loading = ref(false);
+
+// 全局（当前老师自己）的SSE连接状态
+const sseUserId = ref(null);
+const connectionStatus = ref('disconnected'); // connecting | connected | error | reconnecting | disconnected
+const lastHeartbeatAt = ref(0);
 
 // 获取未读消息数据
 const fetchUnreadMessages = async () => {
@@ -197,20 +200,12 @@ const fetchUnreadMessages = async () => {
   }
 };
 
-// 获取学生在线状态
+// 获取学生在线状态 - 改用 chatSSEService
 const fetchStudentOnlineStatus = async (studentId) => {
   try {
-    const res = await isOnline(studentId);
-    // console.log(`获取学生${studentId}在线状态:`, res);
-
-    if (res.data) {
-      return res.data.data === true;
-    } else {
-      // console.warn(`获取学生${studentId}在线状态失败`);
-      return false;
-    }
+    return await chatSSEService.isUserOnline(String(studentId));
   } catch (error) {
-    // console.error(`获取学生${studentId}在线状态出错:`, error);
+    console.error(`获取学生${studentId}在线状态出错:`, error);
     return false;
   }
 };
@@ -235,7 +230,6 @@ const fetchClassStudents = async (courseId) => {
               if (userResponse.data && userResponse.data.code === 0 && userResponse.data.data) {
                 // 根据实际API响应结构获取用户ID
                 userId = userResponse.data.data.userId || userResponse.data.data.id;
-                // console.log(`学号${student.studentNumber}对应的用户ID:`, userId);
               } else {
                 console.log(`学号${student.studentNumber}获取用户ID失败，使用学号作为ID`);
               }
@@ -256,12 +250,14 @@ const fetchClassStudents = async (courseId) => {
               };
             } catch (error) {
               console.error(`获取学号${student.studentNumber}的用户信息失败:`, error);
+              return null;
             }
           })
       );
 
-      // 批量获取在线状态
-      const onlineStatusPromises = studentsWithUserIds.map(async (student) => {
+      // 过滤掉null值并批量获取在线状态
+      const validStudents = studentsWithUserIds.filter(Boolean);
+      const onlineStatusPromises = validStudents.map(async (student) => {
         const onlineStatus = await fetchStudentOnlineStatus(student.id);
         return { ...student, isOnline: onlineStatus };
       });
@@ -274,6 +270,34 @@ const fetchClassStudents = async (courseId) => {
   } catch (error) {
     console.error(`获取课程${courseId}学生数据出错:`, error);
     return [];
+  }
+};
+
+// 统一建立连接：页面 mount 后只连一次（用自己的 userId）
+const connectSSEOnce = async () => {
+  try {
+    const currentUser = getCurrentUser();
+    const userId = String(currentUser.id);
+    sseUserId.value = userId;
+
+    if (chatSSEService.isConnected(userId)) {
+      connectionStatus.value = 'connected';
+      return;
+    }
+
+    connectionStatus.value = 'connecting';
+
+    await chatSSEService.connect(userId, {
+      onConnected: () => (connectionStatus.value = 'connected'),
+      onHeartbeat: () => (lastHeartbeatAt.value = Date.now()),
+      onAiStreamMessage: (d) => console.log('AI流式消息', d),
+      onChatMessage: (d) => handleIncomingMessageUnifiedForTeacher(d),
+      onError: () => (connectionStatus.value = 'error'),
+      onReconnect: () => (connectionStatus.value = 'reconnecting')
+    });
+  } catch (e) {
+    console.error('SSE连接失败', e);
+    connectionStatus.value = 'error';
   }
 };
 
@@ -293,7 +317,6 @@ const refreshAllStudents = async () => {
     const allStudents = [...course1Students, ...course2Students];
 
     if (allStudents.length > 0) {
-      // console.log('加载的学生数据:', allStudents);
       students.value = allStudents;
       ElMessage.success(`成功加载 ${allStudents.length} 名学生数据`);
     } else {
@@ -309,20 +332,13 @@ const refreshAllStudents = async () => {
   }
 };
 
-
-
-// 页面加载时获取学生数据
-refreshAllStudents();
-
-
-
 // 模拟学生数据作为备用
 const mockStudents = ref([
   {
     id: 16,
     name: '张小明',
     description: '武术特长生，对传统文化有浓厚兴趣。',
-    avatar: 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.pngs',
+    avatar: 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png',
     isOnline: true,
     tags: ['Java', '数据结构与算法'],
   },
@@ -330,18 +346,10 @@ const mockStudents = ref([
     id: 2,
     name: '张伟',
     description: '计算机科学专业，擅长编程和算法。',
-    avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epicture.pngs',
+    avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epicture.png',
     isOnline: false,
     tags: ['计算机', '编程', '算法'],
-  },
-  {
-    id: 3,
-    name: '王芳',
-    description: '艺术设计学院学生，热爱绘画和创意。',
-    avatar: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpegs',
-    isOnline: false,
-    tags: ['艺术', '设计', '绘画'],
-  },
+  }
 ]);
 
 // 状态
@@ -350,14 +358,9 @@ const chatMessages = ref({});
 const currentChatMessages = ref([]);
 const unreadMap = ref({});
 const isConnecting = ref(false);
-const connectionStatus = ref('disconnected');
 const typingStatus = ref('');
 const filteredStudents = computed(() => students.value);
 const onlineStudents = computed(() => students.value.filter(s => s.isOnline));
-
-// SSE连接管理
-const sseConnections = ref(new Map()); // 存储每个学生的SSE连接
-const connectionStatusMap = ref(new Map()); // 存储每个学生的连接状态
 
 // 获取或创建会话ID
 const conversationIds = ref(new Map()); // 存储学生ID对应的会话ID
@@ -380,12 +383,48 @@ const getConversationId = (studentId) => {
   return teacherId;
 };
 
+// 统一处理收到的消息（老师端）
+const normalizeIncomingChat = (raw) => {
+  const src = typeof raw === 'string' ? (() => { try { return JSON.parse(raw) } catch { return {} } })() : (raw || {});
+  return {
+    senderUserId: String(src.senderUserId ?? src.senderId ?? src.fromUserId ?? ''),
+    receiverUserId: String(src.receiverUserId ?? src.receiverId ?? src.toUserId ?? ''),
+    content: src.content ?? src.message ?? '',
+    createdAt: src.createdAt ?? src.time ?? Date.now()
+  };
+};
+
+const handleIncomingMessageUnifiedForTeacher = (raw) => {
+  const currentUser = getCurrentUser();
+  const me = String(currentUser.id);
+  const { senderUserId, receiverUserId, content, createdAt } = normalizeIncomingChat(raw);
+
+  if (!content) return;
+  if (senderUserId === me) return; // 忽略自己发的
+
+  // 老师端，来自"学生"的消息，落到学生ID对应的会话
+  const studentId = senderUserId;
+  const timeStr = new Date(createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+
+  if (!chatMessages.value[studentId]) chatMessages.value[studentId] = [];
+  chatMessages.value[studentId].push({
+    sender: 'student',
+    content,
+    time: timeStr
+  });
+
+  if (selectedStudent.value?.id === studentId) {
+    currentChatMessages.value = chatMessages.value[studentId];
+    nextTick(() => { scrollToBottom(); });
+  } else {
+    unreadMap.value[studentId] = (unreadMap.value[studentId] || 0) + 1;
+    ElMessage.info(`收到来自${selectedStudent.value?.name || '学生'}的消息`);
+  }
+};
+
 // 方法
 const selectStudent = async (student) => {
   console.log('选中的学生对象:', student);
-  console.log('学生ID:', student?.id);
-  console.log('学生姓名:', student?.name);
-
   selectedStudent.value = student;
 
   // 如果该学生没有聊天记录，初始化一个默认的欢迎消息
@@ -425,146 +464,76 @@ const selectStudent = async (student) => {
     console.error('建立连接失败:', error);
     ElMessage.error(`连接${student.name}失败`);
   }
-
-  // 建立与该学生的SSE连接
-  await connectToStudentSSE(student.id);
-};
-
-// 建立与学生的SSE连接
-const connectToStudentSSE = async (studentId) => {
-  try {
-    // 如果已经连接，先断开
-    if (sseConnections.value.has(studentId)) {
-      disconnectFromStudentSSE(studentId);
-    }
-
-    // 获取当前教师ID
-    const currentUser = getCurrentUser();
-    const teacherId = currentUser.id;
-
-    if (!teacherId) {
-      throw new Error('无法获取教师用户ID');
-    }
-
-    console.log(`正在建立与学生${studentId}的SSE连接，教师ID: ${teacherId}...`);
-    connectionStatusMap.value.set(studentId, 'connecting');
-
-    await chatSSEService.connect(teacherId.toString(), {
-      onConnected: (data) => {
-        console.log(`与学生${studentId}的SSE连接已建立:`, data);
-        connectionStatusMap.value.set(studentId, 'connected');
-        sseConnections.value.set(studentId, true);
-      },
-      onChatMessage: (data) => {
-        console.log(`收到来自学生${studentId}的消息:`, data);
-        handleIncomingMessage(studentId, data);
-      },
-      onError: (error) => {
-        console.error(`与学生${studentId}的SSE连接错误:`, error);
-        connectionStatusMap.value.set(studentId, 'error');
-        sseConnections.value.delete(studentId);
-      },
-      onReconnect: () => {
-        console.log(`正在重连学生${studentId}...`);
-        connectionStatusMap.value.set(studentId, 'reconnecting');
-      }
-    });
-  } catch (error) {
-    console.error(`建立与学生${studentId}的SSE连接失败:`, error);
-    connectionStatusMap.value.set(studentId, 'error');
-    ElMessage.error(`无法连接到学生${studentId}`);
-  }
-};
-
-// 断开与学生的SSE连接
-const disconnectFromStudentSSE = (studentId) => {
-  try {
-    // 获取当前教师ID
-    const currentUser = getCurrentUser();
-    const teacherId = currentUser.id;
-
-    if (teacherId) {
-      chatSSEService.disconnect(teacherId.toString());
-    }
-    sseConnections.value.delete(studentId);
-    connectionStatusMap.value.delete(studentId);
-    console.log(`已断开与学生${studentId}的SSE连接`);
-  } catch (error) {
-    console.error(`断开与学生${studentId}的SSE连接失败:`, error);
-  }
-};
-
-// 处理收到的消息
-const handleIncomingMessage = (studentId, data) => {
-  // 获取当前用户信息
-  const currentUser = getCurrentUser();
-  const currentUserId = Number(currentUser.id);
-
-  // 检查消息发送者，避免显示自己发送的消息
-  const messageSenderId = Number(data.senderUserId || data.senderId || data.userId);
-
-  console.log('收到消息详情:', {
-    消息发送者ID: messageSenderId,
-    当前用户ID: currentUserId,
-    是否为自己发送: messageSenderId === currentUserId,
-    消息内容: data.content,
-    消息数据: data
-  });
-
-  // 如果是自己发送的消息，不处理（避免回显）
-  if (messageSenderId === currentUserId) {
-    console.log('检测到自己发送的消息，跳过处理');
-    return;
-  }
-
-  // 确保消息内容存在
-  if (!data.content && !data.message) {
-    console.log('消息内容为空，跳过处理');
-    return;
-  }
-
-  const currentTime = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-
-  // 确保该学生的消息数组存在
-  if (!chatMessages.value[studentId]) {
-    chatMessages.value[studentId] = [];
-  }
-
-  // 添加新消息
-  const newMessage = {
-    sender: 'student',
-    content: data.content || data.message || '收到一条消息',
-    time: currentTime
-  };
-
-  chatMessages.value[studentId].push(newMessage);
-
-  // 如果当前选中的学生是消息发送者，更新显示
-  if (selectedStudent.value && selectedStudent.value.id === studentId) {
-    currentChatMessages.value = chatMessages.value[studentId];
-    nextTick(() => {
-      scrollToBottom();
-    });
-  } else {
-    // 增加未读消息计数
-    unreadMap.value[studentId] = (unreadMap.value[studentId] || 0) + 1;
-  }
-
-  // 显示通知
-  ElMessage.info(`收到来自${selectedStudent.value?.name || '学生'}的消息`);
 };
 
 // 发送消息到后端
 const sendMessageToBackend = async (studentId, content) => {
   try {
-    // 获取会话ID
-    const conversationId = conversationIds.value.get(studentId);
-    if (!conversationId) {
-      throw new Error('未找到会话ID，请先建立连接');
+    const authStore = useAuthStore();
+    const token = authStore.getToken;
+
+    if (!token) {
+      throw new Error('未找到认证token，请先登录');
     }
 
-    const result = await teacherChatApiService.sendMessage(studentId, content, 'text', null, conversationId);
-    return result;
+    // 验证参数
+    if (!studentId) {
+      throw new Error('学生ID不能为空');
+    }
+
+    // 获取当前用户信息
+    const currentUser = getCurrentUser();
+
+    // 验证用户信息
+    if (!currentUser || !currentUser.id) {
+      throw new Error('用户信息不完整，请重新登录');
+    }
+
+    // 验证不能给自己发消息
+    const currentUserId = String(currentUser.id);
+    const studentIdStr = String(studentId);
+
+    if (currentUserId === studentIdStr) {
+      throw new Error('不能给自己发送消息');
+    }
+
+    // 获取会话ID
+    let conversationId = conversationIds.value.get(studentId);
+
+    // 如果没有提供会话ID，使用教师用户ID作为会话ID
+    if (!conversationId) {
+      conversationId = Number(currentUser.id);
+      console.log('使用教师用户ID作为会话ID:', conversationId);
+    }
+
+    const requestData = {
+      conversationId: conversationId,
+      content: content,
+      messageType: 'text',
+      fileUrl: null,
+      useId: studentId // 接收者用户ID（学生ID）
+    };
+
+    console.log('发送消息请求:', requestData);
+
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8108'}/studentteacher/chat/sentChatMemory`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'token': token
+      },
+      body: JSON.stringify(requestData)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('发送消息响应:', result);
+    return { success: true, ...result };
   } catch (error) {
     console.error('调用后端发送消息API失败:', error);
     throw error;
@@ -589,7 +558,7 @@ const sendMessage = async (messageContent) => {
 
   // 添加到聊天记录
   chatMessages.value[studentId].push(newMessage);
-  console.log("收到消息教师消息" + newMessage)
+  console.log("收到消息教师消息", newMessage);
 
   // 更新当前显示的消息列表
   currentChatMessages.value = chatMessages.value[studentId];
@@ -619,7 +588,6 @@ const markMessagesAsRead = () => {
   }
 };
 
-
 // 搜索查询
 const searchQuery = ref('');
 
@@ -632,7 +600,7 @@ const filteredStudentsBySearch = computed(() => {
   return filteredStudents.value.filter(student =>
       student.name.toLowerCase().includes(query) ||
       student.description.toLowerCase().includes(query) ||
-      student.courseName.toLowerCase().includes(query)
+      student.courseName?.toLowerCase().includes(query)
   );
 });
 
@@ -646,7 +614,7 @@ const chatMessagesScrollbar = ref(null);
 const showHistoryDialog = ref(false);
 
 // 监听选中的学生变化，更新当前对话消息
-watch(selectedStudent, async (newVal, oldVal) => {
+watch(selectedStudent, (newVal) => {
   if (newVal) {
     currentChatMessages.value = chatMessages.value[newVal.id] || [];
     // 切换学生后，滚动到底部
@@ -655,11 +623,6 @@ watch(selectedStudent, async (newVal, oldVal) => {
     });
   } else {
     currentChatMessages.value = [];
-  }
-
-  // 断开旧学生的连接，连接新学生
-  if (oldVal && oldVal.id !== newVal?.id) {
-    disconnectFromStudentSSE(oldVal.id);
   }
 }, { immediate: true });
 
@@ -694,54 +657,45 @@ const getConnectionStatusText = (status) => {
   return statusMap[status] || '';
 };
 
-// 组件卸载时清理所有SSE连接
+// 组件挂载时获取学生数据并建立SSE连接
+onMounted(() => {
+  refreshAllStudents();
+  connectSSEOnce();
+});
+
+// 卸载时断开自己的连接
 onUnmounted(() => {
-  console.log('组件卸载，清理所有SSE连接');
-  sseConnections.value.forEach((connected, studentId) => {
-    if (connected) {
-      disconnectFromStudentSSE(studentId);
-    }
-  });
-  sseConnections.value.clear();
-  connectionStatusMap.value.clear();
+  if (sseUserId.value) {
+    chatSSEService.disconnect(sseUserId.value);
+  }
 });
 </script>
 
 <style lang="less" scoped>
-// 引入参照的自定义色彩
-@primary: #2563eb; /* 主蓝色 */
-@primary-light: #3b82f6; /* 浅一点的蓝色 */
-@primary-dark: #1d4ed8; /* 深一点的蓝色 */
-@primary-bg: #eff6ff; /* 蓝色背景 */
-@primary-border: #dbeafe; /* 蓝色边框 */
-@secondary: #60a5fa; /* 辅助蓝色 */
-@success: #10b981; /* 成功色（搭配蓝色） */
-@warning: #f59e0b; /* 警告色 */
-@danger: #ef4444; /* 危险色 */
-@text-primary: #1e293b; /* 主要文字 */
-@text-secondary: #64748b; /* 次要文字 */
-@text-tertiary: #94a3b8; /* tertiary文字 */
-@bg-white: #ffffff; /* 白色背景 */
-@bg-light: #f8fafc; /* 浅色背景 */
-@border-light: #e2e8f0; /* 浅色边框 */
-@shadow-sm: 0 2px 8px rgba(37, 99, 235, 0.1); /* 小阴影 */
-@shadow-md: 0 4px 16px rgba(37, 99, 235, 0.15); /* 中阴影 */
+// 引入参照的自定义色彩（与学生端相同的样式）
+@primary: #2563eb;
+@primary-light: #3b82f6;
+@primary-dark: #1d4ed8;
+@primary-bg: #eff6ff;
+@primary-border: #dbeafe;
+@secondary: #60a5fa;
+@success: #10b981;
+@warning: #f59e0b;
+@danger: #ef4444;
+@text-primary: #1e293b;
+@text-secondary: #64748b;
+@text-tertiary: #94a3b8;
+@bg-white: #ffffff;
+@bg-light: #f8fafc;
+@border-light: #e2e8f0;
+@shadow-sm: 0 2px 8px rgba(37, 99, 235, 0.1);
+@shadow-md: 0 4px 16px rgba(37, 99, 235, 0.15);
 @radius-sm: 6px;
 @radius-md: 12px;
 @radius-lg: 16px;
 @transition: all 0.3s ease;
 @breakpoint-md: 1024px;
 @breakpoint-sm: 768px;
-
-// 图标基础样式
-.icon-base() {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
 
 #apps {
   font-family: "Inter", "Helvetica Neue", sans-serif;
@@ -820,8 +774,6 @@ onUnmounted(() => {
         opacity: 0.8;
       }
     }
-
-
   }
 }
 
@@ -839,14 +791,96 @@ onUnmounted(() => {
       }
       &.is-focus {
         border-color: @primary;
-        box-shadow: 0 0 0 1px @primary inset, 0 3px 10px rgba(37, 99, 235, 0.1);
+        box-shadow: 0 0 0 1px @primary inset, 0 3px 12px rgba(37, 99, 235, 0.1);
       }
     }
-    /deep/ .el-input__prefix {
-      color: @text-secondary;
+    /deep/ .el-input-group__append {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
     }
   }
 }
+
+/deep/ .el-scrollbar__wrap {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(37, 99, 235, 0.4);
+    border-radius: 4px;
+    &:hover {
+      background-color: rgba(37, 99, 235, 0.6);
+    }
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+/deep/ .el-empty {
+  /deep/ .el-empty__image {
+    margin-bottom: 15px;
+  }
+  /deep/ .el-empty__description p {
+    font-size: 15px;
+    color: @text-secondary;
+  }
+}
+
+// 响应式设计
+@media (max-width: @breakpoint-md) {
+  .student-selection-panel {
+    padding: 25px 15px;
+  }
+
+  .chat-header {
+    padding: 15px 20px;
+  }
+
+  .chat-messages-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: @breakpoint-sm) {
+  .common-layout {
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .student-selection-panel {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+
+    &.active {
+      transform: translateX(0);
+    }
+  }
+
+  .chat-main-panel {
+    width: 100% !important;
+  }
+}
+    is-focus {
+      border-color: @primary;
+      box-shadow: 0 0 0 1px @primary inset, 0 3px 10px rgba(37, 99, 235, 0.1);
+    }
+
+    /deep/ .el-input__prefix {
+      color: @text-secondary;
+
+    }
+
 
 .student-list-scrollbar {
   flex-grow: 1;
@@ -891,8 +925,7 @@ onUnmounted(() => {
     box-shadow: @shadow-sm;
     transform: scale(1.01);
     .student-name,
-    .student-description,
-    .student-tags .el-tag {
+    .student-description {
       color: @text-primary;
     }
     .online-status {
@@ -964,20 +997,10 @@ onUnmounted(() => {
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-
   }
 }
 
-/deep/ .el-empty {
-  /deep/ .el-empty__image {
-    margin-bottom: 15px;
-  }
-  /deep/ .el-empty__description p {
-    font-size: 15px;
-    color: @text-secondary;
-  }
-}
-
+// 其余样式与学生端相同，包括聊天面板、消息样式等
 .chat-main-panel {
   background-color: @bg-light;
   display: flex;
@@ -1008,14 +1031,6 @@ onUnmounted(() => {
   align-items: center;
   height: 100%;
   background-color: @primary-bg;
-  /deep/ .el-empty {
-    /deep/ .el-empty__description p {
-      font-size: 18px;
-      color: @text-secondary;
-      margin-top: 20px;
-      font-weight: 500;
-    }
-  }
 }
 
 .chat-panel {
@@ -1095,29 +1110,6 @@ onUnmounted(() => {
   padding: 30px;
   overflow-y: auto;
   background-color: transparent;
-
-  .message-list {
-    display: flex;
-    flex-direction: column;
-
-    .message-item {
-      width: 100%;
-
-      .message-content {
-        max-width: 80%;
-
-        .message-bubble {
-          max-width: 100%;
-
-          p {
-            word-break: break-word;
-            overflow-wrap: break-word;
-            white-space: pre-wrap;
-          }
-        }
-      }
-    }
-  }
 }
 
 .message-list {
@@ -1227,6 +1219,7 @@ onUnmounted(() => {
   border-top: 1px solid @primary-border;
   background-color: @bg-white;
   box-shadow: 0 -2px 10px rgba(37, 99, 235, 0.05);
+
   .el-button {
     border-radius: 50%;
     width: 40px;
@@ -1268,101 +1261,123 @@ onUnmounted(() => {
 
   .message-input {
     width: 100%;
+
     /deep/ .el-input__wrapper {
       border-radius: 30px;
       padding: 12px 20px;
       box-shadow: 0 3px 12px rgba(37, 99, 235, 0.05) inset;
       border: 1px solid @primary-border;
       transition: @transition;
+
       &:hover {
         border-color: @secondary;
       }
-      &.is-focus {
-        border-color: @primary;
-        box-shadow: 0 0 0 1px @primary inset, 0 3px 12px rgba(37, 99, 235, 0.1);
+    }
+
+    .message-input {
+      width: 100%;
+
+      /deep/ .el-input__wrapper {
+        border-radius: 30px;
+        padding: 12px 20px;
+        box-shadow: 0 3px 12px rgba(37, 99, 235, 0.05) inset;
+        border: 1px solid @primary-border;
+        transition: @transition;
+
+        &:hover {
+          border-color: @secondary;
+        }
+
+        &.is-focus {
+          border-color: @primary;
+          box-shadow: 0 0 0 1px @primary inset, 0 3px 12px rgba(37, 99, 235, 0.1);
+        }
+      }
+
+      /deep/ .el-input-group__append {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
       }
     }
-    /deep/ .el-input-group__append {
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      padding: 0 10px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-  }
-}
-
-.unread-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: @danger;
-  color: @bg-white;
-  border-radius: 50%;
-  padding: 2px 7px;
-  font-size: 12px;
-  font-weight: bold;
-  z-index: 2;
-  box-shadow: 0 0 4px rgba(0,0,0,0.15);
-}
-
-/deep/ .el-scrollbar__wrap {
-  &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(37, 99, 235, 0.4);
-    border-radius: 4px;
-    &:hover {
-      background-color: rgba(37, 99, 235, 0.6);
-    }
-  }
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-}
-
-
-
-// 响应式设计
-@media (max-width: @breakpoint-md) {
-  .student-selection-panel {
-    padding: 25px 15px;
   }
 
-  .chat-header {
-    padding: 15px 20px;
-  }
-
-  .chat-messages-container {
-    padding: 20px;
-  }
-}
-
-@media (max-width: @breakpoint-sm) {
-  .common-layout {
-    height: 100vh;
-    border-radius: 0;
-  }
-
-  .student-selection-panel {
-    width: 100% !important;
-    height: 100% !important;
+  .unread-badge {
     position: absolute;
-    z-index: 100;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    top: -6px;
+    right: -6px;
+    background: @danger;
+    color: @bg-white;
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+  }
 
-    &.active {
-      transform: translateX(0);
+  /deep/ .el-scrollbar__wrap {
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(37, 99, 235, 0.4);
+      border-radius: 4px;
+
+      &:hover {
+        background-color: rgba(37, 99, 235, 0.6);
+      }
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
     }
   }
 
-  .chat-main-panel {
-    width: 100% !important;
+
+  // 响应式设计
+  @media (max-width: @breakpoint-md) {
+    .student-selection-panel {
+      padding: 25px 15px;
+    }
+
+    .chat-header {
+      padding: 15px 20px;
+    }
+
+    .chat-messages-container {
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: @breakpoint-sm) {
+    .common-layout {
+      height: 100vh;
+      border-radius: 0;
+    }
+
+    .student-selection-panel {
+      width: 100% !important;
+      height: 100% !important;
+      position: absolute;
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+
+      &.active {
+        transform: translateX(0);
+      }
+    }
+
+    .chat-main-panel {
+      width: 100% !important;
+    }
   }
 }
 </style>
