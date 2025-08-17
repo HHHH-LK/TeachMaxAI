@@ -21,19 +21,111 @@
           <div class="problem-container">
             <div class="problem">{{ question }}</div>
 
-            <div class="answer-input">
-              <textarea
+            <!-- 判断题专用界面 -->
+            <div v-if="isTrueFalse" class="true-false-container">
+              <div
+                class="true-option"
+                :class="{
+                  selected: selectedOption === '正确',
+                  correct: showExplanation && isAnswerCorrect('正确'),
+                  incorrect: showExplanation && !isAnswerCorrect('正确'),
+                }"
+                @click="selectOption('正确')"
+              >
+                <div class="option-content">
+                  <div class="option-icon">✓</div>
+                  <div class="option-text">正确</div>
+                </div>
+              </div>
+              <div
+                class="false-option"
+                :class="{
+                  selected: selectedOption === '错误',
+                  correct: showExplanation && isAnswerCorrect('错误'),
+                  incorrect: showExplanation && !isAnswerCorrect('错误'),
+                }"
+                @click="selectOption('错误')"
+              >
+                <div class="option-content">
+                  <div class="option-icon">✗</div>
+                  <div class="option-text">错误</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 其他选择题 -->
+            <div v-else-if="isChoiceQuestion" class="choice-options">
+              <div
+                v-for="(option, index) in answers"
+                :key="index"
+                class="option"
+                :class="{
+                  selected: isSelected(option),
+                  correct: showExplanation,
+                  incorrect: showExplanation && !isSelected(option),
+                }"
+                @click="selectOption(option)"
+              >
+                <span v-if="isMultipleChoice" class="checkbox">
+                  <span v-if="isSelected(option)" class="checkmark">✓</span>
+                </span>
+                {{ option }}
+              </div>
+
+              <!-- 多选题提交按钮 -->
+              <div v-if="isMultipleChoice" class="multiple-choice-submit">
+                <button
+                  class="submit-button"
+                  @click="submitAnswer"
+                  :disabled="isSubmitting || selectedOptions.length === 0"
+                >
+                  <span class="button-text">提交答案</span>
+                  <span class="button-glow"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 填空题输入框 -->
+            <div v-else-if="isShortAnswer" class="short-answer-input">
+              <input
+                type="text"
                 v-model="userAnswer"
                 placeholder="请输入您的答案"
-                rows="4"
-                @keydown.enter.exact.prevent="submitAnswer"
-              ></textarea>
-              <button class="submit-button" @click="submitAnswer">
+                @keydown.enter="submitAnswer"
+                 @input="logInput"
+              />
+              <button
+                class="submit-button"
+                @click="submitAnswer"
+                :disabled="isSubmitting"
+              >
                 <span class="button-text">提交</span>
                 <span class="button-glow"></span>
               </button>
             </div>
 
+            <!-- 问答题输入框 -->
+            <div v-else-if="isFillBank" class="answer-input">
+              <textarea
+                v-model="userAnswer"
+                placeholder="请详细阐述您的答案"
+                rows="4"
+                @keydown.enter="submitAnswer"
+                :disabled="isSubmitting"
+              ></textarea>
+              <button
+                class="submit-button"
+                @click="submitAnswer"
+                :disabled="isSubmitting"
+              >
+                <span class="button-text">提交</span>
+                <span class="button-glow"></span>
+              </button>
+            </div>
+            <div v-else class="unknown-question-type">
+              <p>未知题型，无法显示题目</p>
+              <p>题目类型: {{ props.questionType }}</p>
+            </div>
             <div class="timer">
               <span>剩余时间:</span>
               <div class="time-bar">
@@ -45,18 +137,21 @@
               <span>{{ timeLeft }}秒</span>
             </div>
 
-            <div v-if="feedback" :class="['feedback', feedbackClass]">
+            <!-- 判题状态提示 -->
+            <div v-if="isChecking" class="checking-status">
+              <div class="loading-spinner"></div>
+              <div class="checking-text">正在判题中...</div>
+            </div>
+
+            <div v-else-if="feedback" :class="['feedback', feedbackClass]">
               {{ feedback }}
+              <div v-if="showExplanation" class="explanation">
+                <p><strong>正确答案:</strong> {{ correctAnswerDisplay }}</p>
+                <p><strong>解析:</strong> {{ explanation }}</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="give-up-button" @click="handleGiveUp">
-          <span class="button-text">放弃</span>
-          <span class="button-glow"></span>
-        </button>
       </div>
     </div>
   </div>
@@ -64,6 +159,8 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { gameService } from "@/services/game";
+import userConfig from "@/config/userConfig";
 
 const props = defineProps({
   question: {
@@ -74,20 +171,61 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  correctAnswers: {
+    type: Array,
+    required: true,
+  },
   timeLimit: {
     type: Number,
     default: 120,
   },
+  questionType: {
+    type: String,
+    validator: (value) => {
+      return [
+        "single_choice",
+        "multiple_choice",
+        "true_false",
+        "fill_blank",
+        "short_answer",
+      ].includes(value);
+    },
+  },
+  questionId: {
+    type: Number,
+    required: true,
+  },
+  floorId: {
+    type: Number,
+    required: true,
+  },
+  changeCount: {
+    type: Number,
+    default: 0,
+  },
+  explanation: {
+    type: String,
+    required: true,
+  },
 });
 
-const emit = defineEmits(["close", "completed"]);
+const emit = defineEmits(["close", "completed", "give-up", "damage"]);
 
 // 用户答案
 const userAnswer = ref("");
+const selectedOptions = ref([]);
+const selectedOption = ref("");
 const feedback = ref("");
 const feedbackClass = ref("");
 const timeLeft = ref(props.timeLimit);
 const timer = ref(null);
+const isModalOpen = ref(true);
+const isSubmitting = ref(false);
+const showExplanation = ref(false);
+const explanation = ref("");
+const correctAnswerDisplay = ref("");
+const damageValue = ref(0);
+const isChecking = ref(false);
 
 // 粒子效果
 const particles = ref([]);
@@ -104,6 +242,32 @@ for (let i = 0; i < 30; i++) {
     },
   });
 }
+
+
+
+
+// 计算属性
+const isChoiceQuestion = computed(() => {
+  return ["single_choice", "multiple_choice", "true_false"].includes(
+    props.questionType
+  );
+});
+
+const isFillBank = computed(() => {
+  return props.questionType === "fill_blank";
+});
+
+const isShortAnswer = computed(() => {
+  return props.questionType === "short_answer";
+});
+
+const isMultipleChoice = computed(() => {
+  return props.questionType === "multiple_choice";
+});
+
+const isTrueFalse = computed(() => {
+  return props.questionType === "true_false";
+});
 
 // 时间百分比
 const timePercentage = computed(() => {
@@ -128,62 +292,189 @@ const startTimer = () => {
   }, 1000);
 };
 
-// 提交答案
-const submitAnswer = () => {
-  if (userAnswer.value.trim() === "") {
-    feedback.value = "请输入答案";
-    feedbackClass.value = "error";
-    return;
+// 检查选项是否被选中
+const isSelected = (option) => {
+  if (isMultipleChoice.value) {
+    return selectedOptions.value.includes(option);
+  } else {
+    return selectedOption.value === option;
   }
-
-  // 检查答案是否正确（不区分大小写）
-  const userAnswerNormalized = userAnswer.value.trim().toLowerCase();
-  const isCorrect = props.answers.some((answer) =>
-    userAnswerNormalized.includes(answer.toLowerCase())
-  );
-
-  // 处理挑战完成
-  handleChallengeCompleted(isCorrect);
 };
 
-// 处理放弃挑战
-const handleGiveUp = () => {
-  // 触发敌人攻击玩家
-  const event = new CustomEvent("player-attack", {
-    detail: { success: false },
-  });
-  document.dispatchEvent(event);
+// 检查选项是否正确（用于样式）
+const isAnswerCorrect = (option) => {
+  if (!props.correctAnswers || props.correctAnswers.length === 0) return false;
 
-  // 设置反馈文本
-  feedback.value = "✗ 放弃挑战，挑战失败";
-  feedbackClass.value = "error";
+  const correctAnswer = props.correctAnswers[0] ? "正确" : "错误";
+  return option === correctAnswer;
+};
 
-  // 延迟关闭挑战框
-  setTimeout(() => {
-    emit("completed", false);
-    closeModal();
-  }, 700);
+// 选择选项
+const selectOption = (option) => {
+  if (isSubmitting.value) return;
+
+  if (isMultipleChoice.value) {
+    const index = selectedOptions.value.indexOf(option);
+    if (index === -1) {
+      selectedOptions.value.push(option);
+    } else {
+      selectedOptions.value.splice(index, 1);
+    }
+  } else {
+    selectedOption.value = option;
+
+    if (
+      props.questionType === "single_choice" ||
+      props.questionType === "true_false"
+    ) {
+      submitAnswer();
+    }
+  }
+};
+
+// 提交答案
+const submitAnswer = async () => {
+  if (isSubmitting.value) return;
+  isSubmitting.value = true;
+  isChecking.value = true; 
+  
+  // 添加3秒延迟模拟网络延迟
+  // console.log("开始3秒延迟...");
+  // await new Promise(resolve => setTimeout(resolve, 3000));
+  // console.log("3秒延迟结束，开始处理答案");
+  
+  let userAnswerContext = "";
+
+  if (isChoiceQuestion.value) {
+    if (
+      (isMultipleChoice.value && selectedOptions.value.length === 0) ||
+      (!isMultipleChoice.value && !selectedOption.value)
+    ) {
+      feedback.value = "请选择一个选项";
+      feedbackClass.value = "error";
+      isSubmitting.value = false;
+      isChecking.value = false;
+      return;
+    }
+
+    if (isMultipleChoice.value) {
+      const selectedIndexes = [];
+      props.answers.forEach((answer, index) => {
+        if (selectedOptions.value.includes(answer)) {
+          selectedIndexes.push(index + 1);
+        }
+      });
+      userAnswerContext = selectedIndexes.join(",");
+    } else {
+      if (isTrueFalse.value) {
+        userAnswerContext = selectedOption.value === "正确";
+      } else {
+        userAnswerContext = selectedOption.value;
+      }
+    }
+  } else if (isFillBank.value || isShortAnswer.value) {
+    if (userAnswer.value.trim() === "") {
+      feedback.value = "请输入答案";
+      feedbackClass.value = "error";
+      isSubmitting.value = false;
+      isChecking.value = false;
+      return;
+    }
+
+    userAnswerContext = userAnswer.value.trim();
+  }
+
+  try {
+    const responseCount = await gameService.fighting.getUserChangeCount(
+      userConfig.studentId,
+      props.floorId
+    );
+    const count = responseCount.data.data;
+    console.log("挑战次数", count);
+
+    const response = await gameService.fighting.checkAnswerIsTrue(
+      userConfig.studentId,
+      props.questionId,
+      userAnswerContext,
+      props.floorId,
+      count
+    );
+
+    if (response.data?.success) {
+      const result = response.data.data;
+      
+      showExplanation.value = true;
+      explanation.value = props.explanation;
+      correctAnswerDisplay.value = formatCorrectAnswers();
+      damageValue.value = result.damage;
+
+      if (result.target === "BOSS_HP") {
+        feedback.value = "✓ 答案正确！挑战成功";
+        feedbackClass.value = "success";
+        emit("damage", {
+          target: "boss",
+          damage: parseInt(result.damage),
+        });
+        handleChallengeCompleted(true);
+      } else if (result.target === "USER_HP") {
+        feedback.value = "✗ 答案不正确，挑战失败";
+        feedbackClass.value = "error";
+        emit("damage", {
+          target: "player",
+          damage: parseInt(result.damage),
+        });
+        handleChallengeCompleted(false);
+      }
+    } else {
+      feedback.value = "✗ 答案验证失败，请重试";
+      feedbackClass.value = "error";
+    }
+  } catch (error) {
+    console.error("答案验证失败:", error);
+    feedback.value = "✗ 答案验证失败，请重试";
+    feedbackClass.value = "error";
+  } finally {
+    isChecking.value = false;
+    isSubmitting.value = false;
+  }
+};
+
+const formatCorrectAnswers = () => {
+  if (!props.correctAnswers || props.correctAnswers.length === 0) {
+    return "暂无正确答案";
+  }
+
+  if (props.questionType === "single_choice") {
+    const answer = props.correctAnswers[0];
+    if (typeof answer === "number") {
+      return String.fromCharCode(65 + answer);
+    }
+    return answer;
+  } else if (props.questionType === "multiple_choice") {
+    return props.correctAnswers
+      .map((answer) => {
+        if (typeof answer === "number") {
+          return String.fromCharCode(65 + answer);
+        }
+        return answer;
+      })
+      .join(", ");
+  } else if (props.questionType === "true_false") {
+    return props.correctAnswers[0] ? "正确" : "错误";
+  } else {
+    return props.correctAnswers;
+  }
 };
 
 // 处理挑战完成事件
 const handleChallengeCompleted = (success) => {
-  // 触发全局攻击事件
   const event = new CustomEvent("player-attack", { detail: { success } });
   document.dispatchEvent(event);
 
-  if (success) {
-    feedback.value = "✓ 答案正确！挑战成功";
-    feedbackClass.value = "success";
-  } else {
-    feedback.value = "✗ 答案不正确，挑战失败";
-    feedbackClass.value = "error";
-  }
-
-  // 延迟关闭挑战框
   setTimeout(() => {
     emit("completed", success);
     closeModal();
-  }, 700);
+  }, 2000);
 };
 
 const closeModal = () => {
@@ -248,7 +539,6 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 背景粒子效果 */
 .background-particles {
   position: absolute;
   top: 0;
@@ -351,9 +641,8 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
 }
 
-/* 可滚动内容区域 */
 .scrollable-content {
-  overflow-y: auto; /* 启用垂直滚动 */
+  overflow-y: auto;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -414,34 +703,238 @@ onBeforeUnmount(() => {
   }
 }
 
-.answer-input {
+.true-false-container {
   display: flex;
-  flex-direction: column;
+  justify-content: space-around;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.true-option,
+.false-option {
+  flex: 1;
+  min-height: 120px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  background: rgba(43, 25, 18, 0.5);
+}
+
+.true-option {
+  border-color: #5d4037;
+}
+
+.false-option {
+  border-color: #5d4037;
+}
+
+.true-option:hover,
+.false-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.true-option:hover {
+  background: rgba(0, 100, 0, 0.2);
+}
+
+.false-option:hover {
+  background: rgba(139, 0, 0, 0.2);
+}
+
+.true-option.selected {
+  background: rgba(0, 100, 0, 0.3);
+  border-color: #90ee90;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.false-option.selected {
+  background: rgba(139, 0, 0, 0.3);
+  border-color: #ff416c;
+  box-shadow: 0 0 20px rgba(255, 65, 108, 0.5);
+}
+
+.true-option.correct {
+  background: rgba(0, 128, 0, 0.4) !important;
+  border-color: #90ee90 !important;
+  box-shadow: 0 0 25px rgba(0, 255, 0, 0.7) !important;
+}
+
+.false-option.correct {
+  background: rgba(0, 128, 0, 0.4) !important;
+  border-color: #90ee90 !important;
+  box-shadow: 0 0 25px rgba(0, 255, 0, 0.7) !important;
+}
+
+.true-option.incorrect {
+  background: rgba(255, 0, 0, 0.3) !important;
+  border-color: #ff416c !important;
+}
+
+.false-option.incorrect {
+  background: rgba(255, 0, 0, 0.3) !important;
+  border-color: #ff416c !important;
+}
+
+.option-content {
+  text-align: center;
+  padding: 15px;
+}
+
+.option-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.true-option .option-icon {
+  color: #90ee90;
+}
+
+.false-option .option-icon {
+  color: #ff416c;
+}
+
+.option-text {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.choice-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   margin: 20px 0;
 }
 
+.option {
+  padding: 15px;
+  border: 2px solid #5d4037;
+  border-radius: 10px;
+  background: rgba(43, 25, 18, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option:hover {
+  background: rgba(139, 0, 0, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
+}
+
+.option.selected {
+  background: rgba(0, 100, 0, 0.3);
+  border-color: #90ee90;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+.checkbox {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f9c80e;
+  border-radius: 4px;
+  margin-right: 10px;
+  text-align: center;
+  line-height: 18px;
+}
+
+.checkmark {
+  color: #f9c80e;
+  font-weight: bold;
+}
+
+.option.correct {
+  background: rgba(0, 128, 0, 0.3) !important;
+  border-color: #90ee90 !important;
+}
+
+.option.incorrect {
+  background: rgba(255, 0, 0, 0.3) !important;
+  border-color: #ff416c !important;
+}
+
+.explanation {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(30, 30, 50, 0.5);
+  border-radius: 8px;
+  border-left: 3px solid #f9c80e;
+}
+
+.explanation p {
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+textarea:disabled {
+  background: rgba(50, 50, 70, 0.3);
+}
+
+.short-answer-input {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.short-answer-input input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #6a11cb;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.short-answer-input input:focus {
+  outline: none;
+  border-color: #2575fc;
+  box-shadow: 0 0 10px rgba(37, 117, 252, 0.5);
+}
+
+.answer-input {
+  margin-top: 20px;
+}
+
 .answer-input textarea {
   width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 2px solid #f9c80e;
-  background: rgba(0, 0, 0, 0.3);
+  padding: 12px 15px;
+  border: 2px solid #6a11cb;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.7);
   color: white;
-  outline: none;
+  font-size: 16px;
+  transition: all 0.3s ease;
   resize: vertical;
   min-height: 100px;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(249, 200, 14, 0.3);
 }
 
 .answer-input textarea:focus {
-  box-shadow: 0 0 20px rgba(249, 200, 14, 0.7);
-  transform: scale(1.01);
+  outline: none;
+  border-color: #2575fc;
+  box-shadow: 0 0 10px rgba(37, 117, 252, 0.5);
 }
 
 .submit-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: linear-gradient(to right, #38ef7d, #11998e);
   border: none;
   padding: 0;
@@ -451,7 +944,6 @@ onBeforeUnmount(() => {
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
-  align-self: flex-end;
   position: relative;
   overflow: hidden;
   height: 45px;
@@ -459,10 +951,14 @@ onBeforeUnmount(() => {
 }
 
 .button-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
   position: relative;
   z-index: 2;
-  padding: 12px 0;
-  display: block;
+  line-height: 1;
 }
 
 .button-glow {
@@ -568,63 +1064,67 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 15px rgba(255, 65, 108, 0.3);
 }
 
-.modal-footer {
-  padding: 15px;
+.checking-status {
+  margin-top: 25px;
+  padding: 20px;
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 12px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  border-top: 1px solid rgba(255, 204, 0, 0.2);
-  background: rgba(25, 25, 45, 0.8);
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
+  gap: 15px;
+  border: 1px solid rgba(249, 200, 14, 0.3);
+  box-shadow: 0 0 15px rgba(249, 200, 14, 0.3);
+  animation: pulse-border 2s infinite;
 }
 
-.give-up-button {
-  background: linear-gradient(to right, #ff416c, #ff4b2b);
-  border: none;
-  padding: 0;
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(249, 200, 14, 0.3);
+    border-color: rgba(249, 200, 14, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(249, 200, 14, 0.7);
+    border-color: rgba(249, 200, 14, 0.7);
+  }
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(249, 200, 14, 0.3);
+  border-top: 4px solid #f9c80e;
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.checking-text {
+  color: #f9c80e;
   font-size: 16px;
-  color: white;
-  border-radius: 50px;
-  cursor: pointer;
   font-weight: bold;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
-  position: relative;
-  overflow: hidden;
-  height: 45px;
-  width: 100px;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(249, 200, 14, 0.5);
+  animation: pulse 1.5s infinite;
 }
 
-.give-up-button .button-text {
-  position: relative;
-  z-index: 2;
-  padding: 10px 0;
-  display: block;
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    text-shadow: 0 0 12px rgba(249, 200, 14, 0.8);
+    transform: scale(1.05);
+  }
 }
 
-.give-up-button .button-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.5),
-    transparent
-  );
-  animation: shine 3s infinite linear;
-  z-index: 1;
-}
-
-.give-up-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 65, 108, 0.6);
-}
-
-/* 滚动条样式 */
 .scrollable-content::-webkit-scrollbar {
   width: 8px;
 }
@@ -655,18 +1155,34 @@ onBeforeUnmount(() => {
     padding: 12px;
   }
 
+  .choice-options {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .true-false-container {
+    flex-direction: column;
+  }
+
+  .option-icon {
+    font-size: 36px;
+  }
+
+  .option-text {
+    font-size: 18px;
+  }
+
+  .option {
+    padding: 12px;
+    font-size: 14px;
+  }
+
   .answer-input textarea {
     font-size: 14px;
     min-height: 80px;
   }
 
   .submit-button {
-    font-size: 14px;
-    width: 90px;
-    height: 40px;
-  }
-
-  .give-up-button {
     font-size: 14px;
     width: 90px;
     height: 40px;

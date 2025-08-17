@@ -1,30 +1,26 @@
 <template>
-  <div class="fight-container">
-    <div class="fight-footer">
-      <div class="card-fight">
-        <div class="game-container">
-          <div
-            class="container-card"
-            @mousedown="startInteraction"
-            ref="card"
-            :style="{ cursor: interactionEnabled ? 'pointer' : 'default' }"
-          >
-            <div
-              class="card-image"
-              :style="{
-                backgroundImage: `url(${imageSrc})`,
-                transform: `scale(${isActive ? 1.15 : 1}) translateY(${
-                  isActive ? '-15px' : '0px'
-                })`,
-                opacity: interactionEnabled ? 1 : 0.7,
-              }"
-              ref="cardImg"
-            ></div>
+  <div class="card1">
+    <div class="game-container">
+      <div
+        class="container-card"
+        @mousedown="startInteraction"
+        ref="card"
+        :style="{ cursor: interactionEnabled ? 'pointer' : 'default' }"
+      >
+        <div
+          class="card-image"
+          :style="{
+            backgroundImage: `url(${imageSrc})`,
+            transform: `scale(${isActive ? 1.15 : 1}) translateY(${
+              isActive ? '-15px' : '0px'
+            })`,
+            opacity: interactionEnabled ? 1 : 0.7,
+          }"
+          ref="cardImg"
+        ></div>
 
-            <!-- 箭头 -->
-            <canvas ref="arrowCanvas" class="arrow-canvas"></canvas>
-          </div>
-        </div>
+        <!-- 箭头 -->
+        <canvas ref="arrowCanvas" class="arrow-canvas"></canvas>
       </div>
     </div>
 
@@ -32,13 +28,34 @@
     <CardEffectModal
       v-if="showModal"
       :difficulty="cardDifficulty"
+      :question-bank="questionBank"
+      :current-floor="currentFloor"
+      :current-round="logId"
       @close="closeModal"
+      @correct-answer="handleCorrectAnswer"
+      @wrong-answer="handleWrongAnswer"
+      @damage="handleDamage"
     />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
+import { gameService } from "@/services/game";
+import userConfig from "@/config/userConfig";
+
+const props = defineProps({
+  currentRound: {
+    type: Number,
+    required: true,
+  },
+  currentFloor: {
+    type: Number,
+    required: true,
+  },
+});
+
+const emit = defineEmits(["damage"]);
 
 const imageSrc = ref("/Image/GameCard.png");
 const isActive = ref(false);
@@ -58,6 +75,8 @@ const showModal = ref(false);
 const interactionEnabled = ref(true); //控制交互是否启用
 const originalImage = "/Image/GameCard.png"; // 原始卡牌图片路径
 let enemyElement = null;
+const logId = props.currentRound;
+
 
 // 代替 setInterval 的计时器引用
 let drawInterval = null;
@@ -158,22 +177,22 @@ const checkEnemyTarget = () => {
   enemyPosition.value = { x: enemyCenterX, y: enemyCenterY };
 };
 
+const questionBank = ref([]);
+
 // 全局鼠标释放处理
 const handleGlobalMouseUp = async () => {
   if (!interactionEnabled.value) return;
-
   if (isActive.value) {
-    // 检查是否击中敌人
     if (isEnemyTargeted.value) {
-      // 模拟从后端获取卡牌难度数据
       try {
-        const difficulty = await fetchCardDifficulty();
-        cardDifficulty.value = difficulty;
+        // 从后端获取卡牌难度数据
+        const cardData = await fetchCardDifficulty();
+        cardDifficulty.value = cardData.difficulty;
+        questionBank.value = cardData.questionBank; // 存储题目数据
 
-        // 根据难度更新卡牌图片
-        imageSrc.value = `/Image/GameCard_${difficulty}.png`;
+        imageSrc.value = `/Image/GameCard_${cardDifficulty.value}.png`;
 
-        // 显示模态框
+        // 显示模态框并传递题目数据
         showModal.value = true;
 
         // 禁用卡片交互
@@ -221,17 +240,109 @@ const enableCardInteraction = () => {
   document.addEventListener("mouseup", handleGlobalMouseUp);
 };
 
-// 模拟从后端获取卡牌难度数据
+// 从后端获取卡牌难度数据
 const fetchCardDifficulty = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 随机选择一种难度
-      const difficulties = ["Easy", "Normal", "Hard"];
-      const difficulty =
-        difficulties[Math.floor(Math.random() * difficulties.length)];
-      resolve(difficulty);
-    }, 500);
-  });
+  try {
+    console.log("curr_arr", props.currentRound);
+    // 使用父组件传递的 currentRound
+    const response = await gameService.fighting.userAttack(
+      userConfig.studentId,
+      props.currentRound
+    );
+
+    if (response.data && response.data.success) {
+      console.log("获取卡牌难度成功:", response.data);
+
+      // 安全处理问题选项和正确答案
+      let questionOptions = [];
+      let correctAnswer = [];
+
+      try {
+        // 安全解析 questionOptions
+        if (response.data.data.questionOptions) {
+          try {
+            // 先尝试直接解析
+            questionOptions = JSON.parse(response.data.data.questionOptions);
+          } catch (firstError) {
+            console.warn("直接解析 questionOptions 失败，尝试修复", firstError);
+
+            // 修复1: 安全处理字符串中的双引号
+            const rawQuestionOptions = response.data.data.questionOptions
+              .replace(/\\"/g, '"') // 将 \" 替换为 "
+              .replace(/\\\\/g, "\\") // 将 \\ 替换为 \
+              .replace(/"([^"]*)":/g, '"$1":') // 修复键名周围的引号
+              .replace(/:\s*"([^"]*)"\s*([,\]}])/g, (match, p1, p2) => {
+                // 对字符串值中的双引号进行转义
+                const escapedValue = p1.replace(/"/g, '\\"');
+                return `: "${escapedValue}"${p2}`;
+              });
+
+            // 修复2: 修正键名格式
+            const fixedQuestionOptions = rawQuestionOptions.replace(
+              /is_correct/g,
+              "isCorrect"
+            ); // 将 is_correct 替换为 isCorrect
+
+            console.log("修复后的 questionOptions:", fixedQuestionOptions);
+
+            try {
+              questionOptions = JSON.parse(fixedQuestionOptions);
+            } catch (secondError) {
+              console.error("二次解析失败:", secondError);
+
+              // 尝试使用更宽松的 JSON5 解析器
+              try {
+                const JSON5 = require("json5");
+                questionOptions = JSON5.parse(fixedQuestionOptions);
+              } catch (json5Error) {
+                console.error("JSON5 解析失败:", json5Error);
+                questionOptions = [];
+              }
+            }
+          }
+        }
+        // 安全解析 correctAnswer
+        if (response.data.data.correctAnswer) {
+          correctAnswer = JSON.parse(response.data.data.correctAnswer);
+        }
+      } catch (parseError) {
+        console.error("解析选项或答案失败:", parseError);
+      }
+
+      // 构建题目对象
+      const question = {
+        id: response.data.data.questionId,
+        content: response.data.data.questionContent,
+        options: Array.isArray(questionOptions)
+          ? questionOptions.map((option) => ({
+              label: option.label,
+              content: option.content,
+              isCorrect: option.isCorrect,
+            }))
+          : null, // 填空题 options 为 null
+        correctAnswer: correctAnswer,
+        explanation: response.data.data.explanation,
+        difficulty: response.data.data.difficultyLevel,
+        type: response.data.data.questionType,
+        points: response.data.data.scorePoints,
+      };
+
+      // 返回难度和题目数据
+      return {
+        difficulty: response.data.data.difficultyLevel,
+        questionBank: [question], // 将单个问题包装成数组
+      };
+    } else {
+      throw new Error(response.data?.message || "获取卡牌难度失败");
+    }
+  } catch (error) {
+    console.error("获取卡牌难度异常:", error);
+    // 返回默认值
+    return {
+      difficulty: "Normal",
+      questionBank: [],
+    };
+  }
 };
 
 // 关闭模态框
@@ -429,6 +540,11 @@ const drawArrow = () => {
   }
 };
 
+// 处理伤害事件
+const handleDamage = (damageInfo) => {
+  // 将伤害事件传递给父组件
+  emit("damage", damageInfo);
+};
 
 onMounted(() => {
   positionCard();
@@ -453,13 +569,11 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-
 .game-container {
   position: relative;
   z-index: 200;
   pointer-events: auto;
 }
-
 
 .container-card {
   position: fixed;
@@ -475,7 +589,6 @@ onBeforeUnmount(() => {
   pointer-events: auto;
   z-index: 10001 !important;
 }
-
 
 .card-image {
   position: absolute;
@@ -493,7 +606,6 @@ onBeforeUnmount(() => {
   z-index: 2;
 }
 
-
 .container-card:active .card-image {
   box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.7), 0 25px 50px rgba(0, 0, 0, 0.9),
     0 12px 25px rgba(0, 0, 0, 0.8);
@@ -507,7 +619,7 @@ onBeforeUnmount(() => {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 150; 
+  z-index: 150;
 }
 
 .active-mode {

@@ -1,8 +1,13 @@
 <template>
   <transition name="fade">
     <div class="comic-animation" v-if="show">
+      <!-- 添加开始按钮 -->
+      <div v-if="!animationStarted" class="start-hint">
+        按空格键开始动画
+      </div>
+      
       <!-- 第一页：前三幕 -->
-      <div class="page page-1" v-show="currentPage === 1">
+      <div class="page page-1" v-show="currentPage === 1 && animationStarted">
         <div class="comic-panels">
           <div class="panel panel-1" ref="panel1">
             <div class="panel-content">
@@ -25,7 +30,7 @@
       </div>
 
       <!-- 第二页：后两幕 -->
-      <div class="page page-2" v-show="currentPage === 2">
+      <div class="page page-2" v-show="currentPage === 2 && animationStarted">
         <div class="comic-panels">
           <div class="panel panel-4" ref="panel4">
             <div class="panel-content">
@@ -35,14 +40,14 @@
 
           <div class="panel panel-5" ref="panel5">
             <div class="panel-content">
-              <video 
-                ref="sceneVideo" 
-                class="scene-video" 
-                muted 
+              <video
+                ref="sceneVideo"
+                class="scene-video"
+                muted
                 playsinline
                 @ended="onVideoEnded"
               >
-                <source src="/Video/Anim05.mp4" type="video/mp4">
+                <source src="/Video/Anim05.mp4" type="video/mp4" />
               </video>
             </div>
           </div>
@@ -50,7 +55,7 @@
       </div>
 
       <!-- 全局字幕区域 -->
-      <div class="global-caption" ref="globalCaption">
+      <div class="global-caption" ref="globalCaption" v-show="animationStarted">
         <div class="caption-container">
           <div class="caption-content">
             <p class="caption-paragraph">
@@ -61,13 +66,13 @@
       </div>
 
       <!-- 控制按钮 -->
-      <button class="next-button" @click="nextScene">
+      <button class="next-button" @click="nextScene" v-show="animationStarted">
         <span v-if="currentScene < 5">下一幕</span>
         <span v-else>开始探索</span>
       </button>
 
       <!-- 动态效果元素 -->
-      <div class="comic-effects">
+      <div class="comic-effects" v-show="animationStarted">
         <div class="effect effect-1"></div>
         <div class="effect effect-2"></div>
         <div class="effect effect-3"></div>
@@ -103,6 +108,8 @@ const emit = defineEmits(["animation-end"]);
 
 const currentScene = ref(0);
 const currentPage = ref(1);
+const currentCaptionIndex = ref(0); // 独立的字幕索引
+const animationStarted = ref(false); // 动画开始状态
 
 // 元素引用
 const panel1 = ref(null);
@@ -113,32 +120,77 @@ const panel5 = ref(null);
 const globalCaption = ref(null);
 const sceneVideo = ref(null); // 视频元素引用
 
+// 计时器
+const sceneTimer = ref(null); // 场景切换计时器
+
 // 语音合成相关
 const speechSynthesis = window.speechSynthesis;
 const utterance = ref(null);
 const isSpeaking = ref(false);
+
+// 组件挂载状态跟踪
+const isMounted = ref(true);
 
 // 分割字幕为段落
 const captionsArray = computed(() => {
   return props.captions.split("\n");
 });
 
-// 计算当前场景的字幕段落
+const handleSpaceKey = (event) => {
+  // 防止空格键滚动页面
+  event.preventDefault();
+  
+  if (!animationStarted.value) {
+    startAnimation();
+  }
+};
+
+
+// 过滤掉空白行
+const filteredCaptions = computed(() => {
+  return captionsArray.value.filter(
+    (line) => line.trim() !== ""
+  );
+});
+
+// 计算当前字幕段落
 const currentParagraph = computed(() => {
   if (
-    currentScene.value > 0 &&
-    currentScene.value <= captionsArray.value.length
+    currentCaptionIndex.value >= 0 &&
+    currentCaptionIndex.value < filteredCaptions.value.length
   ) {
-    return captionsArray.value[currentScene.value - 1];
+    return filteredCaptions.value[currentCaptionIndex.value];
   }
   return "";
 });
 
+// 计算字幕长度（用于动态调整动画速度）
+const captionLength = computed(() => {
+  return currentParagraph.value.length;
+});
+
+// 计算动画持续时间（基于字幕长度）
+const animationDuration = computed(() => {
+  // 基础持续时间
+  const baseDuration = 3; // 秒
+  
+  // 每增加10个字符增加0.1秒，最大不超过6秒
+  const extraDuration = Math.min(3, captionLength.value / 100);
+  
+  return baseDuration + extraDuration;
+});
+
 // 重置所有面板
 const resetPanels = () => {
-  const panels = [panel1.value, panel2.value, panel3.value, panel4.value, panel5.value];
-  
-  panels.forEach(panel => {
+  const panels = [
+    panel1.value,
+    panel2.value,
+    panel3.value,
+    panel4.value,
+    panel5.value,
+  ];
+
+  panels.forEach((panel) => {
     if (panel) {
       gsap.set(panel, {
         opacity: 0,
@@ -146,7 +198,7 @@ const resetPanels = () => {
         rotation: 0,
         y: 50,
         x: 0,
-        z: 0
+        z: 0,
       });
     }
   });
@@ -155,54 +207,63 @@ const resetPanels = () => {
 // 动画单个面板
 const animatePanel = (panel) => {
   if (!panel) return;
+
+  // 使用动态计算的持续时间
+  const duration = animationDuration.value;
   
   gsap.to(panel, {
     opacity: 1,
     scale: 1,
     rotation: 0,
     y: 0,
-    duration: 3,
+    duration: duration,
     ease: "elastic.out(1, 0.75)",
     onStart: () => {
       // 添加3D效果
       gsap.set(panel, {
         transformStyle: "preserve-3d",
-        perspective: 9000
+        perspective: 9000,
       });
-      
+
       // 添加阴影效果
       gsap.to(panel, {
         boxShadow: "0 10px 25px rgba(139, 0, 0, 0.6)",
-        duration: 0.5
+        duration: 0.5,
       });
-    }
+    },
   });
-  
+
   // 添加额外的3D效果
-  gsap.fromTo(panel, 
+  gsap.fromTo(
+    panel,
     { rotationY: -10, rotationX: 15 },
-    { rotationY: 0, rotationX: 0, duration: 1.5, ease: "back.out(1.7)" }
+    { rotationY: 0, rotationX: 0, duration: duration * 0.5, ease: "back.out(1.7)" }
   );
 };
 
 // 动画字幕
 const animateCaption = () => {
   if (!globalCaption.value) return;
+
+  // 使用动态计算的持续时间
+  const duration = animationDuration.value * 0.33; // 字幕动画时间较短
   
-  gsap.fromTo(globalCaption.value,
+  gsap.fromTo(
+    globalCaption.value,
     { opacity: 0, y: 30 },
     {
       opacity: 1,
       y: 0,
-      duration: 1,
+      duration: duration,
       ease: "power3.out",
       onStart: () => {
         // 添加文字动画
-        gsap.fromTo(".caption-paragraph", 
+        gsap.fromTo(
+          ".caption-paragraph",
           { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, stagger: 0.1, duration: 0.8 }
+          { opacity: 1, y: 0, stagger: 0.1, duration: duration * 0.8 }
         );
-      }
+      },
     }
   );
 };
@@ -228,19 +289,16 @@ const playSceneAnimation = () => {
       playVideo();
       break;
   }
-  
-  // 字幕动画
-  animateCaption();
-  
-  // 开始语音合成
-  startSpeechSynthesis();
+
+  // 启动场景计时器
+  startSceneTimer();
 };
 
 // 播放视频
 const playVideo = () => {
   if (sceneVideo.value) {
     sceneVideo.value.currentTime = 0; // 重置到开始
-    sceneVideo.value.play().catch(e => {
+    sceneVideo.value.play().catch((e) => {
       console.error("视频播放失败:", e);
     });
   }
@@ -254,37 +312,109 @@ const onVideoEnded = () => {
   }
 };
 
+// 启动场景计时器
+const startSceneTimer = () => {
+  // 清除现有计时器
+  clearSceneTimer();
+
+  // 如果不是最后一幕，设置20秒后自动切换
+  if (currentScene.value < 5) {
+    sceneTimer.value = setTimeout(() => {
+      nextScene();
+    }, 20000);
+  }
+};
+
+// 清除场景计时器
+const clearSceneTimer = () => {
+  if (sceneTimer.value) {
+    clearTimeout(sceneTimer.value);
+    sceneTimer.value = null;
+  }
+};
+
+// 切换到下一幕
+const nextScene = () => {
+  // 清除场景计时器
+  clearSceneTimer();
+
+  if (currentScene.value < 5) {
+    currentScene.value++;
+
+    // 检查是否需要翻页
+    if (currentScene.value === 4) {
+      currentPage.value = 2;
+    }
+
+    playSceneAnimation();
+  } else {
+    // 动画结束
+    emit("animation-end");
+  }
+};
+
+// 切换到下一段字幕
+const nextCaption = () => {
+  // 检查是否还有下一段字幕
+  if (currentCaptionIndex.value < filteredCaptions.value.length - 1) {
+    currentCaptionIndex.value++;
+    startSpeechSynthesis(); // 播放新字幕的语音
+  } else {
+    console.log("所有字幕播放完成，停止切换");
+    // 如果是最后一段字幕，不进行任何操作
+    // 字幕将停留在最后一段
+  }
+};
+
 // 开始语音合成
 const startSpeechSynthesis = () => {
   // 停止当前语音
   stopSpeechSynthesis();
-  
+
   // 创建新的语音合成
   const text = currentParagraph.value;
   if (!text) return;
-  
+
+  // 在语音开始前显示字幕
+  animateCaption();
+
   utterance.value = new SpeechSynthesisUtterance(text);
-  utterance.value.lang = 'zh-CN'; // 设置语言为中文
-  utterance.value.rate = 2.0; // 语速
+  utterance.value.lang = "zh-CN"; // 设置语言为中文
+  
+  // 固定语速
+  utterance.value.rate = 1.0; // 固定语速
+  
   utterance.value.pitch = 1.0; // 音调
   utterance.value.volume = 1.0; // 音量
-  
+
   // 语音开始事件
   utterance.value.onstart = () => {
+    if (!isMounted.value) return;
     isSpeaking.value = true;
+    console.log("语音开始播放");
   };
-  
+
   // 语音结束事件
   utterance.value.onend = () => {
+    // 确保组件仍然挂载
+    if (!isMounted.value) return;
+    
     isSpeaking.value = false;
-    // 语音结束后自动进入下一幕
-    if (currentScene.value < 5) {
-      nextScene();
-    }
+    console.log("语音播放结束");
+    nextCaption(); // 语音结束后切换到下一段字幕
   };
-  
+
+  utterance.value.onerror = (event) => {
+    console.error("语音合成错误:", event.error);
+  };
+
   // 播放语音
-  speechSynthesis.speak(utterance.value);
+  try {
+    speechSynthesis.speak(utterance.value);
+    console.log("语音合成已启动");
+  } catch (error) {
+    console.error("语音合成失败:", error);
+  }
 };
 
 // 停止语音合成
@@ -295,24 +425,18 @@ const stopSpeechSynthesis = () => {
   isSpeaking.value = false;
 };
 
-// 切换到下一幕
-const nextScene = () => {
-  // 停止当前语音
-  stopSpeechSynthesis();
+// 开始动画函数
+const startAnimation = () => {
+  animationStarted.value = true;
+  currentScene.value = 1; // 从第一幕开始
+  currentCaptionIndex.value = 0; // 从第一段字幕开始
   
-  if (currentScene.value < 5) {
-    currentScene.value++;
-    
-    // 检查是否需要翻页
-    if (currentScene.value === 4) {
-      currentPage.value = 2;
-    }
-    
+  // 确保面板重置后再播放动画
+  resetPanels();
+  setTimeout(() => {
     playSceneAnimation();
-  } else {
-    // 动画结束
-    emit("animation-end");
-  }
+    startSpeechSynthesis(); // 播放初始字幕的语音
+  }, 50);
 };
 
 // 监听show属性变化
@@ -320,13 +444,12 @@ watch(
   () => props.show,
   (newVal) => {
     if (newVal) {
-      currentScene.value = 1; // 从第一幕开始
-      // 确保面板重置后再播放动画
+      // 重置动画状态
+      animationStarted.value = false;
       resetPanels();
-      setTimeout(() => {
-        playSceneAnimation();
-      }, 50);
     } else {
+      // 清除所有计时器
+      clearSceneTimer();
       // 停止语音合成
       stopSpeechSynthesis();
     }
@@ -334,18 +457,58 @@ watch(
   { immediate: true }
 );
 
-// 组件卸载时停止语音
+// 组件卸载时清除计时器和语音
 onUnmounted(() => {
+  isMounted.value = false;
+  clearSceneTimer();
   stopSpeechSynthesis();
+  window.removeEventListener('keydown', handleSpaceKey);
 });
 
 // 初始化
 onMounted(() => {
   resetPanels();
+  window.addEventListener('keydown', handleSpaceKey);
+  // 检查浏览器是否支持语音合成
+  if (!('speechSynthesis' in window)) {
+    console.warn("您的浏览器不支持语音合成功能，部分功能可能无法使用");
+  }
 });
 </script>
 
+
 <style scoped>
+
+/* 添加开始提示样式 */
+.start-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px 30px;
+  border-radius: 10px;
+  z-index: 1000;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .comic-animation {
   position: fixed;
   top: 0;
@@ -361,6 +524,35 @@ onMounted(() => {
   overflow: hidden;
   padding: 20px;
   box-sizing: border-box;
+}
+
+.start-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 15px 40px;
+  background: linear-gradient(to bottom, #8b4513, #5d2906);
+  color: #ffd700;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px #000;
+  box-shadow: 
+    0 5px 0 #5d2906, 
+    inset 0 0 15px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.start-button:hover {
+  background: linear-gradient(to bottom, #a0522d, #8b4513);
+  transform: translate(-50%, -53px);
+  box-shadow: 
+    0 8px 0 #5d2906, 
+    inset 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 .page {
@@ -386,7 +578,7 @@ onMounted(() => {
 .panel {
   position: relative;
   background: rgba(30, 20, 10, 0.7);
-  box-shadow: 0 5极狐 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   opacity: 0;
   transform: scale(0.1);
@@ -451,20 +643,22 @@ onMounted(() => {
   transform: scale(1.05);
 }
 
-/* 全局字幕区域 */
+/* 全局字幕区域 - 自适应样式 */
 .global-caption {
   position: fixed;
-  width: 80%;
-  max-width: 900px;
-  height: 20%;
+  width: auto; /* 自适应宽度 */
+  max-width: 80%; /* 最大宽度不超过80% */
+  min-width: 300px; /* 最小宽度 */
+  height: auto; /* 自适应高度 */
   margin-top: 400px;
   opacity: 0;
   transform: translateY(30px);
+  z-index: 100;
 }
 
 .caption-container {
   width: 100%;
-  height: 100%;
+  height: auto; /* 自适应高度 */
   padding: 20px;
   background: 
     linear-gradient(rgba(20, 15, 10, 0.9), rgba(40, 30, 20, 0.7)),
@@ -481,19 +675,9 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.caption-container::before {
-  left: 0;
-  border-right: 1px solid #d4af37;
-}
-
-.caption-container::after {
-  right: 0;
-  border-left: 1px solid #d4af37;
-}
-
 .caption-content {
   width: 100%;
-  height: 100%;
+  height: auto; /* 自适应高度 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -517,6 +701,8 @@ onMounted(() => {
   transform: translateY(20px);
   position: relative;
   letter-spacing: 0.5px;
+  word-wrap: break-word; /* 确保长单词换行 */
+  white-space: pre-line; /* 保留换行符 */
 }
 
 .caption-paragraph::first-letter {
@@ -676,6 +862,11 @@ onMounted(() => {
 
   .page {
     height: 65%; /* 移动端高度调整 */
+  }
+  
+  .start-button {
+    padding: 12px 30px;
+    font-size: 18px;
   }
 }
 </style>

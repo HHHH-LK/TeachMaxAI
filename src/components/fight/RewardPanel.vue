@@ -92,10 +92,10 @@ export default {
     healthValue: { type: Number, default: 63 },
     maxHealth: { type: Number, default: 75 },
     charImg: { type: String, default: "" },
+    rewards: { type: Array, default: () => [] } // 确保定义了 rewards 属性
   },
   data() {
     return {
-      rewards: ["100经验", "生命药水", "神秘卷轴", "黄金护符", "龙之鳞片", "精灵之泪", "矮人战锤", "巫师法杖"],
       selectedReward: null,
     };
   },

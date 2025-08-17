@@ -1,13 +1,18 @@
 <template>
-  <!-- 遮罩层  -->
+  <!-- 遮罩层 -->
   <div class="modal-mask" v-if="isModalOpen"></div>
 
   <div class="modal-overlay" v-if="isModalOpen">
     <!-- 背景粒子效果 -->
     <div class="background-particles">
-      <div v-for="(particle, index) in backgroundParticles" :key="index" class="particle" :style="particle.style"></div>
+      <div
+        v-for="(particle, index) in backgroundParticles"
+        :key="index"
+        class="particle"
+        :style="particle.style"
+      ></div>
     </div>
-    
+
     <div
       class="card-img"
       :style="{
@@ -24,7 +29,7 @@
         <div class="crystal crystal-left"></div>
         <div class="crystal crystal-right"></div>
       </div>
-      
+
       <div class="modal-header">
         <h2>卡牌效果触发!</h2>
       </div>
@@ -38,9 +43,9 @@
         </div>
 
         <div class="effect-description">
-          <p v-if="difficulty === 'Easy'">这张卡牌效果较弱，但对新手友好</p>
-          <p v-else-if="difficulty === 'Normal'">标准卡牌效果，适合普通玩家</p>
-          <p v-else-if="difficulty === 'Hard'">强力卡牌效果，使用需谨慎!</p>
+          <p v-if="difficulty === 'easy'">这张卡牌效果较弱，但对新手友好</p>
+          <p v-else-if="difficulty === 'medium'">标准卡牌效果，适合普通玩家</p>
+          <p v-else-if="difficulty === 'hard'">强力卡牌效果，使用需谨慎!</p>
           <p v-else>未知卡牌效果，请小心使用</p>
         </div>
 
@@ -62,7 +67,7 @@
           <span class="button-glow"></span>
         </button>
       </div>
-      
+
       <!-- 底部装饰 -->
       <div class="decoration-bottom">
         <div class="runes">
@@ -78,30 +83,44 @@
     v-if="showChallenge"
     :question="currentQuestion"
     :answers="currentAnswers"
+    :correct-answers="correctAnswers"
+    :explanation="explanation"
     :time-limit="timeLimit"
+    :question-type="questionType"
+    :question-id="selectedQuestionRef?.id"
+    :floor-id="currentFloor"
+    :change-count="changeCount"
     @close="closeChallenge"
     @completed="handleChallengeCompleted"
     @give-up="handleChallengeGiveUp"
+    @damage="handleDamage"
   />
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import ChallengeModal from "./ChallengeModal.vue";
+import { gameService } from "@/services/game";
+import userConfig from "@/config/userConfig";
 
 const props = defineProps({
+  show: Boolean,
   difficulty: {
     type: String,
-    default: "Normal",
+    default: "Normal", // 添加默认值
   },
+  questionBank: Array, // 接收题目数据
+  currentFloor: Number, // 当前楼层ID
+  changeCount: Number, // 变化计数
+  currentRound: Number,
 });
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "correct-answer", "wrong-answer", "damage"]);
 
 const damageMap = {
-  Easy: 15,
-  Normal: 30,
-  Hard: 60,
+  easy: 15,
+  medium: 30,
+  hard: 60,
   Legendary: 100,
 };
 
@@ -109,7 +128,12 @@ const showChallenge = ref(false);
 const isModalOpen = ref(true);
 const currentQuestion = ref("");
 const currentAnswers = ref([]);
-const timeLimit = ref(120); 
+const correctAnswers = ref([]); // 存储正确答案
+const questionType = ref("open_question"); // 题目类型
+const answerLabelMap = ref({}); // 存储答案字符串到标签的映射
+const explanation = ref([])
+const selectedQuestionRef = ref(null); // 存储当前选中的题目
+const timeLimit = ref(120);
 
 // 背景粒子效果
 const backgroundParticles = ref([]);
@@ -123,7 +147,7 @@ for (let i = 0; i < 20; i++) {
       animationDuration: `${Math.random() * 5 + 3}s`,
       animationDelay: `${Math.random() * 2}s`,
       opacity: Math.random() * 0.5 + 0.2,
-    }
+    },
   });
 }
 
@@ -136,44 +160,57 @@ const cardTransform = computed(() => {
 // 根据难度获取卡牌图片
 const getCardImage = computed(() => {
   const basePath = "/Image/GameCard";
-  switch (props.difficulty) {
-    case "Easy":
+  switch (props.questionBank[0]?.difficulty) {
+    case "easy":
       return `${basePath}_Easy.png`;
-    case "Normal":
+    case "medium":
       return `${basePath}_Middle.png`;
-    case "Hard":
+    case "hard":
       return `${basePath}_Hard.png`;
     default:
       return `${basePath}.png`;
   }
 });
 
-// 计算伤害值
-const damageValue = computed(() => {
-  return damageMap[props.difficulty] || 30;
-});
 
-// 计算伤害百分比
-const damagePercentage = computed(() => {
-  return (damageValue.value / damageMap.Legendary) * 100;
-});
+const damageValue = ref(30); // 默认值30
+
+// 创建一个异步函数获取伤害值
+const fetchDamageValue = async () => {
+  try {
+    console.log("题目ID和当前楼层", props.questionBank[0]?.id, props.currentFloor)
+    // 确保有题目ID和当前楼层
+   
+      const response = await gameService.fighting.getDamage(
+        props.questionBank[0]?.id, 
+        props.currentFloor
+      );
+      
+      console.log("attack", response.data.data)
+      // 更新伤害值，使用响应式变量
+      damageValue.value = response.data.data || 30; // 如果API返回空则使用默认值
+    }catch (error) {
+    console.error('获取伤害值失败:', error);
+    damageValue.value = 30; // 出错时使用默认值
+  }
+};
 
 // 处理卡牌鼠标移动
 const handleCardMove = (event) => {
   const card = event.currentTarget;
   const rect = card.getBoundingClientRect();
-  
+
   // 计算鼠标在卡牌上的相对位置 (0-1)
   const x = (event.clientX - rect.left) / rect.width;
   const y = (event.clientY - rect.top) / rect.height;
-  
+
   // 计算旋转角度 (最大15度)
   const rotateX = (0.5 - y) * 30;
   const rotateY = (x - 0.5) * 30;
-  
+
   cardRotation.value = {
     x: rotateX,
-    y: rotateY
+    y: rotateY,
   };
 };
 
@@ -182,89 +219,46 @@ const handleCardLeave = () => {
   cardRotation.value = { x: 0, y: 0 };
 };
 
-// 题库 
-const questionBank = [
-  {
-    question: "请简述牛顿第一定律的内容",
-    answers: ["物体在没有外力作用时保持静止或匀速直线运动", "惯性定律"],
-    difficulty: "Easy",
-  },
-  {
-    question: "水的化学式是什么？",
-    answers: ["H₂O", "H2O"],
-    difficulty: "Easy",
-  },
-  {
-    question: "请解释光合作用的基本过程",
-    answers: [
-      "植物利用光能将二氧化碳和水转化为有机物和氧气",
-      "光能转化为化学能的过程",
-    ],
-    difficulty: "Normal",
-  },
-  {
-    question: "第二次世界大战的转折点是什么战役？",
-    answers: ["斯大林格勒战役"],
-    difficulty: "Normal",
-  },
-  {
-    question: "请简述相对论的基本思想",
-    answers: [
-      "时间和空间是相对的，受物质和能量影响",
-      "光速不变原理",
-      "引力是时空弯曲的表现",
-    ],
-    difficulty: "Hard",
-  },
-  {
-    question: "量子力学中的测不准原理是什么？",
-    answers: ["无法同时精确测量粒子的位置和动量", "海森堡不确定性原理"],
-    difficulty: "Hard",
-  },
-  {
-    question: "请论述人工智能对社会伦理的影响",
-    answers: [
-      "就业结构变化",
-      "隐私保护问题",
-      "算法偏见与歧视",
-      "自主武器系统的伦理困境",
-    ],
-    difficulty: "Legendary",
-  },
-  {
-    question: "解释区块链技术如何保证数据的安全性",
-    answers: ["分布式账本", "加密算法", "共识机制", "不可篡改性"],
-    difficulty: "Legendary",
-  },
-];
-
 const startChallenge = () => {
+  // 重置映射
+  answerLabelMap.value = {};
+
   // 根据难度筛选题目
-  const filteredQuestions = questionBank.filter(
+  const filteredQuestions = props.questionBank.filter(
     (q) => q.difficulty === props.difficulty
   );
 
-  // 随机选择一道题目
   if (filteredQuestions.length > 0) {
     const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
     const selectedQuestion = filteredQuestions[randomIndex];
+    selectedQuestionRef.value = selectedQuestion;
 
-    currentQuestion.value = selectedQuestion.question;
-    currentAnswers.value = selectedQuestion.answers;
+    // 构建答案字符串数组和映射
+    const answerStrings = selectedQuestion.options.map((opt) => {
+      const str = `${opt.label}. ${opt.content}`;
+      answerLabelMap.value[str] = opt.label;
+      return str;
+    });
+
+    currentQuestion.value = selectedQuestion.content;
+    currentAnswers.value = answerStrings;
+    correctAnswers.value = selectedQuestion.correctAnswer; // 设置正确答案
+    questionType.value = selectedQuestion.type; // 设置题目类型
+    explanation.value = selectedQuestion.explanation;
 
     // 根据难度调整时间限制
     switch (props.difficulty) {
-      case "Easy":
-        timeLimit.value = 150; 
+      case "eeasy":
+        timeLimit.value = 150;
         break;
-      case "Normal":
-        timeLimit.value = 120; 
+      case "medium":
+        timeLimit.value = 120;
         break;
-      case "Hard":
-        timeLimit.value = 90; 
+      case "hard":
+        timeLimit.value = 90;
         break;
       case "Legendary":
-        timeLimit.value = 60; 
+        timeLimit.value = 60;
         break;
       default:
         timeLimit.value = 120;
@@ -275,6 +269,8 @@ const startChallenge = () => {
     // 如果没有匹配的题目，使用默认题目
     currentQuestion.value = "请简述水的三态变化过程";
     currentAnswers.value = ["固态、液态、气态之间的相互转化"];
+    correctAnswers.value = ["固态、液态、气态之间的相互转化"]; // 设置默认正确答案
+    questionType.value = "open_question"; // 设置默认题目类型
     showChallenge.value = true;
   }
 };
@@ -283,7 +279,7 @@ const handleGiveUp = () => {
   // 触发全局放弃事件
   const event = new CustomEvent("global-give-up");
   document.dispatchEvent(event);
-  
+
   // 关闭模态框
   closeModal();
 };
@@ -295,14 +291,28 @@ const closeChallenge = () => {
 
 // 处理挑战完成事件
 const handleChallengeCompleted = (success) => {
-  closeChallenge();
+  // 根据挑战结果触发不同事件
+  if (success) {
+    emit('correct-answer');
+  } else {
+    emit('wrong-answer');
+  }
+  
+  // 关闭整个模态框
   closeModal();
 };
 
 // 处理挑战放弃事件
 const handleChallengeGiveUp = () => {
-  closeChallenge();
+  // 放弃挑战视为失败
+  emit('wrong-answer');
   closeModal();
+};
+
+// 处理伤害事件
+const handleDamage = (damageInfo) => {
+  // 将伤害事件传递给父组件
+  emit('damage', damageInfo);
 };
 
 const closeModal = () => {
@@ -316,6 +326,7 @@ const handleGlobalGiveUp = () => {
 };
 
 onMounted(() => {
+  fetchDamageValue();
   // 监听全局放弃事件
   document.addEventListener("global-give-up", handleGlobalGiveUp);
 });
@@ -333,22 +344,38 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(30, 10, 60, 0.1));
-  z-index: 19999; 
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.5),
+    rgba(30, 10, 60, 0.1)
+  );
+  z-index: 19999;
   backdrop-filter: blur(10px);
   animation: maskPulse 8s infinite alternate;
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 @keyframes maskPulse {
   0% {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(30, 10, 60, 0.4));
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.3),
+      rgba(30, 10, 60, 0.4)
+    );
   }
   50% {
-    background: linear-gradient(135deg, rgba(10, 5, 30, 0.4), rgba(40, 15, 80, 0.5));
+    background: linear-gradient(
+      135deg,
+      rgba(10, 5, 30, 0.4),
+      rgba(40, 15, 80, 0.5)
+    );
   }
   100% {
-    background: linear-gradient(135deg, rgba(20, 0, 40, 0.5), rgba(50, 20, 100, 0.6));
+    background: linear-gradient(
+      135deg,
+      rgba(20, 0, 40, 0.5),
+      rgba(50, 20, 100, 0.6)
+    );
   }
 }
 
@@ -428,7 +455,11 @@ onBeforeUnmount(() => {
 .modal-container {
   width: 85%;
   max-width: 500px;
-  background: linear-gradient(145deg, rgba(26, 26, 46, 0.9), rgba(22, 33, 62, 0.9));
+  background: linear-gradient(
+    145deg,
+    rgba(26, 26, 46, 0.9),
+    rgba(22, 33, 62, 0.9)
+  );
   border-radius: 20px;
   box-shadow: 0 0 30px rgba(255, 204, 0, 0.5), 0 0 50px rgba(76, 201, 240, 0.3);
   overflow: hidden;
@@ -493,7 +524,11 @@ onBeforeUnmount(() => {
 }
 
 .modal-header {
-  background: linear-gradient(to right, rgba(25, 25, 45, 0.9), rgba(40, 30, 70, 0.8));
+  background: linear-gradient(
+    to right,
+    rgba(25, 25, 45, 0.9),
+    rgba(40, 30, 70, 0.8)
+  );
   padding: 20px;
   border-bottom: 2px solid #f9c80e;
   position: relative;
@@ -519,7 +554,12 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(249, 200, 14, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(249, 200, 14, 0.2),
+    transparent
+  );
   animation: headerGlow 3s infinite linear;
 }
 
@@ -592,7 +632,12 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   animation: shine 3s infinite linear;
 }
 
@@ -623,7 +668,6 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
 }
 
-
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -636,7 +680,11 @@ onBeforeUnmount(() => {
 }
 
 .effect-description {
-  background: linear-gradient(to right, rgba(30, 30, 50, 0.7), rgba(40, 35, 70, 0.6));
+  background: linear-gradient(
+    to right,
+    rgba(30, 30, 50, 0.7),
+    rgba(40, 35, 70, 0.6)
+  );
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 25px;
@@ -659,7 +707,12 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, transparent, rgba(249, 200, 14, 0.1), transparent);
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(249, 200, 14, 0.1),
+    transparent
+  );
   animation: shine 5s infinite linear;
 }
 
@@ -697,7 +750,12 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   animation: shine 2s infinite linear;
 }
 
@@ -752,7 +810,12 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
   animation: shine 3s infinite linear;
   z-index: 1;
 }

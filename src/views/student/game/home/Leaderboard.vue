@@ -388,7 +388,7 @@ const fetchTowerRanking = async (towerId) => {
     console.log(`找到塔信息:`, towerInfo);
     console.log(`使用课程ID: ${towerInfo.courseId} 获取排行榜数据`);
     
-    const response = await gameService.towerRanking.getTowerRankingByCourse(towerInfo.courseId);
+    const response = await gameService.towerRanking.getTowerRankingByCourse(towerInfo.towerId);
     console.log(`获取到${towerInfo.name}排行榜数据:`, response);
     
     if (response.data && response.data.success && response.data.data) {

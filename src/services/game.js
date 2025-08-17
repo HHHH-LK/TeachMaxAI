@@ -128,16 +128,16 @@ export const gameService = {
          * @returns {Promise<object>} 使用结果
          */
         useItem: async (useItemData) => {
-            const { itemId, studentId, floorId, changeCount } = useItemData;
+            const { itemId, studentId, floorId, changeCount, max_HP } = useItemData;
             return await apiClient.post('/item/User/useitem', null, {
-                params: { itemId, studentId, floorId, changeCount }
+                params: { itemId, studentId, floorId, changeCount, max_HP }
             });
         }
     },
 
     fighting: {
         /**
-         * 进入回合战斗(返回当前用户挑战塔层Id,并将boss，用户血量缓存进redis中供后续查询)
+         * 进入回合战斗(返回当前用户挑战塔层Id,并将boss，用户血 量缓存进redis中供后续查询)
          * @param {string} floorId - 塔层ID
          * @param {string} studentId - 学生ID
          * @returns {Promise<object>} 挑战塔层Id
@@ -246,6 +246,15 @@ export const gameService = {
         getAward: async (studentId, floorId) => {
             return await apiClient.get('/fighting/get/award', {
                 params: { studentId, floorId }
+            });
+        },
+
+        /**
+         * 获取升级所需经验
+         */
+        getExp: async(studentLevel) => {
+            return await apiClient.get('/fighting/get/requireExp', {
+                params: {studentLevel}
             });
         }
     },

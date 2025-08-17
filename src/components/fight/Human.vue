@@ -270,7 +270,7 @@ const handleGlobalAttack = (event) => {
       enemyParticles.value = generateParticles(50, true);
       isPlayerAttacking.value = true;
       isEnemyHit.value = true;
-    }, 1200);
+    }, 2800);
 
     // 通知父组件敌人受到伤害
     emit('enemy-hit', 20);
@@ -289,7 +289,7 @@ const handleGlobalAttack = (event) => {
       playerParticles.value = generateParticles(40);
       isEnemyAttacking.value = true;
       isPlayerHit.value = true;
-    }, 1200);
+    }, 2800);
 
     // 通知父组件玩家受到伤害
     emit('player-hit', 15);

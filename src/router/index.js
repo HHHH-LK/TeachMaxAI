@@ -193,7 +193,7 @@ const router = createRouter({
       path: '/tower-transition',
       name: 'TowerTransition',
       component: TowerTransition,
-      props: true
+      props: true 
     },
     {
       path: '/chat',
