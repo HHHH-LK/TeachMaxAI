@@ -4,12 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="更新重提交">
+    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="调试新增接口">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/AssessmentManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/AssessmentManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentCard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/assessmentManage/AssessmentList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/assessmentManage/PendingAssessmentCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/assessmentManage/PendingAssessmentCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/fight/CardEffectModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/CardEffectModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/fight/ChallengeModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/ChallengeModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config/userConfig.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/userConfig.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/chatSSEService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/chatSSEService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/TeacherChat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/TeacherChat.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/teacher/StudentChat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/teacher/StudentChat.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/tower/Fight.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/tower/Fight.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,8 +22,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="Vue Composition API Component" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -178,6 +181,13 @@
       <workItem from="1755069339596" duration="19988000" />
       <workItem from="1755134716378" duration="1110000" />
       <workItem from="1755135855467" duration="6791000" />
+      <workItem from="1755350126290" duration="193000" />
+      <workItem from="1755350329551" duration="10271000" />
+      <workItem from="1755386868195" duration="47000" />
+      <workItem from="1755386944132" duration="79000" />
+      <workItem from="1755387036225" duration="1308000" />
+      <workItem from="1755390258545" duration="18632000" />
+      <workItem from="1755411505619" duration="22853000" />
     </task>
     <task id="LOCAL-00001" summary="解耦合教师分配功能，增删改查知识点等">
       <option name="closed" value="true" />
@@ -211,7 +221,31 @@
       <option name="project" value="LOCAL" />
       <updated>1755135402052</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="删除阅卷查看功能，优化bug">
+      <option name="closed" value="true" />
+      <created>1755314046528</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1755314046528</updated>
+    </task>
+    <task id="LOCAL-00006" summary="调试部分接口，优化逻辑">
+      <option name="closed" value="true" />
+      <created>1755348192276</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755348192276</updated>
+    </task>
+    <task id="LOCAL-00007" summary="调试新增接口">
+      <option name="closed" value="true" />
+      <created>1755409230082</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1755409230083</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,6 +283,9 @@
     <MESSAGE value="实现进入游戏动画" />
     <MESSAGE value="更新动画" />
     <MESSAGE value="更新重提交" />
-    <option name="LAST_COMMIT_MESSAGE" value="更新重提交" />
+    <MESSAGE value="删除阅卷查看功能，优化bug" />
+    <MESSAGE value="调试部分接口，优化逻辑" />
+    <MESSAGE value="调试新增接口" />
+    <option name="LAST_COMMIT_MESSAGE" value="调试新增接口" />
   </component>
 </project>
