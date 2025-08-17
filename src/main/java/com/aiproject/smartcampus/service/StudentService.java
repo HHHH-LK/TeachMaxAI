@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.service;
 
+import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.pojo.dto.StudentExamAnswerDTO;
 import com.aiproject.smartcampus.pojo.po.Student;
 import com.aiproject.smartcampus.pojo.vo.StudentSelectAllVO;
@@ -27,4 +28,6 @@ public interface StudentService extends IService<Student> {
     String academicAnalysis(String courseId);
 
     void finshExam(StudentExamAnswerDTO studentExamAnswerDTO);
+
+    Result<String> getStudyByAgent(String studentId, String pointId);
 }

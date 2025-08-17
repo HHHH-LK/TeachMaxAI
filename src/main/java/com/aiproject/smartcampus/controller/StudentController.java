@@ -92,6 +92,14 @@ public class StudentController {
         return Result.success();
     }
 
+    /**
+     * 根据agent获取对应的学习资源
+     * */
+    @GetMapping("/get/studyByAgent")
+    public Result<String> getStudyByAgent(@RequestParam("studentId") String studentId,@RequestParam("pointId")String pointId) {
+
+        return studentService.getStudyByAgent(studentId,pointId);
+    }
 
 }
 
