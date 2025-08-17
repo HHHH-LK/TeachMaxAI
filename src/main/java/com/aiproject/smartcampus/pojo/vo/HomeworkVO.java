@@ -9,13 +9,7 @@ import java.util.Date;
 @Data
 public class HomeworkVO {
     // 作业基本信息
-    private Integer assignmentId;
-    private String title;
-    private String description;
-    private LocalDateTime dueDate;
     private BigDecimal maxScore;
-    private String status;
-
     // 作业统计信息
     private Integer submissionCount; // 提交人数
     private BigDecimal averageScore; // 平均分

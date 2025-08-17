@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @program: SmartCampus
@@ -643,97 +642,162 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 return Result.error("课程ID不能为空");
             }
 
-            // 2. 获取课程基本信息
+            // 2. 初始化课程概要对象
             CourseSummaryVO summary = new CourseSummaryVO();
 
-            // 3. 获取课程总作业数
-            Integer totalAssignments = assignmentMapper.countAssignmentsByCourseId(courseId);
-            summary.setTotalAssignments(totalAssignments);
+            // 3. 获取课程所有章节
+            List<Chapter> chapters = chapterMapper.selectByCourseId(courseId);
+            if (chapters == null || chapters.isEmpty()) {
+                return Result.success(summary); // 无章节时返回空对象
+            }
 
-            // 4. 获取学生总数
-            Integer totalStudents = enrollmentMapper.countEnrollmentsByCourseId(courseId);
+            // 4. 获取课程所有学生ID列表
+            List<String> studentIds = enrollmentMapper.findStudentIdsByCourseId(courseId);
+            if (studentIds == null || studentIds.isEmpty()) {
+                summary.setTotalStudents(0);
+                return Result.success(summary);
+            }
+            int totalStudents = studentIds.size();
             summary.setTotalStudents(totalStudents);
 
-            // 5. 获取所有作业列表
-            List<Assignment> assignments = assignmentMapper.selectByCourseId(courseId);
-
-            // 6. 准备作业统计信息
+            // 5. 统计作业相关数据
             List<HomeworkVO> homeworkList = new ArrayList<>();
+            int totalAssignments = 0;
             BigDecimal totalScoreSum = BigDecimal.ZERO;
             int totalSubmissions = 0;
 
-            for (Assignment assignment : assignments) {
-                HomeworkVO homeworkVO = new HomeworkVO();
+            // 6. 遍历每个章节统计作业
+            for (Chapter chapter : chapters) {
+                // 7. 获取章节的唯一问题列表
+                Set<Integer> uniqueQuestionIds = new HashSet<>();
+                Map<Integer, BigDecimal> questionScores = new HashMap<>();
 
-                // 基础信息
-                homeworkVO.setAssignmentId(assignment.getAssignmentId());
-                homeworkVO.setTitle(assignment.getTitle());
-                homeworkVO.setDescription(assignment.getDescription());
-                homeworkVO.setDueDate(assignment.getDueDate());
-                homeworkVO.setMaxScore(assignment.getMaxScore());
-                homeworkVO.setStatus(String.valueOf(assignment.getStatus()).toLowerCase());
+                // 8. 通过一个学生获取章节问题列表（用于构建唯一问题列表）
+                if (!studentIds.isEmpty()) {
+                    String firstStudentId = studentIds.get(0);
+                    List<ChapterQuestionDetailVO> firstStudentQuestions = chapterMapper.getChapterTestQuestions(
+                            chapter.getChapterId(),
+                            Integer.valueOf(firstStudentId),
+                            Integer.valueOf(courseId)
+                    );
 
-                // 获取作业提交数据
-                List<AssignmentSubmission> submissions = submissionMapper.findByAssignmentId(assignment.getAssignmentId());
-
-                // 统计提交人数
-                int submissionCount = submissions.size();
-                homeworkVO.setSubmissionCount(submissionCount);
-
-                // 计算提交率
-                if (totalStudents > 0) {
-                    BigDecimal rate = new BigDecimal(submissionCount)
-                            .divide(new BigDecimal(totalStudents), 4, RoundingMode.HALF_UP)
-                            .multiply(BigDecimal.valueOf(100))
-                            .setScale(2, RoundingMode.HALF_UP);
-                    homeworkVO.setSubmissionRate(rate);
-                } else {
-                    homeworkVO.setSubmissionRate(BigDecimal.ZERO);
-                }
-
-                // 计算平均分和成绩分布
-                BigDecimal scoreSum = BigDecimal.ZERO;
-                int scoreA = 0, scoreB = 0, scoreC = 0, scoreD = 0, scoreF = 0;
-
-                for (AssignmentSubmission submission : submissions) {
-                    if (submission.getScore() != null) {
-                        scoreSum = scoreSum.add(submission.getScore());
-
-                        // 成绩分布统计
-                        double score = submission.getScore().doubleValue();
-                        if (score >= 90) scoreA++;
-                        else if (score >= 80) scoreB++;
-                        else if (score >= 70) scoreC++;
-                        else if (score >= 60) scoreD++;
-                        else scoreF++;
+                    if (firstStudentQuestions != null) {
+                        for (ChapterQuestionDetailVO question : firstStudentQuestions) {
+                            if (question.getQuestionId() != null && question.getScorePoints() != null) {
+                                uniqueQuestionIds.add(question.getQuestionId());
+                                questionScores.put(question.getQuestionId(), question.getScorePoints());
+                            }
+                        }
                     }
                 }
 
-                // 设置平均分
-                if (submissionCount > 0) {
+                if (uniqueQuestionIds.isEmpty()) {
+                    continue; // 跳过无有效题目的章节
+                }
+
+                totalAssignments++; // 章节至少有一个有效问题，视为一个作业
+
+                // 9. 构建章节作业VO
+                HomeworkVO homeworkVO = new HomeworkVO();
+
+                // 10. 计算章节满分（所有唯一问题分值总和）
+                BigDecimal chapterMaxScore = questionScores.values().stream()
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                homeworkVO.setMaxScore(chapterMaxScore);
+
+                // 11. 获取所有学生的答题记录
+                List<ChapterQuestionDetailVO> allStudentAnswers = new ArrayList<>();
+                for (String studentId : studentIds) {
+                    List<ChapterQuestionDetailVO> studentAnswers = chapterMapper.getChapterTestQuestions(
+                            chapter.getChapterId(),
+                            Integer.valueOf(studentId),
+                            Integer.valueOf(courseId)
+                    );
+                    if (studentAnswers != null) {
+                        allStudentAnswers.addAll(studentAnswers);
+                    }
+                }
+
+                // 12. 按答题记录分组（使用answerId作为分组依据）
+                Map<Integer, List<ChapterQuestionDetailVO>> answerGroups = allStudentAnswers.stream()
+                        .filter(a -> a.getAnswerId() != null) // 有答题记录
+                        .collect(Collectors.groupingBy(ChapterQuestionDetailVO::getAnswerId));
+
+                // 13. 计算章节作业统计数据
+                int chapterSubmissionCount = 0;
+                BigDecimal chapterScoreSum = BigDecimal.ZERO;
+                int[] scoreDistribution = new int[5]; // [A, B, C, D, F]
+
+                for (List<ChapterQuestionDetailVO> answers : answerGroups.values()) {
+                    // 检查是否提交（判断是否有得分）
+                    boolean submitted = answers.stream()
+                            .anyMatch(a -> a.getScoreEarned() != null && a.getScoreEarned().compareTo(BigDecimal.ZERO) >= 0);
+
+                    if (!submitted) continue;
+
+                    chapterSubmissionCount++;
+                    totalSubmissions++;
+
+                    // 计算学生在本章节总得分
+                    BigDecimal studentScore = answers.stream()
+                            .map(q -> q.getScoreEarned() != null ? q.getScoreEarned() : BigDecimal.ZERO)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    chapterScoreSum = chapterScoreSum.add(studentScore);
+
+                    // 计算得分率（转换为百分制）
+                    if (chapterMaxScore.compareTo(BigDecimal.ZERO) > 0) {
+                        BigDecimal scoreRate = studentScore.divide(chapterMaxScore, 4, RoundingMode.HALF_UP);
+                        double percentage = scoreRate.multiply(BigDecimal.valueOf(100)).doubleValue();
+
+                        // 记录成绩分布
+                        // 此为得分率，即学生成绩/总成绩
+                        if (percentage >= 90) scoreDistribution[0]++;
+                        else if (percentage >= 80) scoreDistribution[1]++;
+                        else if (percentage >= 70) scoreDistribution[2]++;
+                        else if (percentage >= 60) scoreDistribution[3]++;
+                        else scoreDistribution[4]++;
+                    }
+                }
+
+                // 14. 填充章节作业数据
+                homeworkVO.setSubmissionCount(chapterSubmissionCount);
+
+                // 平均分计算
+                if (chapterSubmissionCount > 0) {
                     homeworkVO.setAverageScore(
-                            scoreSum.divide(new BigDecimal(submissionCount), 2, RoundingMode.HALF_UP)
+                            chapterScoreSum.divide(BigDecimal.valueOf(chapterSubmissionCount), 2, RoundingMode.HALF_UP)
                     );
                 } else {
                     homeworkVO.setAverageScore(BigDecimal.ZERO);
                 }
 
-                // 设置成绩分布
-                homeworkVO.setScoreA(scoreA);
-                homeworkVO.setScoreB(scoreB);
-                homeworkVO.setScoreC(scoreC);
-                homeworkVO.setScoreD(scoreD);
-                homeworkVO.setScoreF(scoreF);
+                // 提交率计算
+                if (totalStudents > 0) {
+                    BigDecimal submissionRate = new BigDecimal(chapterSubmissionCount)
+                            .divide(new BigDecimal(totalStudents), 4, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100))
+                            .setScale(2, RoundingMode.HALF_UP);
+                    homeworkVO.setSubmissionRate(submissionRate);
+                } else {
+                    homeworkVO.setSubmissionRate(BigDecimal.ZERO);
+                }
 
-                // 添加到列表
+                // 成绩分布
+                homeworkVO.setScoreA(scoreDistribution[0]);
+                homeworkVO.setScoreB(scoreDistribution[1]);
+                homeworkVO.setScoreC(scoreDistribution[2]);
+                homeworkVO.setScoreD(scoreDistribution[3]);
+                homeworkVO.setScoreF(scoreDistribution[4]);
+
                 homeworkList.add(homeworkVO);
-
-                // 累加总分数和总提交数
-                totalScoreSum = totalScoreSum.add(scoreSum);
-                totalSubmissions += submissionCount;
+                totalScoreSum = totalScoreSum.add(chapterScoreSum);
             }
 
-            // 7. 计算课程整体平均分
+            // 15. 设置课程总作业数
+            summary.setTotalAssignments(totalAssignments);
+
+            // 16. 课程整体平均分
             if (totalSubmissions > 0) {
                 summary.setOverallAverageScore(
                         totalScoreSum.divide(new BigDecimal(totalSubmissions), 2, RoundingMode.HALF_UP)
@@ -742,7 +806,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 summary.setOverallAverageScore(BigDecimal.ZERO);
             }
 
-            // 8. 计算课程整体提交率
+            // 17. 课程整体提交率
             int totalPossibleSubmissions = totalAssignments * totalStudents;
             if (totalPossibleSubmissions > 0) {
                 BigDecimal rate = new BigDecimal(totalSubmissions)
@@ -754,13 +818,13 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 summary.setOverallSubmissionRate(BigDecimal.ZERO);
             }
 
-            // 9. 设置作业列表
+            // 18. 设置作业列表
             summary.setHomeworkList(homeworkList);
 
             return Result.success(summary);
 
         } catch (Exception e) {
-            log.error("获取课程作业统计失败: {}", e.getMessage());
+            log.error("获取课程作业统计失败: {}", e.getMessage(), e);
             return Result.error("获取课程作业统计失败");
         }
     }

@@ -82,4 +82,7 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
 
     @Delete("DELETE FROM course_enrollments WHERE course_id = #{courseId}")
     int deleteBycourseId(Integer courseId);
+
+    @Select("SELECT student_id FROM course_enrollments WHERE course_id = #{courseId}")
+    List<String> findStudentIdsByCourseId(String courseId);
 }
