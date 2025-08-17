@@ -104,7 +104,7 @@ public class StudentController {
     /**
      * 根据userId获取student信息
      * */
-    @GetMapping("get/studentIdByUserId")
+    @GetMapping("/get/studentIdByUserId")
     public Result<Student> getStudentIdByUserId(@RequestParam("userId") String userId) {
 
         return studentService.getStudentIdByUserId(userId);
