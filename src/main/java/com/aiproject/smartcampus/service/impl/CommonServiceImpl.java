@@ -3,6 +3,7 @@ package com.aiproject.smartcampus.service.impl;
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.JwtUtils;
 import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
+import com.aiproject.smartcampus.commons.utils.UserOnlineClients;
 import com.aiproject.smartcampus.exception.UserExpection;
 import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.NotificationMessage;
@@ -55,8 +56,9 @@ public class CommonServiceImpl implements CommonService {
     private final UserMapper userMapper;
     private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
-    private final RedisTemplate<String,User> userRedisTemplate;
+    private final RedisTemplate<String, User> userRedisTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final UserOnlineClients userOnlineClients;
     //    private final EmailService emailService;
     private final String tokenKey = "token:" + "TOKEN_";
 
@@ -100,6 +102,9 @@ public class CommonServiceImpl implements CommonService {
         // 4. 生成令牌
         String token = JwtUtils.generateToken(user.getUserId(), user.getUserType());
         log.info("用户 {} 登录成功，生成令牌: {}", user.getUsername(), token);
+
+        // 5 设置登录状态
+        userOnlineClients.addUserOnlineToRedis(String.valueOf(user.getUserId()));
 
         String key = tokenKey + token;
         user.setCreatedAt(LocalDateTime.now());
@@ -173,6 +178,7 @@ public class CommonServiceImpl implements CommonService {
         String key = tokenKey + token;
         Boolean delete = userRedisTemplate.delete(key);
         if (delete) {
+            userOnlineClients.removeUserOnlineFromRedis(String.valueOf(userId));
             return Result.success();
         }
 
