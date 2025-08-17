@@ -30,4 +30,6 @@ public interface StudentService extends IService<Student> {
     void finshExam(StudentExamAnswerDTO studentExamAnswerDTO);
 
     Result<String> getStudyByAgent(String studentId, String pointId);
+
+    Result<Student> getStudentIdByUserId(String userId);
 }

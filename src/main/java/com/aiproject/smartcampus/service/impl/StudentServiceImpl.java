@@ -16,6 +16,7 @@ import com.aiproject.smartcampus.pojo.vo.StudentKnowledgePointVO;
 import com.aiproject.smartcampus.pojo.vo.StudentSelectAllVO;
 import com.aiproject.smartcampus.pojo.vo.StudentWrongQuestionVO;
 import com.aiproject.smartcampus.service.StudentService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -452,6 +453,17 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             log.error("getStudyByAgent 异常", e);
             return Result.error("生成学习链接失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Result<Student> getStudentIdByUserId(String userId) {
+
+        LambdaQueryWrapper<Student> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Student::getUserId, userId);
+        Student student = studentMapper.selectOne(queryWrapper);
+
+        return Result.success(student);
+
     }
 
     // 计算最优学习链接（不走缓存）

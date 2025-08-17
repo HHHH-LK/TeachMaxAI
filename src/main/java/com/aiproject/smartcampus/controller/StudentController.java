@@ -101,6 +101,15 @@ public class StudentController {
         return studentService.getStudyByAgent(studentId,pointId);
     }
 
+    /**
+     * 根据userId获取student信息
+     * */
+    @GetMapping("get/studentIdByUserId")
+    public Result<Student> getStudentIdByUserId(@RequestParam("userId") String userId) {
+
+        return studentService.getStudentIdByUserId(userId);
+    }
+
 }
 
 
