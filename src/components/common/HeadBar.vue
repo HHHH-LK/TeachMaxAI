@@ -25,7 +25,7 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { authService, teacherService } from "@/services/api";
+import { authService, teacherService, studentService, adminService } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 import { ElMessage } from "element-plus";
 
@@ -53,6 +53,65 @@ const fetchTeacherInfo = async (userId) => {
   }
 };
 
+// 获取学生信息的函数
+const fetchStudentInfo = async (userId) => {
+  try {
+    // 第一步：通过userId获取学生基本信息
+    const studentIdResponse = await studentService.getStudentIdByUserId(userId);
+    if (studentIdResponse.data && studentIdResponse.data.success) {
+      const studentIdData = studentIdResponse.data.data;
+      
+      // 第二步：通过学号获取详细学生信息
+      const studentDetailResponse = await studentService.getStudentByNumber(studentIdData.studentNumber);
+      if (studentDetailResponse.data && studentDetailResponse.data.success) {
+        const studentDetailData = studentDetailResponse.data.data;
+        
+        // 更新右上角显示的学生信息
+        username.value = studentDetailData.user?.realName || studentDetailData.user?.username || "zhangxm";
+        userType.value = "学生";
+        avatarUrl.value = "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3";
+      } else {
+        // 如果获取详细信息失败，使用基本信息
+        username.value = studentIdData.studentNumber || "zhangxm";
+        userType.value = "学生";
+        avatarUrl.value = "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3";
+      }
+    } else {
+      // 如果API调用失败，使用默认数据
+      username.value = "zhangxm";
+      userType.value = "学生";
+      avatarUrl.value = "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3";
+    }
+  } catch (error) {
+    console.error('获取学生信息失败:', error);
+    // 如果API调用失败，使用默认数据
+    username.value = "zhangxm";
+    userType.value = "学生";
+    avatarUrl.value = "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3";
+  }
+};
+
+// 获取管理员信息的函数
+const fetchAdminInfo = async () => {
+  try {
+    const response = await adminService.getAdminInfo();
+    if (response.data && response.data.success) {
+      const adminData = response.data.data;
+      
+      // 更新右上角显示的管理员信息
+      username.value = adminData.user?.realName || adminData.user?.username || "wangfk";
+      userType.value = "管理员";
+      avatarUrl.value = "https://tse4-mm.cn.bing.net/th/id/OIP-C._NeFXOQo9CFwgDT20CPNZgHaHa?w=160&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7";
+    }
+  } catch (error) {
+    console.error('获取管理员信息失败:', error);
+    // 如果API调用失败，使用默认数据
+    username.value = "wangfk";
+    userType.value = "管理员";
+    avatarUrl.value = "https://tse4-mm.cn.bing.net/th/id/OIP-C._NeFXOQo9CFwgDT20CPNZgHaHa?w=160&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7";
+  }
+};
+
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -73,12 +132,24 @@ const setName = async () => {
     }
   } else if (path.startsWith('/student')) {
     userType.value = "学生";
-    username.value = "zhangxm";
-    avatarUrl.value = "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3";
+    if (currentUser && currentUser.id) {
+      // 尝试获取真实学生信息
+      await fetchStudentInfo(currentUser.id);
+    } else {
+      // 使用默认数据
+      username.value = "zhangxm";
+      avatarUrl.value = "https://tse3-mm.cn.bing.net/th/id/OIP-C.MyVTP6gOD1WSIDQ8CIV1qAHaHa?w=167&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3";
+    }
   } else if (path.startsWith('/admin')) {
     userType.value = "管理员";
-    username.value = "wangfk";
-    avatarUrl.value = "https://tse4-mm.cn.bing.net/th/id/OIP-C._NeFXOQo9CFwgDT20CPNZgHaHa?w=160&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7";
+    if (currentUser && currentUser.id) {
+      // 尝试获取真实管理员信息
+      await fetchAdminInfo();
+    } else {
+      // 使用默认数据
+      username.value = "wangfk";
+      avatarUrl.value = "https://tse4-mm.cn.bing.net/th/id/OIP-C._NeFXOQo9CFwgDT20CPNZgHaHa?w=160&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7";
+    }
   } else {
     // 默认情况
     userType.value = "学生";

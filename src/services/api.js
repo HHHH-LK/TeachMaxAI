@@ -258,6 +258,15 @@ export const teacherService = {
   },
 
   /**
+   * 章节测试题评判
+   * @param {object} studentTextAnswerDTO - 学生答案对象
+   * @returns {Promise<object>} 评判结果
+   */
+  judgeChapterTest: async (studentTextAnswerDTO) => {
+    return await apiClient.post('/chapter/ju/test', studentTextAnswerDTO);
+  },
+
+  /**
    * 创建课程资源
    * @param {object} createMaterialDTO - 课程资源创建数据
    * @returns {Promise<object>} 创建结果
@@ -434,6 +443,23 @@ export const teacherService = {
 
 //管理员服务
 export const adminService = {
+  /**
+   * 查询管理员个人信息
+   * @returns {Promise<object>} 管理员个人信息
+   */
+  getAdminInfo: async () => {
+    return await apiClient.get('/admin/getAdminInfo');
+  },
+
+  /**
+   * 更改管理员个人信息
+   * @param {object} adminInfo - 管理员信息对象
+   * @returns {Promise<object>} 更新结果
+   */
+  updateAdminInfo: async (adminInfo) => {
+    return await apiClient.put('/admin/updateAdminInfo', adminInfo);
+  },
+
   //获取全部用户信息
   getAllUsers: async () => {
     return await apiClient.get("/admin/getAllUserInfo");
@@ -610,6 +636,24 @@ export const studentService = {
     return await apiClient.get('/stu/get/studentIdByUserId', {
       params: { userId }
     });
+  },
+
+  /**
+   * 根据学号查询学生信息
+   * @param {string} studentNumber - 学生学号
+   * @returns {Promise<object>} 学生信息
+   */
+  getStudentByNumber: async (studentNumber) => {
+    return await apiClient.get(`/stu/student/${studentNumber}`);
+  },
+
+  /**
+   * 更新学生信息
+   * @param {object} student - 学生信息对象
+   * @returns {Promise<object>} 更新结果
+   */
+  updateStudent: async (student) => {
+    return await apiClient.put('/stu/update', student);
   },
 
   /**

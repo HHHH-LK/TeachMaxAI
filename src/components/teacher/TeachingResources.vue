@@ -11,7 +11,7 @@
         </div>
       </template>
 
-      <el-table :data="resources" style="width: 100%" v-loading="loading">
+      <el-table :data="paginatedResources" style="width: 100%" v-loading="loading">
         <el-table-column prop="name" label="资源名称" width="180" />
         <el-table-column prop="type" label="类型" width="100" />
         <el-table-column prop="description" label="描述" width="200" />
@@ -34,6 +34,20 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页组件 -->
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="totalResources"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          background
+        />
+      </div>
     </el-card>
 
     <!-- 上传对话框 -->
@@ -118,7 +132,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import { studentService, teacherService } from "@/services/api.js";
@@ -129,6 +143,10 @@ const courseId = ref(route.params.courseId);
 
 // 章节信息
 const chapters = ref([]);
+
+// 分页相关状态
+const currentPage = ref(1);
+const pageSize = ref(10);
 
 // 上传表单数据
 const uploadForm = ref({
@@ -184,24 +202,23 @@ const fetchResource = async() =>{
     // 清空现有资源
     resources.value = [];
 
-    for(var i = 0; i < chapters.value.length; i++){
-      const response = await teacherService.getMaterialByCourseId(courseId.value)
-      console.log("章节下的资源:", response.data)
+    const response = await teacherService.getMaterialByCourseId(courseId.value)
+    console.log("章节下的资源:", response.data)
 
-      if(response.data && response.data.success && response.data.data){
-        const resourcesTemp = response.data.data.map(item => ({
-          id: item.materialId,
-          name: item.materialTitle,
-          type: item.materialTypeCn || item.materialType,
-          description: item.materialDescription,
-          difficultyLevel: item.difficultyLevel || 'medium',
-          estimatedTime: item.estimatedTime || 30,
-          uploadTime: item.createdAt,
-          url: item.externalResourceUrl
-        }));
-        resources.value.push(...resourcesTemp)
-      }
+    if(response.data && response.data.success && response.data.data){
+      const resourcesTemp = response.data.data.map(item => ({
+        id: item.materialId,
+        name: item.materialTitle,
+        type: item.materialTypeCn || item.materialType,
+        description: item.materialDescription,
+        difficultyLevel: item.difficultyLevel || 'medium',
+        estimatedTime: item.estimatedTime || 30,
+        uploadTime: item.createdAt,
+        url: item.externalResourceUrl
+      }));
+      resources.value.push(...resourcesTemp)
     }
+
     console.log("获取到的资源:", resources.value)
   } catch(e) {
     console.log("获取失败:", e)
@@ -213,6 +230,15 @@ const fetchResource = async() =>{
 
 const resources = ref([]);
 const loading = ref(false);
+
+// 分页计算属性
+const totalResources = computed(() => resources.value.length);
+
+const paginatedResources = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return resources.value.slice(start, end);
+});
 
 const showUploadDialog = ref(false);
 const showPreviewDialog = ref(false);
@@ -358,12 +384,23 @@ const resetUploadForm = () => {
   }
 };
 
+// 分页事件处理
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  currentPage.value = 1; // 重置到第一页
+};
+
+const handleCurrentChange = (newPage) => {
+  currentPage.value = newPage;
+};
+
 // 监听路由参数变化
 watch(
   () => route.params.courseId,
   (newCourseId) => {
     if (newCourseId && newCourseId !== courseId.value) {
       courseId.value = newCourseId;
+      currentPage.value = 1; // 重置分页
       fetchResource();
     }
   }
@@ -438,5 +475,17 @@ onMounted(() => {
 .difficulty-hard {
   background-color: #f56c6c;
   color: white;
+}
+
+/* 分页组件样式 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 10px 0;
+}
+
+.pagination-container .el-pagination {
+  text-align: center;
 }
 </style>

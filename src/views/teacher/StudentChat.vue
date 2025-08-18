@@ -148,7 +148,6 @@ import {
 import teacherAvatar from '@/assets/teacher-avatar.png';
 import {teacherService, isOnline, studentService} from "@/services/api.js";
 import chatSSEService from '@/services/chatSSEService.js';
-import teacherChatApiService from '@/services/teacherChatApiService.js';
 import { getCurrentUser } from '@/utils/userUtils.js';
 import { ElMessage } from 'element-plus';
 import { useAuthStore } from '@/store/authStore.js';
@@ -320,37 +319,19 @@ const refreshAllStudents = async () => {
       students.value = allStudents;
       ElMessage.success(`成功加载 ${allStudents.length} 名学生数据`);
     } else {
-      ElMessage.warning('获取学生数据失败，使用模拟数据');
-      students.value = mockStudents.value;
+      ElMessage.warning('获取学生数据失败，暂无学生数据');
+      students.value = [];
     }
   } catch (error) {
     console.error('获取所有学生数据出错:', error);
-    ElMessage.warning('网络错误，使用模拟数据');
-    students.value = mockStudents.value;
+    ElMessage.warning('网络错误，暂无学生数据');
+    students.value = [];
   } finally {
     loading.value = false;
   }
 };
 
-// 模拟学生数据作为备用
-const mockStudents = ref([
-  {
-    id: 16,
-    name: '张小明',
-    description: '武术特长生，对传统文化有浓厚兴趣。',
-    avatar: 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png',
-    isOnline: true,
-    tags: ['Java', '数据结构与算法'],
-  },
-  {
-    id: 2,
-    name: '张伟',
-    description: '计算机科学专业，擅长编程和算法。',
-    avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epicture.png',
-    isOnline: false,
-    tags: ['计算机', '编程', '算法'],
-  }
-]);
+
 
 // 状态
 const selectedStudent = ref(null);
@@ -427,17 +408,7 @@ const selectStudent = async (student) => {
   console.log('选中的学生对象:', student);
   selectedStudent.value = student;
 
-  // 如果该学生没有聊天记录，初始化一个默认的欢迎消息
-  if (!chatMessages.value[student.id]) {
-    chatMessages.value[student.id] = [
-      {
-        sender: 'teacher',
-        content: `你好，${student.name}！我是你的老师，有什么问题可以随时问我。`,
-        time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-      }
-    ];
-  }
-
+  // 直接获取聊天记录，不自动生成欢迎消息
   currentChatMessages.value = chatMessages.value[student.id] || [];
   if (unreadMap.value[student.id]) {
     unreadMap.value[student.id] = 0;
@@ -779,57 +750,78 @@ onUnmounted(() => {
 
 .search-box {
   margin-bottom: 25px;
+  
   .search-input {
-    /deep/ .el-input__wrapper {
-      border-radius: 30px;
-      padding: 10px 15px;
-      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.05) inset;
-      border: 1px solid @primary-border;
-      transition: @transition;
+    // 增加样式优先级，确保搜索框样式不被覆盖
+    :deep(.el-input__wrapper) {
+      border-radius: 30px !important;
+      padding: 10px 15px !important;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.05) inset !important;
+      border: 1px solid @primary-border !important;
+      transition: @transition !important;
+      background-color: @bg-white !important;
+      
       &:hover {
-        border-color: @secondary;
+        border-color: @secondary !important;
+        box-shadow: 0 3px 12px rgba(37, 99, 235, 0.08) inset !important;
       }
+      
       &.is-focus {
-        border-color: @primary;
-        box-shadow: 0 0 0 1px @primary inset, 0 3px 12px rgba(37, 99, 235, 0.1);
+        border-color: @primary !important;
+        box-shadow: 0 0 0 1px @primary inset, 0 3px 12px rgba(37, 99, 235, 0.1) !important;
       }
     }
-    /deep/ .el-input-group__append {
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      padding: 0 10px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
+    
+    :deep(.el-input__inner) {
+      font-size: 14px !important;
+      color: @text-primary !important;
+      &::placeholder {
+        color: @text-tertiary !important;
+        font-size: 14px !important;
+      }
+    }
+    
+    :deep(.el-input__prefix) {
+      color: @text-secondary !important;
+      font-size: 16px !important;
+    }
+    
+    :deep(.el-input-group__append) {
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 20px !important;
     }
   }
 }
 
-/deep/ .el-scrollbar__wrap {
+:deep(.el-scrollbar__wrap) {
   &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 8px !important;
+    height: 8px !important;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(37, 99, 235, 0.4);
-    border-radius: 4px;
+    background-color: rgba(37, 99, 235, 0.4) !important;
+    border-radius: 4px !important;
     &:hover {
-      background-color: rgba(37, 99, 235, 0.6);
+      background-color: rgba(37, 99, 235, 0.6) !important;
     }
   }
   &::-webkit-scrollbar-track {
-    background-color: transparent;
+    background-color: transparent !important;
   }
 }
 
-/deep/ .el-empty {
-  /deep/ .el-empty__image {
-    margin-bottom: 15px;
+:deep(.el-empty) {
+  :deep(.el-empty__image) {
+    margin-bottom: 15px !important;
   }
-  /deep/ .el-empty__description p {
-    font-size: 15px;
-    color: @text-secondary;
+  :deep(.el-empty__description p) {
+    font-size: 15px !important;
+    color: @text-secondary !important;
   }
 }
 
@@ -871,15 +863,7 @@ onUnmounted(() => {
     width: 100% !important;
   }
 }
-    is-focus {
-      border-color: @primary;
-      box-shadow: 0 0 0 1px @primary inset, 0 3px 10px rgba(37, 99, 235, 0.1);
-    }
 
-    /deep/ .el-input__prefix {
-      color: @text-secondary;
-
-    }
 
 
 .student-list-scrollbar {
@@ -893,9 +877,9 @@ onUnmounted(() => {
 
 .loading-container {
   padding: 20px;
-  /deep/ .el-skeleton {
+  :deep(.el-skeleton) {
     .el-skeleton__item {
-      margin-bottom: 15px;
+      margin-bottom: 15px !important;
     }
   }
 }
@@ -938,10 +922,10 @@ onUnmounted(() => {
     margin-right: 20px;
     flex-shrink: 0;
 
-    /deep/ .el-avatar {
-      border: 3px solid @primary-border;
-      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.1);
-      transition: @transition;
+    :deep(.el-avatar) {
+      border: 3px solid @primary-border !important;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.1) !important;
+      transition: @transition !important;
     }
 
     .online-status {
@@ -956,6 +940,11 @@ onUnmounted(() => {
       transition: background-color 0.3s ease;
       &.is-online {
         background-color: @success;
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+      }
+      &.is-offline {
+        background-color: @text-tertiary;
+        opacity: 0.6;
       }
     }
 
@@ -1262,122 +1251,71 @@ onUnmounted(() => {
   .message-input {
     width: 100%;
 
-    /deep/ .el-input__wrapper {
-      border-radius: 30px;
-      padding: 12px 20px;
-      box-shadow: 0 3px 12px rgba(37, 99, 235, 0.05) inset;
-      border: 1px solid @primary-border;
-      transition: @transition;
+    :deep(.el-input__wrapper) {
+      border-radius: 30px !important;
+      padding: 12px 20px !important;
+      box-shadow: 0 3px 12px rgba(37, 99, 235, 0.05) inset !important;
+      border: 1px solid @primary-border !important;
+      transition: @transition !important;
 
       &:hover {
-        border-color: @secondary;
+        border-color: @secondary !important;
+      }
+
+      &.is-focus {
+        border-color: @primary !important;
+        box-shadow: 0 0 0 1px @primary inset, 0 3px 12px rgba(37, 99, 235, 0.1) !important;
       }
     }
 
-    .message-input {
-      width: 100%;
-
-      /deep/ .el-input__wrapper {
-        border-radius: 30px;
-        padding: 12px 20px;
-        box-shadow: 0 3px 12px rgba(37, 99, 235, 0.05) inset;
-        border: 1px solid @primary-border;
-        transition: @transition;
-
-        &:hover {
-          border-color: @secondary;
-        }
-
-        &.is-focus {
-          border-color: @primary;
-          box-shadow: 0 0 0 1px @primary inset, 0 3px 12px rgba(37, 99, 235, 0.1);
-        }
-      }
-
-      /deep/ .el-input-group__append {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-        padding: 0 10px;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-      }
+    :deep(.el-input-group__append) {
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 20px !important;
     }
   }
+}
 
-  .unread-badge {
+// 响应式设计
+@media (max-width: @breakpoint-md) {
+  .student-selection-panel {
+    padding: 25px 15px;
+  }
+
+  .chat-header {
+    padding: 15px 20px;
+  }
+
+  .chat-messages-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: @breakpoint-sm) {
+  .common-layout {
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .student-selection-panel {
+    width: 100% !important;
+    height: 100% !important;
     position: absolute;
-    top: -6px;
-    right: -6px;
-    background: @danger;
-    color: @bg-white;
-    border-radius: 50%;
-    padding: 2px 7px;
-    font-size: 12px;
-    font-weight: bold;
-    z-index: 2;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
-  }
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
 
-  /deep/ .el-scrollbar__wrap {
-    &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(37, 99, 235, 0.4);
-      border-radius: 4px;
-
-      &:hover {
-        background-color: rgba(37, 99, 235, 0.6);
-      }
-    }
-
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
+    &.active {
+      transform: translateX(0);
     }
   }
 
-
-  // 响应式设计
-  @media (max-width: @breakpoint-md) {
-    .student-selection-panel {
-      padding: 25px 15px;
-    }
-
-    .chat-header {
-      padding: 15px 20px;
-    }
-
-    .chat-messages-container {
-      padding: 20px;
-    }
-  }
-
-  @media (max-width: @breakpoint-sm) {
-    .common-layout {
-      height: 100vh;
-      border-radius: 0;
-    }
-
-    .student-selection-panel {
-      width: 100% !important;
-      height: 100% !important;
-      position: absolute;
-      z-index: 100;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-
-      &.active {
-        transform: translateX(0);
-      }
-    }
-
-    .chat-main-panel {
-      width: 100% !important;
-    }
+  .chat-main-panel {
+    width: 100% !important;
   }
 }
 </style>

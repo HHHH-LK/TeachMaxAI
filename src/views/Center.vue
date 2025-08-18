@@ -127,7 +127,7 @@ import CenterBackground from "@/components/student/center/CenterBackground.vue";
 import { ElMessage } from "element-plus";
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/store/authStore';
-import { teacherService } from '@/services/api';
+import { teacherService, studentService, adminService } from '@/services/api';
 import studentAvatar from '@/assets/student-avatar.png'
 import teacherAvatar from '@/assets/teacher-avatar.png'
 import adminAvatar from '@/assets/admin-avatar.png'
@@ -160,12 +160,15 @@ const userForm = ref({
   student_number: "2023001001",
   grade: "大一",
   class_name: "计算机2301",
+  student_id: 0, // 学生ID
   // 老师字段
   employee_id: "",
   department: "",
   // 管理员字段
   admin_id: "",
   manage_scope: "",
+  admin_level: "",
+  admin_department: "",
 });
 
 // 原始表单数据备份
@@ -211,6 +214,7 @@ const setDefaultUserData = (userType) => {
         student_number: "2023001001",
         grade: "大一",
         class_name: "计算机2301",
+        student_id: 0, // 默认学生ID
         employee_id: "",
         department: "",
         admin_id: "",
@@ -227,6 +231,8 @@ const setDefaultUserData = (userType) => {
         user_type: "admin",
         admin_id: "A2023001",
         manage_scope: "用户管理、系统设置",
+        admin_level: "super_admin",
+        admin_department: "信息技术部",
         student_number: "",
         grade: "",
         class_name: "",
@@ -253,6 +259,26 @@ const initializeUserData = async () => {
       await fetchTeacherInfo(currentUser.id);
     } catch (error) {
       console.error('获取教师信息失败，使用默认数据:', error);
+      // 如果API调用失败，保持默认数据不变
+    }
+  }
+  
+  // 如果是学生且有用户信息，尝试获取真实数据
+  if (userType === 'student' && currentUser && currentUser.id) {
+    try {
+      await fetchStudentInfo(currentUser.id);
+    } catch (error) {
+      console.error('获取学生信息失败，使用默认数据:', error);
+      // 如果API调用失败，保持默认数据不变
+    }
+  }
+  
+  // 如果是管理员，尝试获取真实数据
+  if (userType === 'admin') {
+    try {
+      await fetchAdminInfo();
+    } catch (error) {
+      console.error('获取管理员信息失败，使用默认数据:', error);
       // 如果API调用失败，保持默认数据不变
     }
   }
@@ -388,14 +414,267 @@ const fetchTeacherInfo = async (userId) => {
   }
 };
 
+// 获取学生个人信息
+const fetchStudentInfo = async (userId) => {
+  try {
+    loading.value = true;
+    console.log('正在获取学生信息，用户ID:', userId);
+    
+    // 第一步：通过userId获取学生基本信息
+    const studentIdResponse = await studentService.getStudentIdByUserId(userId);
+    console.log('学生ID信息API响应:', studentIdResponse);
+    
+    if (studentIdResponse.data && studentIdResponse.data.success) {
+      const studentIdData = studentIdResponse.data.data;
+      console.log('学生ID数据:', studentIdData);
+      
+      // 第二步：通过学号获取详细学生信息
+      const studentDetailResponse = await studentService.getStudentByNumber(studentIdData.studentNumber);
+      console.log('学生详细信息API响应:', studentDetailResponse);
+      
+      if (studentDetailResponse.data && studentDetailResponse.data.success) {
+        const studentDetailData = studentDetailResponse.data.data;
+        console.log('学生详细数据:', studentDetailData);
+        
+        // 更新学生表单数据
+        userForm.value = {
+          user_id: studentDetailData.userId?.toString() || studentIdData.userId?.toString() || "STD2023001",
+          username: studentDetailData.user?.username || "zhangxm",
+          real_name: studentDetailData.user?.realName || "张小明",
+          email: studentDetailData.user?.email || "zhangxm@school.com",
+          phone: studentDetailData.user?.phone || "13812345678",
+          user_type: "student",
+          student_number: studentDetailData.studentNumber || studentIdData.studentNumber || "2023001001",
+          grade: studentDetailData.grade || studentIdData.grade || "大一",
+          class_name: studentDetailData.className || studentIdData.className || "计算机2301",
+          // 保存学生ID用于更新
+          student_id: studentDetailData.studentId || studentIdData.studentId || 0,
+          // 其他角色字段置空
+          employee_id: "",
+          department: "",
+          admin_id: "",
+          manage_scope: "",
+        };
+        
+        // 同步更新原始数据备份
+        originalForm.value = { ...userForm.value };
+        console.log('学生信息更新完成');
+      } else {
+        // 如果获取详细信息失败，使用基本信息
+        userForm.value = {
+          user_id: studentIdData.userId?.toString() || "STD2023001",
+          username: "zhangxm",
+          real_name: "张小明",
+          email: "zhangxm@school.com",
+          phone: "13812345678",
+          user_type: "student",
+          student_number: studentIdData.studentNumber || "2023001001",
+          grade: studentIdData.grade || "大一",
+          class_name: studentIdData.className || "计算机2301",
+          // 保存学生ID用于更新
+          student_id: studentIdData.studentId || 0,
+          // 其他角色字段置空
+          employee_id: "",
+          department: "",
+          admin_id: "",
+          manage_scope: "",
+        };
+        
+        // 同步更新原始数据备份
+        originalForm.value = { ...userForm.value };
+        console.log('学生基本信息更新完成');
+      }
+    } else {
+      // 如果API调用失败，使用默认数据
+      userForm.value = {
+        user_id: "STD2023001",
+        username: "zhangxm",
+        real_name: "张小明",
+        email: "zhangxm@school.com",
+        phone: "13812345678",
+        user_type: "student",
+        student_number: "2023001001",
+        grade: "大一",
+        class_name: "计算机2301",
+        // 默认学生ID
+        student_id: 0,
+        // 其他角色字段置空
+        employee_id: "",
+        department: "",
+        admin_id: "",
+        manage_scope: "",
+      };
+      
+      // 同步更新原始数据备份
+      originalForm.value = { ...userForm.value };
+      console.log('使用默认学生数据');
+    }
+  } catch (error) {
+    console.error('获取学生信息失败:', error);
+    ElMessage.error('获取学生信息失败，请重试');
+    
+    // 如果API调用失败，使用默认数据
+    userForm.value = {
+      user_id: "STD2023001",
+      username: "zhangxm",
+      real_name: "张小明",
+      email: "zhangxm@school.com",
+      phone: "13812345678",
+      user_type: "student",
+      student_number: "2023001001",
+      grade: "大一",
+      class_name: "计算机2301",
+      // 默认学生ID
+      student_id: 0,
+      // 其他角色字段置空
+      employee_id: "",
+      department: "",
+      admin_id: "",
+      manage_scope: "",
+    };
+    
+    // 同步更新原始数据备份
+    originalForm.value = { ...userForm.value };
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 获取管理员个人信息
+const fetchAdminInfo = async () => {
+  try {
+    loading.value = true;
+    console.log('正在获取管理员信息');
+    
+    const response = await adminService.getAdminInfo();
+    console.log('管理员信息API响应:', response);
+    
+    if (response.data && response.data.success) {
+      const adminData = response.data.data;
+      console.log('管理员数据:', adminData);
+      
+      // 更新管理员表单数据
+      userForm.value = {
+        user_id: adminData.userId?.toString() || "ADM2023001",
+        username: adminData.user?.username || "admin",
+        real_name: adminData.user?.realName || "飞科",
+        email: adminData.user?.email || "admin@smartcampus.edu",
+        phone: adminData.user?.phone || "13800000001",
+        user_type: "admin",
+        admin_id: adminData.admin?.adminNumber || "ADM001",
+        manage_scope: adminData.admin?.position || "系统管理员",
+        // 保存管理员详细信息用于更新
+        admin_level: adminData.admin?.adminLevel || "super_admin",
+        admin_department: adminData.admin?.department || "信息技术部",
+        // 其他角色字段置空
+        student_number: "",
+        grade: "",
+        class_name: "",
+        employee_id: "",
+        department: "",
+      };
+      
+      // 同步更新原始数据备份
+      originalForm.value = { ...userForm.value };
+      console.log('管理员信息更新完成');
+    } else {
+      console.warn('API响应格式不正确:', response);
+      ElMessage.warning('获取管理员信息格式异常');
+    }
+  } catch (error) {
+    console.error('获取管理员信息失败:', error);
+    ElMessage.error('获取管理员信息失败，请重试');
+  } finally {
+    loading.value = false;
+  }
+};
+
 // 提交表单
-const submitForm = () => {
-  centerDialogVisible.value = false;
-  setTimeout(() => {
+const submitForm = async () => {
+  try {
+    loading.value = true;
+    
+    // 如果是学生角色，调用更新学生信息API
+    if (userForm.value.user_type === 'student') {
+      // 构建更新学生信息的请求数据
+      const updateData = {
+        studentId: userForm.value.student_id || 0,
+        userId: parseInt(userForm.value.user_id) || 0,
+        studentNumber: userForm.value.student_number,
+        grade: userForm.value.grade,
+        className: userForm.value.class_name,
+        user: {
+          userId: parseInt(userForm.value.user_id) || 0,
+          username: userForm.value.username,
+          passwordHash: "", // 不更新密码
+          realName: userForm.value.real_name,
+          email: userForm.value.email,
+          phone: userForm.value.phone,
+          userType: "student",
+          status: "active",
+          createdAt: new Date().toISOString()
+        }
+      };
+      
+      console.log('准备更新学生信息:', updateData);
+      
+      // 调用更新学生信息API
+      const response = await studentService.updateStudent(updateData);
+      
+      if (response.data && response.data.success) {
+        ElMessage.success("学生信息更新成功！");
+        // 更新成功后，重新获取最新信息
+        if (authStore.getUser && authStore.getUser.id) {
+          await fetchStudentInfo(authStore.getUser.id);
+        }
+      } else {
+        ElMessage.error("更新失败：" + (response.data?.message || "未知错误"));
+        return; // 更新失败，不关闭对话框
+      }
+    }
+    
+    // 如果是管理员角色，调用更新管理员信息API
+    if (userForm.value.user_type === 'admin') {
+      // 构建更新管理员信息的请求数据
+      const updateData = {
+        adminNumber: userForm.value.admin_id || "",
+        adminName: userForm.value.real_name || "",
+        adminLevel: userForm.value.admin_level || "",
+        adminRole: userForm.value.manage_scope || "",
+        adminEmail: userForm.value.email || "",
+        adminPhone: userForm.value.phone || "",
+        adminDepartment: userForm.value.admin_department || ""
+      };
+      
+      console.log('准备更新管理员信息:', updateData);
+      
+      // 调用更新管理员信息API
+      const response = await adminService.updateAdminInfo(updateData);
+      
+      if (response.data && response.data.success) {
+        ElMessage.success("管理员信息更新成功！");
+        // 更新成功后，重新获取最新信息
+        await fetchAdminInfo();
+      } else {
+        ElMessage.error("更新失败：" + (response.data?.message || "未知错误"));
+        return; // 更新失败，不关闭对话框
+      }
+    }
+    
+    // 关闭确认对话框
+    centerDialogVisible.value = false;
+    
+    // 更新原始数据备份
     originalForm.value = { ...userForm.value };
     isEditing.value = false;
-    ElMessage.success("个人信息更新成功！");
-  }, 500);
+    
+  } catch (error) {
+    console.error('更新信息失败:', error);
+    ElMessage.error("更新失败：" + (error.message || "网络错误"));
+    return; // 更新失败，不关闭对话框
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 <style scoped lang="scss">

@@ -161,7 +161,6 @@
         <p class="description">{{ selectedHomework.description }}</p>
         <div class="meta-info">
           <!-- <p><strong>截止时间：</strong>{{ formatDate(selectedHomework.deadline) }}</p> -->
-          <p><strong>满分：</strong>{{ selectedHomework.maxScore }}分</p>
           <p>
             <strong>状态：</strong>{{ getStatusText(selectedHomework.status) }}
           </p>
@@ -230,21 +229,20 @@
               }}
             </template>
           </el-table-column>
-          <el-table-column 
-              label="得分" 
-              width="100"
-              v-if="submissions.some(s => s.score !== undefined)"
-          >
-            <template #default="scope">
-              <span v-if="scope.row.score !== undefined" :class="getScoreClass(scope.row.score)">
-                {{ scope.row.score }}/{{ scope.row.maxScore || 100 }}
-              </span>
-              <span v-else class="text-muted">-</span>
-            </template>
-          </el-table-column>
+
           <el-table-column prop="reviewStatus" label="评阅状态" width="120">
             <template #default="scope">
+              <!-- 如果状态是ai_reviewed，只显示一个"AI已评阅"标签 -->
               <el-tag
+                  v-if="scope.row.reviewStatus === 'ai_reviewed'"
+                  :type="getReviewStatusType(scope.row.reviewStatus)"
+                  size="small"
+              >
+                AI已评阅
+              </el-tag>
+              <!-- 其他状态正常显示 -->
+              <el-tag
+                  v-else
                   :type="getReviewStatusType(scope.row.reviewStatus)"
                   size="small"
               >
@@ -316,51 +314,145 @@
         <div class="ai-review-section" v-if="selectedSubmission.aiReview">
           <h5>AI评阅结果：</h5>
           <div class="ai-review-content">
-            <div class="score-section">
-              <span class="score-label">建议分数：</span>
-              <span class="score-value">{{
-                  selectedSubmission.aiReview.suggestedScore
-                }}</span>
+            <!-- 总体评阅信息 -->
+            <div class="overall-review-section">
+              <div class="review-summary">
+                <div class="summary-item">
+                  <span class="summary-label">总体评价：</span>
+                  <el-tag :type="getTestLevelType(selectedSubmission.aiReview.testLevel)" size="small">
+                    {{ selectedSubmission.aiReview.testLevel }}
+                  </el-tag>
+                </div>
+
+                <div class="summary-item">
+                  <span class="summary-label">正确率：</span>
+                  <span class="summary-value">{{ (selectedSubmission.aiReview.accuracy * 100).toFixed(1) }}%</span>
+                </div>
+              </div>
+              
+              <div class="question-count-section">
+                <div class="count-item">
+                  <span class="count-label">题目总数：</span>
+                  <span class="count-value">{{ selectedSubmission.aiReview.totalQuestions }}</span>
+                </div>
+              </div>
             </div>
+
+            <!-- 答题统计 -->
+            <div class="answer-stats-section">
+              <h6>答题统计</h6>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <span class="stat-label">已答题：</span>
+                  <span class="stat-value">{{ selectedSubmission.aiReview.answeredQuestions }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">未答题：</span>
+                  <span class="stat-value">{{ selectedSubmission.aiReview.unansweredQuestions }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">正确题：</span>
+                  <span class="stat-value correct">{{ selectedSubmission.aiReview.correctQuestions }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">错误题：</span>
+                  <span class="stat-value wrong">{{ selectedSubmission.aiReview.wrongQuestions }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 题目类型统计 -->
+            <div class="question-type-stats" v-if="selectedSubmission.aiReview.questionTypeStats">
+              <h6>题目类型统计</h6>
+              <div class="type-stats-grid">
+                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.singleChoice.totalCount > 0">
+                  <span class="type-label">单选题：</span>
+                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.singleChoice.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.singleChoice.totalCount }}</span>
+                </div>
+                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.multipleChoice.totalCount > 0">
+                  <span class="type-label">多选题：</span>
+                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.multipleChoice.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.multipleChoice.totalCount }}</span>
+                </div>
+                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.trueFalse.totalCount > 0">
+                  <span class="type-label">判断题：</span>
+                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.trueFalse.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.trueFalse.totalCount }}</span>
+                </div>
+                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.fillBlank.totalCount > 0">
+                  <span class="type-label">填空题：</span>
+                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.fillBlank.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.fillBlank.totalCount }}</span>
+                </div>
+                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.shortAnswer.totalCount > 0">
+                  <span class="type-label">简答题：</span>
+                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.shortAnswer.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.shortAnswer.totalCount }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 评阅意见 -->
             <div class="feedback-section">
               <span class="feedback-label">评阅意见：</span>
               <p class="feedback-content">
                 {{ selectedSubmission.aiReview.feedback }}
               </p>
             </div>
-            <div class="criteria-section">
-              <span class="criteria-label">评分标准：</span>
-              <ul class="criteria-list">
-                <li
-                    v-for="(criterion, index) in selectedSubmission.aiReview
-                    .criteria"
-                    :key="index"
-                >
-                  {{ criterion.name }}: {{ criterion.score }}分
-                </li>
-              </ul>
+
+            <!-- 学习建议 -->
+            <div class="suggestion-section" v-if="selectedSubmission.aiReview.suggestion">
+              <span class="suggestion-label">学习建议：</span>
+              <p class="suggestion-content">
+                {{ selectedSubmission.aiReview.suggestion }}
+              </p>
             </div>
+
+
           </div>
         </div>
 
         <div class="manual-review-section">
           <h5>手动评阅：</h5>
+          <div class="ai-review-reference" v-if="selectedSubmission.aiReview">
+            <el-alert
+                title="AI评阅参考"
+                type="info"
+                :closable="false"
+                show-icon
+            >
+              <template #default>
+                <div class="ai-reference-content">
+                  <p v-if="selectedSubmission.aiReview.feedback">
+                    <strong>AI评阅意见：</strong>{{ selectedSubmission.aiReview.feedback }}
+                  </p>
+                  <p v-if="selectedSubmission.aiReview.suggestion">
+                    <strong>AI学习建议：</strong>{{ selectedSubmission.aiReview.suggestion }}
+                  </p>
+                  <p v-if="selectedSubmission.aiReview.testLevel">
+                    <strong>AI评价等级：</strong>
+                    <el-tag :type="getTestLevelType(selectedSubmission.aiReview.testLevel)" size="small">
+                      {{ selectedSubmission.aiReview.testLevel }}
+                    </el-tag>
+                  </p>
+
+                </div>
+              </template>
+            </el-alert>
+          </div>
           <el-form :model="manualReview" label-width="100px">
-            <el-form-item label="最终分数">
-              <el-input-number
-                  v-model="manualReview.finalScore"
-                  :min="0"
-                  :max="selectedHomework?.maxScore || 100"
-                  :precision="1"
-              ></el-input-number>
-            </el-form-item>
             <el-form-item label="评阅意见">
               <el-input
                   type="textarea"
                   v-model="manualReview.comments"
                   :rows="3"
-                  placeholder="请输入评阅意见"
+                  placeholder="请输入评阅意见，可参考AI评阅结果"
               ></el-input>
+            </el-form-item>
+            <el-form-item label="评分等级">
+              <el-select v-model="manualReview.grade" placeholder="请选择评分等级" style="width: 100%">
+                <el-option label="优秀" value="优秀"></el-option>
+                <el-option label="良好" value="良好"></el-option>
+                <el-option label="中等" value="中等"></el-option>
+                <el-option label="及格" value="及格"></el-option>
+                <el-option label="不及格" value="不及格"></el-option>
+              </el-select>
             </el-form-item>
           </el-form>
         </div>
@@ -422,8 +514,8 @@ const chapters = ref([]); // 新增：章节列表
 
 // 手动评阅数据
 const manualReview = ref({
-  finalScore: 0,
   comments: "",
+  grade: "",
 });
 
 // 新作业表单数据
@@ -532,11 +624,9 @@ const fetchAllWork = async () => {
                     answer: item.correctAnswer ? item.correctAnswer.replace(/"/g, "") : "",
                     explanation: item.explanation,
                     difficultyLevel: item.difficultyLevel,
-                    scorePoints: item.scorePoints,
                     pointName: item.pointName,
                   };
                 }),
-                maxScore: 100,
                 status: "published",
                 createdAt: new Date(),
                 submittedCount: 0,
@@ -587,7 +677,6 @@ const fetchStudentSubmissions = async (homework) => {
         content: "",
         examContent: "",
         studentAnswers: [],
-        score: undefined,
         reviewStatus: "not_submitted",
         aiGradingLoading: false,
         homeworkData: homeworkData,
@@ -688,20 +777,15 @@ const fetchStudentSubmissions = async (homework) => {
           return `${questionText}\n${optionsText}\n${answer}${explanation}`;
         }).join('\n\n');
         
-        // 处理学生答案
-        submission.studentAnswers = homeworkData.map(item => item.studentAnswer || '');
-        
-        // 计算得分
-        let totalScore = 0;
-        let earnedScore = 0;
-        homeworkData.forEach(item => {
-          totalScore += item.scorePoints || 0;
-          if (item.isCorrect) {
-            earnedScore += item.scorePoints || 0;
+        // 处理学生答案 - 确保空答案被正确识别
+        submission.studentAnswers = homeworkData.map(item => {
+          const answer = item.studentAnswer;
+          // 如果答案为空、null、undefined或只包含空白字符，则视为未作答
+          if (!answer || (typeof answer === 'string' && answer.trim() === '')) {
+            return '';
           }
+          return answer;
         });
-        submission.score = earnedScore;
-        submission.maxScore = totalScore;
       }
       
       submissionsData.push(submission);
@@ -774,7 +858,6 @@ const createHomework = async () => {
         chapterName: chapters.value.find(c => c.chapterId === newHomework.value.chapterId)?.chapterName || '',
         description: newHomework.value.description,
         questions: response.data.data || [],
-        maxScore: 100,
         status: "published",
         createdAt: new Date(),
         submittedCount: 0,
@@ -827,15 +910,7 @@ const totalStudents = computed(() => {
   return courseStudents.value.length;
 });
 
-// 获取成绩样式类
-const getScoreClass = (score) => {
-  if (!score && score !== 0) return "no-score";
-  if (score >= 90) return "score-excellent";
-  if (score >= 80) return "score-good";
-  if (score >= 70) return "score-average";
-  if (score >= 60) return "score-pass";
-  return "score-fail";
-};
+
 
 // 获取评阅状态类型
 const getReviewStatusType = (status) => {
@@ -862,10 +937,13 @@ const getReviewStatusText = (status) => {
 // 查看作业详情
 const viewSubmission = (submission) => {
   selectedSubmission.value = submission;
+  
+  // 初始化手动评阅表单
   manualReview.value = {
-    finalScore: submission.score || 0,
     comments: submission.comments || "",
+    grade: submission.manualGrade || "",
   };
+  
   // 直接传递studentAnswers
   selectedSubmission.value.studentAnswers = submission.studentAnswers || [];
   
@@ -877,22 +955,108 @@ const startAIGrading = async (submission) => {
   submission.aiGradingLoading = true;
 
   try {
-    // 模拟AI评阅过程
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // 检查是否有作业数据
+    if (!submission.homeworkData || submission.homeworkData.length === 0) {
+      ElMessage.warning("该学生没有提交作业数据，无法进行AI评阅");
+      return;
+    }
 
-    // 基于真实作业数据生成AI评阅结果
+    // 构建请求参数
+    const studentAnswerDTOList = submission.homeworkData.map(item => ({
+      questionId: item.questionId || 0,
+      studentAnswer: item.studentAnswer || "",
+      answerEmpty: !item.studentAnswer || item.studentAnswer.trim() === "",
+      valid: true,
+      formattedAnswer: item.studentAnswer || ""
+    }));
+
+    // 验证请求数据完整性
+    if (!selectedHomework.value?.chapterId) {
+      throw new Error("章节ID不能为空");
+    }
+    if (!props.courseId) {
+      throw new Error("课程ID不能为空");
+    }
+    if (studentAnswerDTOList.length === 0) {
+      throw new Error("学生答案列表不能为空");
+    }
+
+    const requestData = {
+      chapterId: selectedHomework.value.chapterId,
+      type: "test", // 作业类型
+      courseId: props.courseId,
+      studentAnswerDTOList: studentAnswerDTOList
+    };
+
+    console.log('AI评阅请求数据:', requestData);
+    console.log('请求数据详情:', {
+      chapterId: requestData.chapterId,
+      type: requestData.type,
+      courseId: requestData.courseId,
+      studentAnswerCount: requestData.studentAnswerDTOList.length,
+      firstAnswer: requestData.studentAnswerDTOList[0]
+    });
+
+    // 调用AI评阅接口
+    const response = await teacherService.judgeChapterTest(requestData);
+    console.log('AI评阅接口响应:', response);
+    
+    if (response.data && response.data.success) {
+      const result = response.data.data;
+      
+      // 处理AI评阅结果
+      const aiReview = {
+        feedback: result.overallComment || result.feedback || generateAIFeedback(submission),
+        criteria: result.criteria || generateAICriteria(submission),
+        questionResults: result.questionResults || [],
+        // 新增：从接口响应中提取更多评阅信息
+        accuracy: result.accuracy || 0,
+        totalQuestions: result.totalQuestions || 0,
+        correctQuestions: result.correctQuestions || 0,
+        wrongQuestions: result.wrongQuestions || 0,
+        answeredQuestions: result.answeredQuestions || 0,
+        unansweredQuestions: result.unansweredQuestions || 0,
+        testLevel: result.testLevel || '未知',
+        suggestion: result.suggestion || '',
+        durationMinutes: result.durationMinutes || null,
+        testStartTime: result.testStartTime || null,
+        testEndTime: result.testEndTime || null,
+        // 题目类型统计
+        questionTypeStats: {
+          singleChoice: result.singleChoiceStats || {},
+          multipleChoice: result.multipleChoiceStats || {},
+          trueFalse: result.trueFalseStats || {},
+          fillBlank: result.fillBlankStats || {},
+          shortAnswer: result.shortAnswerStats || {}
+        }
+      };
+
+      submission.aiReview = aiReview;
+      submission.reviewStatus = "ai_reviewed";
+
+      ElMessage.success(`${submission.studentName} 的作业AI评阅完成！`);
+    } else {
+      console.error('AI评阅接口返回失败:', response);
+      throw new Error(response.data?.message || `AI评阅失败: ${response.status || '未知错误'}`);
+    }
+  } catch (error) {
+    console.error('AI评阅失败:', error);
+    console.error('错误详情:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response
+    });
+    
+    ElMessage.error(`AI评阅失败：${error.message || '请重试'}`);
+    
+    // 如果AI评阅失败，不设置AI评阅状态，保持原状态
+    // 只提供基本的评阅信息，不标记为AI已评阅
     const aiReview = {
-      suggestedScore: submission.score || Math.floor(Math.random() * 30) + 70, // 使用实际得分或随机70-100分
       feedback: generateAIFeedback(submission),
       criteria: generateAICriteria(submission),
     };
-
     submission.aiReview = aiReview;
-    submission.reviewStatus = "ai_reviewed";
-
-    ElMessage.success(`${submission.studentName} 的作业AI评阅完成！`);
-  } catch (error) {
-    ElMessage.error("AI评阅失败，请重试");
+    // 不改变reviewStatus，保持原状态
   } finally {
     submission.aiGradingLoading = false;
   }
@@ -919,13 +1083,13 @@ const generateAIFeedback = (submission) => {
   }
 };
 
-// 生成AI评分标准
+// 生成AI评阅标准
 const generateAICriteria = (submission) => {
   if (!submission.homeworkData || submission.homeworkData.length === 0) {
     return [
-      { name: "作业完整性", score: 0 },
-      { name: "答案正确性", score: 0 },
-      { name: "理解深度", score: 0 },
+      { name: "作业完整性", description: "作业是否完整提交" },
+      { name: "答案正确性", description: "答案的准确程度" },
+      { name: "理解深度", description: "对知识点的理解程度" },
     ];
   }
   
@@ -934,9 +1098,9 @@ const generateAICriteria = (submission) => {
   const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) : 0;
   
   return [
-    { name: "作业完整性", score: Math.round(20 * (submission.status === "submitted" ? 1 : 0)) },
-    { name: "答案正确性", score: Math.round(50 * accuracy) },
-    { name: "理解深度", score: Math.round(30 * accuracy) },
+    { name: "作业完整性", description: submission.status === "submitted" ? "作业已完整提交" : "作业未完整提交" },
+    { name: "答案正确性", description: `正确率${(accuracy * 100).toFixed(1)}%` },
+    { name: "理解深度", description: accuracy >= 0.8 ? "理解深入" : accuracy >= 0.6 ? "理解一般" : "需要加强学习" },
   ];
 };
 
@@ -952,16 +1116,29 @@ const startBatchReview = async () => {
   }
 
   batchReviewLoading.value = true;
+  let successCount = 0;
+  let failCount = 0;
 
   try {
     for (const submission of pendingSubmissions) {
-      await startAIGrading(submission);
-      await new Promise((resolve) => setTimeout(resolve, 500)); // 间隔500ms
+      try {
+        await startAIGrading(submission);
+        successCount++;
+        // 间隔500ms，避免请求过于频繁
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      } catch (error) {
+        console.error(`评阅学生 ${submission.studentName} 的作业失败:`, error);
+        failCount++;
+      }
     }
-    ElMessage.success(
-        `批量评阅完成，共评阅 ${pendingSubmissions.length} 份作业`
-    );
+    
+    if (failCount === 0) {
+      ElMessage.success(`批量评阅完成，共成功评阅 ${successCount} 份作业`);
+    } else {
+      ElMessage.warning(`批量评阅完成，成功 ${successCount} 份，失败 ${failCount} 份`);
+    }
   } catch (error) {
+    console.error("批量评阅过程中出现错误:", error);
     ElMessage.error("批量评阅过程中出现错误");
   } finally {
     batchReviewLoading.value = false;
@@ -972,8 +1149,8 @@ const startBatchReview = async () => {
 const saveManualReview = () => {
   if (!selectedSubmission.value) return;
 
-  selectedSubmission.value.score = manualReview.value.finalScore;
   selectedSubmission.value.comments = manualReview.value.comments;
+  selectedSubmission.value.manualGrade = manualReview.value.grade;
   selectedSubmission.value.reviewStatus = "reviewed";
 
   ElMessage.success("评阅结果保存成功！");
@@ -1003,6 +1180,26 @@ const getDifficultyText = (difficulty) => {
     hard: "困难"
   };
   return texts[difficulty] || "未知";
+};
+
+// 获取测试等级对应的标签类型
+const getTestLevelType = (testLevel) => {
+  if (!testLevel) return 'info';
+  
+  const level = testLevel.toLowerCase();
+  if (level.includes('优秀') || level.includes('a') || level.includes('90')) {
+    return 'success';
+  } else if (level.includes('良好') || level.includes('b') || level.includes('80')) {
+    return 'primary';
+  } else if (level.includes('中等') || level.includes('c') || level.includes('70')) {
+    return 'warning';
+  } else if (level.includes('及格') || level.includes('d') || level.includes('60')) {
+    return 'warning';
+  } else if (level.includes('不及格') || level.includes('f') || level.includes('0')) {
+    return 'danger';
+  } else {
+    return 'info';
+  }
 };
 </script>
 
@@ -1127,13 +1324,7 @@ const getDifficultyText = (difficulty) => {
   transition: background-color 0.2s ease;
 }
 
-/* 得分显示样式优化 */
-.score-display {
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #f8f9fa;
-}
+
 
 /* 班级信息样式 */
 .class-info {
@@ -1204,36 +1395,7 @@ const getDifficultyText = (difficulty) => {
   overflow-y: auto;
 }
 
-/* 成绩样式 */
-.score-excellent {
-  color: #10b981;
-  font-weight: bold;
-}
 
-.score-good {
-  color: #3b82f6;
-  font-weight: bold;
-}
-
-.score-average {
-  color: #f59e0b;
-  font-weight: bold;
-}
-
-.score-pass {
-  color: #8b5cf6;
-  font-weight: bold;
-}
-
-.score-fail {
-  color: #ef4444;
-  font-weight: bold;
-}
-
-.no-score {
-  color: #9ca3af;
-  font-style: italic;
-}
 
 /* 作业详情样式 */
 .submission-detail {
@@ -1298,28 +1460,159 @@ const getDifficultyText = (difficulty) => {
   font-size: 16px;
 }
 
+.ai-review-section h6 {
+  margin: 0 0 12px 0;
+  color: #0369a1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .ai-review-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.score-section {
+/* 总体评阅信息样式 */
+.overall-review-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e0f2fe;
+}
+
+.review-summary {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.score-label {
+.summary-label {
   font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #059669;
+  font-size: 16px;
+}
+
+/* 题目数量显示样式 */
+.question-count-section {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.count-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.count-value {
+  font-weight: 600;
+  color: #2563eb;
+  font-size: 16px;
+}
+
+/* 答题统计样式 */
+.answer-stats-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e0f2fe;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
   color: #374151;
 }
 
-.score-value {
-  font-size: 18px;
-  font-weight: bold;
-  color: #10b981;
+.stat-value.correct {
+  color: #059669;
 }
+
+.stat-value.wrong {
+  color: #dc2626;
+}
+
+/* 题目类型统计样式 */
+.question-type-stats {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e0f2fe;
+}
+
+.type-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.type-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+}
+
+.type-label {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.type-value {
+  font-size: 14px;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+
 
 .feedback-section {
   display: flex;
@@ -1362,6 +1655,33 @@ const getDifficultyText = (difficulty) => {
   margin-bottom: 4px;
 }
 
+
+
+/* 学习建议样式 */
+.suggestion-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e0f2fe;
+}
+
+.suggestion-label {
+  font-weight: 600;
+  color: #374151;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.suggestion-content {
+  margin: 0;
+  padding: 12px;
+  background: #fef3c7;
+  border-radius: 6px;
+  line-height: 1.6;
+  color: #92400e;
+  border-left: 3px solid #f59e0b;
+}
+
 /* 手动评阅样式 */
 .manual-review-section {
   padding: 20px;
@@ -1376,11 +1696,45 @@ const getDifficultyText = (difficulty) => {
   font-size: 16px;
 }
 
+.ai-review-reference {
+  margin-bottom: 20px;
+}
+
+.ai-review-reference .el-alert {
+  margin-bottom: 0;
+}
+
+.ai-review-reference p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.ai-reference-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-reference-content p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-reference-content strong {
+  color: #374151;
+  min-width: 80px;
+}
+
 /* 新增样式 */
 .text-muted {
   color: #9ca3af;
   font-style: italic;
 }
+
+
 
 /* 智能创建作业表单样式 */
 .create-tips {

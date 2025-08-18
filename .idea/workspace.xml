@@ -4,15 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="调试新增接口">
+    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="调试师生交流">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/fight/CardEffectModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/CardEffectModal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/fight/ChallengeModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/fight/ChallengeModal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config/userConfig.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/userConfig.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/chatSSEService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/chatSSEService.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/student/TeacherChat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/TeacherChat.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ExamPaper.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ExamPaper.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/HeadBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/HeadBar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/LessonPlanManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/LessonPlanManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/teacher/TeachingResources.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/TeachingResources.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/Center.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Center.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/admin/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/admin/Dashboard.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/teacher/StudentChat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/teacher/StudentChat.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/tower/Fight.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/tower/Fight.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -187,7 +189,12 @@
       <workItem from="1755386944132" duration="79000" />
       <workItem from="1755387036225" duration="1308000" />
       <workItem from="1755390258545" duration="18632000" />
-      <workItem from="1755411505619" duration="22853000" />
+      <workItem from="1755411505619" duration="23722000" />
+      <workItem from="1755437400651" duration="74000" />
+      <workItem from="1755444094832" duration="177000" />
+      <workItem from="1755444283649" duration="3464000" />
+      <workItem from="1755474329260" duration="2075000" />
+      <workItem from="1755477901691" duration="1479000" />
     </task>
     <task id="LOCAL-00001" summary="解耦合教师分配功能，增删改查知识点等">
       <option name="closed" value="true" />
@@ -245,7 +252,23 @@
       <option name="project" value="LOCAL" />
       <updated>1755409230083</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="调试师生交流">
+      <option name="closed" value="true" />
+      <created>1755436382640</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1755436382640</updated>
+    </task>
+    <task id="LOCAL-00009" summary="调试师生交流">
+      <option name="closed" value="true" />
+      <created>1755437035577</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1755437035577</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -286,6 +309,7 @@
     <MESSAGE value="删除阅卷查看功能，优化bug" />
     <MESSAGE value="调试部分接口，优化逻辑" />
     <MESSAGE value="调试新增接口" />
-    <option name="LAST_COMMIT_MESSAGE" value="调试新增接口" />
+    <MESSAGE value="调试师生交流" />
+    <option name="LAST_COMMIT_MESSAGE" value="调试师生交流" />
   </component>
 </project>

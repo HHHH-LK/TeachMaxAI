@@ -66,7 +66,7 @@
        <!-- 教案卡片列表 -->
        <el-row v-else :gutter="20">
          <el-col
-           v-for="lessonPlan in filteredLessonPlans"
+           v-for="lessonPlan in paginatedLessonPlans"
            :key="lessonPlan.id"
            :span="8"
            class="lesson-plan-col"
@@ -130,19 +130,19 @@
       </el-row>
 
              <!-- 空状态 -->
-       <div v-if="!loading && filteredLessonPlans.length === 0" class="empty-state">
+       <div v-if="!loading && totalFilteredItems === 0" class="empty-state">
          <el-empty description="暂无教案数据">
          </el-empty>
        </div>
     </div>
 
          <!-- 分页 -->
-     <div class="pagination-section" v-if="!loading && filteredLessonPlans.length > 0">
+     <div class="pagination-section" v-if="!loading && totalFilteredItems > 0">
       <el-pagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
         :page-sizes="[6, 12, 24]"
-        :total="totalItems"
+        :total="totalFilteredItems"
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -267,7 +267,6 @@ const hasError = ref(false)
 const errorMessage = ref('')
 const currentPage = ref(1)
 const pageSize = ref(6)
-const totalItems = ref(0)
 const searchQuery = ref('')
 const filterStatus = ref('')
 
@@ -317,6 +316,16 @@ const filteredLessonPlans = computed(() => {
   return filtered
 })
 
+// 分页后的教案列表
+const paginatedLessonPlans = computed(() => {
+  const startIndex = (currentPage.value - 1) * pageSize.value
+  const endIndex = startIndex + pageSize.value
+  return filteredLessonPlans.value.slice(startIndex, endIndex)
+})
+
+// 更新总数为过滤后的数据长度
+const totalFilteredItems = computed(() => filteredLessonPlans.value.length)
+
 // 方法
 // 状态映射函数
 const mapAuditStatus = (auditStatus) => {
@@ -356,11 +365,9 @@ const loadLessonPlans = async () => {
         teacherId: item.teacherId,
         originalData: item
       }))
-      totalItems.value = lessonPlans.value.length
       console.log('映射后的教案数据:', lessonPlans.value)
     } else {
       lessonPlans.value = []
-      totalItems.value = 0
       if (response.message) {
         ElMessage.warning(response.message)
       }
@@ -370,13 +377,16 @@ const loadLessonPlans = async () => {
     hasError.value = true
     errorMessage.value = '获取教案列表失败，请稍后重试'
     lessonPlans.value = []
-    totalItems.value = 0
   } finally {
     loading.value = false
   }
 }
 
 const handleSearch = () => {
+  currentPage.value = 1
+}
+
+const handleFilter = () => {
   currentPage.value = 1
 }
 
@@ -478,7 +488,6 @@ const deleteLessonPlan = async (id) => {
       const index = lessonPlans.value.findIndex(p => p.id === id)
       if (index > -1) {
         lessonPlans.value.splice(index, 1)
-        totalItems.value--
       }
 
       ElMessage.success('教案删除成功')

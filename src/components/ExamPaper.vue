@@ -94,7 +94,8 @@
           <p class="your-answer" :class="isCorrect(question, displayUserAnswers[index]) ? 'correct' : 'wrong'">
             你选择的答案：{{ formatUserAnswer(displayUserAnswers[index], question.type) }}
             <span v-if="isCorrect(question, displayUserAnswers[index])">（正确）</span>
-            <span v-else>（错误）</span>
+            <span v-else-if="displayUserAnswers[index] && (typeof displayUserAnswers[index] === 'string' && displayUserAnswers[index].trim() !== '') || (Array.isArray(displayUserAnswers[index]) && displayUserAnswers[index].length > 0)">（错误）</span>
+            <span v-else>（未作答）</span>
           </p>
           <p class="correct-answer">正确答案: {{ formatAnswer(question.answer, question.type) }}</p>
           <p v-if="question.explanation" class="explanation">解析: {{ question.explanation }}</p>
@@ -266,7 +267,12 @@ const getQuestionTypeLabel = (type) => {
 
 // 获取选项样式
 const getOptionClass = (optionValue, correctAnswer, userAnswer) => {
-  if (userAnswer === undefined) return '';
+  // 检查学生是否作答：undefined、null、空字符串、空数组都视为未作答
+  if (userAnswer === undefined || userAnswer === null || 
+      (typeof userAnswer === 'string' && userAnswer.trim() === '') ||
+      (Array.isArray(userAnswer) && userAnswer.length === 0)) {
+    return '';
+  }
 
   // 判断题和单选题直接比较
   if (typeof userAnswer === 'string') {
@@ -286,7 +292,12 @@ const getOptionClass = (optionValue, correctAnswer, userAnswer) => {
 
 // 检查答案是否正确
 const isCorrect = (question, userAnswer) => {
-  if (userAnswer === undefined) return false;
+  // 检查学生是否作答：undefined、null、空字符串、空数组都视为未作答
+  if (userAnswer === undefined || userAnswer === null || 
+      (typeof userAnswer === 'string' && userAnswer.trim() === '') ||
+      (Array.isArray(userAnswer) && userAnswer.length === 0)) {
+    return false;
+  }
 
   const correctAnswer = question.answer;
   switch (question.type) {
@@ -313,7 +324,12 @@ const isCorrect = (question, userAnswer) => {
 
 // 格式化用户答案
 const formatUserAnswer = (userAnswer, type) => {
-  if (userAnswer === undefined) return '';
+  // 检查学生是否作答：undefined、null、空字符串、空数组都视为未作答
+  if (userAnswer === undefined || userAnswer === null || 
+      (typeof userAnswer === 'string' && userAnswer.trim() === '') ||
+      (Array.isArray(userAnswer) && userAnswer.length === 0)) {
+    return '未作答';
+  }
 
   if (type === 'multiple-choice' && Array.isArray(userAnswer)) {
     return userAnswer.join(', ');
