@@ -606,7 +606,6 @@ const submitForm = async () => {
         user: {
           userId: parseInt(userForm.value.user_id) || 0,
           username: userForm.value.username,
-          passwordHash: "", // 不更新密码
           realName: userForm.value.real_name,
           email: userForm.value.email,
           phone: userForm.value.phone,

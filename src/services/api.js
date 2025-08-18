@@ -680,6 +680,33 @@ export const studentService = {
   },
 
   /**
+   * 开始进行章节学习
+   * @param {object} studentStudyDTO - 学生学习信息对象
+   * @returns {Promise<object>} 学习开始结果
+   */
+  startChapterStudy: async (studentStudyDTO) => {
+    return await apiClient.post('/chapter/chapterstudy/start', studentStudyDTO);
+  },
+
+  /**
+   * 退出章节学习，还未完成
+   * @param {object} studentStudyDTO - 学生学习信息对象
+   * @returns {Promise<object>} 学习结束结果
+   */
+  endChapterStudy: async (studentStudyDTO) => {
+    return await apiClient.post('/chapter/chapterstudy/end', studentStudyDTO);
+  },
+
+  /**
+   * 完成章节学习
+   * @param {object} studentStudyDTO - 学生学习信息对象
+   * @returns {Promise<object>} 学习完成结果
+   */
+  finishChapterStudy: async (studentStudyDTO) => {
+    return await apiClient.post('/chapter/finsh', studentStudyDTO);
+  },
+
+  /**
    * 获取学生错题分析数据
    * @returns {Promise<object>} 错题分析数据
    */

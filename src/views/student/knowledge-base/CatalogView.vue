@@ -180,10 +180,10 @@
       </div>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="learningPreviewVisible = false"
+          <el-button @click="handleLearningEnd(selectedKnowledgePoint)"
             >退出学习</el-button
           >
-          <el-button type="primary" @click="handleLearningFinish"
+          <el-button type="primary" @click="handleLearningFinish(selectedKnowledgePoint)"
             >完成学习</el-button
           >
         </div>
@@ -246,6 +246,17 @@ const showKnowledgePointDetail = (knowledgePoint) => {
   detailDialogVisible.value = true;
 };
 
+const formatDateTime = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
 // 开始学习
 const startLearning = async (point) => {
   try {
@@ -256,19 +267,23 @@ const startLearning = async (point) => {
     learningStartTime.value = new Date();
     elapsedTime.value = 0;
 
+    const studentStudyDTO = {
+      chapterId: point.chapterId,
+      nowmaterialId: point.id.toString(),
+      // 格式化当前时间为后端要求的格式
+      studyTime: formatDateTime(new Date()),
+      courseId: props.courseId
+    };
+    console.log("开始学习参数：", studentStudyDTO);
+
     // 调用开始学习API
-    // const response = await studentService.startStudy({
-    //   chapterId: point.chapterId.toString(),
-    //   nowmaterialId: point.id.toString(),
-    //   studyTime: new Date().toISOString(),
-    //   courseId: props.courseId.toString()
-    // });
-    //
-    // if (response.data.code === 0) {
-    //   ElMessage.success("学习已开始，系统将自动记录学习时间");
-    // } else {
-    //   ElMessage.warning(response.data.msg || "学习开始记录失败");
-    // }
+    const response = await studentService.startChapterStudy(studentStudyDTO);
+
+    if (response.data.code === 0) {
+      ElMessage.success("学习资源加载中……，");
+    } else {
+      ElMessage.warning(response.data.msg || "学习开始记录失败");
+    }
 
     const userId = getCurrentUserId();
     const res = await studentService.getStudentIdByUserId(userId)
@@ -315,20 +330,24 @@ const stopLearningTimer = () => {
 };
 
 // 处理学习结束
-const handleLearningEnd = async () => {
+const handleLearningEnd = async (point) => {
+  learningPreviewVisible.value = false
   try {
     // 停止计时器
     stopLearningTimer();
 
     if (!currentLearningPoint.value) return;
 
+    const studentStudyDTO = {
+      chapterId: point.chapterId,
+      nowmaterialId: point.id.toString(),
+      // 格式化当前时间为后端要求的格式
+      studyTime: formatDateTime(new Date()),
+      courseId: props.courseId
+    };
+
     // 调用结束学习API
-    const response = await studentService.endStudy({
-      chapterId: currentLearningPoint.value.chapterId.toString(),
-      nowmaterialId: currentLearningPoint.value.id.toString(),
-      studyTime: formatTimeForBackend(),
-      courseId: props.courseId.toString()
-    });
+    const response = await studentService.endChapterStudy(studentStudyDTO);
 
     if (response.data.code === 0) {
       ElMessage.success(
@@ -356,22 +375,23 @@ const formatTimeForBackend = () => {
 };
 
 // 处理学习完成
-const handleLearningFinish = async () => {
+const handleLearningFinish = async (point) => {
   try {
     // 停止计时器
     stopLearningTimer();
 
     if (!currentLearningPoint.value) return;
 
-    // 调用完成学习API
-    const response = await studentService.finishStudy({
-      chapterId: currentLearningPoint.value.chapterId.toString(),
-      nowmaterialId: currentLearningPoint.value.id.toString(),
-      studyTime: formatTimeForBackend(), // 完成时间
-      courseId: props.courseId.toString()
-    });
+    const studentStudyDTO = {
+      chapterId: point.chapterId,
+      nowmaterialId: point.id.toString(),
+      // 格式化当前时间为后端要求的格式
+      studyTime: formatDateTime(new Date()),
+      courseId: props.courseId
+    };
 
-    
+    // 调用完成学习API
+    const response = await studentService.finishChapterStudy(studentStudyDTO);
 
     if (response.data.code === 0) {
       ElMessage.success(`学习完成！总时长: ${formatTime(elapsedTime.value)}`);
@@ -487,14 +507,6 @@ watch(
   },
   { immediate: true }
 );
-
-// 监听学习预览弹窗状态
-watch(learningPreviewVisible, (newVal) => {
-  if (!newVal) {
-    // 弹窗关闭时处理学习结束
-    handleLearningEnd();
-  }
-});
 </script>
 
 <style lang="less" scoped>

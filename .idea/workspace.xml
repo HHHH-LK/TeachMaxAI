@@ -4,17 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="调试师生交流">
+    <list default="true" id="06404182-f7fb-4467-9d35-b08a7203ef80" name="Changes" comment="调试剩余接口，优化样式">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ExamPaper.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ExamPaper.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/HeadBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/HeadBar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/HomeworkManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/LessonPlanManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/LessonPlanManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/teacher/TeachingResources.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/teacher/TeachingResources.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config/userConfig.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/userConfig.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Center.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Center.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/admin/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/admin/Dashboard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/teacher/StudentChat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/teacher/StudentChat.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/admin/ResourceManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/admin/ResourceManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/student/knowledge-base/CatalogView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/student/knowledge-base/CatalogView.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -194,7 +190,7 @@
       <workItem from="1755444094832" duration="177000" />
       <workItem from="1755444283649" duration="3464000" />
       <workItem from="1755474329260" duration="2075000" />
-      <workItem from="1755477901691" duration="1479000" />
+      <workItem from="1755477901691" duration="4891000" />
     </task>
     <task id="LOCAL-00001" summary="解耦合教师分配功能，增删改查知识点等">
       <option name="closed" value="true" />
@@ -268,7 +264,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755437035577</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="调试剩余接口，优化样式">
+      <option name="closed" value="true" />
+      <created>1755479629631</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1755479629631</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -310,6 +314,7 @@
     <MESSAGE value="调试部分接口，优化逻辑" />
     <MESSAGE value="调试新增接口" />
     <MESSAGE value="调试师生交流" />
-    <option name="LAST_COMMIT_MESSAGE" value="调试师生交流" />
+    <MESSAGE value="调试剩余接口，优化样式" />
+    <option name="LAST_COMMIT_MESSAGE" value="调试剩余接口，优化样式" />
   </component>
 </project>

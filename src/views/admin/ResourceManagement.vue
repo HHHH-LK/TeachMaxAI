@@ -85,7 +85,7 @@
           <el-descriptions-item label="标题">{{ selectedResource.title }}</el-descriptions-item>
           <el-descriptions-item label="教师">{{ selectedResource.teacher }}</el-descriptions-item>
           <el-descriptions-item label="内容" :span="1">
-            <p class="resource-content">{{ selectedResource.description || '无内容' }}</p>
+            <div class="resource-content" v-html="renderMarkdown(selectedResource.description || '无内容')"></div>
           </el-descriptions-item>
         </el-descriptions>
       </div>
@@ -97,6 +97,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessageBox, ElMessage, ElDescriptions, ElDescriptionsItem, ElTag } from 'element-plus';
 import {adminService, teacherService} from '@/services/api';
+import renderMarkdown from '@/utils/markdown';
 
 const subjects = ref([]);
 const selectedSubject = ref('');
@@ -392,9 +393,74 @@ onMounted(async() => {
 
 /* 内容样式优化 */
 .resource-content {
-  white-space: pre-wrap; /* 保留换行和空格 */
   line-height: 1.6;
   margin: 0;
   padding: 8px 0;
+}
+
+/* Markdown 渲染后的内容样式 */
+.resource-content :deep(h1),
+.resource-content :deep(h2),
+.resource-content :deep(h3),
+.resource-content :deep(h4),
+.resource-content :deep(h5),
+.resource-content :deep(h6) {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+}
+
+.resource-content :deep(p) {
+  margin: 8px 0;
+}
+
+.resource-content :deep(ul),
+.resource-content :deep(ol) {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.resource-content :deep(li) {
+  margin: 4px 0;
+}
+
+.resource-content :deep(blockquote) {
+  margin: 8px 0;
+  padding: 8px 16px;
+  border-left: 4px solid #e0e0e0;
+  background-color: #f9f9f9;
+  color: #666;
+}
+
+.resource-content :deep(code) {
+  background-color: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+}
+
+.resource-content :deep(pre) {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.resource-content :deep(table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.resource-content :deep(th),
+.resource-content :deep(td) {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.resource-content :deep(th) {
+  background-color: #f2f2f2;
+  font-weight: 600;
 }
 </style>
