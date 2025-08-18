@@ -965,10 +965,10 @@ const startAIGrading = async (submission) => {
     const studentAnswerDTOList = submission.homeworkData.map(item => ({
       questionId: item.questionId || 0,
       studentAnswer: item.studentAnswer || "",
-      answerEmpty: !item.studentAnswer || item.studentAnswer.trim() === "",
-      valid: true,
-      formattedAnswer: item.studentAnswer || ""
     }));
+      // answerEmpty: !item.studentAnswer || item.studentAnswer.trim() === "",
+      // valid: true,
+      // formattedAnswer: item.studentAnswer || ""
 
     // 验证请求数据完整性
     if (!selectedHomework.value?.chapterId) {

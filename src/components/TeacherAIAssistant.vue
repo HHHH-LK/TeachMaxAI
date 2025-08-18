@@ -526,7 +526,7 @@ const updateSpeechVolume = (volume) => {
               <!-- 中心光晕 -->
               <div class="center-glow"></div>
             </div>
-            <div class="thinking-text">小V正在思考中...</div>
+            <div class="thinking-text">小T正在思考中...</div>
             <!-- 进度条 -->
             <div class="progress-container">
               <div class="progress-bar-thinking"></div>

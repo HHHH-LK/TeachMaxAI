@@ -6,10 +6,10 @@
 
 export const userConfig = {
   // 用户ID
-  userId: 16,
+  userId: 17,
   
   // 学生ID
-  studentId: 1,
+  studentId: 2,
   
   // 课程ID列表 (1-4)
   courseIds: [1, 2, 3, 4],

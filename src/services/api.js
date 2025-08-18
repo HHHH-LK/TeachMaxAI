@@ -770,6 +770,15 @@ export const studentService = {
   },
 
   /**
+   * 学生试卷答题功能
+   * @param {object} studentExamAnswerDTO - 学生试卷答题数据
+   * @returns {Promise<object>} 提交结果
+   */
+  finishExam: async (studentExamAnswerDTO) => {
+    return await apiClient.post('/stu/finsh/exam', studentExamAnswerDTO);
+  },
+
+  /**
    * 获取课程列表
    * @returns {Promise<Array>} 课程数据数组
    */

@@ -141,8 +141,13 @@ const props = defineProps({
   userAnswers: {
     type: Array,
     default: undefined
+  },
+  userInfo: {
+    type: String,
+    default: 'practice'
   }
 });
+
 
 const questions = ref([]);
 const localUserAnswers = ref([]);
@@ -365,11 +370,13 @@ const submitExam = async () => {
   // 修改1：创建单个对象而不是数组
   const payload = {
     chapterId: props.chapterId,
-    type: "practice",
+    type: props.userInfo,
     courseId: props.courseId,
     // 初始化答案列表
     studentAnswerDTOList: []
   };
+
+  console.log("提交的payload:", payload)
 
   const minId = parseInt(props.minIds) || 0;
 
@@ -401,9 +408,6 @@ const submitExam = async () => {
     // 发送单个对象
     const response = await studentService.submitStudentAnswer(payload);
     console.log("提交成功并判题成1", response);
-    // const judgeResponse = await studentService.judgeStudentAnswer(payload);
-
-    // console.log("判题结果", judgeResponse);
   } catch (error) {
     console.error("提交失败", error);
   }

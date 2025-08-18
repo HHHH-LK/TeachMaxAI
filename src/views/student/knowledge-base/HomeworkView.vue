@@ -10,7 +10,12 @@
         ← 返回作业列表
       </button>
       <h3>{{ currentHomeworkTitle }}</h3>
-      <ExamPaper :examContent="currentHomeworkContent" />
+      <ExamPaper
+          :examContent="currentHomeworkContent"
+          :courseId="props.courseId"
+          :userInfo="userInfo"
+          :chapterId="chapterIdNumber"
+      />
     </div>
     <div v-else>
       <div class="homework-list">
@@ -43,13 +48,15 @@ const props = defineProps({
 });
 
 const homeworks = ref([]);
-
+const userInfo = ref("test");
+const chapterIdNumber = ref(null)
 const selectedHomework = ref(null);
 const userAnswers = ref({});
 const doingHomework = ref(false);
 const currentHomeworkContent = ref("");
 const currentHomeworkTitle = ref("");
 
+console.log("props", props.courseId)
 //获取作业列表
 const fetchAllWork = async () => {
   // console.log("coures", props.courseId)
@@ -155,6 +162,7 @@ const selectHomework = (homework) => {
 
 //开始作业
 const startHomework = (homework) => {
+  chapterIdNumber.value = homework.chapterId;
   currentHomeworkContent.value = toExamPaperContent(homework.questions);
   currentHomeworkTitle.value = homework.title;
   doingHomework.value = true;

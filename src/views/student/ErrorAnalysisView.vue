@@ -193,7 +193,7 @@
     </div>
     <el-dialog
         v-model="showExamPaper"
-        title="生成试卷"
+        title="智能生成试题"
         width="800px"
         :close-on-click-modal="false"
     >
@@ -474,6 +474,8 @@ const generateSelected = async () => {
         StringParams
     );
 
+    console.log("原始试卷", response)
+
     try {
       const jsonStrWithIds = response.data.data; // 完整字符串
       const idsRegex = /ids:min:(\d+),max:(\d+)$/;
@@ -494,7 +496,6 @@ const generateSelected = async () => {
       console.error("解析试卷数据失败", e);
       generatedExamContent.value = "试卷数据解析失败";
     }
-    console.log("组卷结果", response.data);
   } else {
     showExamPaper.value = true;
     const pointIds = ref([]);
