@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,6 +34,73 @@ public class ChatAgent {
 
     private enum Route {LLM, AGENT}
 
+    // === 新增：记忆使用决策封装 ===
+    private static class MemoryUseDecision {
+        final boolean use;
+        final String reason;
+
+        private MemoryUseDecision(boolean use, String reason) {
+            this.use = use;
+            this.reason = reason;
+        }
+
+        static MemoryUseDecision yes(String reason) {
+            return new MemoryUseDecision(true, reason);
+        }
+
+        static MemoryUseDecision no(String reason) {
+            return new MemoryUseDecision(false, reason);
+        }
+    }
+
+    // === 新增：判断是否存在续谈/指代/改写类提示词（强依赖上下文） ===
+    private static boolean hasFollowUpCues(String textLower) {
+        return containsAnyIgnoreCase(textLower,
+                "继续", "接着", "刚才", "之前", "上一个", "上文", "上面", "上述", "同上",
+                "还是那个", "按之前", "基于上面", "延续",
+                "这个", "那个", "它", "他", "她", "这门", "那门", "这本", "那本",
+                "换个说法", "润色", "改写", "总结", "精简", "优化", "重述", "扩展", "补充");
+    }
+
+    // === 新增：忽略大小写包含判断 ===
+    private static boolean containsAnyIgnoreCase(String text, String... kws) {
+        if (text == null || text.isEmpty()) return false;
+        String lower = text.toLowerCase(Locale.ROOT);
+        for (String kw : kws) {
+            if (lower.contains(kw.toLowerCase(Locale.ROOT))) return true;
+        }
+        return false;
+    }
+
+    // === 新增：记忆使用决策逻辑 ===
+    private MemoryUseDecision decideMemoryUse(String userMessage,
+                                              UnifiedMemoryManager.MemorySearchResult searchResult) {
+        if (userMessage == null || userMessage.isBlank()) {
+            return MemoryUseDecision.no("空消息，不使用记忆");
+        }
+
+        List<ChatMessage> matched = (searchResult != null && searchResult.getMatchedMessages() != null)
+                ? searchResult.getMatchedMessages() : Collections.emptyList();
+        int matchedTurns = (searchResult != null) ? searchResult.getMatchedTurnsCount() : 0;
+
+        if (matched.isEmpty() || matchedTurns == 0) {
+            return MemoryUseDecision.no("检索无相关记忆");
+        }
+
+        String lower = userMessage.toLowerCase(Locale.ROOT).trim();
+        boolean shortMsg = lower.codePointCount(0, lower.length()) <= 22; // 近似判定短消息
+        boolean followUp = hasFollowUpCues(lower);
+        boolean looksElliptical = shortMsg && containsAnyIgnoreCase(lower,
+                "这个", "那个", "这门", "那门", "这本", "那本", "上述", "上面");
+
+        // 核心规则：
+        if (followUp) return MemoryUseDecision.yes("存在续谈/指代/改写类提示词");
+        if (looksElliptical) return MemoryUseDecision.yes("问题简短且存在指代/省略，依赖历史");
+        if (matchedTurns >= 2 && shortMsg) return MemoryUseDecision.yes("检索多条相关记忆且问题简短");
+
+        return MemoryUseDecision.no("当前问题自足，避免引入记忆噪声");
+    }
+
     /**
      * 智能体入口方法（带路由 + 检索）
      */
@@ -42,13 +110,17 @@ public class ChatAgent {
         log.info("用户ID: {}, 用户消息: {}", userId, userMessage);
 
         try {
-            // 1) 相关记忆检索（只保留和当前问题相关的短片段，降低幻觉）
+            // 1) 相关记忆检索（先检索，再判定是否使用）
             UnifiedMemoryManager.MemorySearchResult searchResult =
                     memoryManager.searchRelevantMemory(userId, userMessage, DEFAULT_SEARCH_OPTS);
-            List<ChatMessage> relevantMessages = searchResult.getMatchedMessages();
+            List<ChatMessage> relevantMessages =
+                    (searchResult != null && searchResult.getMatchedMessages() != null)
+                            ? searchResult.getMatchedMessages()
+                            : Collections.emptyList();
             String memoryContext = memoryManager.searchRelevantMemoryAsContext(userId, userMessage, DEFAULT_SEARCH_OPTS);
 
-            log.info("检索到相关记忆轮次: {}", searchResult.getMatchedTurnsCount());
+            int matchedTurnsCount = (searchResult != null) ? searchResult.getMatchedTurnsCount() : 0;
+            log.info("检索到相关记忆轮次: {}", matchedTurnsCount);
 
             if (log.isDebugEnabled() && !relevantMessages.isEmpty()) {
                 log.debug("相关记忆（最多前4条）：");
@@ -59,9 +131,19 @@ public class ChatAgent {
                 }
             }
 
-            // 2) 设置线程上下文（仅保留相关记忆，避免噪声）
+            // 2) 是否使用记忆（关键优化点）
+            MemoryUseDecision memDecision = decideMemoryUse(userMessage, searchResult);
+            log.info("记忆使用决策：{}（原因：{}）", memDecision.use ? "使用" : "不使用", memDecision.reason);
+
+            // 设置线程上下文
             UserLocalThreadUtils.setUserId(userId);
-            UserLocalThreadUtils.setUserMemory(relevantMessages);
+            if (memDecision.use) {
+                UserLocalThreadUtils.setUserMemory(relevantMessages);
+            } else {
+                UserLocalThreadUtils.setUserMemory((String) null);
+                relevantMessages = Collections.emptyList();
+                memoryContext = null;
+            }
 
             // 3) 路由决策：LLM vs Agent
             Route route = decideRoute(userMessage, searchResult);
@@ -70,18 +152,22 @@ public class ChatAgent {
             String answer;
 
             if (route == Route.LLM) {
-                // 3.1 直接调用 LLM（附带相关记忆片段，要求“不知道就说不知道”）
-                answer = callLLM(userMessage, memoryContext);
+                // 3.1 直接调用 LLM（仅在 memDecision.use 时附带记忆片段）
+                answer = callLLM(userMessage, memDecision.use ? memoryContext : null);
 
-                // 回退机制：LLM失败或返回空，改走Agent
+                // 回退机制：LLM失败或返回空，改走Agent（同样遵循记忆使用决策）
                 if (answer == null || answer.trim().isEmpty()) {
                     log.warn("直接LLM返回为空，回退到Agent处理");
-                    answer = processIntentWithMemory(userMessage, relevantMessages);
+                    answer = memDecision.use
+                            ? processIntentWithMemory(userMessage, relevantMessages)
+                            : intentHandler.handlerIntent(userMessage);
                 }
 
             } else {
-                // 3.2 走智能体意图链路（传入相关记忆）
-                answer = processIntentWithMemory(userMessage, relevantMessages);
+                // 3.2 走智能体意图链路（遵循记忆使用决策）
+                answer = memDecision.use
+                        ? processIntentWithMemory(userMessage, relevantMessages)
+                        : intentHandler.handlerIntent(userMessage);
             }
 
             // 4) 会话落库（统一存储）
@@ -159,8 +245,28 @@ public class ChatAgent {
      */
     private String callLLM(String userMessage, String memoryContext) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("你是一个严谨的校园助手。只使用我提供的“相关历史对话片段”作为背景知识；")
-                .append("如果信息不足，请明确说明不知道或需要更多信息，避免臆造。\n");
+        prompt.append("""
+        你的名字叫做智能学习助手
+        你是一名高效、可靠、带点温度的师生学习助手。你的目标是生成准确、有用、让用户马上能用的回答，同时保持简洁、友好和缓和的语气。
+        
+        【语气与个性化】
+        - 回答要简洁直观，语气亲切，不冷冰冰。
+        - 更倾向“清楚解释 + 温柔提示”，避免官话或僵硬表达。
+        - 根据“相关历史对话片段”推断用户偏好（精炼/详细、口语/正式、关注点），自适应表达长度与用词。
+        - 若用户情绪紧张或焦虑，请加入一句轻简安抚；否则直奔主题，不额外寒暄。
+        - 输出语言跟随用户问题（中文问中文答、英文问英文答）。
+        
+        【输出结构（换行用 ¥ 分隔，不要输出换行符 \\n）】
+        
+        【质量与效率】
+        - 不使用任何 Markdown 符号（** * _ ` # > - + [] ()）。
+        
+        【数学表达规范】
+        - \\lim_{x→a} → lim(x→a)
+        - \\frac{a}{b} → a/b
+        - x^2 → x²，x^3 → x³
+        - \\sqrt{x} → √x
+        """);
 
         if (memoryContext != null && !memoryContext.isEmpty()) {
             prompt.append("\n【相关历史对话片段】\n").append(memoryContext).append("\n");
@@ -169,7 +275,7 @@ public class ChatAgent {
         prompt.append("\n【当前用户问题】\n").append(userMessage).append("\n");
 
         try {
-            return llm.generate(prompt.toString());
+            return llm.chat(prompt.toString());
         } catch (Exception e) {
             log.error("直接LLM调用失败", e);
             return null;
