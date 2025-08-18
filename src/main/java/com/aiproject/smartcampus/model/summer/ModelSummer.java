@@ -2,33 +2,22 @@ package com.aiproject.smartcampus.model.summer;
 
 import com.aiproject.smartcampus.commons.client.ResultCilent;
 import com.aiproject.smartcampus.commons.utils.UserLocalThreadUtils;
+import com.aiproject.smartcampus.model.store.UnifiedMemoryManager;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static com.aiproject.smartcampus.model.prompts.SystemPrompts.OPTIMIZED_SUMMER_PROMPT;
-
-/**
- * @program: SmartCampus
- * @description: 优化的模型结果处理器 - 提升响应速度
- * @author: lk
- * @create: 2025-05-28 00:33
- **/
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Arrays;
 
 @Service
 @Slf4j
@@ -37,52 +26,73 @@ public class ModelSummer {
 
     private final ResultCilent resultCilent;
     private final ChatLanguageModel chatLanguageModel;
+    private final UnifiedMemoryManager memoryManager;
 
     // 性能优化配置
-    private static final int MAX_INPUT_LENGTH = 2500; // 减少输入长度，提升速度
-    private static final int TASK_TIMEOUT_SECONDS = 6; // 缩短超时时间
-    private static final int TOTAL_TIMEOUT_SECONDS = 12; // 总超时时间
-    private static final int MAX_RESULTS_PER_INTENT = 2; // 减少每个意图的结果数量
-    private static final int MAX_TOTAL_RESULTS = 6; // 限制总结果数量
+    private static final int MAX_INPUT_LENGTH = 2500; // 外部资料拼接最大输入长度
+    private static final int TASK_TIMEOUT_SECONDS = 6;
+    private static final int TOTAL_TIMEOUT_SECONDS = 12;
+    private static final int MAX_RESULTS_PER_INTENT = 2;
+    private static final int MAX_TOTAL_RESULTS = 6;
 
     // 质量控制配置
-    private static final int MIN_RESULT_LENGTH = 20; // 最小结果长度
-    private static final double SIMILARITY_THRESHOLD = 0.8; // 相似度阈值
+    private static final int MIN_RESULT_LENGTH = 20;
+    private static final double SIMILARITY_THRESHOLD = 0.8;
+
+    // 记忆检索配置
+    private static final UnifiedMemoryManager.MemorySearchOptions SEARCH_OPTS =
+            UnifiedMemoryManager.MemorySearchOptions.builder()
+                    .topK(3)
+                    .minScore(0.2)
+                    .neighborWindow(0)
+                    .build();
 
     private static final String DEFAULT_RESPONSE = "根据当前信息，我正在为您整理相关内容，请稍等片刻。";
 
     /**
-     * 高效高质量的主处理方法
+     * 兼容旧入口（无用户问题时，不注入历史记忆）
      */
     public String summer(List<String> intents) {
+        return summer(intents, null);
+    }
+
+    /**
+     * 新入口：带用户问题，结合“相关历史片段”+“外部资料”做高质量总结（抗幻觉）
+     */
+    public String summer(List<String> intents, String userQuery) {
         long startTime = System.currentTimeMillis();
 
         try {
-            // 1. 快速验证和预处理
+            // 1) 快速验证和预处理
             if (intents == null || intents.isEmpty()) {
                 return DEFAULT_RESPONSE;
             }
 
-            // 2. 智能意图优先级排序
+            // 2) 智能意图优先级排序
             List<String> prioritizedIntents = prioritizeIntents(intents);
             log.debug("优先级排序后的意图: {}", prioritizedIntents);
 
-            // 3. 并行获取高质量结果
+            // 3) 并行获取高质量结果（外部资料）
             Map<String, List<String>> intentResults = getHighQualityResults(prioritizedIntents);
 
-            // 4. 智能结果筛选和去重
+            // 4) 智能结果筛选和去重
             List<String> qualityResults = selectQualityResults(intentResults);
-
             if (qualityResults.isEmpty()) {
                 return DEFAULT_RESPONSE;
             }
 
-            // 5. 高效汇总生成
-            String result = generateHighQualitySummary(qualityResults);
+            // 5) 相关记忆检索（仅与当前问题相关）
+            String userId = getCurrentUserId();
+            String memoryContext = "";
+            if (userQuery != null && !userQuery.trim().isEmpty()) {
+                memoryContext = memoryManager.searchRelevantMemoryAsContext(userId, userQuery, SEARCH_OPTS);
+            }
+
+            // 6) 高效汇总生成（严格基于“相关历史片段 + 外部资料”）
+            String result = generateHighQualitySummary(userQuery, qualityResults, memoryContext);
 
             long duration = System.currentTimeMillis() - startTime;
-            log.info("EnhancedModelSummer处理完成，耗时: {}ms，结果质量评分: {}",
-                    duration, evaluateQuality(result));
+            log.info("ModelSummer处理完成，耗时: {}ms，结果质量评分: {}", duration, evaluateQuality(result));
 
             return result;
 
@@ -96,21 +106,20 @@ public class ModelSummer {
      * 智能意图优先级排序
      */
     private List<String> prioritizeIntents(List<String> intents) {
-        // 定义意图重要性权重
         Map<String, Integer> intentWeights = Map.of(
-                "search", 10,      // 搜索类最高优先级
-                "question", 9,     // 问答类次之
-                "analysis", 8,     // 分析类
-                "recommendation", 7, // 推荐类
-                "calculation", 6,  // 计算类
-                "education", 5,    // 教育类
-                "general", 1       // 通用类最低
+                "search", 10,
+                "question", 9,
+                "analysis", 8,
+                "recommendation", 7,
+                "calculation", 6,
+                "education", 5,
+                "general", 1
         );
 
         return intents.stream()
                 .distinct()
                 .sorted((a, b) -> intentWeights.getOrDefault(b, 0) - intentWeights.getOrDefault(a, 0))
-                .limit(3) // 最多处理3个意图
+                .limit(3)
                 .collect(Collectors.toList());
     }
 
@@ -120,7 +129,6 @@ public class ModelSummer {
     private Map<String, List<String>> getHighQualityResults(List<String> intents) {
         Map<String, List<String>> results = new ConcurrentHashMap<>();
 
-        // 使用并行流提升效率
         List<CompletableFuture<Void>> futures = intents.stream()
                 .map(intent -> CompletableFuture
                         .runAsync(() -> {
@@ -134,7 +142,7 @@ public class ModelSummer {
                             }
                         })
                         .orTimeout(TASK_TIMEOUT_SECONDS, TimeUnit.SECONDS))
-                .collect(Collectors.toList());
+                .toList();
 
         try {
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
@@ -156,18 +164,12 @@ public class ModelSummer {
                 return new ArrayList<>();
             }
 
-            // 等待结果完成
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                     .get(TASK_TIMEOUT_SECONDS - 1, TimeUnit.SECONDS);
 
-            // 收集并质量筛选
             return futures.stream()
-                    .map(future -> {
-                        try {
-                            return future.get();
-                        } catch (Exception e) {
-                            return null;
-                        }
+                    .map(f -> {
+                        try { return f.get(); } catch (Exception e) { return null; }
                     })
                     .filter(Objects::nonNull)
                     .filter(this::isQualityResult)
@@ -184,25 +186,14 @@ public class ModelSummer {
      * 质量结果判断
      */
     private boolean isQualityResult(String result) {
-        if (result == null || result.trim().isEmpty()) {
-            return false;
-        }
+        if (result == null || result.trim().isEmpty()) return false;
 
         String trimmed = result.trim();
+        if (trimmed.length() < MIN_RESULT_LENGTH) return false;
 
-        // 长度检查
-        if (trimmed.length() < MIN_RESULT_LENGTH) {
-            return false;
-        }
-
-        // 内容质量检查
-        if (trimmed.matches(".*[。！？].*")) {
-            return true;
-        }
-
-        if (trimmed.length() > 50 && !trimmed.equals(trimmed.toUpperCase())) {
-            return true;
-        }
+        // 简易质量启发
+        if (trimmed.matches(".*[。！？].*")) return true;
+        if (trimmed.length() > 50 && !trimmed.equals(trimmed.toUpperCase())) return true;
 
         return false;
     }
@@ -213,73 +204,50 @@ public class ModelSummer {
     private List<String> selectQualityResults(Map<String, List<String>> intentResults) {
         List<String> allResults = new ArrayList<>();
 
-        // 按优先级收集结果
         String[] priority = {"search", "question", "analysis", "recommendation"};
         for (String intent : priority) {
             List<String> results = intentResults.get(intent);
-            if (results != null) {
-                allResults.addAll(results);
-            }
+            if (results != null) allResults.addAll(results);
         }
 
-        // 添加其他意图结果
         intentResults.entrySet().stream()
                 .filter(entry -> !Arrays.asList(priority).contains(entry.getKey()))
                 .forEach(entry -> allResults.addAll(entry.getValue()));
 
-        // 智能去重和筛选
-        return deduplicateAndRank(allResults)
-                .stream()
+        return deduplicateAndRank(allResults).stream()
                 .limit(MAX_TOTAL_RESULTS)
                 .collect(Collectors.toList());
     }
 
     /**
-     * 智能去重和排序（增强异常处理）
+     * 智能去重与排序
      */
     private List<String> deduplicateAndRank(List<String> results) {
-        if (results == null || results.isEmpty()) {
-            return new ArrayList<>();
-        }
+        if (results == null || results.isEmpty()) return new ArrayList<>();
 
         List<String> deduplicated = new ArrayList<>();
+        for (String r : results) {
+            if (r == null || r.trim().isEmpty()) continue;
 
-        for (String result : results) {
-            if (result == null || result.trim().isEmpty()) {
-                continue;
-            }
-
-            boolean isDuplicate = false;
-
+            boolean dup = false;
             try {
-                // 简单的相似度检查
-                for (String existing : deduplicated) {
-                    if (calculateSimilarity(result, existing) > SIMILARITY_THRESHOLD) {
-                        isDuplicate = true;
-                        break;
-                    }
+                for (String ex : deduplicated) {
+                    if (calculateSimilarity(r, ex) > SIMILARITY_THRESHOLD) { dup = true; break; }
                 }
             } catch (Exception e) {
-                log.debug("相似度计算异常，跳过去重检查: {}", e.getMessage());
-                // 如果相似度计算失败，进行简单的字符串比较
-                isDuplicate = deduplicated.contains(result);
+                log.debug("相似度计算异常，使用直接包含判断");
+                dup = deduplicated.contains(r);
             }
-
-            if (!isDuplicate) {
-                deduplicated.add(result);
-            }
+            if (!dup) deduplicated.add(r);
         }
 
-        // 按长度和质量排序，增加异常处理
         try {
             return deduplicated.stream()
                     .sorted((a, b) -> {
                         try {
-                            int qualityA = calculateQualityScore(a);
-                            int qualityB = calculateQualityScore(b);
-                            return Integer.compare(qualityB, qualityA);
+                            int qa = calculateQualityScore(a), qb = calculateQualityScore(b);
+                            return Integer.compare(qb, qa);
                         } catch (Exception e) {
-                            log.debug("质量评分异常，使用长度排序: {}", e.getMessage());
                             return Integer.compare(b.length(), a.length());
                         }
                     })
@@ -291,30 +259,24 @@ public class ModelSummer {
     }
 
     /**
-     * 计算文本相似度（修复版）
+     * 计算文本相似度（Jaccard）
      */
-    private double calculateSimilarity(String text1, String text2) {
-        if (text1 == null || text2 == null) return 0.0;
-        if (text1.equals(text2)) return 1.0;
+    private double calculateSimilarity(String t1, String t2) {
+        if (t1 == null || t2 == null) return 0.0;
+        if (t1.equals(t2)) return 1.0;
 
-        // 修复：使用HashSet避免重复元素异常
-        Set<String> words1 = new HashSet<>(Arrays.asList(text1.toLowerCase().split("\\s+")));
-        Set<String> words2 = new HashSet<>(Arrays.asList(text2.toLowerCase().split("\\s+")));
+        Set<String> s1 = new HashSet<>(Arrays.asList(t1.toLowerCase().split("\\s+")));
+        Set<String> s2 = new HashSet<>(Arrays.asList(t2.toLowerCase().split("\\s+")));
+        s1.removeIf(String::isEmpty);
+        s2.removeIf(String::isEmpty);
 
-        // 移除空字符串
-        words1.removeIf(String::isEmpty);
-        words2.removeIf(String::isEmpty);
+        if (s1.isEmpty() && s2.isEmpty()) return 1.0;
+        if (s1.isEmpty() || s2.isEmpty()) return 0.0;
 
-        if (words1.isEmpty() && words2.isEmpty()) return 1.0;
-        if (words1.isEmpty() || words2.isEmpty()) return 0.0;
+        Set<String> inter = new HashSet<>(s1); inter.retainAll(s2);
+        Set<String> union = new HashSet<>(s1); union.addAll(s2);
 
-        Set<String> intersection = new HashSet<>(words1);
-        intersection.retainAll(words2);
-
-        Set<String> union = new HashSet<>(words1);
-        union.addAll(words2);
-
-        return union.isEmpty() ? 0.0 : (double) intersection.size() / union.size();
+        return union.isEmpty() ? 0.0 : (double) inter.size() / union.size();
     }
 
     /**
@@ -322,60 +284,39 @@ public class ModelSummer {
      */
     private int calculateQualityScore(String result) {
         int score = 0;
-
-        // 长度分数（适中长度得分高）
-        int length = result.length();
-        if (length >= 50 && length <= 300) {
-            score += 10;
-        } else if (length > 300) {
-            score += 5;
-        }
-
-        // 完整性分数
-        if (result.contains("。") || result.contains("！") || result.contains("？")) {
-            score += 15;
-        }
-
-        // 信息密度分数
-        long sentenceCount = result.chars().filter(ch -> ch == '。' || ch == '！' || ch == '？').count();
-        if (sentenceCount >= 2) {
-            score += 10;
-        }
-
-        // 专业性分数
-        if (result.matches(".*根据.*|.*显示.*|.*表明.*")) {
-            score += 5;
-        }
-
+        int len = result.length();
+        if (len >= 50 && len <= 300) score += 10; else if (len > 300) score += 5;
+        if (result.contains("。") || result.contains("！") || result.contains("？")) score += 15;
+        long sentences = result.chars().filter(ch -> ch == '。' || ch == '！' || ch == '？').count();
+        if (sentences >= 2) score += 10;
+        if (result.matches(".*根据.*|.*显示.*|.*表明.*")) score += 5;
         return score;
     }
 
     /**
-     * 生成高质量汇总
+     * 生成高质量汇总（抗幻觉）
      */
-    private String generateHighQualitySummary(List<String> results) {
-        String summaryInput = String.join("\n", results);
+    private String generateHighQualitySummary(String userQuery, List<String> results, String memoryContext) {
+        String evidenceBlock = buildEvidenceBlock(results);
 
-        // 智能截断
-        if (summaryInput.length() > MAX_INPUT_LENGTH) {
-            summaryInput = intelligentTruncate(summaryInput);
+        // 智能截断（仅对外部资料块）
+        if (evidenceBlock.length() > MAX_INPUT_LENGTH) {
+            evidenceBlock = intelligentTruncate(evidenceBlock);
         }
 
-        String userMemory = UserLocalThreadUtils.getUserMemory();
-        String enhancedPrompt = buildEnhancedPrompt(userMemory, results.size());
+        // 构建用户消息载荷：用户问题 + 相关历史片段 + 外部资料
+        String userPayload = buildUserPayload(userQuery, memoryContext, evidenceBlock);
 
-        long modelStartTime = System.currentTimeMillis();
-
+        long modelStart = System.currentTimeMillis();
         try {
             ChatResponse response = chatLanguageModel.chat(
-                    SystemMessage.from(OPTIMIZED_SUMMER_PROMPT + enhancedPrompt),
-                    UserMessage.from(summaryInput)
+                    SystemMessage.from(OPTIMIZED_SUMMER_PROMPT),
+                    UserMessage.from(userPayload)
             );
+            log.debug("模型调用耗时: {}ms", System.currentTimeMillis() - modelStart);
 
-            log.debug("模型调用耗时: {}ms", System.currentTimeMillis() - modelStartTime);
-
-            String rawResponse = response.aiMessage().text();
-            return enhanceResponse(rawResponse);
+            String raw = response.aiMessage().text();
+            return enhanceResponse(raw);
 
         } catch (Exception e) {
             log.error("模型调用失败", e);
@@ -383,32 +324,27 @@ public class ModelSummer {
         }
     }
 
-    /**
-     * 构建增强提示词
-     */
-    private String buildEnhancedPrompt(String userMemory, int resultCount) {
-        return String.format("""
-                
-                ## 当前任务上下文：
-                - 用户需求：%s
-                - 可用信息量：%d条高质量结果
-                - 期望输出：300-500字的专业回答
-                
-                ## 质量标准：
-                1. 信息准确性：严格基于提供的资料
-                2. 逻辑清晰性：重要信息优先，层次分明
-                3. 实用价值：提供可操作的具体建议
-                4. 语言亲和：专业而不失温暖
-                
-                ## 效率要求：
-                - 开头直接回答核心问题
-                - 中间3个要点支撑
-                - 结尾实用建议
-                
-                请生成高质量的专业回答。
-                """,
-                userMemory != null ? userMemory : "通用咨询",
-                resultCount);
+    private String buildEvidenceBlock(List<String> results) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < results.size(); i++) {
+            String item = results.get(i);
+            // 单条资料再控长，避免超长段落
+            if (item.length() > 600) {
+                item = item.substring(0, 600) + "...";
+            }
+            sb.append("- 资料").append(i + 1).append("：").append(item.trim()).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    private String buildUserPayload(String userQuery, String memoryContext, String evidenceBlock) {
+        String uq = (userQuery == null || userQuery.trim().isEmpty()) ? "通用咨询" : userQuery.trim();
+        String mc = (memoryContext == null || memoryContext.trim().isEmpty()) ? "无" : memoryContext.trim();
+
+        return new StringBuilder()
+                .append("【当前用户问题】\n").append(uq).append("\n\n")
+                .append("【相关历史对话片段】\n").append(mc).append("\n\n")
+                .append("【外部资料（供总结）】\n").append(evidenceBlock).toString();
     }
 
     /**
@@ -423,15 +359,10 @@ public class ModelSummer {
             String sentence = sentences[i];
             if (currentLength + sentence.length() <= MAX_INPUT_LENGTH) {
                 result.append(sentence);
-                if (i < sentences.length - 1) {
-                    result.append("。");
-                }
+                if (i < sentences.length - 1) result.append("。");
                 currentLength += sentence.length() + 1;
-            } else {
-                break;
-            }
+            } else break;
         }
-
         return result.toString();
     }
 
@@ -439,32 +370,26 @@ public class ModelSummer {
      * 响应增强处理
      */
     private String enhanceResponse(String response) {
-        if (response == null || response.trim().isEmpty()) {
-            return DEFAULT_RESPONSE;
-        }
-
+        if (response == null || response.trim().isEmpty()) return DEFAULT_RESPONSE;
         String enhanced = response.trim();
-
-        // 格式优化
         enhanced = optimizeFormat(enhanced);
-
-        // 数学公式转换
         enhanced = convertMathFormulas(enhanced);
 
-        // 质量验证
         if (evaluateQuality(enhanced) < 60) {
             log.warn("生成的回答质量较低，使用默认回答");
             return DEFAULT_RESPONSE;
         }
-
         return enhanced;
     }
 
     /**
-     * 格式优化
+     * 格式优化：清理轻量Markdown、将 ¥ 转换为空行、智能换行
      */
     private String optimizeFormat(String text) {
-        // 强制Markdown清理
+        // 将模型段落分隔符 ¥ 转为空行
+        text = text.replace("¥", "\n\n");
+
+        // 轻量Markdown清理
         text = text.replaceAll("\\*\\*([^*]+)\\*\\*", "$1");
         text = text.replaceAll("\\*([^*]+)\\*", "$1");
         text = text.replaceAll("^#{1,6}\\s+", "");
@@ -492,7 +417,6 @@ public class ModelSummer {
         text = text.replaceAll("\\$?([a-zA-Z])\\^3\\$?", "$1³");
         text = text.replaceAll("\\$?\\\\sqrt\\{([^}]+)\\}\\$?", "√($1)");
         text = text.replaceAll("\\$+", "");
-
         return text;
     }
 
@@ -500,42 +424,41 @@ public class ModelSummer {
      * 评估回答质量
      */
     private int evaluateQuality(String response) {
-        if (response == null || response.trim().isEmpty()) {
-            return 0;
-        }
+        if (response == null || response.trim().isEmpty()) return 0;
 
         int score = 0;
         String text = response.trim();
-
-        // 长度合理性 (25分)
         int length = text.length();
-        if (length >= 200 && length <= 600) {
-            score += 25;
-        } else if (length >= 100) {
-            score += 15;
-        }
+        if (length >= 200 && length <= 600) score += 25;
+        else if (length >= 100) score += 15;
 
-        // 结构完整性 (25分)
-        if (text.contains("首先") || text.contains("其次")) {
-            score += 15;
-        }
-        if (text.contains("根据") || text.contains("显示")) {
-            score += 10;
-        }
+        if (text.contains("首先") || text.contains("其次")) score += 15;
+        if (text.contains("根据") || text.contains("显示")) score += 10;
 
-        // 内容丰富性 (25分)
         long sentenceCount = text.chars().filter(ch -> ch == '。' || ch == '！' || ch == '？').count();
-        if (sentenceCount >= 3) {
-            score += 25;
-        } else if (sentenceCount >= 2) {
-            score += 15;
-        }
+        if (sentenceCount >= 3) score += 25; else if (sentenceCount >= 2) score += 15;
 
-        // 格式规范性 (25分)
-        if (!text.contains("**") && !text.contains("*") && !text.contains("#")) {
-            score += 25;
-        }
+        if (!text.contains("**") && !text.contains("*") && !text.contains("#")) score += 25;
 
         return score;
+    }
+
+    /**
+     * 获取当前用户ID
+     */
+    private String getCurrentUserId() {
+        try {
+            if (UserLocalThreadUtils.getUserInfo() != null &&
+                    UserLocalThreadUtils.getUserInfo().getUserId() != null) {
+                String userId = UserLocalThreadUtils.getUserInfo().getUserId().toString();
+                log.debug("从UserLocalThreadUtils获取用户ID: {}", userId);
+                return userId;
+            }
+        } catch (Exception e) {
+            log.debug("从UserLocalThreadUtils获取用户ID失败: {}", e.getMessage());
+        }
+        String defaultUserId = "default_user_1";
+        log.debug("使用默认用户ID: {}", defaultUserId);
+        return defaultUserId;
     }
 }

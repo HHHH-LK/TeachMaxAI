@@ -1,192 +1,192 @@
-  server:
-    port: 8108
-    address: localhost
+server:
+  port: 8109
+  address: localhost
 
-  spring:
-    application:
-      name: smartcampus
-    datasource:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      username: root
-      password: 10280017
-    data:
-      redis:
-        host: localhost
-        port: 6379
+spring:
+  application:
+    name: smartcampus
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/education_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: 10280017
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
-  # 🔧 推荐方案：修改application.yml，禁用包扫描
-  mybatis-plus:
-    # Mapper XML文件位置
-    mapper-locations: classpath*:mapper/*.xml
+# 🔧 推荐方案：修改application.yml，禁用包扫描
+mybatis-plus:
+  # Mapper XML文件位置
+  mapper-locations: classpath*:mapper/*.xml
 
-    # 类型别名包路径
-    type-aliases-package: com.aiproject.smartcampus.pojo
+  # 类型别名包路径
+  type-aliases-package: com.aiproject.smartcampus.pojo
 
-    # 🔧 禁用TypeHandler包扫描，避免扫描到有问题的GenericEnumTypeHandler
-    type-handlers-package: ""
+  # 🔧 禁用TypeHandler包扫描，避免扫描到有问题的GenericEnumTypeHandler
+  type-handlers-package: ""
 
-    # MyBatis配置
-    configuration:
-      # 驱峰命名转换
-      map-underscore-to-camel-case: true
-      # 当查询结果为null时，也调用setter方法
-      call-setters-on-nulls: true
-      # 处理null值的JDBC类型
-      jdbc-type-for-null: NULL
-      # 日志实现（开发环境使用，生产环境建议关闭）
-      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-      # 缓存配置
-      cache-enabled: true
-      # 延迟加载
-      lazy-loading-enabled: false
-      # 设置超时时间
-      default-statement-timeout: 30
-      # 设置最大行数限制
-      default-fetch-size: 100
+  # MyBatis配置
+  configuration:
+    # 驱峰命名转换
+    map-underscore-to-camel-case: true
+    # 当查询结果为null时，也调用setter方法
+    call-setters-on-nulls: true
+    # 处理null值的JDBC类型
+    jdbc-type-for-null: NULL
+    # 日志实现（开发环境使用，生产环境建议关闭）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 缓存配置
+    cache-enabled: true
+    # 延迟加载
+    lazy-loading-enabled: false
+    # 设置超时时间
+    default-statement-timeout: 30
+    # 设置最大行数限制
+    default-fetch-size: 100
 
-      # === 处理BLOB/CLOB的核心配置 ===
-      # 执行器类型：SIMPLE、REUSE、BATCH
-      default-executor-type: reuse
-      # 自动映射行为：NONE、PARTIAL、FULL
-      auto-mapping-behavior: partial
-      # 处理未知列的行为：NONE、WARNING、FAILING
-      auto-mapping-unknown-column-behavior: warning
+    # === 处理BLOB/CLOB的核心配置 ===
+    # 执行器类型：SIMPLE、REUSE、BATCH
+    default-executor-type: reuse
+    # 自动映射行为：NONE、PARTIAL、FULL
+    auto-mapping-behavior: partial
+    # 处理未知列的行为：NONE、WARNING、FAILING
+    auto-mapping-unknown-column-behavior: warning
 
-      # === TEXT/BLOB处理的关键配置 ===
-      # 使用实际的列名
-      use-actual-param-name: true
-      # 返回实例类型
-      return-instance-for-empty-row: false
-      # 收缩空白字符
-      shrink-whitespaces-in-sql: false
-      # 默认枚举类型处理器
-      default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+    # === TEXT/BLOB处理的关键配置 ===
+    # 使用实际的列名
+    use-actual-param-name: true
+    # 返回实例类型
+    return-instance-for-empty-row: false
+    # 收缩空白字符
+    shrink-whitespaces-in-sql: false
+    # 默认枚举类型处理器
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
 
-      # === 新增BLOB/TEXT处理配置 ===
-      # 积极的延迟加载（关闭以避免BLOB问题）
-      aggressive-lazy-loading: false
-      # 多个结果集处理
-      multiple-result-sets-enabled: true
-      # 使用列标签代替列名
-      use-column-label: true
-      # 使用生成的键
-      use-generated-keys: false
-      # 本地缓存作用域：SESSION 或 STATEMENT
-      local-cache-scope: session
-      # 默认脚本语言驱动
-      default-scripting-language-driver: org.apache.ibatis.scripting.xmltags.XMLLanguageDriver
+    # === 新增BLOB/TEXT处理配置 ===
+    # 积极的延迟加载（关闭以避免BLOB问题）
+    aggressive-lazy-loading: false
+    # 多个结果集处理
+    multiple-result-sets-enabled: true
+    # 使用列标签代替列名
+    use-column-label: true
+    # 使用生成的键
+    use-generated-keys: false
+    # 本地缓存作用域：SESSION 或 STATEMENT
+    local-cache-scope: session
+    # 默认脚本语言驱动
+    default-scripting-language-driver: org.apache.ibatis.scripting.xmltags.XMLLanguageDriver
 
-    # 全局配置
-    global-config:
-      # 数据库配置
-      db-config:
-        # 逻辑删除值(已删除)
-        logic-delete-value: 1
-        # 逻辑未删除值(未删除)
-        logic-not-delete-value: 0
-        # 主键类型（自动递增）
-        id-type: auto
-        # 字段策略
-        insert-strategy: not_null
-        update-strategy: not_null
-        where-strategy: not_null
+  # 全局配置
+  global-config:
+    # 数据库配置
+    db-config:
+      # 逻辑删除值(已删除)
+      logic-delete-value: 1
+      # 逻辑未删除值(未删除)
+      logic-not-delete-value: 0
+      # 主键类型（自动递增）
+      id-type: auto
+      # 字段策略
+      insert-strategy: not_null
+      update-strategy: not_null
+      where-strategy: not_null
 
-        # === 字段命名策略 ===
-        # 数据库字段命名策略
-        column-underline: true
-        # 表名命名策略
-        table-underline: true
+      # === 字段命名策略 ===
+      # 数据库字段命名策略
+      column-underline: true
+      # 表名命名策略
+      table-underline: true
 
-      # === 横幅配置 ===
-      banner: true
+    # === 横幅配置 ===
+    banner: true
 
-  mail:
-    host: smtp.qq.com    # SMTP服务器地址
-    port: 587                 # 端口
-    username: 3963077470@qq.com  # 邮箱用户名
-    password: xbtalymioxrzcgfg   # 邮箱密码或授权码
-    display-name: 教学实训
-    protocol: smtp
-    properties:
-      mail:
-        smtp:
-          socketFactoryClass: javax.net.ssl.SSLSocketFactory
-          #表示开启 DEBUG 模式，这样，邮件发送过程的日志会在控制台打印出来，方便排查错误
-          debug: true
-          ssl:
-            enable: true
-            trust: smtp.qq.com
+mail:
+  host: smtp.qq.com    # SMTP服务器地址
+  port: 587                 # 端口
+  username: 3963077470@qq.com  # 邮箱用户名
+  password: xbtalymioxrzcgfg   # 邮箱密码或授权码
+  display-name: 教学实训
+  protocol: smtp
+  properties:
+    mail:
+      smtp:
+        socketFactoryClass: javax.net.ssl.SSLSocketFactory
+        #表示开启 DEBUG 模式，这样，邮件发送过程的日志会在控制台打印出来，方便排查错误
+        debug: true
+        ssl:
+          enable: true
+          trust: smtp.qq.com
 
-    # 短信服务配置（根据服务商不同调整）
-  sms:
-    ali:
-      access-key-id: your-access-key-id
-      access-key-secret: your-access-key-secret
-      sign-name: smart_campus
-      template-code: SMS_10001  # 验证码模板ID
-    tencent:
-      secret-id: your-secret-id  #企业资质
-      secret-key: your-secret-key
-      app-id: 1400000000
-      sign-name: 智慧校园
-      template-id: 123456
-
-
-      templates:
-        reset-password:
-          subject: 密码重置验证码
-          text: |-
-            您的验证码是：{code}
-            此验证码5分钟内有效，请勿告知他人
-  
-
-  langchain4j:
-    community:
-      dashscope:
-        chat-model:
-          api-key: ${OTHER_DASHSCOPE_API_KEY}
-          model-name: qwen-max-latest
-        embedding-model:
-          api-key: ${OTHER_DASHSCOPE_API_KEY}
-          model-name: text-embedding-v3
+  # 短信服务配置（根据服务商不同调整）
+sms:
+  ali:
+    access-key-id: your-access-key-id
+    access-key-secret: your-access-key-secret
+    sign-name: smart_campus
+    template-code: SMS_10001  # 验证码模板ID
+  tencent:
+    secret-id: your-secret-id  #企业资质
+    secret-key: your-secret-key
+    app-id: 1400000000
+    sign-name: 智慧校园
+    template-id: 123456
 
 
-  logging:
-    level:
-      org.apache.ibatis.session: WARN
-      org.mybatis.spring: WARN
-      com.hmall: DEBUG             # 设置包级别日志
-      com.aiproject.smartcampus.commons.utils.aliyunossutils: DEBUG  # OSS相关日志
-    pattern:
-      dateformat: HH:mm:ss:SSS     # 时间格式
-    file:
-      path: logs/${spring.application.name}   # 引用已定义的应用名
+    templates:
+      reset-password:
+        subject: 密码重置验证码
+        text: |-
+          您的验证码是：{code}
+          此验证码5分钟内有效，请勿告知他人
 
-  # 接口文档配置
-  knife4j:
-    enable: true
-    openapi:
-      title: "智慧校园"
-      version: 1.0
-      group:
-        default:
-          api-rule: package
-          api-rule-resources:
-            - com.aiproject.smartcampus.controller
 
-  # 阿里云OSS配置 - 使用您自己的bucket
-  aliyun:
-    oss:
-      endpoint: https://oss-cn-beijing.aliyuncs.com
-      bucketName: smart-campus-resources-${random.int(1000,9999)}  # 使用唯一的bucket名称
-      region: cn-beijing
-      accessKeyId: LTAI5tHAaGZDfWRA5jTmiHsn
-      accessKeySecret: COEDRVsbvau1b0WdQHyU8kwsS9J9kl
+langchain4j:
+  community:
+    dashscope:
+      chat-model:
+        api-key: ${OTHER_DASHSCOPE_API_KEY}
+        model-name: deepseek-r1
+      embedding-model:
+        api-key: ${OTHER_DASHSCOPE_API_KEY}
+        model-name: text-embedding-v3
 
-  smart-campus:
-    memory:
-      max-memory-rounds: 10
-      memory-prefix: "smart_campus_summary_memory:"
-      enable-memory-recovery: true
-      enable-memory-stats: true
+
+logging:
+  level:
+    org.apache.ibatis.session: WARN
+    org.mybatis.spring: WARN
+    com.hmall: DEBUG             # 设置包级别日志
+    com.aiproject.smartcampus.commons.utils.aliyunossutils: DEBUG  # OSS相关日志
+  pattern:
+    dateformat: HH:mm:ss:SSS     # 时间格式
+  file:
+    path: logs/${spring.application.name}   # 引用已定义的应用名
+
+# 接口文档配置
+knife4j:
+  enable: true
+  openapi:
+    title: "智慧校园"
+    version: 1.0
+    group:
+      default:
+        api-rule: package
+        api-rule-resources:
+          - com.aiproject.smartcampus.controller
+
+# 阿里云OSS配置 - 使用您自己的bucket
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    bucketName: smart-campus-resources-${random.int(1000,9999)}  # 使用唯一的bucket名称
+    region: cn-beijing
+    accessKeyId: LTAI5tHAaGZDfWRA5jTmiHsn
+    accessKeySecret: COEDRVsbvau1b0WdQHyU8kwsS9J9kl
+
+smart-campus:
+  memory:
+    max-memory-rounds: 10
+    memory-prefix: "smart_campus_summary_memory:"
+    enable-memory-recovery: true
+    enable-memory-stats: true
