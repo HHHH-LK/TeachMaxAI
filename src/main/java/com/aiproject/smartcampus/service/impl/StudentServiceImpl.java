@@ -119,8 +119,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Override
     public String academicAnalysis(String courseId) {
         try {
-            String studentId = "1"; // or userToTypeUtils.change();
-
+          String studentId = userToTypeUtils.change();
             // 错题
             log.info("开始检索学生{}错误题目信息", studentId);
             List<StudentWrongQuestionVO> wrongList = studentMapper.selectWrongQuestion(studentId, courseId);

@@ -12,12 +12,12 @@ import com.aiproject.smartcampus.pojo.bo.TBO;
 import com.aiproject.smartcampus.pojo.bo.TestTaskBO;
 import com.aiproject.smartcampus.pojo.dto.GetKnowledgePointDTO;
 import com.aiproject.smartcampus.pojo.dto.HavingTPointDTO;
-import com.aiproject.smartcampus.pojo.po.Chapter;
-import com.aiproject.smartcampus.pojo.po.ChapterKnowledgePoint;
-import com.aiproject.smartcampus.pojo.po.KnowledgePoint;
+import com.aiproject.smartcampus.pojo.dto.StudentAnswerDTO;
+import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.KnowledgePointSimpleVO;
 import com.aiproject.smartcampus.pojo.vo.StudentWrongKnowledgeVO;
 import com.aiproject.smartcampus.service.KnoledgeService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -56,6 +59,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     private final UserToTypeUtils getUserToTypeUtils;
     private final ChapterKnowledgePointMapper chapterKnowledgePointMapper;
     private final ChapterMapper chapterMapper;
+    private final StudentAnswerMapper studentAnswerMapper;
 
     private final Duration duration = Duration.ofHours(3);
     private final String KnledgeRedisKey = "system:knoledge:imformation:";
@@ -96,9 +100,7 @@ public class KnoledgeServiceImpl implements KnoledgeService {
     @Override
     public Result getgetKnowlegeInformationBypointId(String pointId) {
 
-        //String studentId = getUserToTypeUtils.change();
-        //todo进行测试
-        String studentId = "1";
+        String studentId = getUserToTypeUtils.change();
 
         if (studentId == null) {
             log.error("该用户未登录[{}]", studentId);
@@ -215,16 +217,21 @@ public class KnoledgeServiceImpl implements KnoledgeService {
 
         String studentId = userToTypeUtils.change();
 
-        //查询学生的平均错误率
-        List<StudentWrongKnowledgeBO> studentWrongKnowledgeByStudentId = knowledgePointMapper.getStudentWrongKnowledgeByStudentId(studentId);
+        LambdaQueryWrapper<StudentAnswer> studentAnswerLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        studentAnswerLambdaQueryWrapper.eq(StudentAnswer::getStudentId, studentId);
+        Long total = studentAnswerMapper.selectCount(studentAnswerLambdaQueryWrapper);
+        LambdaQueryWrapper<StudentAnswer> studentAnswerLambdaQueryWrapperIsCorrect = new LambdaQueryWrapper<>();
+        studentAnswerLambdaQueryWrapperIsCorrect.eq(StudentAnswer::getStudentId, studentId);
+        studentAnswerLambdaQueryWrapperIsCorrect.eq(StudentAnswer::getIsCorrect, "1");
+        Long correctTotals = studentAnswerMapper.selectCount(studentAnswerLambdaQueryWrapperIsCorrect);
 
-        double sum = 0.0;
-        for (StudentWrongKnowledgeBO studentWrongKnowledgeBO : studentWrongKnowledgeByStudentId) {
-            sum += studentWrongKnowledgeBO.getAccuracyRate();
-        }
-        sum = 100.00 - (sum / studentWrongKnowledgeByStudentId.size());
+        BigDecimal ratio = BigDecimal.valueOf(correctTotals)
+                .divide(BigDecimal.valueOf(total), 4, RoundingMode.HALF_UP); // 先保留4位小数提高中间精度
 
-        return Result.success(sum);
+        BigDecimal sum = ratio.setScale(2, RoundingMode.HALF_UP) // 保留两位小数
+                .multiply(BigDecimal.valueOf(100)); // 乘以100
+
+        return Result.success(100-sum.doubleValue()); // 转为double返回（或直接返回BigDecimal视Result类型而定）
     }
 
     @Override

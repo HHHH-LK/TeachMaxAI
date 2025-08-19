@@ -362,8 +362,10 @@ public class ChapterServiceImpl implements ChapterService {
                 .collect(Collectors.toMap(StudentAnswerDTO::getQuestionId, dto -> dto));
 
         // 查询出试题
-        List<ChapterQuestionDetailVO> chapterQuestionDetailVOS = chapterMapper.selectTestByType(chapterId, courseId, type);
-
+        List<ChapterQuestionDetailVO> chapterQuestionDetailVOss = chapterMapper.selectTestByType(chapterId, courseId, type);
+        //获取出却questionId 列表并过滤出对应的题目
+        List<Integer> list = studentAnswerDTOList.stream().map(a -> a.getQuestionId()).toList();
+        List<ChapterQuestionDetailVO> chapterQuestionDetailVOS = chapterQuestionDetailVOss.stream().filter(a -> list.contains(a.getQuestionId())).toList();
         // 对试卷进行排版
         List<ChapterQuestionDetailVO> sortedQuestions = setTToAllQuestion(chapterQuestionDetailVOS).stream()
                 .sorted((a, b) -> a.getT() - b.getT())
@@ -401,7 +403,7 @@ public class ChapterServiceImpl implements ChapterService {
 
                 // 判断答案是否正确
                 boolean isCorrect = studentAnswer != null && studentAnswer.equals(correctAnswer);
-                String correct = isCorrect?"1":"0";
+                String correct = isCorrect ? "1" : "0";
 
                 // 设置结果信息
                 studentAnswerResultVO.setStudentAnswer(studentAnswer);
