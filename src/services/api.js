@@ -703,7 +703,7 @@ export const studentService = {
    * @returns {Promise<object>} 学习完成结果
    */
   finishChapterStudy: async (studentStudyDTO) => {
-    return await apiClient.post('/chapter/finsh', studentStudyDTO);
+    return await apiClient.post('/chapter/chapter/finsh', studentStudyDTO);
   },
 
   /**
