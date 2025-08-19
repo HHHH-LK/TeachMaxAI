@@ -248,9 +248,8 @@ public class FightingServiceImpl implements FightingService {
             if (question == null) return Result.error("题目不存在");
 
             // 先本地判题，不能本地判再调 LLM
-            /*Boolean localResult = judgeAnswerLocal(question, context);*/
-            /* boolean isCorrect = (localResult != null) ? localResult : judgeAnswerWithAI(question, context);*/
-            boolean isCorrect = judgeAnswerWithAI(question, context);
+            Boolean localResult = judgeAnswerLocal(question, context);
+            boolean isCorrect = (localResult != null) ? localResult : judgeAnswerWithAI(question, context);
 
             //进行回合处理（入库处理）
             String result = isCorrect ? "成功" : "失败";
