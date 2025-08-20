@@ -18,7 +18,7 @@ class FileloadFunctionTest {
     @Test
     void test() {
 
-        fileloadFunction.documentsloade();
+        fileloadFunction.documentsloade(new File("documents/java_programming_guide.md"));
 
 
     }

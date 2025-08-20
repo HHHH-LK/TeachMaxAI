@@ -17,20 +17,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /**
- * 智能文档加载和处理器
- * 功能：
- * 1. 支持多种文档格式的批量加载
- * 2. 智能文档结构识别和分析
- * 3. 多层次文本分割和优化
- * 4. 向量嵌入生成和存储
- * 5. 文档缓存和性能优化
+ * 智能文档加载和处理器 - 优化版
+ * 优化重点：提高RAG检索准确率
  *
  * @author lk
  * @since 2025-05-17
@@ -46,22 +46,41 @@ public class FileloadFunction {
     private final ChatLanguageModel chatLanguageModel;
     private final LocalTokenizerFuncation tokenizer;
 
+    // === 线程池 ===
+    private final ExecutorService executorService = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors()
+    );
+
     // === 常量配置 ===
     private static final String DEFAULT_DOCUMENT_PATH = "documents";
     private static final Set<String> SUPPORTED_EXTENSIONS = Set.of(
-            ".txt", ".md", ".pdf", ".docx", ".doc", ".rtf", ".html", ".htm"
+            ".txt", ".md", ".pdf", ".docx", ".doc", ".rtf", ".html", ".htm", ".json", ".xml", ".csv"
     );
+
+    // === 优化的分割参数 ===
+    private static final int DEFAULT_CHUNK_SIZE = 500;
+    private static final int DEFAULT_OVERLAP_SIZE = 100;
+    private static final int MIN_CHUNK_SIZE = 100;
+    private static final int MAX_CHUNK_SIZE = 1500;
 
     // === 文档结构识别正则表达式 ===
     private static final Pattern TITLE_PATTERN = Pattern.compile(
             "^#{1,6}\\s+(.+)$|^(.+)\\n[=-]{3,}$", Pattern.MULTILINE);
     private static final Pattern LIST_PATTERN = Pattern.compile(
-            "^[\\s]*[-*+]\\s+(.+)$|^[\\s]*\\d+\\.\\s+(.+)$", Pattern.MULTILINE);
-    private static final Pattern CODE_PATTERN = Pattern.compile("```[\\s\\S]*?```|`[^`]+`");
-    private static final Pattern TABLE_PATTERN = Pattern.compile("\\|.*\\|");
+            "^[\\s]*[-*+•]\\s+(.+)$|^[\\s]*\\d+[.)］】]\\s+(.+)$", Pattern.MULTILINE);
+    private static final Pattern CODE_PATTERN = Pattern.compile(
+            "```[\\s\\S]*?```|`[^`]+`");
+    private static final Pattern TABLE_PATTERN = Pattern.compile(
+            "\\|.*\\|.*\\n\\|[-:| ]+\\|");
+    private static final Pattern CHINESE_SENTENCE_PATTERN = Pattern.compile(
+            "[。！？；]");
+    private static final Pattern ENGLISH_SENTENCE_PATTERN = Pattern.compile(
+            "[.!?]+\\s+");
 
     // === 缓存 ===
     private final Map<String, List<TextSegment>> documentCache = new ConcurrentHashMap<>();
+    private final Map<String, Long> cacheTimestamps = new ConcurrentHashMap<>();
+    private static final long CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
     // ========================================
     // 公共API方法
@@ -76,7 +95,6 @@ public class FileloadFunction {
 
     /**
      * 文档加载方法 - 支持指定文件或默认目录
-     * @param file 指定文件，为null时加载默认目录
      */
     public void documentsloade(File file) {
         if (file == null || !file.exists()) {
@@ -90,7 +108,6 @@ public class FileloadFunction {
 
     /**
      * 批量加载目录下的所有文件
-     * @param directoryPath 目录路径
      */
     public void loadAllFilesInDirectory(String directoryPath) {
         try {
@@ -109,7 +126,6 @@ public class FileloadFunction {
 
     /**
      * 批量加载多个指定文件
-     * @param filePaths 文件路径列表
      */
     public void loadMultipleFiles(List<String> filePaths) {
         if (filePaths == null || filePaths.isEmpty()) {
@@ -143,39 +159,7 @@ public class FileloadFunction {
     }
 
     /**
-     * 生成文档摘要报告
-     * @param file 文档文件
-     * @return 文档摘要报告
-     */
-    public DocumentSummaryReport generateDocumentReport(File file) {
-        try {
-            String fileKey = generateFileKey(file);
-            List<TextSegment> segments = documentCache.get(fileKey);
-
-            if (segments == null || segments.isEmpty()) {
-                return new DocumentSummaryReport("文档未找到或未处理", "", new ArrayList<>(), new HashMap<>());
-            }
-
-            String documentSummary = getMetadataValue(segments.get(0), "document_summary");
-            List<String> allKeywords = extractAllKeywords(segments);
-            Map<String, Long> topicDistribution = calculateTopicDistribution(segments);
-
-            return new DocumentSummaryReport(
-                    file.getName(),
-                    documentSummary != null ? documentSummary : "无摘要",
-                    allKeywords,
-                    topicDistribution
-            );
-
-        } catch (Exception e) {
-            log.error("生成文档报告失败: {}", file.getName(), e);
-            return new DocumentSummaryReport("报告生成失败", "", new ArrayList<>(), new HashMap<>());
-        }
-    }
-
-    /**
      * 获取文档统计信息
-     * @return 统计信息映射
      */
     public Map<String, Object> getDocumentStats() {
         Map<String, Object> stats = new HashMap<>();
@@ -191,11 +175,12 @@ public class FileloadFunction {
      */
     public void clearCache() {
         documentCache.clear();
+        cacheTimestamps.clear();
         log.info("文档缓存已清理");
     }
 
     // ========================================
-    // 核心处理方法
+    // 核心处理方法 - 优化版
     // ========================================
 
     /**
@@ -296,7 +281,7 @@ public class FileloadFunction {
         try {
             // 检查文件缓存
             String fileKey = generateFileKey(file);
-            if (documentCache.containsKey(fileKey)) {
+            if (isCacheValid(fileKey, file)) {
                 log.info("文档已存在缓存中，跳过重复处理: {}", file.getName());
                 return;
             }
@@ -319,39 +304,41 @@ public class FileloadFunction {
     }
 
     /**
-     * 处理单个文档的核心逻辑
+     * 处理单个文档的核心逻辑 - 优化版
      */
     private void processDocument(Document document) {
         try {
             String fileName = getDocumentFileName(document);
             log.debug("开始处理文档: {}, 内容长度: {}", fileName, document.text().length());
 
-            // 1. 智能识别文档结构
-            DocumentStructure structure = analyzeDocumentStructure(document);
+            // 1. 检测文档语言
+            boolean isChinese = detectChineseContent(document.text());
 
-            // 2. 多层次分割文档
-            List<TextSegment> segments = performMultiLevelSplitting(document, structure);
+            // 2. 智能识别文档结构
+            DocumentStructure structure = analyzeDocumentStructureEnhanced(document);
+
+            // 3. 优化的文档分割
+            List<TextSegment> segments = performOptimizedSplitting(document, structure, isChinese);
 
             if (segments.isEmpty()) {
                 log.warn("文档分割后无有效段落: {}", fileName);
                 return;
             }
 
-            // 3. 生成文档级摘要
+            // 4. 生成文档级摘要
             String documentSummary = generateDocumentSummary(segments);
 
-            // 4. 增强文本段落
-            List<TextSegment> enhancedSegments = enhanceTextSegments(segments, structure, documentSummary);
+            // 5. 增强文本段落
+            List<TextSegment> enhancedSegments = enhanceTextSegmentsOptimized(
+                    segments, structure, documentSummary, isChinese);
 
-            // 5. 生成向量嵌入
-            List<Embedding> embeddings = generateEmbeddings(enhancedSegments);
-
-            // 6. 存储到向量数据库
-            storeEmbeddings(enhancedSegments, embeddings);
+            // 6. 生成和存储向量嵌入
+            generateAndStoreEmbeddings(enhancedSegments);
 
             // 7. 缓存处理结果
             String fileKey = generateDocumentKey(document);
             documentCache.put(fileKey, enhancedSegments);
+            cacheTimestamps.put(fileKey, System.currentTimeMillis());
 
             log.info("文档处理完成: {}, 生成段落: {}", fileName, enhancedSegments.size());
 
@@ -362,17 +349,35 @@ public class FileloadFunction {
     }
 
     // ========================================
-    // 文档结构分析
+    // 语言检测
     // ========================================
 
     /**
-     * 分析文档结构
+     * 检测是否包含中文内容
      */
-    private DocumentStructure analyzeDocumentStructure(Document document) {
+    private boolean detectChineseContent(String text) {
+        if (text == null || text.isEmpty()) {
+            return false;
+        }
+
+        // 取样本检测
+        String sample = text.length() > 1000 ? text.substring(0, 1000) : text;
+        long chineseChars = sample.chars().filter(ch -> ch >= 0x4e00 && ch <= 0x9fa5).count();
+
+        return chineseChars > sample.length() * 0.1; // 超过10%认为是中文文档
+    }
+
+    // ========================================
+    // 文档结构分析 - 增强版
+    // ========================================
+
+    /**
+     * 增强的文档结构分析
+     */
+    private DocumentStructure analyzeDocumentStructureEnhanced(Document document) {
         DocumentStructure structure = new DocumentStructure();
 
         if (document == null || document.text() == null || document.text().trim().isEmpty()) {
-            log.warn("文档为空或无内容，返回空的文档结构");
             return structure;
         }
 
@@ -391,6 +396,9 @@ public class FileloadFunction {
             // 识别表格
             extractTables(content, structure);
 
+            // 识别关键段落（首尾段落等）
+            identifyKeyParagraphs(content, structure);
+
             log.debug("文档结构分析完成 - 标题:{}, 列表:{}, 代码块:{}, 表格:{}",
                     structure.getTitles().size(),
                     structure.getListItems().size(),
@@ -405,201 +413,232 @@ public class FileloadFunction {
     }
 
     private void extractTitles(String content, DocumentStructure structure) {
-        Matcher titleMatcher = TITLE_PATTERN.matcher(content);
-        while (titleMatcher.find()) {
-            String title = titleMatcher.group(1) != null ? titleMatcher.group(1) : titleMatcher.group(2);
+        Matcher matcher = TITLE_PATTERN.matcher(content);
+        while (matcher.find()) {
+            String title = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
             if (title != null && !title.trim().isEmpty()) {
-                structure.addTitle(title.trim(), titleMatcher.start());
+                structure.addTitle(title.trim(), matcher.start());
             }
         }
     }
 
     private void extractLists(String content, DocumentStructure structure) {
-        Matcher listMatcher = LIST_PATTERN.matcher(content);
-        while (listMatcher.find()) {
-            String listItem = listMatcher.group(1) != null ? listMatcher.group(1) : listMatcher.group(2);
+        Matcher matcher = LIST_PATTERN.matcher(content);
+        while (matcher.find()) {
+            String listItem = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
             if (listItem != null && !listItem.trim().isEmpty()) {
-                structure.addListItem(listItem.trim(), listMatcher.start());
+                structure.addListItem(listItem.trim(), matcher.start());
             }
         }
     }
 
     private void extractCodeBlocks(String content, DocumentStructure structure) {
-        Matcher codeMatcher = CODE_PATTERN.matcher(content);
-        while (codeMatcher.find()) {
-            structure.addCodeBlock(codeMatcher.group(), codeMatcher.start());
+        Matcher matcher = CODE_PATTERN.matcher(content);
+        while (matcher.find()) {
+            structure.addCodeBlock(matcher.group(), matcher.start());
         }
     }
 
     private void extractTables(String content, DocumentStructure structure) {
-        Matcher tableMatcher = TABLE_PATTERN.matcher(content);
-        while (tableMatcher.find()) {
-            structure.addTable(tableMatcher.group(), tableMatcher.start());
+        Matcher matcher = TABLE_PATTERN.matcher(content);
+        while (matcher.find()) {
+            structure.addTable(matcher.group(), matcher.start());
         }
-    }
-
-    // ========================================
-    // 文本分割和优化
-    // ========================================
-
-    /**
-     * 多层次文本分割
-     */
-    private List<TextSegment> performMultiLevelSplitting(Document document, DocumentStructure structure) {
-        List<TextSegment> segments = new ArrayList<>();
-        String content = document.text();
-
-        // 1. 基于文档结构的主要分割
-        List<TextSegment> structuralSegments = splitByStructure(content, structure);
-
-        // 2. 对每个结构段落进行二次分割
-        for (TextSegment segment : structuralSegments) {
-            List<TextSegment> refinedSegments = performSemanticSplitting(segment, structure);
-            segments.addAll(refinedSegments);
-        }
-
-        // 3. 质量检查和优化
-        segments = optimizeSegments(segments);
-
-        return segments;
     }
 
     /**
-     * 基于结构的分割
+     * 识别关键段落
      */
-    private List<TextSegment> splitByStructure(String content, DocumentStructure structure) {
-        List<TextSegment> segments = new ArrayList<>();
+    private void identifyKeyParagraphs(String content, DocumentStructure structure) {
+        String[] paragraphs = content.split("\\n\\n+");
 
-        if (content == null || content.trim().isEmpty()) {
-            log.warn("内容为空，无法进行结构化分割");
-            return segments;
+        // 标记首段
+        if (paragraphs.length > 0 && paragraphs[0].length() > 50) {
+            structure.addKeyParagraph(paragraphs[0], 0, "introduction");
         }
 
-        if (structure == null || structure.isEmpty()) {
-            log.warn("文档结构为空，使用简单分割策略");
-            return performSimpleSplit(content);
-        }
-
-        List<Integer> splitPoints = collectSplitPoints(structure, content.length());
-        return createSegmentsFromSplitPoints(content, splitPoints);
-    }
-
-    private List<TextSegment> performSimpleSplit(String content) {
-        List<TextSegment> segments = new ArrayList<>();
-        String[] paragraphs = content.split("\n\n+");
-
-        for (String paragraph : paragraphs) {
-            if (paragraph.trim().length() > 50) {
-                Metadata metadata = new Metadata();
-                metadata.put("split_method", "simple_paragraph");
-                segments.add(TextSegment.from(paragraph.trim(), metadata));
+        // 标记末段
+        if (paragraphs.length > 1) {
+            String lastPara = paragraphs[paragraphs.length - 1];
+            if (lastPara.length() > 50) {
+                structure.addKeyParagraph(lastPara, content.lastIndexOf(lastPara), "conclusion");
             }
         }
 
+        // 标记包含关键词的段落
+        String[] keywords = {"总结", "结论", "概述", "摘要", "summary", "conclusion", "abstract"};
+        for (String para : paragraphs) {
+            String lower = para.toLowerCase();
+            for (String keyword : keywords) {
+                if (lower.contains(keyword)) {
+                    structure.addKeyParagraph(para, content.indexOf(para), "key_content");
+                    break;
+                }
+            }
+        }
+    }
+
+    // ========================================
+    // 优化的文本分割
+    // ========================================
+
+    /**
+     * 执行优化的文档分割
+     */
+    private List<TextSegment> performOptimizedSplitting(Document document, DocumentStructure structure,
+                                                        boolean isChinese) {
+        List<TextSegment> segments = new ArrayList<>();
+        String content = document.text();
+
+        // 确定最优块大小
+        int chunkSize = determineOptimalChunkSize(content, structure, isChinese);
+        int overlapSize = Math.min(chunkSize / 5, 150);
+
+        // 1. 先按结构分割成大段
+        List<String> sections = splitByStructure(content, structure);
+
+        // 2. 对每个大段进行语义分割
+        for (int sectionIdx = 0; sectionIdx < sections.size(); sectionIdx++) {
+            String section = sections.get(sectionIdx);
+            List<TextSegment> sectionSegments = splitSectionSemantically(
+                    section, chunkSize, overlapSize, isChinese, sectionIdx);
+            segments.addAll(sectionSegments);
+        }
+
+        // 3. 优化段落边界
+        segments = optimizeSegmentBoundaries(segments);
+
         return segments;
     }
 
-    private List<Integer> collectSplitPoints(DocumentStructure structure, int contentLength) {
-        List<Integer> splitPoints = new ArrayList<>();
+    /**
+     * 确定最优块大小
+     */
+    private int determineOptimalChunkSize(String content, DocumentStructure structure, boolean isChinese) {
+        int baseSize = DEFAULT_CHUNK_SIZE;
 
-        structure.getTitles().forEach(title -> splitPoints.add(title.getPosition()));
-        structure.getCodeBlocks().forEach(code -> splitPoints.add(code.getPosition()));
-        structure.getTables().forEach(table -> splitPoints.add(table.getPosition()));
+        // 根据文档类型调整
+        if (!structure.getCodeBlocks().isEmpty()) {
+            baseSize = 800; // 代码文档需要更大的块
+        } else if (!structure.getTables().isEmpty()) {
+            baseSize = 1000; // 包含表格的文档
+        }
 
-        splitPoints.sort(Integer::compareTo);
-        splitPoints.add(0, 0); // 添加开始点
-        splitPoints.add(contentLength); // 添加结束点
+        // 根据语言调整
+        if (isChinese) {
+            baseSize = (int) (baseSize * 0.8); // 中文文档稍小
+        }
 
-        return splitPoints;
+        // 根据文档长度调整
+        if (content.length() > 50000) {
+            baseSize = (int) (baseSize * 1.2);
+        } else if (content.length() < 5000) {
+            baseSize = (int) (baseSize * 0.8);
+        }
+
+        return Math.min(Math.max(baseSize, MIN_CHUNK_SIZE), MAX_CHUNK_SIZE);
     }
 
-    private List<TextSegment> createSegmentsFromSplitPoints(String content, List<Integer> splitPoints) {
-        List<TextSegment> segments = new ArrayList<>();
+    /**
+     * 基于结构分割文档
+     */
+    private List<String> splitByStructure(String content, DocumentStructure structure) {
+        List<String> sections = new ArrayList<>();
 
-        for (int i = 0; i < splitPoints.size() - 1; i++) {
-            int start = splitPoints.get(i);
-            int end = splitPoints.get(i + 1);
+        if (structure.getTitles().isEmpty()) {
+            // 没有标题结构，按段落分割
+            String[] paragraphs = content.split("\\n\\n+");
+            StringBuilder currentSection = new StringBuilder();
 
-            if (end > start && end - start > 50) {
-                String segmentText = content.substring(start, Math.min(end, content.length())).trim();
-                if (!segmentText.isEmpty()) {
-                    Metadata metadata = new Metadata();
-                    metadata.put("split_method", "structural");
-                    metadata.put("position", String.valueOf(start));
-                    segments.add(TextSegment.from(segmentText, metadata));
+            for (String para : paragraphs) {
+                if (currentSection.length() + para.length() > MAX_CHUNK_SIZE * 2) {
+                    if (currentSection.length() > 0) {
+                        sections.add(currentSection.toString());
+                        currentSection = new StringBuilder();
+                    }
+                }
+                currentSection.append(para).append("\n\n");
+            }
+
+            if (currentSection.length() > 0) {
+                sections.add(currentSection.toString());
+            }
+        } else {
+            // 按标题分割
+            List<StructureElement> titles = new ArrayList<>(structure.getTitles());
+            titles.sort(Comparator.comparingInt(StructureElement::getPosition));
+
+            int lastPos = 0;
+            for (int i = 0; i < titles.size(); i++) {
+                int endPos = (i < titles.size() - 1) ?
+                        titles.get(i + 1).getPosition() : content.length();
+
+                if (endPos > lastPos) {
+                    sections.add(content.substring(lastPos, endPos));
+                    lastPos = endPos;
                 }
             }
         }
 
-        return segments;
+        return sections;
     }
 
     /**
-     * 语义分割
+     * 语义分割段落
      */
-    private List<TextSegment> performSemanticSplitting(TextSegment segment, DocumentStructure structure) {
+    private List<TextSegment> splitSectionSemantically(String section, int chunkSize,
+                                                       int overlapSize, boolean isChinese, int sectionIdx) {
         List<TextSegment> segments = new ArrayList<>();
-        String text = segment.text();
 
-        int maxChunkSize = determineOptimalChunkSize(text, structure);
-        int overlapSize = Math.min(maxChunkSize / 10, 100);
+        // 分句
+        List<String> sentences = splitIntoSentences(section, isChinese);
 
-        if (text.length() <= maxChunkSize) {
-            segments.add(segment);
+        if (sentences.isEmpty()) {
             return segments;
         }
 
-        List<String> sentences = splitIntoSentences(text);
-        return createSemanticChunks(sentences, maxChunkSize, overlapSize, segment.metadata());
-    }
-
-    private int determineOptimalChunkSize(String text, DocumentStructure structure) {
-        if (containsCode(text)) return 800;
-        if (containsTables(text)) return 1000;
-        if (containsLists(text)) return 600;
-        if (isTechnicalContent(text)) return 700;
-        return 500;
-    }
-
-    private List<String> splitIntoSentences(String text) {
-        List<String> sentences = new ArrayList<>();
-        String[] rawSentences = text.split("[.!?。！？]");
-
-        for (String sentence : rawSentences) {
-            sentence = sentence.trim();
-            if (sentence.length() > 10) {
-                sentences.add(sentence);
-            }
-        }
-
-        return sentences;
-    }
-
-    private List<TextSegment> createSemanticChunks(List<String> sentences, int maxChunkSize,
-                                                   int overlapSize, Metadata originalMetadata) {
-        List<TextSegment> segments = new ArrayList<>();
+        // 滑动窗口创建段落
         StringBuilder currentChunk = new StringBuilder();
+        List<String> currentSentences = new ArrayList<>();
+        int currentLength = 0;
 
         for (String sentence : sentences) {
-            if (currentChunk.length() + sentence.length() > maxChunkSize && currentChunk.length() > 0) {
+            int sentenceLength = estimateLength(sentence);
+
+            if (currentLength + sentenceLength > chunkSize && !currentSentences.isEmpty()) {
                 // 创建段落
-                Metadata metadata = copyMetadata(originalMetadata);
-                metadata.put("chunk_method", "semantic");
+                Metadata metadata = new Metadata();
+                metadata.put("section_index", String.valueOf(sectionIdx));
                 metadata.put("chunk_size", String.valueOf(currentChunk.length()));
                 segments.add(TextSegment.from(currentChunk.toString().trim(), metadata));
 
-                // 开始新段落，保持重叠
-                String overlap = getLastSentences(currentChunk.toString(), overlapSize);
-                currentChunk = new StringBuilder(overlap);
+                // 处理重叠
+                currentChunk = new StringBuilder();
+                currentSentences = new ArrayList<>();
+                currentLength = 0;
+
+                // 从后向前添加句子作为重叠
+                int overlapLength = 0;
+                for (int i = segments.size() - 1; i >= 0 && overlapLength < overlapSize; i--) {
+                    String lastSentence = sentences.get(Math.max(0, sentences.indexOf(sentence) - 1));
+                    if (lastSentence != null && overlapLength + lastSentence.length() <= overlapSize) {
+                        currentChunk.append(lastSentence).append(" ");
+                        currentSentences.add(lastSentence);
+                        overlapLength += lastSentence.length();
+                    }
+                }
+                currentLength = overlapLength;
             }
 
             currentChunk.append(sentence).append(" ");
+            currentSentences.add(sentence);
+            currentLength += sentenceLength;
         }
 
         // 添加最后一个段落
-        if (currentChunk.length() > 0) {
-            Metadata metadata = copyMetadata(originalMetadata);
-            metadata.put("chunk_method", "semantic");
+        if (!currentSentences.isEmpty()) {
+            Metadata metadata = new Metadata();
+            metadata.put("section_index", String.valueOf(sectionIdx));
             metadata.put("chunk_size", String.valueOf(currentChunk.length()));
             segments.add(TextSegment.from(currentChunk.toString().trim(), metadata));
         }
@@ -608,152 +647,417 @@ public class FileloadFunction {
     }
 
     /**
-     * 优化段落质量
+     * 分句
      */
-    private List<TextSegment> optimizeSegments(List<TextSegment> segments) {
-        return segments.stream()
-                .filter(segment -> isHighQualitySegment(segment.text()))
-                .map(this::addQualityScore)
-                .collect(Collectors.toList());
-    }
+    private List<String> splitIntoSentences(String text, boolean isChinese) {
+        List<String> sentences = new ArrayList<>();
 
-    private TextSegment addQualityScore(TextSegment segment) {
-        Metadata metadata = segment.metadata();
-        metadata.put("quality_score", String.valueOf(calculateQualityScore(segment.text())));
-        return TextSegment.from(segment.text(), metadata);
-    }
-
-    // ========================================
-    // 文本增强和摘要生成
-    // ========================================
-
-    /**
-     * 增强文本段落
-     */
-    private List<TextSegment> enhanceTextSegments(List<TextSegment> segments,
-                                                  DocumentStructure structure,
-                                                  String documentSummary) {
-        return segments.stream()
-                .map(segment -> enhanceSingleSegment(segment, structure, documentSummary))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 增强单个文本段落
-     */
-    private TextSegment enhanceSingleSegment(TextSegment segment, DocumentStructure structure, String documentSummary) {
-        Metadata metadata = segment.metadata();
-        String text = segment.text();
-
-        // 添加基本信息
-        addBasicMetadata(metadata, text);
-
-        // 添加结构化信息
-        addStructuralMetadata(metadata, text, structure);
-
-        // 生成段落摘要
-        addSegmentSummary(metadata, text);
-
-        // 添加文档级摘要引用
-        metadata.put("document_summary", documentSummary);
-
-        // 提取关键词
-        addKeywords(metadata, text);
-
-        // 添加主题分类
-        addTopicClassification(metadata, text);
-
-        // 添加分词信息
-        addTokenizationInfo(metadata, text);
-
-        return TextSegment.from(text, metadata);
-    }
-
-    private void addBasicMetadata(Metadata metadata, String text) {
-        metadata.put("word_count", String.valueOf(text.split("\\s+").length));
-        metadata.put("char_count", String.valueOf(text.length()));
-    }
-
-    private void addStructuralMetadata(Metadata metadata, String text, DocumentStructure structure) {
-        if (containsStructuralElement(text, structure)) {
-            metadata.put("has_structure", "true");
-            metadata.put("structure_type", identifyStructureType(text, structure));
+        if (text == null || text.trim().isEmpty()) {
+            return sentences;
         }
-    }
 
-    private void addSegmentSummary(Metadata metadata, String text) {
-        String segmentSummary = generateSegmentSummary(text);
-        if (!segmentSummary.isEmpty()) {
-            metadata.put("summary", segmentSummary);
+        Pattern pattern = isChinese ? CHINESE_SENTENCE_PATTERN : ENGLISH_SENTENCE_PATTERN;
+        Matcher matcher = pattern.matcher(text);
+
+        int lastEnd = 0;
+        while (matcher.find()) {
+            String sentence = text.substring(lastEnd, matcher.end()).trim();
+            if (sentence.length() > 10) {
+                sentences.add(sentence);
+            }
+            lastEnd = matcher.end();
         }
-    }
 
-    private void addKeywords(Metadata metadata, String text) {
-        List<String> keywords = extractKeywords(text);
-        if (!keywords.isEmpty()) {
-            metadata.put("keywords", String.join(", ", keywords));
-        }
-    }
-
-    private void addTopicClassification(Metadata metadata, String text) {
-        String topic = classifyTopic(text);
-        metadata.put("topic", topic);
-    }
-
-    private void addTokenizationInfo(Metadata metadata, String text) {
-        try {
-            List<String> tokens = performTokenization(text);
-            metadata.put("token_count", String.valueOf(tokens.size()));
-
-            int estimatedTokens = tokenizer.estimateTokenCountInText(text);
-            metadata.put("estimated_tokens", String.valueOf(estimatedTokens));
-
-        } catch (Exception e) {
-            log.debug("分词处理失败: {}", text.substring(0, Math.min(50, text.length())));
-        }
-    }
-
-    // ========================================
-    // 向量嵌入处理
-    // ========================================
-
-    /**
-     * 生成向量嵌入
-     */
-    private List<Embedding> generateEmbeddings(List<TextSegment> segments) {
-        List<Embedding> embeddings = new ArrayList<>();
-
-        for (TextSegment segment : segments) {
-            try {
-                Embedding embedding = embeddingModel.embed(segment).content();
-                embeddings.add(embedding);
-            } catch (Exception e) {
-                log.error("生成嵌入向量失败: {}",
-                        segment.text().substring(0, Math.min(50, segment.text().length())), e);
-                embeddings.add(null);
+        // 添加最后一部分
+        if (lastEnd < text.length()) {
+            String lastSentence = text.substring(lastEnd).trim();
+            if (lastSentence.length() > 10) {
+                sentences.add(lastSentence);
             }
         }
 
-        return embeddings;
+        // 如果没有找到句子，直接返回整个文本
+        if (sentences.isEmpty() && text.length() > 10) {
+            sentences.add(text);
+        }
+
+        return sentences;
     }
 
     /**
-     * 存储向量嵌入
+     * 优化段落边界
      */
-        private void storeEmbeddings(List<TextSegment> segments, List<Embedding> embeddings) {
-            for (int i = 0; i < segments.size(); i++) {
-                if (embeddings.get(i) != null) {
-                    try {
-                        embeddingStore.add(embeddings.get(i), segments.get(i));
-                        log.info("嵌入成功{},{}",embeddings.get(i), segments.get(i));
+    private List<TextSegment> optimizeSegmentBoundaries(List<TextSegment> segments) {
+        List<TextSegment> optimized = new ArrayList<>();
 
+        for (int i = 0; i < segments.size(); i++) {
+            TextSegment current = segments.get(i);
+            String text = current.text().trim();
+
+            // 检查段落是否太短
+            if (text.length() < MIN_CHUNK_SIZE && i < segments.size() - 1) {
+                // 尝试与下一个段落合并
+                TextSegment next = segments.get(i + 1);
+                String merged = text + "\n" + next.text();
+                if (merged.length() <= MAX_CHUNK_SIZE) {
+                    // 创建新的元数据，复制当前段落的元数据
+                    Metadata mergedMetadata = new Metadata();
+                    // 复制当前段落的元数据
+                    Map<String, Object> currentMap = current.metadata().toMap();
+                    for (Map.Entry<String, Object> entry : currentMap.entrySet()) {
+                        mergedMetadata.put(entry.getKey(), entry.getValue().toString());
+                    }
+                    optimized.add(TextSegment.from(merged, mergedMetadata));
+                    i++; // 跳过下一个段落
+                    continue;
+                }
+            }
+
+            optimized.add(current);
+        }
+
+        return optimized;
+    }
+
+    // ========================================
+    // 文本增强
+    // ========================================
+
+    /**
+     * 增强文本段落 - 优化版
+     */
+    private List<TextSegment> enhanceTextSegmentsOptimized(List<TextSegment> segments,
+                                                           DocumentStructure structure,
+                                                           String documentSummary,
+                                                           boolean isChinese) {
+        List<TextSegment> enhanced = new ArrayList<>();
+
+        for (int i = 0; i < segments.size(); i++) {
+            TextSegment segment = segments.get(i);
+            Metadata metadata = segment.metadata();
+            String text = segment.text();
+
+            // 添加文档级信息
+            metadata.put("document_summary", documentSummary);
+            metadata.put("is_chinese", String.valueOf(isChinese));
+
+            // 添加位置信息
+            metadata.put("position", String.valueOf(i));
+            metadata.put("total_segments", String.valueOf(segments.size()));
+            metadata.put("position_ratio", String.format("%.2f", (double) i / segments.size()));
+
+            // 添加结构信息
+            addStructuralInfo(metadata, text, structure);
+
+            // 添加内容特征
+            addContentFeatures(metadata, text);
+
+            // 添加上下文
+            if (i > 0) {
+                String prevText = segments.get(i - 1).text();
+                metadata.put("prev_context", prevText.substring(0, Math.min(100, prevText.length())));
+            }
+            if (i < segments.size() - 1) {
+                String nextText = segments.get(i + 1).text();
+                metadata.put("next_context", nextText.substring(0, Math.min(100, nextText.length())));
+            }
+
+            // 提取并添加关键词
+            List<String> keywords = extractKeywords(text);
+            if (!keywords.isEmpty()) {
+                metadata.put("keywords", String.join(", ", keywords));
+            }
+
+            // 计算质量分数
+            double qualityScore = calculateQualityScore(text, i, segments.size());
+            metadata.put("quality_score", String.format("%.3f", qualityScore));
+
+            enhanced.add(TextSegment.from(text, metadata));
+        }
+
+        return enhanced;
+    }
+
+    /**
+     * 添加结构信息
+     */
+    private void addStructuralInfo(Metadata metadata, String text, DocumentStructure structure) {
+        // 查找最近的标题
+        String nearestTitle = findNearestTitle(text, structure);
+        if (nearestTitle != null) {
+            metadata.put("section_title", nearestTitle);
+        }
+
+        // 检查内容类型
+        if (CODE_PATTERN.matcher(text).find()) {
+            metadata.put("contains_code", "true");
+        }
+        if (TABLE_PATTERN.matcher(text).find()) {
+            metadata.put("contains_table", "true");
+        }
+        if (LIST_PATTERN.matcher(text).find()) {
+            metadata.put("contains_list", "true");
+        }
+
+        // 检查是否是关键段落
+        for (KeyParagraph kp : structure.getKeyParagraphs()) {
+            if (text.contains(kp.getContent().substring(0, Math.min(50, kp.getContent().length())))) {
+                metadata.put("is_key_paragraph", "true");
+                metadata.put("paragraph_type", kp.getType());
+                break;
+            }
+        }
+    }
+
+    /**
+     * 添加内容特征
+     */
+    private void addContentFeatures(Metadata metadata, String text) {
+        // 字数统计
+        metadata.put("word_count", String.valueOf(text.split("\\s+").length));
+        metadata.put("char_count", String.valueOf(text.length()));
+
+        // 检查是否包含问题
+        if (text.contains("?") || text.contains("？")) {
+            metadata.put("contains_question", "true");
+        }
+
+        // 检查是否包含数字
+        if (text.matches(".*\\d+.*")) {
+            metadata.put("contains_numbers", "true");
+        }
+
+        // 检查是否是定义
+        if (text.contains("是指") || text.contains("定义为") || text.contains("is defined as") ||
+                text.contains("refers to")) {
+            metadata.put("is_definition", "true");
+        }
+    }
+
+    /**
+     * 查找最近的标题
+     */
+    private String findNearestTitle(String text, DocumentStructure structure) {
+        if (structure.getTitles().isEmpty()) {
+            return null;
+        }
+
+        // 简单实现：返回第一个标题
+        // 实际应该根据位置查找最近的
+        return structure.getTitles().getFirst().getContent();
+    }
+
+    /**
+     * 提取关键词
+     */
+    private List<String> extractKeywords(String text) {
+        List<String> keywords = new ArrayList<>();
+
+        try {
+            // 简单的关键词提取：基于词频
+            String[] words = text.toLowerCase()
+                    .replaceAll("[^\\w\\s\\u4e00-\\u9fa5]", " ")
+                    .split("\\s+");
+
+            Map<String, Integer> wordFreq = new HashMap<>();
+            for (String word : words) {
+                if (word.length() > 2 && !isStopWord(word)) {
+                    wordFreq.put(word, wordFreq.getOrDefault(word, 0) + 1);
+                }
+            }
+
+            // 取频率最高的5个词
+            keywords = wordFreq.entrySet().stream()
+                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                    .limit(5)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.debug("关键词提取失败", e);
+        }
+
+        return keywords;
+    }
+
+    /**
+     * 判断是否是停用词
+     */
+    private boolean isStopWord(String word) {
+        Set<String> stopWords = Set.of(
+                "的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "一个",
+                "the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by",
+                "is", "are", "was", "were", "be", "been", "being", "have", "has", "had"
+        );
+        return stopWords.contains(word.toLowerCase());
+    }
+
+    /**
+     * 计算质量分数
+     */
+    private double calculateQualityScore(String text, int position, int totalSegments) {
+        double score = 0.5; // 基础分
+
+        // 长度评分
+        int length = text.length();
+        if (length >= 200 && length <= 800) {
+            score += 0.2;
+        } else if (length >= 100 && length <= 1000) {
+            score += 0.1;
+        }
+
+        // 位置评分（首尾段落更重要）
+        if (position == 0 || position == totalSegments - 1) {
+            score += 0.15;
+        } else if (position < 3 || position > totalSegments - 4) {
+            score += 0.1;
+        }
+
+        // 内容丰富度评分
+        if (text.contains("？") || text.contains("?")) score += 0.05;
+        if (text.matches(".*\\d+.*")) score += 0.05;
+        if (text.split("\\s+").length > 50) score += 0.05;
+
+        return Math.min(score, 1.0);
+    }
+
+    // ========================================
+    // 向量嵌入生成和存储
+    // ========================================
+
+    /**
+     * 生成和存储嵌入
+     */
+    private void generateAndStoreEmbeddings(List<TextSegment> segments) {
+        // 批量处理
+        int batchSize = 10;
+
+        for (int i = 0; i < segments.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, segments.size());
+            List<TextSegment> batch = segments.subList(i, end);
+
+            try {
+                // 准备增强的文本段落
+                List<TextSegment> enhancedBatch = new ArrayList<>();
+                for (TextSegment segment : batch) {
+                    String enhancedText = prepareEmbeddingText(segment);
+                    // 创建新的TextSegment，包含增强的文本但保留原始元数据
+                    enhancedBatch.add(TextSegment.from(enhancedText, segment.metadata()));
+                }
+
+                // 批量生成嵌入
+                List<Embedding> embeddings = embeddingModel.embedAll(enhancedBatch).content();
+
+                // 存储（使用原始段落，而不是增强版本）
+                for (int j = 0; j < batch.size(); j++) {
+                    try {
+                        embeddingStore.add(embeddings.get(j), batch.get(j));
+                        log.debug("成功存储段落 {} 的嵌入", i + j);
                     } catch (Exception e) {
-                        log.error("存储嵌入向量失败: {}",
-                                segments.get(i).text().substring(0, Math.min(50, segments.get(i).text().length())), e);
+                        log.error("存储嵌入失败", e);
+                    }
+                }
+
+            } catch (Exception e) {
+                log.error("批量生成嵌入失败", e);
+                // 降级到单个处理
+                for (TextSegment segment : batch) {
+                    try {
+                        // 创建增强文本的TextSegment
+                        String enhancedText = prepareEmbeddingText(segment);
+                        TextSegment enhancedSegment = TextSegment.from(enhancedText, segment.metadata());
+
+                        Embedding embedding = embeddingModel.embed(enhancedSegment).content();
+                        embeddingStore.add(embedding, segment);
+                    } catch (Exception ex) {
+                        log.error("单个嵌入生成失败", ex);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * 准备嵌入文本
+     */
+    private String prepareEmbeddingText(TextSegment segment) {
+        StringBuilder text = new StringBuilder();
+
+        // 添加标题上下文
+        Map<String, Object> metadataMap = segment.metadata().toMap();
+        Object sectionTitle = metadataMap.get("section_title");
+        if (sectionTitle != null && !sectionTitle.toString().isEmpty()) {
+            text.append("[标题: ").append(sectionTitle).append("] ");
+        }
+
+        // 主要内容
+        text.append(segment.text());
+
+        // 添加关键词
+        Object keywords = metadataMap.get("keywords");
+        if (keywords != null && !keywords.toString().isEmpty()) {
+            text.append(" [关键词: ").append(keywords).append("]");
+        }
+
+        return text.toString();
+    }
+
+    // ========================================
+    // 摘要生成
+    // ========================================
+
+    /**
+     * 生成文档摘要
+     */
+    private String generateDocumentSummary(List<TextSegment> segments) {
+        try {
+            // 选择关键段落
+            List<String> keyTexts = new ArrayList<>();
+
+            // 添加第一个段落
+            if (!segments.isEmpty()) {
+                keyTexts.add(segments.get(0).text());
+            }
+
+            // 添加最后一个段落
+            if (segments.size() > 1) {
+                keyTexts.add(segments.get(segments.size() - 1).text());
+            }
+
+            // 添加中间的关键段落
+            for (TextSegment segment : segments) {
+                Map<String, Object> metadataMap = segment.metadata().toMap();
+                Object isKey = metadataMap.get("is_key_paragraph");
+                if (isKey != null && "true".equals(isKey.toString()) && keyTexts.size() < 5) {
+                    keyTexts.add(segment.text());
+                }
+            }
+
+            if (keyTexts.isEmpty()) {
+                return "文档摘要生成失败";
+            }
+
+            // 合并文本
+            String combinedText = String.join("\n\n", keyTexts);
+            if (combinedText.length() > 2000) {
+                combinedText = combinedText.substring(0, 2000);
+            }
+
+            // 使用LLM生成摘要
+            String prompt = "请为以下文档内容生成一个100-200字的摘要：\n\n" + combinedText;
+
+            ChatResponse response = chatLanguageModel.chat(
+                    SystemMessage.from("你是一个专业的文档摘要生成助手。"),
+                    UserMessage.from(prompt)
+            );
+
+            return response.aiMessage().text();
+
+        } catch (Exception e) {
+            log.error("生成文档摘要失败", e);
+            return "文档包含" + segments.size() + "个段落";
+        }
+    }
 
     // ========================================
     // 工具方法
@@ -804,432 +1108,60 @@ public class FileloadFunction {
         }
     }
 
-    private Metadata copyMetadata(Metadata original) {
-        Metadata copy = new Metadata();
-        if (original != null) {
-            Map<String, Object> originalMap = original.toMap();
-            originalMap.forEach((key, value) -> {
-                if (value != null) {
-                    copy.put(key, value.toString());
-                }
-            });
-        }
-        return copy;
-    }
-
-    private String getMetadataValue(TextSegment segment, String key) {
-        try {
-            Metadata metadata = segment.metadata();
-            Map<String, Object> metadataMap = metadata.toMap();
-            Object value = metadataMap.get(key);
-            return value != null ? value.toString() : null;
-        } catch (Exception e) {
-            log.debug("获取元数据失败: key={}", key);
-            return null;
-        }
-    }
-
-    private List<String> extractAllKeywords(List<TextSegment> segments) {
-        return segments.stream()
-                .map(segment -> getMetadataValue(segment, "keywords"))
-                .filter(Objects::nonNull)
-                .filter(keywords -> !keywords.isEmpty())
-                .flatMap(keywords -> Arrays.stream(keywords.split(", ")))
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    private Map<String, Long> calculateTopicDistribution(List<TextSegment> segments) {
-        return segments.stream()
-                .map(segment -> getMetadataValue(segment, "topic"))
-                .filter(Objects::nonNull)
-                .filter(topic -> !topic.isEmpty())
-                .collect(Collectors.groupingBy(
-                        topic -> topic,
-                        Collectors.counting()
-                ));
-    }
-
-    // ========================================
-    // 内容分析方法
-    // ========================================
-
-    private boolean containsCode(String text) {
-        return text.contains("```") || text.contains("function") || text.contains("class ") ||
-                text.contains("def ") || text.contains("import ") || text.contains("package ");
-    }
-
-    private boolean containsTables(String text) {
-        return text.contains("|") && text.contains("---");
-    }
-
-    private boolean containsLists(String text) {
-        return text.matches(".*^\\s*[-*+]\\s+.*") || text.matches(".*^\\s*\\d+\\.\\s+.*");
-    }
-
-    private boolean isTechnicalContent(String text) {
-        String[] techKeywords = {"algorithm", "function", "parameter", "variable", "method",
-                "class", "object", "API", "database", "server", "client"};
-        String lowerText = text.toLowerCase();
-        return Arrays.stream(techKeywords).anyMatch(lowerText::contains);
-    }
-
-    private String getLastSentences(String text, int maxLength) {
-        if (text.length() <= maxLength) return text;
-
-        int pos = text.length() - maxLength;
-        while (pos < text.length() && !Character.isWhitespace(text.charAt(pos))) {
-            pos++;
+    private boolean isCacheValid(String fileKey, File file) {
+        if (!documentCache.containsKey(fileKey)) {
+            return false;
         }
 
-        return text.substring(pos).trim();
-    }
+        Long cacheTime = cacheTimestamps.get(fileKey);
+        if (cacheTime == null) {
+            return false;
+        }
 
-    private boolean isHighQualitySegment(String text) {
-        if (text.length() < 20) return false;
-        if (text.length() > 2000) return false;
+        // 检查缓存是否过期
+        if (System.currentTimeMillis() - cacheTime > CACHE_EXPIRY_MS) {
+            documentCache.remove(fileKey);
+            cacheTimestamps.remove(fileKey);
+            return false;
+        }
 
-        String[] words = text.split("\\s+");
-        if (words.length < 5) return false;
-
-        if (text.replaceAll("[\\p{P}\\p{S}\\s\\d]", "").length() < text.length() * 0.3) {
+        // 检查文件是否被修改
+        if (file.lastModified() > cacheTime) {
+            documentCache.remove(fileKey);
+            cacheTimestamps.remove(fileKey);
             return false;
         }
 
         return true;
     }
 
-    private double calculateQualityScore(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            return 0.0;
-        }
-
-        double score = 0.0;
+    private int estimateLength(String text) {
+        if (text == null || text.isEmpty()) return 0;
 
         try {
-            // 基于长度的评分
-            int length = text.length();
-            if (length >= 100 && length <= 800) score += 0.3;
-
-            // 基于词汇多样性的评分
-            String[] words = text.toLowerCase().split("\\s+");
-            Set<String> uniqueWords = new HashSet<>(Arrays.asList(words));
-            double diversity = words.length > 0 ? (double) uniqueWords.size() / words.length : 0;
-            score += diversity * 0.4;
-
-            // 基于结构化内容的评分
-            if (containsStructuralElement(text, null)) score += 0.2;
-
-            // 基于技术内容的评分
-            if (isTechnicalContent(text)) score += 0.1;
-
+            return tokenizer.estimateTokenCountInText(text);
         } catch (Exception e) {
-            log.debug("计算质量评分时发生错误", e);
-            return 0.5;
+            // 简单估算
+            return text.length() / 3;
         }
-
-        return Math.min(1.0, score);
     }
 
-    private boolean containsStructuralElement(String text, DocumentStructure structure) {
-        if (structure == null || text == null || text.trim().isEmpty()) {
-            return false;
-        }
-
+    /**
+     * 清理资源
+     */
+    public void cleanup() {
         try {
-            return structure.getTitles().stream().anyMatch(title -> text.contains(title.getContent())) ||
-                    structure.getListItems().stream().anyMatch(item -> text.contains(item.getContent()));
+            executorService.shutdown();
+            documentCache.clear();
+            cacheTimestamps.clear();
+            log.info("资源清理完成");
         } catch (Exception e) {
-            log.debug("检查结构化元素时发生错误", e);
-            return false;
-        }
-    }
-
-    private String identifyStructureType(String text, DocumentStructure structure) {
-        if (structure == null || text == null || text.trim().isEmpty()) {
-            return "paragraph";
-        }
-
-        try {
-            if (structure.getTitles().stream().anyMatch(title -> text.contains(title.getContent()))) {
-                return "title";
-            } else if (structure.getListItems().stream().anyMatch(item -> text.contains(item.getContent()))) {
-                return "list";
-            } else if (structure.getCodeBlocks().stream().anyMatch(code -> text.contains(code.getContent()))) {
-                return "code";
-            } else if (structure.getTables().stream().anyMatch(table -> text.contains(table.getContent()))) {
-                return "table";
-            }
-        } catch (Exception e) {
-            log.debug("识别结构类型时发生错误", e);
-        }
-
-        return "paragraph";
-    }
-
-    // ========================================
-    // 摘要和关键词提取
-    // ========================================
-
-    private String generateDocumentSummary(List<TextSegment> segments) {
-        try {
-            List<TextSegment> keySegments = selectKeySegments(segments, 3);
-
-            if (keySegments.isEmpty()) {
-                return "无法生成文档摘要";
-            }
-
-            String combinedText = keySegments.stream()
-                    .map(TextSegment::text)
-                    .collect(Collectors.joining("\n\n"));
-
-            if (combinedText.length() > 2000) {
-                combinedText = combinedText.substring(0, 2000) + "...";
-            }
-
-            String prompt = "请为以下文档内容生成一个简洁的摘要（100-200字）：\n\n" + combinedText;
-
-            ChatResponse response = chatLanguageModel.chat(
-                    SystemMessage.from("你是一个专业的文档摘要生成助手，请生成准确、简洁的摘要。"),
-                    UserMessage.from(prompt)
-            );
-
-            return cleanAndValidateSummary(response.aiMessage().text());
-
-        } catch (Exception e) {
-            log.error("生成文档摘要失败", e);
-            return generateFallbackSummary(segments);
-        }
-    }
-
-    private String generateSegmentSummary(String text) {
-        try {
-            if (text.length() < 200) {
-                return "";
-            }
-
-            String[] sentences = text.split("[.!?。！？]");
-            if (sentences.length >= 2) {
-                String summary = sentences[0].trim();
-                if (sentences.length > 1 && summary.length() < 100) {
-                    summary += "。" + sentences[1].trim();
-                }
-                return summary.length() > 150 ? summary.substring(0, 150) + "..." : summary;
-            }
-
-            if (text.length() > 800) {
-                return generateLLMSummary(text, 50);
-            }
-
-            return "";
-
-        } catch (Exception e) {
-            log.debug("生成段落摘要失败: {}", text.substring(0, Math.min(50, text.length())));
-            return "";
-        }
-    }
-
-    private String generateLLMSummary(String text, int maxLength) {
-        try {
-            String prompt = String.format("请为以下文本生成一个%d字以内的摘要：\n\n%s",
-                    maxLength, text.length() > 1000 ? text.substring(0, 1000) + "..." : text);
-
-            ChatResponse response = chatLanguageModel.chat(
-                    SystemMessage.from("你是一个专业的文本摘要助手，请生成准确、简洁的摘要。"),
-                    UserMessage.from(prompt)
-            );
-
-            return cleanAndValidateSummary(response.aiMessage().text());
-
-        } catch (Exception e) {
-            log.debug("LLM摘要生成失败", e);
-            return "";
-        }
-    }
-
-    private List<TextSegment> selectKeySegments(List<TextSegment> segments, int count) {
-        return segments.stream()
-                .sorted((a, b) -> {
-                    double scoreA = calculateSegmentImportance(a);
-                    double scoreB = calculateSegmentImportance(b);
-                    return Double.compare(scoreB, scoreA);
-                })
-                .limit(count)
-                .collect(Collectors.toList());
-    }
-
-    private double calculateSegmentImportance(TextSegment segment) {
-        String text = segment.text();
-        double score = 0.0;
-
-        score += Math.min(text.length() / 500.0, 1.0) * 0.3;
-
-        if (text.contains("#") || text.contains("##")) score += 0.4;
-        if (text.matches(".*^\\s*[-*+]\\s+.*") || text.matches(".*^\\s*\\d+\\.\\s+.*")) score += 0.2;
-
-        String[] importantWords = {"重要", "关键", "核心", "主要", "总结", "结论", "概述", "摘要"};
-        long keywordCount = Arrays.stream(importantWords)
-                .mapToLong(word -> text.toLowerCase().split(word).length - 1)
-                .sum();
-        score += Math.min(keywordCount / 10.0, 0.3);
-
-        return score;
-    }
-
-    private String cleanAndValidateSummary(String summary) {
-        if (summary == null || summary.trim().isEmpty()) {
-            return "无摘要";
-        }
-
-        summary = summary.trim()
-                .replaceAll("\\n+", " ")
-                .replaceAll("\\s+", " ");
-
-        if (summary.length() > 300) {
-            summary = summary.substring(0, 300) + "...";
-        }
-
-        return summary;
-    }
-
-    private String generateFallbackSummary(List<TextSegment> segments) {
-        int totalSegments = segments.size();
-        int totalWords = segments.stream()
-                .mapToInt(segment -> segment.text().split("\\s+").length)
-                .sum();
-
-        return String.format("文档包含%d个段落，共计约%d个词。", totalSegments, totalWords);
-    }
-
-    private List<String> extractKeywords(String text) {
-        List<String> keywords = new ArrayList<>();
-
-        try {
-            String[] words = text.toLowerCase()
-                    .replaceAll("[^\\w\\s]", " ")
-                    .split("\\s+");
-
-            Map<String, Integer> wordFreq = new HashMap<>();
-            for (String word : words) {
-                if (word.length() > 3 && !isStopWord(word)) {
-                    wordFreq.put(word, wordFreq.getOrDefault(word, 0) + 1);
-                }
-            }
-
-            keywords = wordFreq.entrySet().stream()
-                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                    .limit(5)
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            log.debug("关键词提取失败", e);
-        }
-
-        return keywords;
-    }
-
-    private boolean isStopWord(String word) {
-        Set<String> stopWords = Set.of(
-                "的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "一个", "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这",
-                "the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by", "from", "this", "that", "these", "those", "a", "an", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did", "will", "would", "could", "should"
-        );
-        return stopWords.contains(word.toLowerCase());
-    }
-
-    private String classifyTopic(String text) {
-        String lowerText = text.toLowerCase();
-
-        if (lowerText.contains("技术") || lowerText.contains("开发") || lowerText.contains("code") || lowerText.contains("programming")) {
-            return "技术";
-        } else if (lowerText.contains("管理") || lowerText.contains("business") || lowerText.contains("策略")) {
-            return "管理";
-        } else if (lowerText.contains("教育") || lowerText.contains("学习") || lowerText.contains("education")) {
-            return "教育";
-        } else if (lowerText.contains("医疗") || lowerText.contains("健康") || lowerText.contains("medical")) {
-            return "医疗";
-        } else if (lowerText.contains("法律") || lowerText.contains("法规") || lowerText.contains("legal")) {
-            return "法律";
-        } else {
-            return "通用";
+            log.error("资源清理失败", e);
         }
     }
 
     // ========================================
-    // 分词处理
-    // ========================================
-
-    private List<String> performTokenization(String text) {
-        try {
-            int tokenCount = tokenizer.estimateTokenCountInText(text);
-            log.debug("文本token估算数量: {}", tokenCount);
-
-            return performDefaultTokenization(text);
-
-        } catch (Exception e) {
-            log.debug("分词处理失败，返回空列表: {}", e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    private List<String> performDefaultTokenization(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<String> tokens = new ArrayList<>();
-
-        String cleanText = text.toLowerCase()
-                .replaceAll("[\\p{P}\\p{S}&&[^\\u4e00-\\u9fa5]]+", " ")
-                .replaceAll("\\s+", " ")
-                .trim();
-
-        String[] words = cleanText.split("\\s+");
-
-        for (String word : words) {
-            if (word.length() > 1) {
-                if (containsChinese(word)) {
-                    tokens.addAll(tokenizeChinese(word));
-                } else {
-                    tokens.add(word);
-                }
-            }
-        }
-
-        return tokens.stream()
-                .filter(token -> token.length() > 0)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    private boolean containsChinese(String text) {
-        return text.matches(".*[\\u4e00-\\u9fa5]+.*");
-    }
-
-    private List<String> tokenizeChinese(String chineseText) {
-        List<String> tokens = new ArrayList<>();
-        char[] chars = chineseText.toCharArray();
-
-        // 单字分词
-        for (char c : chars) {
-            if (Character.toString(c).matches("[\\u4e00-\\u9fa5]")) {
-                tokens.add(Character.toString(c));
-            }
-        }
-
-        // 双字组合（bigram）
-        for (int i = 0; i < chars.length - 1; i++) {
-            if (Character.toString(chars[i]).matches("[\\u4e00-\\u9fa5]") &&
-                    Character.toString(chars[i + 1]).matches("[\\u4e00-\\u9fa5]")) {
-                tokens.add(String.valueOf(chars[i]) + String.valueOf(chars[i + 1]));
-            }
-        }
-
-        return tokens;
-    }
-
-    // ========================================
-    // 内部数据结构
+    // 内部类
     // ========================================
 
     /**
@@ -1240,6 +1172,7 @@ public class FileloadFunction {
         private final List<StructureElement> listItems = new ArrayList<>();
         private final List<StructureElement> codeBlocks = new ArrayList<>();
         private final List<StructureElement> tables = new ArrayList<>();
+        private final List<KeyParagraph> keyParagraphs = new ArrayList<>();
 
         public void addTitle(String content, int position) {
             titles.add(new StructureElement(content, position));
@@ -1257,13 +1190,28 @@ public class FileloadFunction {
             tables.add(new StructureElement(content, position));
         }
 
-        public List<StructureElement> getTitles() { return titles; }
-        public List<StructureElement> getListItems() { return listItems; }
-        public List<StructureElement> getCodeBlocks() { return codeBlocks; }
-        public List<StructureElement> getTables() { return tables; }
+        public void addKeyParagraph(String content, int position, String type) {
+            keyParagraphs.add(new KeyParagraph(content, position, type));
+        }
 
-        public boolean isEmpty() {
-            return titles.isEmpty() && listItems.isEmpty() && codeBlocks.isEmpty() && tables.isEmpty();
+        public List<StructureElement> getTitles() {
+            return titles;
+        }
+
+        public List<StructureElement> getListItems() {
+            return listItems;
+        }
+
+        public List<StructureElement> getCodeBlocks() {
+            return codeBlocks;
+        }
+
+        public List<StructureElement> getTables() {
+            return tables;
+        }
+
+        public List<KeyParagraph> getKeyParagraphs() {
+            return keyParagraphs;
         }
     }
 
@@ -1279,37 +1227,39 @@ public class FileloadFunction {
             this.position = position;
         }
 
-        public String getContent() { return content; }
-        public int getPosition() { return position; }
+        public String getContent() {
+            return content;
+        }
+
+        public int getPosition() {
+            return position;
+        }
     }
 
     /**
-     * 文档摘要报告类
+     * 关键段落类
      */
-    public static class DocumentSummaryReport {
-        private final String fileName;
-        private final String summary;
-        private final List<String> keywords;
-        private final Map<String, Long> topicDistribution;
+    private static class KeyParagraph {
+        private final String content;
+        private final int position;
+        private final String type;
 
-        public DocumentSummaryReport(String fileName, String summary, List<String> keywords, Map<String, Long> topicDistribution) {
-            this.fileName = fileName;
-            this.summary = summary;
-            this.keywords = keywords;
-            this.topicDistribution = topicDistribution;
+        public KeyParagraph(String content, int position, String type) {
+            this.content = content;
+            this.position = position;
+            this.type = type;
         }
 
-        public String getFileName() { return fileName; }
-        public String getSummary() { return summary; }
-        public List<String> getKeywords() { return keywords; }
-        public Map<String, Long> getTopicDistribution() { return topicDistribution; }
+        public String getContent() {
+            return content;
+        }
 
-        @Override
-        public String toString() {
-            return String.format(
-                    "文档: %s\n摘要: %s\n关键词: %s\n主题分布: %s",
-                    fileName, summary, String.join(", ", keywords), topicDistribution
-            );
+        public int getPosition() {
+            return position;
+        }
+
+        public String getType() {
+            return type;
         }
     }
 }

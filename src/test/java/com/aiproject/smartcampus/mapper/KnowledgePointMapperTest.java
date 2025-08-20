@@ -28,4 +28,12 @@ class KnowledgePointMapperTest {
 
     }
 
+    @Test
+    void getStudentWrongKnowledgeByPointId() {
+
+        KnowledgePointSimpleVO knowledgeInformationByPointId = knowledgePointMapper.getKnowledgeInformationByPointId("43", "1");
+
+        System.out.printf("knowledgeInformationByPointId=%s\n", knowledgeInformationByPointId);
+    }
+
 }

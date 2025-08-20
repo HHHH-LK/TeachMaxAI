@@ -276,7 +276,7 @@ public class ModelSummer {
         Set<String> inter = new HashSet<>(s1); inter.retainAll(s2);
         Set<String> union = new HashSet<>(s1); union.addAll(s2);
 
-        return union.isEmpty() ? 0.0 : (double) inter.size() / union.size();
+        return (double) inter.size() / union.size();
     }
 
     /**
@@ -341,10 +341,9 @@ public class ModelSummer {
         String uq = (userQuery == null || userQuery.trim().isEmpty()) ? "通用咨询" : userQuery.trim();
         String mc = (memoryContext == null || memoryContext.trim().isEmpty()) ? "无" : memoryContext.trim();
 
-        return new StringBuilder()
-                .append("【当前用户问题】\n").append(uq).append("\n\n")
-                .append("【相关历史对话片段】\n").append(mc).append("\n\n")
-                .append("【外部资料（供总结）】\n").append(evidenceBlock).toString();
+        return "【当前用户问题】\n" + uq + "\n\n" +
+                "【相关历史对话片段】\n" + mc + "\n\n" +
+                "【外部资料（供总结）】\n" + evidenceBlock;
     }
 
     /**
