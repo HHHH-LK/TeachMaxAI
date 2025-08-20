@@ -1,0 +1,745 @@
+{
+  "systemMetrics" : {
+    "传统Java教学RAG系统（基线）" : {
+      "avgRetrievalTime" : 0.11538461538461539,
+      "avgGenerationTime" : 0.0,
+      "avgPrecision" : 0.0,
+      "avgRecall" : 0.0,
+      "avgF1Score" : 0.0
+    },
+    "增强型Java教学RAG系统" : {
+      "avgRetrievalTime" : 39109.96153846154,
+      "avgGenerationTime" : 0.0,
+      "avgPrecision" : 0.5801282051282052,
+      "avgRecall" : 0.5221153846153846,
+      "avgF1Score" : 0.5495452847277863
+    }
+  },
+  "testCaseResults" : [ {
+    "query" : "Java有哪些基础数据类型？默认类型是什么？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java有哪些基础数据类型？默认类型是什么？\n检索到 6 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;\n\n【结果 2】\n相关度: 0.0323\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n【结果 3】\n相关度: 0.0315\n内容: Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。\n\n【结果 4】\n相关度: 0.0310\n内容: Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。\n\n【结果 5】\n相关度: 0.0310\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_basic_001",
+          "content" : "Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        }, {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 0.7,
+          "rank" : 4
+        }, {
+          "id" : "java_io_001",
+          "content" : "Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。",
+          "relevanceScore" : 0.6,
+          "rank" : 5
+        }, {
+          "id" : "java_generic_001",
+          "content" : "Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。",
+          "relevanceScore" : 0.5,
+          "rank" : 6
+        } ],
+        "retrievalTimeMs" : 49501,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "如何在Java中声明变量？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 如何在Java中声明变量？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_basic_001",
+          "content" : "Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 34620,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java面向对象编程的三大特性是什么？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java面向对象编程的三大特性是什么？\n检索到 3 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 2】\n相关度: 0.0323\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n【结果 3】\n相关度: 0.0317\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        } ],
+        "retrievalTimeMs" : 46864,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java中如何实现继承和多态？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java中如何实现继承和多态？\n检索到 3 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 2】\n相关度: 0.0484\n内容: Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。\n\n【结果 3】\n相关度: 0.0317\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        } ],
+        "retrievalTimeMs" : 22521,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "什么是封装？如何实现？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 1,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "未找到相关内容",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 33315,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java异常处理使用什么语句？常见异常有哪些？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java异常处理使用什么语句？常见异常有哪些？\n检索到 5 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。\n\n【结果 2】\n相关度: 0.0323\n内容: Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;\n\n【结果 3】\n相关度: 0.0315\n内容: Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。\n\n【结果 4】\n相关度: 0.0315\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n【结果 5】\n相关度: 0.0308\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_exception_001",
+          "content" : "Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 37253,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "checked异常和unchecked异常有什么区别？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: checked异常和unchecked异常有什么区别？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_exception_001",
+          "content" : "Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 70391,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "ArrayList和LinkedList有什么区别？各自适用于什么场景？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: ArrayList和LinkedList有什么区别？各自适用于什么场景？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 87881,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "HashMap和TreeMap的实现原理和特点是什么？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: HashMap和TreeMap的实现原理和特点是什么？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 37643,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java集合框架的主要接口有哪些？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java集合框架的主要接口有哪些？\n检索到 6 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n【结果 2】\n相关度: 0.0323\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 3】\n相关度: 0.0315\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n【结果 4】\n相关度: 0.0310\n内容: Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。\n\n【结果 5】\n相关度: 0.0310\n内容: Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        }, {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 0.7,
+          "rank" : 4
+        } ],
+        "retrievalTimeMs" : 38506,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java中创建线程有哪些方式？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java中创建线程有哪些方式？\n检索到 3 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。\n\n【结果 2】\n相关度: 0.0323\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n【结果 3】\n相关度: 0.0317\n内容: Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_io_001",
+          "content" : "Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        } ],
+        "retrievalTimeMs" : 22911,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "如何实现线程同步？线程池如何使用？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 如何实现线程同步？线程池如何使用？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 39750,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java线程有哪些状态？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java线程有哪些状态？\n检索到 7 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。\n\n【结果 2】\n相关度: 0.0484\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n【结果 3】\n相关度: 0.0317\n内容: Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。\n\n【结果 4】\n相关度: 0.0313\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n【结果 5】\n相关度: 0.0308\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_io_001",
+          "content" : "Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        }, {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 0.7,
+          "rank" : 4
+        }, {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 0.6,
+          "rank" : 5
+        }, {
+          "id" : "java_basic_001",
+          "content" : "Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;",
+          "relevanceScore" : 0.5,
+          "rank" : 6
+        } ],
+        "retrievalTimeMs" : 43682,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java IO操作分为哪几种流？各有什么特点？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java IO操作分为哪几种流？各有什么特点？\n检索到 6 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。\n\n【结果 2】\n相关度: 0.0320\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 3】\n相关度: 0.0313\n内容: Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。\n\n【结果 4】\n相关度: 0.0313\n内容: Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;\n\n【结果 5】\n相关度: 0.0310\n内容: Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_io_001",
+          "content" : "Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        }, {
+          "id" : "java_exception_001",
+          "content" : "Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。",
+          "relevanceScore" : 0.7,
+          "rank" : 4
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.6,
+          "rank" : 5
+        }, {
+          "id" : "java_basic_001",
+          "content" : "Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;",
+          "relevanceScore" : 0.5,
+          "rank" : 6
+        } ],
+        "retrievalTimeMs" : 39147,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "如何提高Java文件读写效率？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 1,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 如何提高Java文件读写效率？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_io_001",
+          "content" : "Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 22302,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "常用的Java设计模式有哪些？各自的作用是什么？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 常用的Java设计模式有哪些？各自的作用是什么？\n检索到 7 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n【结果 2】\n相关度: 0.0323\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 3】\n相关度: 0.0317\n内容: Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;\n\n【结果 4】\n相关度: 0.0310\n内容: Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。\n\n【结果 5】\n相关度: 0.0308\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        }, {
+          "id" : "java_basic_001",
+          "content" : "Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;",
+          "relevanceScore" : 0.7,
+          "rank" : 4
+        }, {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 0.6,
+          "rank" : 5
+        }, {
+          "id" : "java_generic_001",
+          "content" : "Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。",
+          "relevanceScore" : 0.5,
+          "rank" : 6
+        } ],
+        "retrievalTimeMs" : 33089,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "单例模式和工厂模式分别解决什么问题？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 单例模式和工厂模式分别解决什么问题？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 28432,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java内存是如何管理的？JVM内存结构包括哪些部分？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "Java程序设计处理失败: UNAVAILABLE: Network closed for unknown reason",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 48076,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "常见的垃圾回收算法有哪些？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 常见的垃圾回收算法有哪些？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java内存管理由JVM自动完成。堆内存存储对象实例和数组，栈内存存储局部变量和方法调用信息。方法区存储类信息和常量池。垃圾回收器(GC)自动回收不再引用的对象内存，常见GC算法包括标记-清除、复制算法、标记-整理。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_memory_001",
+          "content" : "Java内存管理由JVM自动完成。堆内存存储对象实例和数组，栈内存存储局部变量和方法调用信息。方法区存储类信息和常量池。垃圾回收器(GC)自动回收不再引用的对象内存，常见GC算法包括标记-清除、复制算法、标记-整理。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 39636,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java泛型有什么作用？如何使用通配符？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java泛型有什么作用？如何使用通配符？\n检索到 4 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。\n\n【结果 2】\n相关度: 0.0320\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 3】\n相关度: 0.0320\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n【结果 4】\n相关度: 0.0313\n内容: Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_generic_001",
+          "content" : "Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        }, {
+          "id" : "java_basic_001",
+          "content" : "Java基础数据类型包括8种：byte、short、int、long、float、double、boolean、char。其中整型默认是int，浮点型默认是double。变量声明格式为：数据类型 变量名 = 初始值;",
+          "relevanceScore" : 0.7,
+          "rank" : 4
+        } ],
+        "retrievalTimeMs" : 29400,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java反射机制有什么用途？常用方法有哪些？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java反射机制有什么用途？常用方法有哪些？\n检索到 5 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java反射机制允许程序在运行时检查和操作类、方法、字段等。Class.forName()获取类对象，getMethod()获取方法，getField()获取字段。反射常用于框架开发、动态代理、注解处理等场景，但会影响性能和安全性。\n\n【结果 2】\n相关度: 0.0320\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 3】\n相关度: 0.0315\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n【结果 4】\n相关度: 0.0315\n内容: Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。\n\n【结果 5】\n相关度: 0.0310\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_reflection_001",
+          "content" : "Java反射机制允许程序在运行时检查和操作类、方法、字段等。Class.forName()获取类对象，getMethod()获取方法，getField()获取字段。反射常用于框架开发、动态代理、注解处理等场景，但会影响性能和安全性。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_exception_001",
+          "content" : "Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        }, {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 0.7,
+          "rank" : 4
+        } ],
+        "retrievalTimeMs" : 45891,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "Java中如何处理文件操作异常？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: Java中如何处理文件操作异常？\n检索到 2 个相关结果\n\n【结果 1】\n相关度: 0.0492\n内容: Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。\n\n【结果 2】\n相关度: 0.0484\n内容: Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_exception_001",
+          "content" : "Java异常处理机制使用try-catch-finally语句块。checked异常(如IOException)必须处理，unchecked异常(如RuntimeException)可选择处理。常见异常包括NullPointerException、ArrayIndexOutOfBoundsException、ClassCastException等。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_io_001",
+          "content" : "Java IO操作分为字节流和字符流。InputStream/OutputStream处理字节数据，Reader/Writer处理字符数据。BufferedReader提高读取效率，FileWriter简化文件写入。NIO提供了更高效的非阻塞IO操作，支持Channel和Buffer。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        } ],
+        "retrievalTimeMs" : 35815,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "使用多线程时需要注意什么？如何避免线程安全问题？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 使用多线程时需要注意什么？如何避免线程安全问题？\n检索到 1 个相关结果\n\n【结果 1】\n相关度: 0.0328\n内容: Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_thread_001",
+          "content" : "Java多线程编程可通过继承Thread类或实现Runnable接口创建线程。线程同步使用synchronized关键字或Lock接口防止数据竞争。ExecutorService线程池可以高效管理多个线程。线程状态包括NEW、RUNNABLE、BLOCKED、WAITING、TERMINATED。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        } ],
+        "retrievalTimeMs" : 28713,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "泛型和集合框架如何结合使用？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 泛型和集合框架如何结合使用？\n检索到 2 个相关结果\n\n【结果 1】\n相关度: 0.0328\n内容: Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。\n\n【结果 2】\n相关度: 0.0323\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_generic_001",
+          "content" : "Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_collection_001",
+          "content" : "Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        } ],
+        "retrievalTimeMs" : 26849,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "什么时候使用ArrayList，什么时候使用LinkedList？需要考虑哪些因素？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 1,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "未找到相关内容",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 28192,
+        "generationTimeMs" : 0
+      }
+    }
+  }, {
+    "query" : "设计一个Java类时应该考虑哪些面向对象原则？",
+    "systemResponses" : {
+      "传统Java教学RAG系统（基线）" : {
+        "answer" : "基于Java程序设计知识库检索，答案是：未找到相关Java知识",
+        "retrievedDocuments" : [ ],
+        "retrievalTimeMs" : 0,
+        "generationTimeMs" : 0
+      },
+      "增强型Java教学RAG系统" : {
+        "answer" : "查询意图: 设计一个Java类时应该考虑哪些面向对象原则？\n检索到 4 个相关结果\n\n【结果 1】\n相关度: 0.0328\n内容: Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。\n\n【结果 2】\n相关度: 0.0323\n内容: 常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。\n\n【结果 3】\n相关度: 0.0317\n内容: Java集合框架主要包括List、Set、Map三大接口。ArrayList适合随机访问和遍历，LinkedList适合频繁插入删除。HashMap基于哈希表实现快速查找，TreeMap基于红黑树实现有序存储。Vector是线程安全的动态数组。\n\n【结果 4】\n相关度: 0.0313\n内容: Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。\n\n",
+        "retrievedDocuments" : [ {
+          "id" : "java_oop_001",
+          "content" : "Java面向对象编程三大特性：封装、继承、多态。封装通过private关键字实现信息隐藏，继承使用extends关键字实现代码复用，多态通过方法重写(Override)和接口实现。",
+          "relevanceScore" : 1.0,
+          "rank" : 1
+        }, {
+          "id" : "java_pattern_001",
+          "content" : "常用Java设计模式包括单例模式、工厂模式、观察者模式、装饰器模式等。单例模式确保类只有一个实例，工厂模式用于创建对象而不暴露创建逻辑，观察者模式实现一对多的依赖关系，装饰器模式动态添加对象功能。",
+          "relevanceScore" : 0.9,
+          "rank" : 2
+        }, {
+          "id" : "java_generic_001",
+          "content" : "Java泛型提供编译时类型安全检查。泛型类使用<T>声明类型参数，泛型方法在返回类型前声明类型参数。通配符?表示未知类型，? extends T表示上界，? super T表示下界。泛型擦除机制在运行时移除类型信息。",
+          "relevanceScore" : 0.8,
+          "rank" : 3
+        } ],
+        "retrievalTimeMs" : 46479,
+        "generationTimeMs" : 0
+      }
+    }
+  } ]
+}
