@@ -317,14 +317,14 @@ const fetchData = async () => {
 
       // 更新教师使用次数
       usageOption.value.series[0].data = [
-        usageData.teacher.week || 0,
         usageData.teacher.today || 0,
+        usageData.teacher.week || 0,
       ];
 
       // 更新学生使用次数
       usageOption.value.series[1].data = [
-        usageData.student.week || 0,
         usageData.student.today || 0,
+        usageData.student.week || 0,
       ];
     } else {
       throw new Error(usageResponse.data?.msg || "获取使用次数失败");
