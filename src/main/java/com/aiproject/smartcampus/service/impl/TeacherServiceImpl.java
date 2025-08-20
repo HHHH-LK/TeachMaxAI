@@ -200,8 +200,16 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             return studentWrongKnowledgeBOMap.get(a.getKey());
         }).toList();
 
+        LambdaQueryWrapper<Course> courseLambdaQueryWrapper=new LambdaQueryWrapper<>();
+        courseLambdaQueryWrapper.eq(Course::getCourseId,couresId);
+        Course course = courseMapper.selectOne(courseLambdaQueryWrapper);
+        String courseName = course.getCourseName();
 
-        return Result.success(list);
+        List<StudentWrongKnowledgeBO> list1 = list.stream().filter(a ->
+                a.getCourseName().equals(courseName)
+        ).toList();
+
+        return Result.success(list1);
     }
 
     /**
