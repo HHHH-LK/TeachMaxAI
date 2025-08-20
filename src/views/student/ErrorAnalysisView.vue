@@ -446,14 +446,18 @@ const generateSelected = async () => {
     ElMessage.error(`未选择知识点`);
   }
 
+  console.log("select", selectItem.value);
   const detailKnow = ref([]);
   for (var i = 0; i < selectItem.value.length; i++) {
     const response = await studentService.getKnowlegeById(
         selectItem.value[i].pointId
     );
     detailKnow.value.push(response.data.data);
+    console.log("resonse", response.data.data)
   }
 
+  console.log("detail", detailKnow.value);
+  console.log("detail.chapterid", detailKnow.value[0].chapterId)
   courseId = detailKnow.value[0].courseId;
   chapterId = detailKnow.value[0].chapterId;
   const description = detailKnow.value[0].description;
@@ -482,12 +486,13 @@ const generateSelected = async () => {
       const match = jsonStrWithIds.match(idsRegex);
 
       // 使用这两个 const 变量保存结果
-      const minIds = match ? parseInt(match[1]) : null;
-      const maxIds = match ? parseInt(match[2]) : null;
+       minIds = match ? parseInt(match[1]) : null;
+       maxIds = match ? parseInt(match[2]) : null;
       // 解析response.data.data，然后生成试卷内容
       const jsonStr = response.data.data
           .replace(/ids:min:\d+,max:\d+$/, "")
           .trim();
+
       const examData = JSON.parse(jsonStr);
       generatedExamContent.value = generateRealExamContent(examData);
       console.log("解析后", generatedExamContent.value)

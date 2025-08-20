@@ -4,10 +4,16 @@
       <p>正在生成中</p>
     </div>
     <div v-else>
-      <div v-for="(question, index) in questions" :key="index" class="question-card">
+      <div
+        v-for="(question, index) in questions"
+        :key="index"
+        class="question-card"
+      >
         <div class="question-header">
           <span class="question-number">{{ index + 1 }}.</span>
-          <span class="question-type">[{{ getQuestionTypeLabel(question.type) }}]</span>
+          <span class="question-type"
+            >[{{ getQuestionTypeLabel(question.type) }}]</span
+          >
           <span class="question-text">{{ question.text }}</span>
         </div>
 
@@ -15,35 +21,61 @@
           <!-- 单选 -->
           <div v-if="question.type === 'single-choice'" class="options-list">
             <label
-                v-for="(option, oIndex) in question.options"
-                :key="oIndex"
-                :class="['option-item', submitted ? getOptionClass(option.value, question.answer, displayUserAnswers[index]) : '', {'selected': displayUserAnswers[index] === option.value}]"
+              v-for="(option, oIndex) in question.options"
+              :key="oIndex"
+              :class="[
+                'option-item',
+                submitted
+                  ? getOptionClass(
+                      option.value,
+                      question.answer,
+                      displayUserAnswers[index]
+                    )
+                  : '',
+                { selected: displayUserAnswers[index] === option.value },
+              ]"
             >
               <input
-                  type="radio"
-                  :name="'question-' + index"
-                  :value="option.value"
-                  v-model="localUserAnswers[index]"
-                  :disabled="isReadonly || submitted"
+                type="radio"
+                :name="'question-' + index"
+                :value="option.value"
+                v-model="localUserAnswers[index]"
+                :disabled="isReadonly || submitted"
               />
               {{ option.label }}. {{ option.content }}
             </label>
           </div>
 
-
           <!-- 多选 -->
-          <div v-else-if="question.type === 'multiple-choice'" class="options-list">
+          <div
+            v-else-if="question.type === 'multiple-choice'"
+            class="options-list"
+          >
             <label
-                v-for="(option, oIndex) in question.options"
-                :key="oIndex"
-                :class="['option-item', submitted ? getOptionClass(option.value, question.answer, displayUserAnswers[index]) : '', {'selected': Array.isArray(displayUserAnswers[index]) && displayUserAnswers[index].includes(option.value)}]"
+              v-for="(option, oIndex) in question.options"
+              :key="oIndex"
+              :class="[
+                'option-item',
+                submitted
+                  ? getOptionClass(
+                      option.value,
+                      question.answer,
+                      displayUserAnswers[index]
+                    )
+                  : '',
+                {
+                  selected:
+                    Array.isArray(displayUserAnswers[index]) &&
+                    displayUserAnswers[index].includes(option.value),
+                },
+              ]"
             >
               <input
-                  type="checkbox"
-                  :name="'question-' + index + '-multiple'"
-                  :value="option.value"
-                  v-model="localUserAnswers[index]"
-                  :disabled="isReadonly || submitted"
+                type="checkbox"
+                :name="'question-' + index + '-multiple'"
+                :value="option.value"
+                v-model="localUserAnswers[index]"
+                :disabled="isReadonly || submitted"
               />
               {{ option.label }}. {{ option.content }}
             </label>
@@ -52,27 +84,37 @@
           <!-- 填空 -->
           <div v-else-if="question.type === 'fill-in-blank'">
             <input
-                type="text"
-                v-model="localUserAnswers[index]"
-                placeholder="请填写答案"
-                class="fill-in-input"
-                :disabled="isReadonly || submitted"
+              type="text"
+              v-model="localUserAnswers[index]"
+              placeholder="请填写答案"
+              class="fill-in-input"
+              :disabled="isReadonly || submitted"
             />
           </div>
 
           <!-- 判断 -->
           <div v-else-if="question.type === 'true-false'" class="options-list">
             <label
-                v-for="(option, oIndex) in question.options"
-                :key="oIndex"
-                :class="['option-item', submitted ? getOptionClass(option.value, question.answer, displayUserAnswers[index]) : '', {'selected': displayUserAnswers[index] === option.value}]"
+              v-for="(option, oIndex) in question.options"
+              :key="oIndex"
+              :class="[
+                'option-item',
+                submitted
+                  ? getOptionClass(
+                      option.value,
+                      question.answer,
+                      displayUserAnswers[index]
+                    )
+                  : '',
+                { selected: displayUserAnswers[index] === option.value },
+              ]"
             >
               <input
-                  type="radio"
-                  :name="'question-tf-' + index"
-                  :value="option.value"
-                  v-model="localUserAnswers[index]"
-                  :disabled="isReadonly || submitted"
+                type="radio"
+                :name="'question-tf-' + index"
+                :value="option.value"
+                v-model="localUserAnswers[index]"
+                :disabled="isReadonly || submitted"
               />
               {{ option.label }}. {{ option.content }}
             </label>
@@ -81,73 +123,102 @@
           <!-- 简答 -->
           <div v-else-if="question.type === 'short-answer'">
             <textarea
-                v-model="localUserAnswers[index]"
-                placeholder="请在此处作答"
-                class="short-answer-textarea"
-                :disabled="isReadonly || submitted"
+              v-model="localUserAnswers[index]"
+              placeholder="请在此处作答"
+              class="short-answer-textarea"
+              :disabled="isReadonly || submitted"
             ></textarea>
           </div>
         </div>
 
         <!-- 答案与解析区域 -->
         <div v-if="isReadonly || submitted" class="answer-section">
-          <p class="your-answer" :class="isCorrect(question, displayUserAnswers[index]) ? 'correct' : 'wrong'">
-            你选择的答案：{{ formatUserAnswer(displayUserAnswers[index], question.type) }}
-            <span v-if="isCorrect(question, displayUserAnswers[index])">（正确）</span>
-            <span v-else-if="displayUserAnswers[index] && (typeof displayUserAnswers[index] === 'string' && displayUserAnswers[index].trim() !== '') || (Array.isArray(displayUserAnswers[index]) && displayUserAnswers[index].length > 0)">（错误）</span>
+          <p
+            class="your-answer"
+            :class="
+              isCorrect(question, displayUserAnswers[index])
+                ? 'correct'
+                : 'wrong'
+            "
+          >
+            你选择的答案：{{
+              formatUserAnswer(displayUserAnswers[index], question.type)
+            }}
+            <span v-if="isCorrect(question, displayUserAnswers[index])"
+              >（正确）</span
+            >
+            <span
+              v-else-if="
+                (displayUserAnswers[index] &&
+                  typeof displayUserAnswers[index] === 'string' &&
+                  displayUserAnswers[index].trim() !== '') ||
+                (Array.isArray(displayUserAnswers[index]) &&
+                  displayUserAnswers[index].length > 0)
+              "
+              >（错误）</span
+            >
             <span v-else>（未作答）</span>
           </p>
-          <p class="correct-answer">正确答案: {{ formatAnswer(question.answer, question.type) }}</p>
-          <p v-if="question.explanation" class="explanation">解析: {{ question.explanation }}</p>
+          <p class="correct-answer">
+            正确答案: {{ formatAnswer(question.answer, question.type) }}
+          </p>
+          <p v-if="question.explanation" class="explanation">
+            解析: {{ question.explanation }}
+          </p>
         </div>
       </div>
 
       <div class="exam-actions" v-if="!isReadonly">
-        <button @click="submitExam" :disabled="submitted" class="submit-btn">提交试卷</button>
+        <button @click="submitExam" :disabled="submitted" class="submit-btn">
+          提交试卷
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { studentService } from '@/services/api';
-import { ref, onMounted, watch, computed } from 'vue';
+import { studentService } from "@/services/api";
+import { ref, onMounted, watch, computed } from "vue";
 
 const props = defineProps({
   examContent: {
     type: String,
-    default: ''
+    default: "",
   },
   chapterId: {
     type: String,
-    default: ''
+    default: "",
   },
   courseId: {
     type: String,
-    default: ''
+    default: "",
   },
   minIds: {
     type: String,
-    default:''
+    default: "",
   },
   maxIds: {
     type: String,
-    default: ''
+    default: "",
   },
   readonly: {
     type: Boolean,
-    default: false
+    default: false,
   },
   userAnswers: {
     type: Array,
-    default: undefined
+    default: undefined,
   },
   userInfo: {
     type: String,
-    default: 'practice'
-  }
+    default: "practice",
+  },
+  homeworks: {
+    type: Array,
+    default: undefined,
+  },
 });
-
 
 const questions = ref([]);
 const localUserAnswers = ref([]);
@@ -157,7 +228,11 @@ const isReadonly = computed(() => props.readonly);
 
 // 只读模式下优先用外部userAnswers
 const displayUserAnswers = computed(() => {
-  if (isReadonly.value && Array.isArray(props.userAnswers) && props.userAnswers.length > 0) {
+  if (
+    isReadonly.value &&
+    Array.isArray(props.userAnswers) &&
+    props.userAnswers.length > 0
+  ) {
     return props.userAnswers;
   }
   return localUserAnswers.value;
@@ -166,9 +241,9 @@ const displayUserAnswers = computed(() => {
 // 解析考试内容
 const parseExamContent = (content) => {
   if (!content) return [];
-  
-  const lines = content.split('\n').filter(line => line.trim() !== '');
-  
+
+  const lines = content.split("\n").filter((line) => line.trim() !== "");
+
   const parsedQuestions = [];
   let currentQuestion = null;
 
@@ -176,7 +251,9 @@ const parseExamContent = (content) => {
     const trimmedLine = line.trim();
 
     // 匹配题目行（支持单/多选、填空、判断和简答）
-    const questionMatch = trimmedLine.match(/^(\d+)\.\s*\[(single-choice|multiple-choice|fill-in-blank|true-false|short-answer)\]\s*(.*)/);
+    const questionMatch = trimmedLine.match(
+      /^(\d+)\.\s*\[(single-choice|multiple-choice|fill-in-blank|true-false|short-answer)\]\s*(.*)/
+    );
 
     if (questionMatch) {
       // 如果有当前题目，先保存
@@ -187,15 +264,15 @@ const parseExamContent = (content) => {
         type: questionMatch[2],
         text: questionMatch[3],
         options: [],
-        answer: '',
-        explanation: ''
+        answer: "",
+        explanation: "",
       };
 
       // 为判断题添加默认选项
-      if (questionMatch[2] === 'true-false') {
+      if (questionMatch[2] === "true-false") {
         currentQuestion.options = [
-          { label: 'A', content: '正确', value: 'true' },
-          { label: 'B', content: '错误', value: 'false' }
+          { label: "A", content: "正确", value: "true" },
+          { label: "B", content: "错误", value: "false" },
         ];
       }
     }
@@ -204,34 +281,41 @@ const parseExamContent = (content) => {
       const optionMatch = trimmedLine.match(/^([A-D])\.\s*(.*)/);
       if (optionMatch) {
         // 如果是单选或多选
-        if (currentQuestion.type === 'single-choice' || currentQuestion.type === 'multiple-choice') {
+        if (
+          currentQuestion.type === "single-choice" ||
+          currentQuestion.type === "multiple-choice"
+        ) {
           // 过滤掉 [object Object] 这样的无效内容
           const optionContent = optionMatch[2].trim();
-          if (optionContent && !optionContent.includes('[object Object]')) {
+          if (optionContent && !optionContent.includes("[object Object]")) {
             currentQuestion.options.push({
               label: optionMatch[1],
               content: optionContent,
-              value: optionMatch[1] // 设置value
+              value: optionMatch[1], // 设置value
             });
           } else {
-            console.warn('跳过无效选项:', optionContent);
+            console.warn("跳过无效选项:", optionContent);
           }
         }
       }
     }
     // 匹配答案行（兼容两种前缀）
-    else if (currentQuestion && /^(正确答案|答案|Answer):\s*/.test(trimmedLine)) {
-      const answerText = trimmedLine.replace(/^(正确答案|答案|Answer):\s*/, '');
+    else if (
+      currentQuestion &&
+      /^(正确答案|答案|Answer):\s*/.test(trimmedLine)
+    ) {
+      const answerText = trimmedLine.replace(/^(正确答案|答案|Answer):\s*/, "");
       // 判断题答案转换
-      if (currentQuestion.type === 'true-false') {
-        currentQuestion.answer = answerText.toUpperCase() === 'A' ? 'true' : 'false';
+      if (currentQuestion.type === "true-false") {
+        currentQuestion.answer =
+          answerText.toUpperCase() === "A" ? "true" : "false";
       } else {
         currentQuestion.answer = answerText;
       }
     }
     // 匹配解析行
-    else if (currentQuestion && trimmedLine.startsWith('解析: ')) {
-      const explanationText = trimmedLine.replace('解析: ', '');
+    else if (currentQuestion && trimmedLine.startsWith("解析: ")) {
+      const explanationText = trimmedLine.replace("解析: ", "");
       currentQuestion.explanation = explanationText;
     }
   });
@@ -240,9 +324,9 @@ const parseExamContent = (content) => {
   if (currentQuestion) parsedQuestions.push(currentQuestion);
 
   // 确保所有单选题和多选题选项都有value
-  parsedQuestions.forEach(q => {
-    if (q.type === 'single-choice' || q.type === 'multiple-choice') {
-      q.options.forEach(opt => {
+  parsedQuestions.forEach((q) => {
+    if (q.type === "single-choice" || q.type === "multiple-choice") {
+      q.options.forEach((opt) => {
         if (!opt.value) {
           opt.value = opt.label;
         }
@@ -251,8 +335,8 @@ const parseExamContent = (content) => {
   });
 
   // 初始化用户答案数组 - 修复：为多选题初始化为空数组
-  localUserAnswers.value = parsedQuestions.map(q =>
-      q.type === 'multiple-choice' ? [] : ''
+  localUserAnswers.value = parsedQuestions.map((q) =>
+    q.type === "multiple-choice" ? [] : ""
   );
 
   return parsedQuestions;
@@ -261,11 +345,11 @@ const parseExamContent = (content) => {
 // 获取题目类型中文标签
 const getQuestionTypeLabel = (type) => {
   const typeLabels = {
-    'single-choice': '单选题',
-    'multiple-choice': '多选题',
-    'fill-in-blank': '填空题',
-    'true-false': '判断题',
-    'short-answer': '简答题'
+    "single-choice": "单选题",
+    "multiple-choice": "多选题",
+    "fill-in-blank": "填空题",
+    "true-false": "判断题",
+    "short-answer": "简答题",
   };
   return typeLabels[type] || type;
 };
@@ -273,52 +357,61 @@ const getQuestionTypeLabel = (type) => {
 // 获取选项样式
 const getOptionClass = (optionValue, correctAnswer, userAnswer) => {
   // 检查学生是否作答：undefined、null、空字符串、空数组都视为未作答
-  if (userAnswer === undefined || userAnswer === null || 
-      (typeof userAnswer === 'string' && userAnswer.trim() === '') ||
-      (Array.isArray(userAnswer) && userAnswer.length === 0)) {
-    return '';
+  if (
+    userAnswer === undefined ||
+    userAnswer === null ||
+    (typeof userAnswer === "string" && userAnswer.trim() === "") ||
+    (Array.isArray(userAnswer) && userAnswer.length === 0)
+  ) {
+    return "";
   }
 
   // 判断题和单选题直接比较
-  if (typeof userAnswer === 'string') {
-    if (optionValue === correctAnswer) return 'correct-option';
-    if (optionValue === userAnswer && userAnswer !== correctAnswer) return 'wrong-option';
+  if (typeof userAnswer === "string") {
+    if (optionValue === correctAnswer) return "correct-option";
+    if (optionValue === userAnswer && userAnswer !== correctAnswer)
+      return "wrong-option";
   }
   // 多选题：多个答案
   else if (Array.isArray(userAnswer)) {
     if (correctAnswer.includes(optionValue)) {
-      return userAnswer.includes(optionValue) ? 'correct-option' : 'missing-option';
+      return userAnswer.includes(optionValue)
+        ? "correct-option"
+        : "missing-option";
     } else {
-      return userAnswer.includes(optionValue) ? 'wrong-option' : '';
+      return userAnswer.includes(optionValue) ? "wrong-option" : "";
     }
   }
-  return '';
+  return "";
 };
 
 // 检查答案是否正确
 const isCorrect = (question, userAnswer) => {
   // 检查学生是否作答：undefined、null、空字符串、空数组都视为未作答
-  if (userAnswer === undefined || userAnswer === null || 
-      (typeof userAnswer === 'string' && userAnswer.trim() === '') ||
-      (Array.isArray(userAnswer) && userAnswer.length === 0)) {
+  if (
+    userAnswer === undefined ||
+    userAnswer === null ||
+    (typeof userAnswer === "string" && userAnswer.trim() === "") ||
+    (Array.isArray(userAnswer) && userAnswer.length === 0)
+  ) {
     return false;
   }
 
   const correctAnswer = question.answer;
   switch (question.type) {
-    case 'single-choice':
-    case 'fill-in-blank':
-    case 'true-false':
+    case "single-choice":
+    case "fill-in-blank":
+    case "true-false":
       return userAnswer === correctAnswer;
 
-    case 'multiple-choice':
+    case "multiple-choice":
       // 多选题：确保每个选项都正确（假设正确答案是逗号分隔的字符串，如"A,B"）
-      const correctArray = correctAnswer.split(',').map(a => a.trim());
+      const correctArray = correctAnswer.split(",").map((a) => a.trim());
       return Array.isArray(userAnswer)
-          ? userAnswer.sort().toString() === correctArray.sort().toString()
-          : false;
+        ? userAnswer.sort().toString() === correctArray.sort().toString()
+        : false;
 
-    case 'short-answer':
+    case "short-answer":
       // 简答题暂时不判对错
       return false;
 
@@ -330,20 +423,23 @@ const isCorrect = (question, userAnswer) => {
 // 格式化用户答案
 const formatUserAnswer = (userAnswer, type) => {
   // 检查学生是否作答：undefined、null、空字符串、空数组都视为未作答
-  if (userAnswer === undefined || userAnswer === null || 
-      (typeof userAnswer === 'string' && userAnswer.trim() === '') ||
-      (Array.isArray(userAnswer) && userAnswer.length === 0)) {
-    return '未作答';
+  if (
+    userAnswer === undefined ||
+    userAnswer === null ||
+    (typeof userAnswer === "string" && userAnswer.trim() === "") ||
+    (Array.isArray(userAnswer) && userAnswer.length === 0)
+  ) {
+    return "未作答";
   }
 
-  if (type === 'multiple-choice' && Array.isArray(userAnswer)) {
-    return userAnswer.join(', ');
+  if (type === "multiple-choice" && Array.isArray(userAnswer)) {
+    return userAnswer.join(", ");
   }
 
-  if (type === 'true-false') {
-    if(userAnswer === 'true') return '正确';
-    else if(userAnswer === 'false') return '错误';
-    else return '未作答';
+  if (type === "true-false") {
+    if (userAnswer === "true") return "正确";
+    else if (userAnswer === "false") return "错误";
+    else return "未作答";
   }
 
   return userAnswer;
@@ -351,14 +447,17 @@ const formatUserAnswer = (userAnswer, type) => {
 
 // 格式化正确答案
 const formatAnswer = (answer, type) => {
-  if (!answer) return '';
+  if (!answer) return "";
 
-  if (type === 'multiple-choice') {
-    return answer.split(',').map(a => a.trim()).join(', ');
+  if (type === "multiple-choice") {
+    return answer
+      .split(",")
+      .map((a) => a.trim())
+      .join(", ");
   }
 
-  if (type === 'true-false') {
-    return answer === 'true' ? '正确' : '错误';
+  if (type === "true-false") {
+    return answer === "true" ? "正确" : "错误";
   }
   return answer;
 };
@@ -367,61 +466,153 @@ const formatAnswer = (answer, type) => {
 const submitExam = async () => {
   submitted.value = true;
 
-  // 修改1：创建单个对象而不是数组
   const payload = {
     chapterId: props.chapterId,
     type: props.userInfo,
     courseId: props.courseId,
     // 初始化答案列表
-    studentAnswerDTOList: []
+    studentAnswerDTOList: [],
   };
 
-  console.log("提交的payload:", payload)
+  console.log("提交的payload:", payload);
 
-  const minId = parseInt(props.minIds) || 0;
+  const minId = parseInt(props.minIds) + 1 || 0;
 
-  questions.value.forEach((question, index) => {
-    const questionId = minId + index;
+  if (minId) {
+    console.log("ids", minId);
+    questions.value.forEach((question, index) => {
+      const questionId = minId + index;
 
-    let formattedAnswer = "";
-    if (question.type === "multiple-choice") {
-      formattedAnswer = Array.isArray(localUserAnswers.value[index])
+      console.log("index", index);
+      console.log("questionid", questionId);
+      let formattedAnswer = "";
+      if (question.type === "multiple-choice") {
+        formattedAnswer = Array.isArray(localUserAnswers.value[index])
           ? localUserAnswers.value[index].join(",")
           : "";
-      //
-    } else if (question.type === "true-false") {
-      formattedAnswer = localUserAnswers.value[index] === "true" ? "A" : "B";
-    } else {
-      formattedAnswer = localUserAnswers.value[index] || "";
+        //
+      } else if (question.type === "true-false") {
+        formattedAnswer = localUserAnswers.value[index] === "true" ? "A" : "B";
+      } else {
+        formattedAnswer = localUserAnswers.value[index] || "";
+      }
+
+      console.log(question.toString());
+
+      // 修改2：直接添加到 studentAnswerDTOList
+      payload.studentAnswerDTOList.push({
+        questionId: questionId.toString(),
+        studentAnswer: formattedAnswer || "无",
+      });
+    });
+
+    console.log("提交的payload:", payload); // 现在是个对象
+  } else {
+    const currentHomework = props.homeworks.find(
+      (hw) => hw.chapterId === props.chapterId
+    );
+
+    if (!currentHomework) {
+      console.error("找不到匹配的作业");
+      return;
     }
 
-    // 修改2：直接添加到 studentAnswerDTOList
-    payload.studentAnswerDTOList.push({
-      questionId: questionId.toString(),
-      studentAnswer: formattedAnswer || "无",
-    });
-  });
+    questions.value.forEach((question, index) => {
+      // 直接从当前作业的题目列表中获取 ID
+      const questionId = currentHomework.questions[index]?.id;
 
-  console.log("提交的payload:", payload); // 现在是个对象
+      if (!questionId) {
+        console.warn(`第 ${index + 1} 题缺少 ID`);
+        return;
+      }
+
+      let formattedAnswer = "";
+      if (question.type === "multiple-choice") {
+        formattedAnswer = Array.isArray(localUserAnswers.value[index])
+          ? localUserAnswers.value[index].join(",")
+          : "";
+      } else if (question.type === "true-false") {
+        formattedAnswer = localUserAnswers.value[index] === "true" ? "A" : "B";
+      } else {
+        formattedAnswer = localUserAnswers.value[index] || "";
+      }
+
+      payload.studentAnswerDTOList.push({
+        questionId: questionId.toString(),
+        studentAnswer: formattedAnswer || "无",
+      });
+    });
+
+    console.log("提交的payload:", payload); // 现在是个对象
+  }
 
   try {
     // 发送单个对象
     const response = await studentService.submitStudentAnswer(payload);
-    console.log("提交成功并判题成1", response);
+    console.log("提交成功并判题成", response);
   } catch (error) {
     console.error("提交失败", error);
   }
 };
 
 // 监听examContent变化以解析题目
-watch(() => props.examContent, (newContent) => {
-  if (newContent) {
-    const parsed = parseExamContent(newContent);
-    questions.value = parsed;
-  } else {
-    questions.value = [];
+watch(
+  () => props.examContent,
+  (newContent) => {
+    if (newContent) {
+      const parsed = parseExamContent(newContent);
+      questions.value = parsed;
+    } else {
+      questions.value = [];
+    }
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
+  // console.log("questions", questions.value[0]);
+  // console.log("ids", props.minIds);
+  // console.log("homework", props.homeworks);
+  if (props.homeworks) {
+    const currentHomework = props.homeworks.find(
+      (hw) => hw.chapterId === props.chapterId
+    );
+
+    if (currentHomework) {
+      const hasAnswered = currentHomework.questions.some((q) => q.answered);
+      if (hasAnswered) {
+        currentHomework.questions.forEach((q, index) => {
+          if (index < questions.value.length) {
+            // 根据实际数据结构获取用户答案
+            const userAnswer = q.studentAnswer || "未作答";
+
+            if (userAnswer) {
+              if (questions.value[index].type === "multiple-choice") {
+                // 处理多选题答案
+                if (Array.isArray(userAnswer)) {
+                  localUserAnswers.value[index] = userAnswer;
+                } else if (typeof userAnswer === "string") {
+                  localUserAnswers.value[index] = userAnswer.split(",");
+                }
+              } else if (questions.value[index].type === "true-false") {
+                // 处理判断题答案
+                if (userAnswer === "A" || userAnswer === "true") {
+                  localUserAnswers.value[index] = "true";
+                } else if (userAnswer === "B" || userAnswer === "false") {
+                  localUserAnswers.value[index] = "false";
+                }
+              } else {
+                // 其他类型直接赋值
+                localUserAnswers.value[index] = userAnswer;
+              }
+            }
+          }
+        });
+        submitted.value = true;
+      }
+    }
   }
-}, { immediate: true });
+});
 </script>
 <style scoped>
 .exam-paper-container {
@@ -453,7 +644,7 @@ watch(() => props.examContent, (newContent) => {
 }
 
 .question-card:hover {
-  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.10);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.1);
 }
 
 .question-header {

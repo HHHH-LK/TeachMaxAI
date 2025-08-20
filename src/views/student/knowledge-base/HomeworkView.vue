@@ -3,31 +3,32 @@
     <h2>课程作业内容</h2>
     <div v-if="doingHomework">
       <button
-          class="back-button"
-          @click="backToList"
-          style="margin-bottom: 18px"
+        class="back-button"
+        @click="backToList"
+        style="margin-bottom: 18px"
       >
         ← 返回作业列表
       </button>
       <h3>{{ currentHomeworkTitle }}</h3>
       <ExamPaper
-          :examContent="currentHomeworkContent"
-          :courseId="props.courseId"
-          :userInfo="userInfo"
-          :chapterId="chapterIdNumber"
+        :examContent="currentHomeworkContent"
+        :courseId="props.courseId"
+        :userInfo="userInfo"
+        :chapterId="chapterIdNumber"
+        :homeworks="homeworks"
       />
     </div>
     <div v-else>
       <div class="homework-list">
         <div
-            class="homework-item"
-            v-for="homework in homeworks"
-            :key="homework.id"
+          class="homework-item"
+          v-for="homework in homeworks"
+          :key="homework.id"
         >
           <h3>{{ homework.title }}</h3>
-<!--          <p>题目数量: {{ homework.questions.length }}</p>-->
+          <!--          <p>题目数量: {{ homework.questions.length }}</p>-->
           <button class="start-button" @click.stop="startHomework(homework)">
-            开始做题
+            开始作业
           </button>
         </div>
       </div>
@@ -49,21 +50,20 @@ const props = defineProps({
 
 const homeworks = ref([]);
 const userInfo = ref("test");
-const chapterIdNumber = ref(null)
+const chapterIdNumber = ref(null);
 const selectedHomework = ref(null);
 const userAnswers = ref({});
 const doingHomework = ref(false);
 const currentHomeworkContent = ref("");
 const currentHomeworkTitle = ref("");
 
-console.log("props", props.courseId)
+console.log("props", props.courseId);
 //获取作业列表
 const fetchAllWork = async () => {
   // console.log("coures", props.courseId)
   try {
     const chapter = ref([]);
     const responseChapter = await studentService.getChapterInfo(props.courseId);
-    console.log("chapter", responseChapter.data);
     if (responseChapter.data) {
       chapter.value = responseChapter.data.data.map((item) => ({
         id: item.chapterId,
@@ -72,8 +72,8 @@ const fetchAllWork = async () => {
     let number = 1;
     for (var i = 0; i < chapter.value.length; i++) {
       const response = await studentService.getAllWork(
-          chapter.value[i].id,
-          props.courseId
+        chapter.value[i].id,
+        props.courseId
       );
       console.log("response", response.data);
       if (response.data.data) {
@@ -82,8 +82,9 @@ const fetchAllWork = async () => {
           title: `第${number}次作业`,
           chapterId: chapter.value[i].id, // 添加章节关联ID
           questions: [],
+          allAnswered: false,
         };
-        // console.log("homework", response.data)
+        console.log("homework", response.data);
         homework.questions = response.data.data.map((item) => {
           let parsedOptions = [];
           try {
@@ -98,10 +99,15 @@ const fetchAllWork = async () => {
             text: item.questionContent,
             options: parsedOptions, // 正确结构
             answer: item.correctAnswer.replace(/"/g, ""), // 去掉引号
+            answered: item.answered,
+            studentAnswer: item.studentAnswer
           };
         });
 
-        // console.log("homework", homework.value);
+        // console.log("homework", homework);
+        homework.allAnswered =
+          homework.questions.length > 0 &&
+          homework.questions.every((q) => q.answered === true);
 
         if (homework.questions.length) {
           number++;
@@ -125,34 +131,32 @@ function toExamPaperContent(questions) {
   };
 
   return questions
-      .map((q, idx) => {
-        const typeTag = typeMap[q.type] || "unknown-type";
+    .map((q, idx) => {
+      const typeTag = typeMap[q.type] || "unknown-type";
 
-        // options: [{ label: "A", content: "xxx" }]
-        const options = Array.isArray(q.options) ? q.options : [];
+      // options: [{ label: "A", content: "xxx" }]
+      const options = Array.isArray(q.options) ? q.options : [];
 
-        const opts = options
-            .map((opt) => `${opt.label}. ${opt.content}`)
-            .join("\n");
+      const opts = options
+        .map((opt) => `${opt.label}. ${opt.content}`)
+        .join("\n");
 
-        // 处理答案
-        let answerText = "";
-        if (q.type === "multiple_choice") {
-          // 多选答案为字符串数组或逗号分隔的字符串
-          if (Array.isArray(q.answer)) {
-            answerText = q.answer.join(",");
-          } else {
-            answerText = q.answer;
-          }
+      // 处理答案
+      let answerText = "";
+      if (q.type === "multiple_choice") {
+        // 多选答案为字符串数组或逗号分隔的字符串
+        if (Array.isArray(q.answer)) {
+          answerText = q.answer.join(",");
         } else {
           answerText = q.answer;
         }
+      } else {
+        answerText = q.answer;
+      }
 
-        return `${idx + 1}. [${typeTag}] ${
-            q.text
-        }\n${opts}\n答案: ${answerText}`;
-      })
-      .join("\n\n");
+      return `${idx + 1}. [${typeTag}] ${q.text}\n${opts}\n答案: ${answerText}`;
+    })
+    .join("\n\n");
 }
 //选择作业项
 const selectHomework = (homework) => {
@@ -174,13 +178,13 @@ const backToList = () => {
 };
 
 watch(
-    () => props.courseId,
-    (newCourseId) => {
-      if (newCourseId) {
-        fetchAllWork();
-      }
-    },
-    { immediate: true }
+  () => props.courseId,
+  (newCourseId) => {
+    if (newCourseId) {
+      fetchAllWork();
+    }
+  },
+  { immediate: true }
 );
 </script>
 
