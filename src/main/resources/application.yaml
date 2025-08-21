@@ -1,6 +1,6 @@
 server:
-  port: 8109
-  address: localhost
+  port: 8108
+  address: 0.0.0.0
 
 spring:
   application:
