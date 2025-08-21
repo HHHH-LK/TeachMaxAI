@@ -23,12 +23,17 @@ import java.util.*;
 @RequestMapping("/test")
 public class JavaRAGTestController {
 
-    @Autowired private SeptIntentRagHandler handler;
-    @Autowired private ContentRetriever contentRetriever; // 使用 @Primary 的那份
-    @Autowired private ChatLanguageModel chatModel;
+    @Autowired
+    private SeptIntentRagHandler handler;
+    @Autowired
+    private ContentRetriever contentRetriever; // 使用 @Primary 的那份
+    @Autowired
+    private ChatLanguageModel chatModel;
 
-    @Autowired private EmbeddingStore<TextSegment> store;
-    @Autowired private EmbeddingModel embeddingModel;
+    @Autowired
+    private EmbeddingStore<TextSegment> store;
+    @Autowired
+    private EmbeddingModel embeddingModel;
 
     /**
      * 运行 Java 程序设计 RAG 的 A/B 测试
@@ -52,6 +57,13 @@ public class JavaRAGTestController {
         return "Java 程序设计 RAG A/B 测试已完成，请查看控制台输出和结果文件";
     }
 
+    @GetMapping("/RAG/test")
+    public String runRAG(@RequestParam String userQuery) {
+
+        return handler.executeDirectTask(userQuery);
+
+    }
+
     /**
      * 运行 Java 程序设计专项性能测试
      */
@@ -68,7 +80,7 @@ public class JavaRAGTestController {
         ingestor.ingest(docs);
 
         // 性能测试
-       JavaPerformanceTest perfTest =
+        JavaPerformanceTest perfTest =
                 new com.aiproject.smartcampus.test.ab.JavaPerformanceTest(handler, contentRetriever);
         perfTest.testConcurrentPerformance();
         perfTest.testJavaRetrievalQuality();

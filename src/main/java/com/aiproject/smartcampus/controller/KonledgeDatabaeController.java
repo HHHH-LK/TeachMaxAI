@@ -24,7 +24,7 @@ public class KonledgeDatabaeController {
 
         /*File pdfFile = new File("/Users/lk_hhh/Desktop/Thinking+in+Java+4th+Edition（JAVA编程思想 第四版 英文版）.pdf");
         log.info("documentation 接收到的 file: {}, exists: {}", pdfFile, pdfFile == null ? "null" : pdfFile.exists());*/
-        fileloadFunction.documentsloade(null);
+        fileloadFunction.processDocumentDynamically(null);
         return "加载成功";
 
     }

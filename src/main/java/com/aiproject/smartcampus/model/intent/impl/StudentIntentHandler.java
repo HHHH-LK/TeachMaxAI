@@ -66,7 +66,7 @@ public class StudentIntentHandler implements Intent {
             }
 
             // 进行路由并获取总结
-            result = stepIntentRouter.route(intentSpider);
+            result = stepIntentRouter.route(intentSpider,intent);
             log.info("用户意图 [{}] 处理完成，处理结果: [{}]", intent, result);
 
         } catch (Exception e) {

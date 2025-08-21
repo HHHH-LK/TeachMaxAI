@@ -6,7 +6,7 @@ import java.util.List;
 public interface StepRouter {
 
     //意图路由
-    String route(List<String> intent);
+    String route(List<String> intent,String userQuery);
 
 
 }

@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.rag;
 
+
 import com.aiproject.smartcampus.model.rag.FileloadFunction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ class FileloadFunctionTest {
     @Test
     void test() {
 
-        fileloadFunction.documentsloade(new File("documents/java_programming_guide.md"));
+        fileloadFunction.processDocumentDynamically(new File("/Users/lk_hhh/Documents/ss/TeacherMaxAI/documents/java_programming_guide.md"));
 
 
     }

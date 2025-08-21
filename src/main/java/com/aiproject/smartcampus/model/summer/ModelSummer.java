@@ -53,6 +53,7 @@ public class ModelSummer {
      * 兼容旧入口（无用户问题时，不注入历史记忆）
      */
     public String summer(List<String> intents) {
+
         return summer(intents, null);
     }
 
@@ -118,10 +119,96 @@ public class ModelSummer {
 
         return intents.stream()
                 .distinct()
-                .sorted((a, b) -> intentWeights.getOrDefault(b, 0) - intentWeights.getOrDefault(a, 0))
+                .sorted((a, b) ->
+                        intentWeights.getOrDefault(generateHighQualitySummary(b), 0) - intentWeights.getOrDefault(generateHighQualitySummary(a), 0))
                 .limit(3)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 获取分解意图的处理
+     * 单条文本 -> 对每个标签打分 -> 返回最高分标签
+     */
+    private String generateHighQualitySummary(String qualityResults) {
+        if (qualityResults == null || qualityResults.isEmpty()) {
+            return "general";
+        }
+
+        // 标签及权重
+        Map<String, Integer> labels = Map.of(
+                "search", 10,
+                "question", 9,
+                "analysis", 8,
+                "recommendation", 7,
+                "calculation", 6,
+                "education", 5,
+                "general", 1
+        );
+
+        // 标签对应关键词，用于评分
+        Map<String, List<String>> labelKeywords = Map.of(
+                "search", List.of(
+                        "查询", "查找", "搜索", "获取", "查看", "成绩", "资料",
+                        "信息", "数据", "记录", "名单", "列表", "定位", "搜索结果", "检索", "查阅"
+                ),
+                "question", List.of(
+                        "为什么", "是什么", "怎么", "如何", "解答", "问", "原因",
+                        "疑问", "原因分析", "解释", "说明", "问题", "请问", "怎么做", "能否"
+                ),
+                "analysis", List.of(
+                        "分析", "评估", "研究", "对比", "剖析", "诊断",
+                        "统计", "总结", "趋势", "规律", "模型", "计算", "报告", "判断", "解析"
+                ),
+                "recommendation", List.of(
+                        "推荐", "建议", "选择", "路线", "方案", "规划",
+                        "指导", "指导意见", "提示", "推荐方案", "推荐课程", "推荐资源", "引导"
+                ),
+                "calculation", List.of(
+                        "计算", "运算", "结果", "推理", "平均", "总和", "公式",
+                        "求和", "求平均", "求最大值", "求最小值", "统计", "数学计算", "算出", "估算"
+                ),
+                "education", List.of(
+                        "学习", "教学", "课程", "辅导", "训练", "练习", "题库",
+                        "课堂", "教学计划", "知识点", "作业", "复习", "教学资源", "教学安排", "课堂内容"
+                ),
+                "general", List.of(
+                        "信息", "内容", "说明", "帮助", "介绍",
+                        "功能", "系统", "通知", "提示", "公告", "消息", "通用"
+                )
+        );
+
+
+        String bestLabel = "general";
+        double bestScore = -1;
+
+        for (Map.Entry<String, List<String>> entry : labelKeywords.entrySet()) {
+            String label = entry.getKey();
+            List<String> keywords = entry.getValue();
+            int weight = labels.getOrDefault(label, 1);
+
+            double score = 0.0;
+
+            for (String kw : keywords) {
+                if (qualityResults.contains(kw)) {
+                    // 完全匹配关键字 → 得权重分
+                    score = Math.max(score, weight);
+                } else {
+                    // 模糊匹配：公共字符数 / 平均长度 * 权重
+                    long common = qualityResults.chars().filter(ch -> kw.indexOf(ch) >= 0).count();
+                    double fuzzyScore = weight * (2.0 * common / (qualityResults.length() + kw.length()));
+                    score = Math.max(score, fuzzyScore);
+                }
+            }
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestLabel = label;
+            }
+        }
+
+        return bestLabel;
+    }
+
 
     /**
      * 获取高质量结果
@@ -169,7 +256,11 @@ public class ModelSummer {
 
             return futures.stream()
                     .map(f -> {
-                        try { return f.get(); } catch (Exception e) { return null; }
+                        try {
+                            return f.get();
+                        } catch (Exception e) {
+                            return null;
+                        }
                     })
                     .filter(Objects::nonNull)
                     .filter(this::isQualityResult)
@@ -232,7 +323,10 @@ public class ModelSummer {
             boolean dup = false;
             try {
                 for (String ex : deduplicated) {
-                    if (calculateSimilarity(r, ex) > SIMILARITY_THRESHOLD) { dup = true; break; }
+                    if (calculateSimilarity(r, ex) > SIMILARITY_THRESHOLD) {
+                        dup = true;
+                        break;
+                    }
                 }
             } catch (Exception e) {
                 log.debug("相似度计算异常，使用直接包含判断");
@@ -273,8 +367,10 @@ public class ModelSummer {
         if (s1.isEmpty() && s2.isEmpty()) return 1.0;
         if (s1.isEmpty() || s2.isEmpty()) return 0.0;
 
-        Set<String> inter = new HashSet<>(s1); inter.retainAll(s2);
-        Set<String> union = new HashSet<>(s1); union.addAll(s2);
+        Set<String> inter = new HashSet<>(s1);
+        inter.retainAll(s2);
+        Set<String> union = new HashSet<>(s1);
+        union.addAll(s2);
 
         return (double) inter.size() / union.size();
     }
@@ -285,7 +381,8 @@ public class ModelSummer {
     private int calculateQualityScore(String result) {
         int score = 0;
         int len = result.length();
-        if (len >= 50 && len <= 300) score += 10; else if (len > 300) score += 5;
+        if (len >= 50 && len <= 300) score += 10;
+        else if (len > 300) score += 5;
         if (result.contains("。") || result.contains("！") || result.contains("？")) score += 15;
         long sentences = result.chars().filter(ch -> ch == '。' || ch == '！' || ch == '？').count();
         if (sentences >= 2) score += 10;
@@ -435,7 +532,8 @@ public class ModelSummer {
         if (text.contains("根据") || text.contains("显示")) score += 10;
 
         long sentenceCount = text.chars().filter(ch -> ch == '。' || ch == '！' || ch == '？').count();
-        if (sentenceCount >= 3) score += 25; else if (sentenceCount >= 2) score += 15;
+        if (sentenceCount >= 3) score += 25;
+        else if (sentenceCount >= 2) score += 15;
 
         if (!text.contains("**") && !text.contains("*") && !text.contains("#")) score += 25;
 

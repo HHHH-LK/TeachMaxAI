@@ -6,6 +6,7 @@ import com.aiproject.smartcampus.commons.utils.PromptUtils;
 import com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler;
 import com.aiproject.smartcampus.service.TeacherAIservice;
 
+import com.aiproject.smartcampus.test.ab.JavaRAGABTestIntegration;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
 import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;

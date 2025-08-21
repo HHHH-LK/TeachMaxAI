@@ -121,7 +121,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
         }
     }
 
-    private String executeDirectTask(String intent) {
+    public String executeDirectTask(String intent) {
         try {
             List<ScoredContent> scoredContents = performMultiDimensionalRetrieval(intent);
             if (scoredContents.isEmpty()) {
@@ -314,7 +314,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
                                     })
                                     .sorted(Comparator.comparingDouble(ScoredContent::getScore).reversed())
                                     .limit(TOP_K_PER_STRATEGY)
-                                    .collect(Collectors.toList());
+                                    .toList();
 
                             // 关键词打分
                             List<ScoredContent> keywordList = candidates.stream()
@@ -326,7 +326,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
                                     })
                                     .sorted(Comparator.comparingDouble(ScoredContent::getScore).reversed())
                                     .limit(TOP_K_PER_STRATEGY)
-                                    .collect(Collectors.toList());
+                                    .toList();
 
                             // 混合打分
                             List<ScoredContent> hybrid = candidates.stream()
@@ -342,7 +342,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
                                     })
                                     .sorted(Comparator.comparingDouble(ScoredContent::getScore).reversed())
                                     .limit(TOP_K_PER_STRATEGY)
-                                    .collect(Collectors.toList());
+                                    .toList();
 
                             List<ScoredContent> ret = new ArrayList<>(semantic.size() + keywordList.size() + hybrid.size());
                             ret.addAll(semantic);
@@ -608,7 +608,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
             if (StringUtils.hasText(sectionTitle)) {
                 sb.append("章节: ").append(sectionTitle).append("\n");
             }
-            sb.append("相关度: ").append(String.format("%.4f", sc.getScore())).append("\n");
+            sb.append("“RRF排名分: ").append(String.format("%.4f", sc.getScore())).append("\n");
             sb.append("内容: ").append(snippet).append("\n\n");
         }
         return sb.toString();

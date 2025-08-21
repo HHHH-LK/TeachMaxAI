@@ -4,11 +4,13 @@ import com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler;
 import dev.langchain4j.rag.content.Content;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.query.Query;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class JavaPerformanceTest {
 
     private final SeptIntentRagHandler handler;
@@ -49,6 +51,8 @@ public class JavaPerformanceTest {
                 .map(CompletableFuture::join)
                 .toList();
 
+        log.info("RAG检索结果为: {}", results);
+
         long totalTime = System.currentTimeMillis() - startTime;
 
         System.out.println("=== Java程序设计并发性能测试结果 ===");
@@ -82,14 +86,15 @@ public class JavaPerformanceTest {
             try {
                 List<Content> retrieved = retriever.retrieve(Query.from(query));
 
-                    long matches = retrieved.stream()
-                            .filter(content -> expectedDocs.stream()
-                                    .anyMatch(docId -> {
-                                        if (content.textSegment() == null || content.textSegment().metadata() == null) return false;
-                                        var md = content.textSegment().metadata();
-                                        return md.containsKey("id") && docId.equals(md.getString("id"));
-                                    }))
-                            .count();
+                long matches = retrieved.stream()
+                        .filter(content -> expectedDocs.stream()
+                                .anyMatch(docId -> {
+                                    if (content.textSegment() == null || content.textSegment().metadata() == null)
+                                        return false;
+                                    var md = content.textSegment().metadata();
+                                    return md.containsKey("id") && docId.equals(md.getString("id"));
+                                }))
+                        .count();
 
                 double precision = retrieved.isEmpty() ? 0 : (double) matches / retrieved.size();
                 totalPrecision += precision;

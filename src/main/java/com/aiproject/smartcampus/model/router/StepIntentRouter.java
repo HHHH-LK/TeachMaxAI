@@ -48,7 +48,7 @@ public class StepIntentRouter implements StepRouter {
     private static final int SINGLE_TASK_TIMEOUT_SECONDS = 180;       // 单任务超时：120s -> 180s (3分钟)
 
     @Override
-    public String route(List<String> intents) {
+    public String route(List<String> intents,String userQuery) {
         log.info("开始进行意图路由,意图为：{}", intents);
         // 内容检查
         boolean check = contentCheckClient.check(intents);
@@ -62,10 +62,10 @@ public class StepIntentRouter implements StepRouter {
             if (!success) {
                 log.error("任务执行失败或超时");
                 return "任务执行失败，请稍后重试";
+
             }
             // 获取总结
-            String summer = modelSummer.summer(intents);
-            return summer;
+            return modelSummer.summer(intents,userQuery);
         } catch (Exception e) {
             log.error("路由执行过程中发生异常", e);
             return "处理请求时发生异常，请稍后重试";
