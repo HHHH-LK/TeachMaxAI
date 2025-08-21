@@ -1,6 +1,7 @@
 package com.aiproject.smartcampus.controller;
 
 
+import com.aiproject.smartcampus.model.rag.FileloadFunction;
 import com.aiproject.smartcampus.test.ab.JavaPerformanceTest;
 import com.aiproject.smartcampus.test.ab.JavaRAGABTestIntegration;
 import com.aiproject.smartcampus.test.ab.JavaTestDataGenerator;
@@ -12,14 +13,18 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler;
 
+import java.io.File;
+import java.net.URL;
 import java.util.*;
 
 @RestController
+@Slf4j
 @RequestMapping("/test")
 public class JavaRAGTestController {
 
@@ -29,7 +34,8 @@ public class JavaRAGTestController {
     private ContentRetriever contentRetriever; // 使用 @Primary 的那份
     @Autowired
     private ChatLanguageModel chatModel;
-
+    @Autowired
+    private FileloadFunction fileloadFunction;
     @Autowired
     private EmbeddingStore<TextSegment> store;
     @Autowired
@@ -91,4 +97,76 @@ public class JavaRAGTestController {
         result.put("timestamp", new Date());
         return result;
     }
+
+    /**
+     * 导入知识库资料
+     */
+
+    @GetMapping("/knowledge/database")
+    public void loadKnowledgeDatabase(String url) {
+
+        if (url == null||url.isEmpty()) {
+            return;
+        }
+
+        // 搜索所有文件
+        List<File> allFiles = searchAllFiles(url);
+
+        log.info("开始知识库文件，一共【{}】个数据文件", allFiles.size());
+
+        for (File file : allFiles) {
+            fileloadFunction.processDocumentDynamically(file);
+            log.info("文件{}导入完毕", file.getName());
+        }
+
+        log.info("导入知识库文件成功，一共处理了【{}】条数据", allFiles.size());
+    }
+
+    /**
+     * 从指定的父文件夹中搜索所有文件（包括子文件夹中的文件）
+     *
+     * @param parentFolderPath 父文件夹路径
+     * @return 包含所有文件的List集合
+     */
+    public static List<File> searchAllFiles(String parentFolderPath) {
+        List<File> fileList = new ArrayList<>();
+        File parentFolder = new File(parentFolderPath);
+
+        // 检查父文件夹是否存在且是一个目录
+        if (!parentFolder.exists() || !parentFolder.isDirectory()) {
+            System.out.println("错误：指定的路径不存在或不是一个文件夹 - " + parentFolderPath);
+            return fileList;
+        }
+
+        // 递归搜索文件
+        searchFilesRecursively(parentFolder, fileList);
+        return fileList;
+    }
+
+    /**
+     * 递归搜索文件夹中的所有文件
+     *
+     * @param folder   要搜索的文件夹
+     * @param fileList 存储找到的文件的集合
+     */
+    private static void searchFilesRecursively(File folder, List<File> fileList) {
+        // 获取文件夹中的所有文件和子文件夹
+        File[] files = folder.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    // 如果是文件，添加到集合中
+                    fileList.add(file);
+                } else if (file.isDirectory()) {
+                    // 如果是文件夹，递归搜索
+                    searchFilesRecursively(file, fileList);
+                }
+            }
+        } else {
+            // 处理无法访问的文件夹（如权限问题）
+            System.out.println("警告：无法访问文件夹 - " + folder.getAbsolutePath());
+        }
+    }
+
 }

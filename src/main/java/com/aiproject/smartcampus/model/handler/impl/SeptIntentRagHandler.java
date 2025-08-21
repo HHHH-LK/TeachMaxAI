@@ -95,7 +95,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
     @Data
     public static class ScoredContent {
         private Content content;
-        private double score;
+        private double score; // 用于排序显示，融合后默认为 RRF 分
         private RetrievalStrategy strategy;
         private Map<String, Double> dimensionScores = new HashMap<>();
 
@@ -290,12 +290,10 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
 
     /**
      * 多维度检索：每个扩展 query 只进行一次召回，在内存中做多策略打分
-     * 修复类型问题
      */
     private List<ScoredContent> performMultiDimensionalRetrieval(String intent) {
         List<String> expandedQueries = expandQuery(intent);
 
-        // 修复：明确指定泛型类型为 List<ScoredContent>
         List<CompletableFuture<List<ScoredContent>>> futures = expandedQueries.stream()
                 .map(q -> CompletableFuture.supplyAsync(() -> {
                             List<Content> candidates = safeRetrieve(q, TOP_K_CANDIDATES);
@@ -379,6 +377,8 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
 
     /**
      * RRF 融合与重排序，按内容唯一键聚合
+     * - 使用策略权重加权 RRF：add = strategy.weight / (RRF_K + rank)
+     * - 计算并存储 rrf 与 rrf_norm（min-max 归一化）
      */
     private List<ScoredContent> fuseAndRerankRRF(List<ScoredContent> scoredContents) {
         if (scoredContents == null || scoredContents.isEmpty()) return Collections.emptyList();
@@ -394,7 +394,6 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
 
         for (Map.Entry<RetrievalStrategy, List<ScoredContent>> entry : byStrategy.entrySet()) {
             RetrievalStrategy st = entry.getKey();
-            // 对于同一内容，只记第一次出现的 rank（更靠前的版本）
             List<ScoredContent> sorted = entry.getValue().stream()
                     .sorted(Comparator.comparingDouble(ScoredContent::getScore).reversed())
                     .toList();
@@ -403,10 +402,14 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
             int rank = 1;
             for (ScoredContent sc : sorted) {
                 String key = contentKey(sc.getContent());
-                if (seen.contains(key)) continue;
+                if (seen.contains(key)) {
+                    rank++;
+                    continue;
+                }
                 seen.add(key);
 
-                double add = 1.0 / (RRF_K + rank);
+                // 策略加权 RRF
+                double add = st.getWeight() / (RRF_K + rank);
                 rrfScore.merge(key, add, Double::sum);
 
                 // 代表条目：保留最高分的作为代表
@@ -422,13 +425,29 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
             }
         }
 
+        // 计算归一化（min-max）
+        double max = rrfScore.values().stream().mapToDouble(Double::doubleValue).max().orElse(1.0);
+        double min = rrfScore.values().stream().mapToDouble(Double::doubleValue).min().orElse(0.0);
+
         // 组装融合结果
         List<ScoredContent> fused = new ArrayList<>(representative.size());
         for (Map.Entry<String, ScoredContent> e : representative.entrySet()) {
+            String key = e.getKey();
             ScoredContent rep = e.getValue();
-            rep.setScore(rrfScore.getOrDefault(e.getKey(), 0.0));
+
+            double rrf = rrfScore.getOrDefault(key, 0.0);
+            double rrfn = (rrf - min) / (Math.max(1e-9, (max - min)));
+
+            // 排序分使用原始 RRF（也可改为 rrfn）
+            rep.setScore(rrf);
             rep.setStrategy(RetrievalStrategy.HYBRID); // 标记为融合
-            rep.setDimensionScores(dimAgg.getOrDefault(e.getKey(), Collections.emptyMap()));
+
+            // 维度分：聚合维度 + RRF 指标
+            Map<String, Double> dims = new HashMap<>(dimAgg.getOrDefault(key, Collections.emptyMap()));
+            dims.put("rrf", rrf);
+            dims.put("rrf_norm", rrfn);
+            rep.setDimensionScores(dims);
+
             fused.add(rep);
         }
 
@@ -588,6 +607,8 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
 
     /**
      * 构建最终结果
+     * - 显示 RRF 排名分与归一化分
+     * - 同时展示 semantic/keyword/hybrid 维度分，提升可解释性
      */
     private String buildFinalResult(List<ScoredContent> fusedResults, String intent) {
         StringBuilder sb = new StringBuilder();
@@ -604,11 +625,29 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
                 sectionTitle = getMeta(sc.getContent(), "标题"); // 若使用自然语言前缀入库
             }
 
+            // 维度分与 RRF 分
+            Map<String, Double> dims = sc.getDimensionScores() != null ? sc.getDimensionScores() : Collections.emptyMap();
+            double rrf = dims.getOrDefault("rrf", sc.getScore());
+            Double rrfn = dims.get("rrf_norm");
+            Double sem = dims.get("semantic");
+            Double key = dims.get("keyword");
+            Double hyb = dims.get("hybrid");
+
             sb.append("【结果 ").append(i + 1).append("】\n");
             if (StringUtils.hasText(sectionTitle)) {
                 sb.append("章节: ").append(sectionTitle).append("\n");
             }
-            sb.append("“RRF排名分: ").append(String.format("%.4f", sc.getScore())).append("\n");
+            sb.append("RRF排名分: ").append(String.format("%.4f", rrf));
+            if (rrfn != null) {
+                sb.append(" | 归一化: ").append(String.format("%.3f", rrfn));
+            }
+            if (sem != null || key != null || hyb != null) {
+                sb.append(" | 维度分:");
+                if (sem != null) sb.append(" 语义=").append(String.format("%.3f", sem));
+                if (key != null) sb.append(" 关键词=").append(String.format("%.3f", key));
+                if (hyb != null) sb.append(" 混合=").append(String.format("%.3f", hyb));
+            }
+            sb.append("\n");
             sb.append("内容: ").append(snippet).append("\n\n");
         }
         return sb.toString();
@@ -653,11 +692,11 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
 
     // 可选：移除可能的人工标签痕迹
     private static final Pattern BLOCK_MATH = Pattern.compile(
-            "```math\\s*\\R(.*?)\n```",                // 匹配 ```math ... ``` 块
+            "```math\\s*\\R(.*?)\n```",
             Pattern.DOTALL);
 
     private static final Pattern LINE_TITLE_OR_KEYWORD = Pattern.compile(
-            "^\\s*(标题|关键词)\\s*:.*\\R?",             // 匹配"标题:"或"关键词:"开头的整行
+            "^\\s*(标题|关键词)\\s*:.*\\R?",
             Pattern.MULTILINE);
 
     /**
@@ -671,8 +710,8 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
         Matcher m = BLOCK_MATH.matcher(text);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
-            String blockBody = m.group(1);                       // 取出 ```math 里的内容
-            String cleaned = LINE_TITLE_OR_KEYWORD               // 删除指定行
+            String blockBody = m.group(1);
+            String cleaned = LINE_TITLE_OR_KEYWORD
                     .matcher(blockBody)
                     .replaceAll("");
             m.appendReplacement(sb,
@@ -683,7 +722,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
     }
 
     /**
-     * 修复：使用文本内容的哈希值作为唯一标识，而不是使用不存在的id()方法
+     * 使用文本内容的哈希值作为唯一标识，优先 metadata.document_id 和 position
      */
     private String contentKey(Content content) {
         // 获取文本内容
