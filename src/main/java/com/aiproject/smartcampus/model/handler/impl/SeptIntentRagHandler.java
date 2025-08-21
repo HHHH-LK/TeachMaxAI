@@ -67,6 +67,11 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
     private static final int RETRIEVAL_TIMEOUT_SECONDS = 10;
     private static final int RRF_K = 60;                // RRF 稳定常数
 
+    // 评估与展示参数
+    private static final double ESTIMATE_GOOD_HYBRID_THRESHOLD = 0.60; // 估计“相关”阈值（用于 Precision@K）
+    private static final double CONF_WEIGHT_RRF_THEO = 0.5; // 匹配度中 RRF 理论归一化权重
+    private static final double CONF_WEIGHT_HYBRID   = 0.5; // 匹配度中 hybrid 分权重
+
     // Embedding 缓存（简单 LRU）
     private final Map<String, double[]> embeddingCache = Collections.synchronizedMap(
             new LinkedHashMap<String, double[]>(1024, 0.75f, true) {
@@ -378,19 +383,19 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
     /**
      * RRF 融合与重排序，按内容唯一键聚合
      * - 使用策略权重加权 RRF：add = strategy.weight / (RRF_K + rank)
-     * - 计算并存储 rrf 与 rrf_norm（min-max 归一化）
+     * - 计算并存储 rrf 与归一化（min-max + 兜底 + 理论上限）
+     * - 记录每条内容的“策略支持数”（命中的策略数），用于直观解释
      */
     private List<ScoredContent> fuseAndRerankRRF(List<ScoredContent> scoredContents) {
         if (scoredContents == null || scoredContents.isEmpty()) return Collections.emptyList();
 
-        // 分策略排序并生成 rank
         Map<RetrievalStrategy, List<ScoredContent>> byStrategy = scoredContents.stream()
                 .collect(Collectors.groupingBy(ScoredContent::getStrategy));
 
-        // 用内容 key 做聚合
         Map<String, Double> rrfScore = new HashMap<>();
         Map<String, ScoredContent> representative = new HashMap<>();
         Map<String, Map<String, Double>> dimAgg = new HashMap<>();
+        Map<String, Set<RetrievalStrategy>> supportMap = new HashMap<>(); // 记录命中的策略集合
 
         for (Map.Entry<RetrievalStrategy, List<ScoredContent>> entry : byStrategy.entrySet()) {
             RetrievalStrategy st = entry.getKey();
@@ -412,6 +417,9 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
                 double add = st.getWeight() / (RRF_K + rank);
                 rrfScore.merge(key, add, Double::sum);
 
+                // 支持策略计数
+                supportMap.computeIfAbsent(key, k -> new HashSet<>()).add(st);
+
                 // 代表条目：保留最高分的作为代表
                 representative.merge(key, sc, (oldV, newV) ->
                         (newV.getScore() > oldV.getScore()) ? newV : oldV);
@@ -425,9 +433,26 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
             }
         }
 
-        // 计算归一化（min-max）
+        // RRF min-max 归一化所需范围
         double max = rrfScore.values().stream().mapToDouble(Double::doubleValue).max().orElse(1.0);
         double min = rrfScore.values().stream().mapToDouble(Double::doubleValue).min().orElse(0.0);
+        double spread = max - min;
+
+        // 排名归一化兜底（无零版）：保证末位也 > 0
+        List<Map.Entry<String, Double>> sortedByRrf = rrfScore.entrySet().stream()
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .toList();
+        Map<String, Double> rrfnRankNoZero = new HashMap<>();
+        int n = sortedByRrf.size();
+        for (int i = 0; i < n; i++) {
+            rrfnRankNoZero.put(sortedByRrf.get(i).getKey(), (n - i) / (n + 1.0));
+        }
+        boolean degenerate = spread < 1e-12 || n <= 1;
+
+        // 理论上限（跨查询可比）
+        double rrfMaxTheoretical = Arrays.stream(RetrievalStrategy.values())
+                .mapToDouble(st -> st.getWeight() / (RRF_K + 1.0))
+                .sum();
 
         // 组装融合结果
         List<ScoredContent> fused = new ArrayList<>(representative.size());
@@ -436,16 +461,22 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
             ScoredContent rep = e.getValue();
 
             double rrf = rrfScore.getOrDefault(key, 0.0);
-            double rrfn = (rrf - min) / (Math.max(1e-9, (max - min)));
+            double rrfnMinMax = degenerate ? rrfnRankNoZero.getOrDefault(key, 0.5)
+                    : (rrf - min) / (spread + 1e-12);
+            double rrfnTheoretical = rrfMaxTheoretical > 0 ? Math.min(1.0, rrf / rrfMaxTheoretical) : 0.0;
+            int support = supportMap.getOrDefault(key, Collections.emptySet()).size();
 
-            // 排序分使用原始 RRF（也可改为 rrfn）
+            // 排序分使用原始 RRF（也可改为 rrfnMinMax/rrfnTheoretical）
             rep.setScore(rrf);
             rep.setStrategy(RetrievalStrategy.HYBRID); // 标记为融合
 
-            // 维度分：聚合维度 + RRF 指标
+            // 维度分：聚合维度 + RRF 指标 + 策略支持数
             Map<String, Double> dims = new HashMap<>(dimAgg.getOrDefault(key, Collections.emptyMap()));
             dims.put("rrf", rrf);
-            dims.put("rrf_norm", rrfn);
+            dims.put("rrf_norm", rrfnMinMax);                // 列表内可比（兜底）
+            dims.put("rrf_norm_theoretical", rrfnTheoretical); // 跨查询可比
+            dims.put("rrf_rank_norm", rrfnRankNoZero.getOrDefault(key, 0.5)); // 兜底值
+            dims.put("strategy_support", (double) support);    // 命中的策略个数
             rep.setDimensionScores(dims);
 
             fused.add(rep);
@@ -606,16 +637,20 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
     }
 
     /**
-     * 构建最终结果
-     * - 显示 RRF 排名分与归一化分
-     * - 同时展示 semantic/keyword/hybrid 维度分，提升可解释性
+     * 构建最终结果（更直白）
+     * - 顶部“总体指标”：估计精确度@K、平均匹配度、策略一致性、理论归一化分范围
+     * - 单条结果：匹配度%、策略支持、RRF排名分、归一化分、维度分
      */
     private String buildFinalResult(List<ScoredContent> fusedResults, String intent) {
         StringBuilder sb = new StringBuilder();
         sb.append("查询意图: ").append(intent).append("\n");
-        sb.append("检索到 ").append(fusedResults.size()).append(" 个相关结果\n\n");
 
-        for (int i = 0; i < Math.min(TOP_N_FINAL, fusedResults.size()); i++) {
+        // 总体指标
+        sb.append(buildOverallMetrics(fusedResults));
+
+        // 逐条展示
+        int show = Math.min(TOP_N_FINAL, fusedResults.size());
+        for (int i = 0; i < show; i++) {
             ScoredContent sc = fusedResults.get(i);
             String text = extractDisplayText(sc.getContent());
             String snippet = text.length() > 400 ? text.substring(0, 400) + "..." : text;
@@ -625,32 +660,109 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
                 sectionTitle = getMeta(sc.getContent(), "标题"); // 若使用自然语言前缀入库
             }
 
-            // 维度分与 RRF 分
             Map<String, Double> dims = sc.getDimensionScores() != null ? sc.getDimensionScores() : Collections.emptyMap();
             double rrf = dims.getOrDefault("rrf", sc.getScore());
             Double rrfn = dims.get("rrf_norm");
+            Double rrfnTheo = dims.get("rrf_norm_theoretical");
+            Double rrfnRank = dims.get("rrf_rank_norm");
             Double sem = dims.get("semantic");
             Double key = dims.get("keyword");
             Double hyb = dims.get("hybrid");
+            int support = dims.containsKey("strategy_support") ? dims.get("strategy_support").intValue() : 1;
+            double confidence = computeMatchConfidence(rrfnTheo, rrfn, hyb);
 
             sb.append("【结果 ").append(i + 1).append("】\n");
             if (StringUtils.hasText(sectionTitle)) {
                 sb.append("章节: ").append(sectionTitle).append("\n");
             }
-            sb.append("RRF排名分: ").append(String.format("%.4f", rrf));
+            sb.append("匹配度: ").append(formatPercent(confidence));
+            sb.append(" | 策略支持: ").append(support).append("/").append(RetrievalStrategy.values().length);
+            sb.append(" | 综合排名分(RRF): ").append(String.format("%.4f", rrf));
             if (rrfn != null) {
-                sb.append(" | 归一化: ").append(String.format("%.3f", rrfn));
+                sb.append(" | 归一化: ").append(String.format("%.4f", rrfn));
+            }
+            if (rrfnTheo != null) {
+                sb.append(" | 理论归一化: ").append(String.format("%.4f", rrfnTheo));
+            }
+            if (rrfnRank != null) {
+                sb.append(" | 排名归一化兜底: ").append(String.format("%.4f", rrfnRank));
             }
             if (sem != null || key != null || hyb != null) {
-                sb.append(" | 维度分:");
+                sb.append("\n维度分:");
                 if (sem != null) sb.append(" 语义=").append(String.format("%.3f", sem));
                 if (key != null) sb.append(" 关键词=").append(String.format("%.3f", key));
                 if (hyb != null) sb.append(" 混合=").append(String.format("%.3f", hyb));
             }
-            sb.append("\n");
-            sb.append("内容: ").append(snippet).append("\n\n");
+            sb.append("\n内容: ").append(snippet).append("\n\n");
         }
         return sb.toString();
+    }
+
+    /**
+     * 总体指标（更直白的“精确度”等信息）
+     */
+    private String buildOverallMetrics(List<ScoredContent> fusedResults) {
+        int total = fusedResults.size();
+        int show = Math.min(TOP_N_FINAL, total);
+
+        double sumConf = 0.0;
+        double sumSupport = 0.0;
+        int good = 0;
+        double minTheo = 1.0, maxTheo = 0.0;
+
+        for (int i = 0; i < show; i++) {
+            Map<String, Double> dims = fusedResults.get(i).getDimensionScores();
+            Double rrfnTheo = dims.get("rrf_norm_theoretical");
+            Double rrfn = dims.get("rrf_norm");
+            Double hyb = dims.get("hybrid");
+            int support = dims.containsKey("strategy_support") ? dims.get("strategy_support").intValue() : 1;
+
+            double conf = computeMatchConfidence(rrfnTheo, rrfn, hyb);
+            sumConf += conf;
+            sumSupport += support;
+
+            double theo = rrfnTheo != null ? rrfnTheo : 0.0;
+            minTheo = Math.min(minTheo, theo);
+            maxTheo = Math.max(maxTheo, theo);
+
+            double h = hyb != null ? hyb : 0.0;
+            if (h >= ESTIMATE_GOOD_HYBRID_THRESHOLD) good++;
+        }
+
+        double precisionAtK = show > 0 ? (good * 1.0 / show) : 0.0;
+        double avgConf = show > 0 ? (sumConf / show) : 0.0;
+        double avgSupport = show > 0 ? (sumSupport / show) : 0.0;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("检索到 ").append(total).append(" 个相关结果，以下展示前 ").append(show).append(" 个：\n");
+        sb.append("- 估计精确度@").append(show).append(": ").append(formatPercent(precisionAtK))
+                .append("（阈值: 混合分≥").append(String.format("%.2f", ESTIMATE_GOOD_HYBRID_THRESHOLD)).append("）\n");
+        sb.append("- 平均匹配度: ").append(formatPercent(avgConf)).append("\n");
+        sb.append("- 策略一致性(平均支持): ").append(String.format("%.2f", avgSupport))
+                .append("/").append(RetrievalStrategy.values().length).append("\n");
+        sb.append("- 理论归一化分范围: ")
+                .append(String.format("%.4f", show > 0 ? minTheo : 0.0))
+                .append(" ~ ")
+                .append(String.format("%.4f", show > 0 ? maxTheo : 0.0))
+                .append("\n\n");
+        return sb.toString();
+    }
+
+    private double computeMatchConfidence(Double rrfnTheo, Double rrfn, Double hybrid) {
+        double th = rrfnTheo != null ? rrfnTheo : (rrfn != null ? rrfn : 0.0);
+        double hy = hybrid != null ? hybrid : 0.0;
+        double conf = CONF_WEIGHT_RRF_THEO * th + CONF_WEIGHT_HYBRID * hy;
+        return clamp01(conf);
+    }
+
+    private String formatPercent(double v01) {
+        return String.format("%.1f%%", clamp01(v01) * 100.0);
+    }
+
+    private double clamp01(double v) {
+        if (v < 0.0) return 0.0;
+        if (v > 1.0) return 1.0;
+        return v;
     }
 
     // =============== 工具方法 ===============
@@ -725,10 +837,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
      * 使用文本内容的哈希值作为唯一标识，优先 metadata.document_id 和 position
      */
     private String contentKey(Content content) {
-        // 获取文本内容
         String text = extractTextFromContent(content);
-
-        // 如果有元数据中的唯一标识，优先使用
         String docId = getMeta(content, "document_id");
         if (StringUtils.hasText(docId)) {
             String position = getMeta(content, "position");
@@ -737,8 +846,6 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
             }
             return docId;
         }
-
-        // 否则使用文本的哈希值
         return sha256(text);
     }
 
