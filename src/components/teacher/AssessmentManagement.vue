@@ -45,6 +45,7 @@
     <ExamContentModal
       v-model="showExamModal"
       :examPaper="selectedExamPaper"
+      :courseId="currentCourseId"
     />
   </div>
 </template>

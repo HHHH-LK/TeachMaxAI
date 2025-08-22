@@ -3,11 +3,24 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title">
-          <el-icon><Reading /></el-icon>
-          课程管理中心
-        </h1>
-        <p class="page-subtitle">管理您的所有课程，创建精彩的教学内容</p>
+        <div class="header-top">
+          <div class="header-left">
+            <h1 class="page-title">
+              <el-icon><Reading /></el-icon>
+              课程管理中心
+            </h1>
+            <p class="page-subtitle">管理您的所有课程，创建精彩的教学内容</p>
+          </div>
+          <!-- 添加导入知识资料按钮到右侧 -->
+          <el-button 
+            type="primary" 
+            @click="importKnowledge"
+            class="import-button"
+          >
+            <el-icon><Upload /></el-icon>
+            导入知识资料
+          </el-button>
+        </div>
       </div>
     </div>
 
@@ -84,18 +97,70 @@
       <h3>暂无课程</h3>
       <p>当前没有找到符合条件的课程</p>
     </div>
+
+    <!-- 导入知识资料对话框 -->
+    <el-dialog
+      v-model="importDialogVisible"
+      title="导入知识资料"
+      width="500px"
+      :close-on-click-modal="false"
+      center
+    >
+      <div class="import-dialog-content">
+        <div class="upload-icon">
+          <el-icon><UploadFilled /></el-icon>
+        </div>
+        <h3 class="dialog-title">输入文件夹路径或URL</h3>
+        <p class="dialog-subtitle">请输入本地文件夹路径或网络文件URL</p>
+        
+        <el-form :model="importForm" :rules="importRules" ref="importFormRef">
+          <el-form-item prop="fileUrl">
+            <el-input
+              v-model="importForm.fileUrl"
+              placeholder="例如：C:\documents\file "
+              clearable
+            >
+              <template #prepend>
+                <el-icon><Link /></el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
+        </el-form>
+        
+        <div class="path-examples">
+          <div class="example-title">示例路径：</div>
+          <div class="example-item">Windows: C:\Users\用户名\Documents</div>
+          <div class="example-item">Mac/Linux: /Users/用户名/Documents</div>
+        </div>
+        
+        <div class="dialog-footer">
+          <el-button @click="importDialogVisible = false">取消</el-button>
+          <el-button 
+            type="primary" 
+            @click="submitImport"
+            :loading="isSubmitting"
+          >
+            开始导入
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage, ElNotification } from 'element-plus'
 import {
   Reading,
   Search,
   Calendar,
   Collection,
-  Document
+  Document,
+  Upload,
+  UploadFilled,
+  Link
 } from '@element-plus/icons-vue'
 import { teacherService } from '@/services/api'
 import {getCurrentUserId} from "@/utils/userUtils.js";
@@ -104,6 +169,74 @@ const router = useRouter()
 const searchQuery = ref('')
 const semesterFilter = ref('')
 const courses = ref([])
+
+// 导入对话框相关状态
+const importDialogVisible = ref(false)
+const importForm = ref({
+  fileUrl: ''
+})
+const importFormRef = ref(null)
+const isSubmitting = ref(false)
+
+// 表单验证规则 - 支持本地路径和URL
+const importRules = {
+  fileUrl: [
+    { required: true, message: '请输入文件夹路径或URL', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        // 验证本地路径格式（Windows和Unix风格）
+        const localPathRegex = /^([a-zA-Z]:)?[\\/]?([^\\/:\*\?"<>\|\r\n]+[\\/])*[^\\/:\*\?"<>\|\r\n]*$/;
+        // 验证URL格式
+        const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
+        
+        if (localPathRegex.test(value) || urlRegex.test(value)) {
+          callback();
+        } else {
+          callback(new Error('请输入有效的文件文件夹路径或URL'));
+        }
+      },
+      trigger: 'blur'
+    }
+  ]
+}
+
+// 打开导入对话框
+function importKnowledge() {
+  importForm.value.fileUrl = ''
+  importDialogVisible.value = true
+}
+
+// 提交导入
+async function submitImport() {
+  try {
+    // 验证表单
+    const valid = await importFormRef.value.validate()
+    if (!valid) return
+    
+    isSubmitting.value = true
+    
+    // 调用后端API
+    const response = await teacherService.uploadKnowledge(importForm.value.fileUrl)
+    
+    // 处理响应
+    if (response.data && response.data.success) {
+      ElNotification({
+        title: '导入成功',
+        message: '知识资料已成功导入系统',
+        type: 'success',
+        duration: 3000
+      })
+      importDialogVisible.value = false
+    } else {
+      throw new Error(response.data.message || '导入失败')
+    }
+  } catch (error) {
+    console.error('导入知识资料失败:', error)
+    ElMessage.error(`导入失败: ${error.message || '请检查路径是否正确'}`)
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
 // 获取所有课程
 const fetchAllClass = async () => {
@@ -168,6 +301,7 @@ onMounted(() => {
   fetchAllClass()
 })
 </script>
+
 <style lang="less">
 // 蓝色主题色变量
 @primary-blue: #1a56db;
@@ -222,6 +356,21 @@ onMounted(() => {
   border: 1px solid @border-color;
 
   .header-content {
+    width: 100%;
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    
+    .header-left {
+      flex: 1;
+      min-width: 300px;
+    }
+    
     .page-title {
       font-size: 2.2rem;
       font-weight: 700;
@@ -243,6 +392,41 @@ onMounted(() => {
       margin: 0.5rem 0 0 0;
       font-size: 1rem;
       font-weight: 500;
+    }
+    
+    // 导入按钮样式
+    .import-button {
+      background: @primary-blue;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+      align-self: center;
+      margin-top: 0.5rem;
+      
+      &:hover {
+        background: @light-blue;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(26, 86, 219, 0.4);
+      }
+      
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(26, 86, 219, 0.3);
+      }
+      
+      .el-icon {
+        font-size: 1.2rem;
+        color: white;
+      }
     }
   }
 }
@@ -539,6 +723,76 @@ onMounted(() => {
   }
 }
 
+// 导入对话框样式
+.import-dialog-content {
+  text-align: center;
+  padding: 20px;
+  
+  .upload-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, @primary-blue 0%, @light-blue 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: white;
+    
+    .el-icon {
+      font-size: 40px;
+    }
+  }
+  
+  .dialog-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: @text-dark;
+    margin-bottom: 10px;
+  }
+  
+  .dialog-subtitle {
+    color: @text-gray;
+    margin-bottom: 15px;
+    font-size: 15px;
+  }
+  
+  .path-examples {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 15px 0;
+    text-align: left;
+    
+    .example-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: @text-dark;
+    }
+    
+    .example-item {
+      font-size: 13px;
+      color: @text-gray;
+      margin-bottom: 5px;
+      font-family: monospace;
+    }
+  }
+  
+  .dialog-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    
+    .el-button {
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+  }
+}
+
 // Element Plus 图标样式
 .el-icon {
   vertical-align: middle;
@@ -555,6 +809,16 @@ onMounted(() => {
     gap: 1rem;
     text-align: center;
     padding: 1.5rem;
+    
+    .header-top {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .import-button {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   .search-filter-section {
@@ -579,6 +843,12 @@ onMounted(() => {
 
   .courses-grid {
     grid-template-columns: 1fr;
+  }
+  
+  // 对话框响应式
+  .el-dialog {
+    width: 90% !important;
+    max-width: 100%;
   }
 }
 </style>

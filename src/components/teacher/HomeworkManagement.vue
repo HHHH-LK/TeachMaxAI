@@ -4,9 +4,9 @@
     <div class="top-actions">
       <h2>课堂作业管理</h2>
       <el-button
-          type="primary"
-          @click="showCreateDialog = true"
-          class="create-btn"
+        type="primary"
+        @click="showCreateDialog = true"
+        class="create-btn"
       >
         <el-icon><Plus /></el-icon>
         智能创建作业
@@ -16,9 +16,9 @@
     <!-- 作业列表 -->
     <div class="homework-list">
       <div
-          v-for="homework in filteredHomework"
-          :key="homework.id"
-          class="homework-card"
+        v-for="homework in filteredHomework"
+        :key="homework.id"
+        class="homework-card"
       >
         <div class="homework-header">
           <div class="homework-title">
@@ -26,13 +26,13 @@
           </div>
           <div class="homework-actions">
             <el-button size="small" @click="viewHomework(homework)"
-            >查看</el-button
+              >查看</el-button
             >
             <el-button
-                size="small"
-                type="info"
-                @click="viewSubmissions(homework)"
-            >提交情况</el-button
+              size="small"
+              type="info"
+              @click="viewSubmissions(homework)"
+              >提交情况</el-button
             >
           </div>
         </div>
@@ -43,16 +43,18 @@
           </div>
           <div class="homework-meta">
             <span
-            ><el-icon><User /></el-icon> 已提交:
+              ><el-icon><User /></el-icon> 已提交:
               {{ homework.submittedCount }}/{{ homework.totalStudents }}</span
             >
             <span v-if="homework.questions && homework.questions.length > 0"
-            ><el-icon><QuestionFilled /></el-icon> 题目数量:
+              ><el-icon><QuestionFilled /></el-icon> 题目数量:
               {{ homework.questions.length }}</span
             >
             <span v-if="homework.difficultyLevel"
-            ><el-icon><Star /></el-icon> 难度:
-              <span :class="`difficulty-tag difficulty-${homework.difficultyLevel}`">
+              ><el-icon><Star /></el-icon> 难度:
+              <span
+                :class="`difficulty-tag difficulty-${homework.difficultyLevel}`"
+              >
                 {{ getDifficultyText(homework.difficultyLevel) }}
               </span>
             </span>
@@ -63,18 +65,18 @@
 
     <!-- 创建作业对话框 -->
     <el-dialog
-        v-model="showCreateDialog"
-        title="智能创建并发布新作业"
-        width="60%"
-        :before-close="handleClose"
+      v-model="showCreateDialog"
+      title="智能创建并发布新作业"
+      width="60%"
+      :before-close="handleClose"
     >
       <!-- 提示信息 -->
       <div class="create-tips">
         <el-alert
-            title="智能创建作业提示"
-            type="info"
-            :closable="false"
-            show-icon
+          title="智能创建作业提示"
+          type="info"
+          :closable="false"
+          show-icon
         >
           <template #default>
             <p>1. 选择章节：选择要创建作业的课程章节</p>
@@ -85,53 +87,53 @@
         </el-alert>
       </div>
       <el-form
-          :model="newHomework"
-          :rules="rules"
-          ref="homeworkForm"
-          label-width="100px"
+        :model="newHomework"
+        :rules="rules"
+        ref="homeworkForm"
+        label-width="100px"
       >
         <el-form-item label="选择章节" prop="chapterId">
           <el-select
-              v-model="newHomework.chapterId"
-              placeholder="请选择章节"
-              @change="onChapterChange"
-              style="width: 100%"
+            v-model="newHomework.chapterId"
+            placeholder="请选择章节"
+            @change="onChapterChange"
+            style="width: 100%"
           >
             <el-option
-                v-for="chapter in chapters"
-                :key="chapter.chapterId"
-                :label="chapter.chapterName"
-                :value="chapter.chapterId"
+              v-for="chapter in chapters"
+              :key="chapter.chapterId"
+              :label="chapter.chapterName"
+              :value="chapter.chapterId"
             ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="作业标题" prop="title">
           <el-input
-              v-model="newHomework.title"
-              placeholder="请输入作业标题"
+            v-model="newHomework.title"
+            placeholder="请输入作业标题"
           ></el-input>
         </el-form-item>
         <el-form-item label="作业描述" prop="description">
           <el-input
-              type="textarea"
-              v-model="newHomework.description"
-              :rows="3"
-              placeholder="请输入作业描述，AI将根据描述智能生成题目"
+            type="textarea"
+            v-model="newHomework.description"
+            :rows="3"
+            placeholder="请输入作业描述，AI将根据描述智能生成题目"
           ></el-input>
         </el-form-item>
         <el-form-item label="题目数量" prop="questionCount">
           <el-input-number
-              v-model="newHomework.questionCount"
-              :min="1"
-              :max="20"
-              placeholder="请输入题目数量"
+            v-model="newHomework.questionCount"
+            :min="1"
+            :max="20"
+            placeholder="请输入题目数量"
           ></el-input-number>
         </el-form-item>
         <el-form-item label="难度等级" prop="difficultyLevel">
           <el-select
-              v-model="newHomework.difficultyLevel"
-              placeholder="请选择难度等级"
-              style="width: 100%"
+            v-model="newHomework.difficultyLevel"
+            placeholder="请选择难度等级"
+            style="width: 100%"
           >
             <el-option label="简单" value="easy"></el-option>
             <el-option label="中等" value="medium"></el-option>
@@ -142,10 +144,10 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showCreateDialog = false">取消</el-button>
-          <el-button 
-              type="primary" 
-              @click="createHomework"
-              :loading="createLoading"
+          <el-button
+            type="primary"
+            @click="createHomework"
+            :loading="createLoading"
           >
             <el-icon><MagicStick /></el-icon>
             智能创建并发布
@@ -171,6 +173,17 @@
           </p>
         </div>
       </div>
+
+      <div class="questions-section">
+        <h4>题目列表：</h4>
+        <ExamPaperHome
+          :examContent="formatHomeworkQuestions(selectedHomework)"
+          :readonly="true"
+          :chapterId="String(selectedHomework?.chapterId || '')"
+          :courseId="props.courseId"
+          :questionIds="getQuestionIds(selectedHomework)"
+        ></ExamPaperHome>
+      </div>
     </el-dialog>
 
     <!-- 提交情况对话框 -->
@@ -182,9 +195,9 @@
         </div>
         <div class="submissions-actions">
           <el-button
-              type="primary"
-              @click="startBatchReview"
-              :loading="batchReviewLoading"
+            type="primary"
+            @click="startBatchReview"
+            :loading="batchReviewLoading"
           >
             <el-icon><MagicStick /></el-icon>
             批量智能评阅
@@ -194,24 +207,24 @@
 
       <div class="submissions-list">
         <el-table
-            :data="submissions"
-            style="width: 100%"
-            v-loading="tableLoading"
+          :data="submissions"
+          style="width: 100%"
+          v-loading="tableLoading"
         >
           <el-table-column
-              prop="studentName"
-              label="学生姓名"
-              width="120"
+            prop="studentName"
+            label="学生姓名"
+            width="120"
           ></el-table-column>
           <el-table-column
-              prop="studentId"
-              label="学号"
-              width="120"
+            prop="studentId"
+            label="学号"
+            width="120"
           ></el-table-column>
-          <el-table-column 
-              label="班级信息" 
-              width="150"
-              v-if="submissions.some(s => s.studentDetail?.className)"
+          <el-table-column
+            label="班级信息"
+            width="150"
+            v-if="submissions.some((s) => s.studentDetail?.className)"
           >
             <template #default="scope">
               <span v-if="scope.row.studentDetail?.className">
@@ -224,8 +237,8 @@
             <template #default="scope">
               {{
                 scope.row.submitTime
-                    ? formatDate(scope.row.submitTime)
-                    : "未提交"
+                  ? formatDate(scope.row.submitTime)
+                  : "未提交"
               }}
             </template>
           </el-table-column>
@@ -234,17 +247,17 @@
             <template #default="scope">
               <!-- 如果状态是ai_reviewed，只显示一个"AI已评阅"标签 -->
               <el-tag
-                  v-if="scope.row.reviewStatus === 'ai_reviewed'"
-                  :type="getReviewStatusType(scope.row.reviewStatus)"
-                  size="small"
+                v-if="scope.row.reviewStatus === 'ai_reviewed'"
+                :type="getReviewStatusType(scope.row.reviewStatus)"
+                size="small"
               >
                 AI已评阅
               </el-tag>
               <!-- 其他状态正常显示 -->
               <el-tag
-                  v-else
-                  :type="getReviewStatusType(scope.row.reviewStatus)"
-                  size="small"
+                v-else
+                :type="getReviewStatusType(scope.row.reviewStatus)"
+                size="small"
               >
                 {{ getReviewStatusText(scope.row.reviewStatus) }}
               </el-tag>
@@ -253,22 +266,22 @@
           <el-table-column label="操作" width="200">
             <template #default="scope">
               <el-button
-                  size="small"
-                  type="primary"
-                  @click="viewSubmission(scope.row)"
-                  :disabled="scope.row.status !== 'submitted'"
+                size="small"
+                type="primary"
+                @click="viewSubmission(scope.row)"
+                :disabled="scope.row.status !== 'submitted'"
               >
                 查看
               </el-button>
               <el-button
-                  size="small"
-                  type="success"
-                  @click="startAIGrading(scope.row)"
-                  :disabled="
+                size="small"
+                type="success"
+                @click="startAIGrading(scope.row)"
+                :disabled="
                   scope.row.status !== 'submitted' ||
                   scope.row.reviewStatus === 'reviewed'
                 "
-                  :loading="scope.row.aiGradingLoading"
+                :loading="scope.row.aiGradingLoading"
               >
                 智能评阅
               </el-button>
@@ -280,9 +293,9 @@
 
     <!-- 作业详情查看对话框 -->
     <el-dialog
-        v-model="showSubmissionDetailDialog"
-        title="作业详情"
-        width="80%"
+      v-model="showSubmissionDetailDialog"
+      title="作业详情"
+      width="80%"
     >
       <div v-if="selectedSubmission" class="submission-detail">
         <div class="student-info">
@@ -298,15 +311,15 @@
           <h5>作业内容：</h5>
           <div class="content-area">
             <ExamPaper
-                :examContent="
+              :examContent="
                 selectedSubmission.examContent ||
                 selectedSubmission.content ||
                 ''
               "
-                :readonly="true"
-                :userAnswers="selectedSubmission.studentAnswers || []"
-                :chapterId="selectedHomework?.chapterId || ''"
-                :courseId="props.courseId"
+              :readonly="true"
+              :userAnswers="selectedSubmission.studentAnswers || []"
+              :chapterId="selectedHomework?.chapterId || ''"
+              :courseId="props.courseId"
             />
           </div>
         </div>
@@ -319,21 +332,32 @@
               <div class="review-summary">
                 <div class="summary-item">
                   <span class="summary-label">总体评价：</span>
-                  <el-tag :type="getTestLevelType(selectedSubmission.aiReview.testLevel)" size="small">
+                  <el-tag
+                    :type="
+                      getTestLevelType(selectedSubmission.aiReview.testLevel)
+                    "
+                    size="small"
+                  >
                     {{ selectedSubmission.aiReview.testLevel }}
                   </el-tag>
                 </div>
 
                 <div class="summary-item">
                   <span class="summary-label">正确率：</span>
-                  <span class="summary-value">{{ (selectedSubmission.aiReview.accuracy * 100).toFixed(1) }}%</span>
+                  <span class="summary-value"
+                    >{{
+                      (selectedSubmission.aiReview.accuracy * 100).toFixed(1)
+                    }}%</span
+                  >
                 </div>
               </div>
-              
+
               <div class="question-count-section">
                 <div class="count-item">
                   <span class="count-label">题目总数：</span>
-                  <span class="count-value">{{ selectedSubmission.aiReview.totalQuestions }}</span>
+                  <span class="count-value">{{
+                    selectedSubmission.aiReview.totalQuestions
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -344,46 +368,127 @@
               <div class="stats-grid">
                 <div class="stat-item">
                   <span class="stat-label">已答题：</span>
-                  <span class="stat-value">{{ selectedSubmission.aiReview.answeredQuestions }}</span>
+                  <span class="stat-value">{{
+                    selectedSubmission.aiReview.answeredQuestions
+                  }}</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-label">未答题：</span>
-                  <span class="stat-value">{{ selectedSubmission.aiReview.unansweredQuestions }}</span>
+                  <span class="stat-value">{{
+                    selectedSubmission.aiReview.unansweredQuestions
+                  }}</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-label">正确题：</span>
-                  <span class="stat-value correct">{{ selectedSubmission.aiReview.correctQuestions }}</span>
+                  <span class="stat-value correct">{{
+                    selectedSubmission.aiReview.correctQuestions
+                  }}</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-label">错误题：</span>
-                  <span class="stat-value wrong">{{ selectedSubmission.aiReview.wrongQuestions }}</span>
+                  <span class="stat-value wrong">{{
+                    selectedSubmission.aiReview.wrongQuestions
+                  }}</span>
                 </div>
               </div>
             </div>
 
             <!-- 题目类型统计 -->
-            <div class="question-type-stats" v-if="selectedSubmission.aiReview.questionTypeStats">
+            <div
+              class="question-type-stats"
+              v-if="selectedSubmission.aiReview.questionTypeStats"
+            >
               <h6>题目类型统计</h6>
               <div class="type-stats-grid">
-                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.singleChoice.totalCount > 0">
+                <div
+                  class="type-stat-item"
+                  v-if="
+                    selectedSubmission.aiReview.questionTypeStats.singleChoice
+                      .totalCount > 0
+                  "
+                >
                   <span class="type-label">单选题：</span>
-                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.singleChoice.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.singleChoice.totalCount }}</span>
+                  <span class="type-value"
+                    >{{
+                      selectedSubmission.aiReview.questionTypeStats.singleChoice
+                        .correctCount
+                    }}/{{
+                      selectedSubmission.aiReview.questionTypeStats.singleChoice
+                        .totalCount
+                    }}</span
+                  >
                 </div>
-                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.multipleChoice.totalCount > 0">
+                <div
+                  class="type-stat-item"
+                  v-if="
+                    selectedSubmission.aiReview.questionTypeStats.multipleChoice
+                      .totalCount > 0
+                  "
+                >
                   <span class="type-label">多选题：</span>
-                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.multipleChoice.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.multipleChoice.totalCount }}</span>
+                  <span class="type-value"
+                    >{{
+                      selectedSubmission.aiReview.questionTypeStats
+                        .multipleChoice.correctCount
+                    }}/{{
+                      selectedSubmission.aiReview.questionTypeStats
+                        .multipleChoice.totalCount
+                    }}</span
+                  >
                 </div>
-                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.trueFalse.totalCount > 0">
+                <div
+                  class="type-stat-item"
+                  v-if="
+                    selectedSubmission.aiReview.questionTypeStats.trueFalse
+                      .totalCount > 0
+                  "
+                >
                   <span class="type-label">判断题：</span>
-                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.trueFalse.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.trueFalse.totalCount }}</span>
+                  <span class="type-value"
+                    >{{
+                      selectedSubmission.aiReview.questionTypeStats.trueFalse
+                        .correctCount
+                    }}/{{
+                      selectedSubmission.aiReview.questionTypeStats.trueFalse
+                        .totalCount
+                    }}</span
+                  >
                 </div>
-                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.fillBlank.totalCount > 0">
+                <div
+                  class="type-stat-item"
+                  v-if="
+                    selectedSubmission.aiReview.questionTypeStats.fillBlank
+                      .totalCount > 0
+                  "
+                >
                   <span class="type-label">填空题：</span>
-                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.fillBlank.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.fillBlank.totalCount }}</span>
+                  <span class="type-value"
+                    >{{
+                      selectedSubmission.aiReview.questionTypeStats.fillBlank
+                        .correctCount
+                    }}/{{
+                      selectedSubmission.aiReview.questionTypeStats.fillBlank
+                        .totalCount
+                    }}</span
+                  >
                 </div>
-                <div class="type-stat-item" v-if="selectedSubmission.aiReview.questionTypeStats.shortAnswer.totalCount > 0">
+                <div
+                  class="type-stat-item"
+                  v-if="
+                    selectedSubmission.aiReview.questionTypeStats.shortAnswer
+                      .totalCount > 0
+                  "
+                >
                   <span class="type-label">简答题：</span>
-                  <span class="type-value">{{ selectedSubmission.aiReview.questionTypeStats.shortAnswer.correctCount }}/{{ selectedSubmission.aiReview.questionTypeStats.shortAnswer.totalCount }}</span>
+                  <span class="type-value"
+                    >{{
+                      selectedSubmission.aiReview.questionTypeStats.shortAnswer
+                        .correctCount
+                    }}/{{
+                      selectedSubmission.aiReview.questionTypeStats.shortAnswer
+                        .totalCount
+                    }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -397,14 +502,15 @@
             </div>
 
             <!-- 学习建议 -->
-            <div class="suggestion-section" v-if="selectedSubmission.aiReview.suggestion">
+            <div
+              class="suggestion-section"
+              v-if="selectedSubmission.aiReview.suggestion"
+            >
               <span class="suggestion-label">学习建议：</span>
               <p class="suggestion-content">
                 {{ selectedSubmission.aiReview.suggestion }}
               </p>
             </div>
-
-
           </div>
         </div>
 
@@ -412,26 +518,32 @@
           <h5>手动评阅：</h5>
           <div class="ai-review-reference" v-if="selectedSubmission.aiReview">
             <el-alert
-                title="AI评阅参考"
-                type="info"
-                :closable="false"
-                show-icon
+              title="AI评阅参考"
+              type="info"
+              :closable="false"
+              show-icon
             >
               <template #default>
                 <div class="ai-reference-content">
                   <p v-if="selectedSubmission.aiReview.feedback">
-                    <strong>AI评阅意见：</strong>{{ selectedSubmission.aiReview.feedback }}
+                    <strong>AI评阅意见：</strong
+                    >{{ selectedSubmission.aiReview.feedback }}
                   </p>
                   <p v-if="selectedSubmission.aiReview.suggestion">
-                    <strong>AI学习建议：</strong>{{ selectedSubmission.aiReview.suggestion }}
+                    <strong>AI学习建议：</strong
+                    >{{ selectedSubmission.aiReview.suggestion }}
                   </p>
                   <p v-if="selectedSubmission.aiReview.testLevel">
                     <strong>AI评价等级：</strong>
-                    <el-tag :type="getTestLevelType(selectedSubmission.aiReview.testLevel)" size="small">
+                    <el-tag
+                      :type="
+                        getTestLevelType(selectedSubmission.aiReview.testLevel)
+                      "
+                      size="small"
+                    >
                       {{ selectedSubmission.aiReview.testLevel }}
                     </el-tag>
                   </p>
-
                 </div>
               </template>
             </el-alert>
@@ -439,14 +551,18 @@
           <el-form :model="manualReview" label-width="100px">
             <el-form-item label="评阅意见">
               <el-input
-                  type="textarea"
-                  v-model="manualReview.comments"
-                  :rows="3"
-                  placeholder="请输入评阅意见，可参考AI评阅结果"
+                type="textarea"
+                v-model="manualReview.comments"
+                :rows="3"
+                placeholder="请输入评阅意见，可参考AI评阅结果"
               ></el-input>
             </el-form-item>
             <el-form-item label="评分等级">
-              <el-select v-model="manualReview.grade" placeholder="请选择评分等级" style="width: 100%">
+              <el-select
+                v-model="manualReview.grade"
+                placeholder="请选择评分等级"
+                style="width: 100%"
+              >
                 <el-option label="优秀" value="优秀"></el-option>
                 <el-option label="良好" value="良好"></el-option>
                 <el-option label="中等" value="中等"></el-option>
@@ -461,10 +577,10 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showSubmissionDetailDialog = false"
-          >取消</el-button
+            >取消</el-button
           >
           <el-button type="primary" @click="saveManualReview"
-          >保存评阅</el-button
+            >保存评阅</el-button
           >
         </span>
       </template>
@@ -484,6 +600,7 @@ import {
 } from "@element-plus/icons-vue";
 import ExamPaper from "@/components/ExamPaper.vue";
 import { teacherService, studentService } from "@/services/api.js";
+import ExamPaperHome from "./ExamPaperHome.vue";
 
 // 定义props接收课程ID
 const props = defineProps({
@@ -518,6 +635,41 @@ const manualReview = ref({
   grade: "",
 });
 
+const getQuestionIds = (homework) => {
+  if (!homework || !homework.questions) return [];
+  return homework.questions.map(q => q.id);
+};
+
+// 将作业题目转换为ExamPaper需要的格式
+const formatHomeworkQuestions = (homework) => {
+  if (!homework || !homework.questions || homework.questions.length === 0) {
+    return "该作业暂无题目";
+  }
+  
+  return homework.questions.map((q, index) => {
+    let questionText = `${index + 1}. [${q.type}] ${q.text || q.title || q.questionContent}`;
+    
+    // 添加选项（如果是选择题）
+    if (q.options && q.options.length > 0) {
+      questionText += "\n" + q.options.map((opt, optIndex) => {
+        return `${String.fromCharCode(65 + optIndex)}. ${opt.content || opt.label || opt.text}`;
+      }).join("\n");
+    }
+    
+    // 添加正确答案
+    if (q.answer || q.correctAnswer) {
+      questionText += `\n答案: ${q.answer || q.correctAnswer}`;
+    }
+    
+    // 添加解析
+    if (q.explanation) {
+      questionText += `\n解析: ${q.explanation}`;
+    }
+    
+    return questionText;
+  }).join("\n\n");
+};
+
 // 新作业表单数据
 const newHomework = ref({
   chapterId: "", // 新增：章节ID
@@ -532,22 +684,26 @@ const rules = {
   chapterId: [{ required: true, message: "请选择章节", trigger: "change" }],
   title: [{ required: true, message: "请输入作业标题", trigger: "blur" }],
   description: [{ required: true, message: "请输入作业描述", trigger: "blur" }],
-  questionCount: [{ required: true, message: "请输入题目数量", trigger: "blur" }],
-  difficultyLevel: [{ required: true, message: "请选择难度等级", trigger: "change" }],
+  questionCount: [
+    { required: true, message: "请输入题目数量", trigger: "blur" },
+  ],
+  difficultyLevel: [
+    { required: true, message: "请选择难度等级", trigger: "change" },
+  ],
 };
 
 // 获取课程学生列表
 const fetchCourseStudents = async () => {
   try {
     const response = await teacherService.getClassStudents(props.courseId);
-    console.log('获取课程学生列表:', response);
+    console.log("获取课程学生列表:", response);
     if (response.data && response.data.success && response.data.data) {
       courseStudents.value = response.data.data;
-      console.log('课程学生列表:', courseStudents.value);
+      console.log("课程学生列表:", courseStudents.value);
     }
   } catch (error) {
-    console.error('获取课程学生列表失败:', error);
-    ElMessage.error('获取课程学生列表失败');
+    console.error("获取课程学生列表失败:", error);
+    ElMessage.error("获取课程学生列表失败");
   }
 };
 
@@ -560,7 +716,7 @@ const getStudentDetail = async (studentNumber) => {
     }
     return null;
   } catch (error) {
-    console.error('获取学生详细信息失败:', error);
+    console.error("获取学生详细信息失败:", error);
     return null;
   }
 };
@@ -568,14 +724,18 @@ const getStudentDetail = async (studentNumber) => {
 // 获取学生作业信息
 const getStudentHomework = async (studentId, courseId, chapterId) => {
   try {
-    const response = await teacherService.getHomeworkByStudent(studentId, courseId, chapterId);
-    console.log('获取学生作业信息:', response);
+    const response = await teacherService.getHomeworkByStudent(
+      studentId,
+      courseId,
+      chapterId
+    );
+    console.log("获取学生作业信息:", response);
     if (response.data && response.data.success && response.data.data) {
       return response.data.data;
     }
     return [];
   } catch (error) {
-    console.error('获取学生作业信息失败:', error);
+    console.error("获取学生作业信息失败:", error);
     return [];
   }
 };
@@ -586,20 +746,29 @@ const fetchAllWork = async () => {
     // 获取章节信息
     const responseChapter = await studentService.getChapterInfo(props.courseId);
     console.log("章节列表", responseChapter);
-    
+
     if (responseChapter.data && responseChapter.data.data) {
       chapters.value = responseChapter.data.data;
-      console.log('章节列表:', chapters.value);
-      
+      console.log("章节列表:", chapters.value);
+
       // 获取每个章节的作业信息
       for (const chapter of chapters.value) {
         try {
-          const response = await teacherService.getHomework(props.courseId, chapter.chapterId);
+          const response = await teacherService.getHomework(
+            props.courseId,
+            chapter.chapterId
+          );
           console.log(`章节 ${chapter.chapterName} 的作业:`, response);
-          
-          if (response.data && response.data.data && response.data.data.length > 0) {
+
+          if (
+            response.data &&
+            response.data.data &&
+            response.data.data.length > 0
+          ) {
             // 检查是否已经存在该章节的作业
-            const existingHomework = homeworkList.value.find(h => h.chapterId === chapter.chapterId);
+            const existingHomework = homeworkList.value.find(
+              (h) => h.chapterId === chapter.chapterId
+            );
             if (!existingHomework) {
               const homework = {
                 id: `${props.courseId}-${chapter.chapterId}-${Date.now()}`,
@@ -610,7 +779,7 @@ const fetchAllWork = async () => {
                 questions: response.data.data.map((item) => {
                   let parsedOptions = [];
                   try {
-                    parsedOptions = JSON.parse(item.questionOptions || '[]');
+                    parsedOptions = JSON.parse(item.questionOptions || "[]");
                   } catch (e) {
                     console.warn("选项解析失败:", item.questionOptions);
                     parsedOptions = [];
@@ -621,7 +790,9 @@ const fetchAllWork = async () => {
                     type: item.questionType,
                     text: item.questionContent,
                     options: parsedOptions,
-                    answer: item.correctAnswer ? item.correctAnswer.replace(/"/g, "") : "",
+                    answer: item.correctAnswer
+                      ? item.correctAnswer.replace(/"/g, "")
+                      : "",
                     explanation: item.explanation,
                     difficultyLevel: item.difficultyLevel,
                     pointName: item.pointName,
@@ -632,9 +803,9 @@ const fetchAllWork = async () => {
                 submittedCount: 0,
                 totalStudents: courseStudents.value.length || 0,
                 questionCount: response.data.data.length,
-                difficultyLevel: "medium"
+                difficultyLevel: "medium",
               };
-              
+
               homeworkList.value.push(homework);
             }
           }
@@ -652,22 +823,22 @@ const fetchAllWork = async () => {
 // 获取学生提交情况
 const fetchStudentSubmissions = async (homework) => {
   if (!homework || !homework.chapterId) return;
-  
+
   tableLoading.value = true;
   try {
     const submissionsData = [];
-    
+
     for (const student of courseStudents.value) {
       // 获取学生详细信息
       const studentDetail = await getStudentDetail(student.studentNumber);
-      
+
       // 获取学生作业信息
       const homeworkData = await getStudentHomework(
-        studentDetail?.studentId || student.studentNumber, 
-        props.courseId, 
+        studentDetail?.studentId || student.studentNumber,
+        props.courseId,
         homework.chapterId
       );
-      
+
       const submission = {
         studentName: student.realName,
         studentId: student.studentNumber,
@@ -681,122 +852,142 @@ const fetchStudentSubmissions = async (homework) => {
         aiGradingLoading: false,
         homeworkData: homeworkData,
       };
-      
+
       // 如果有作业数据，说明学生已提交
       if (homeworkData && homeworkData.length > 0) {
         submission.status = "submitted";
         submission.submitTime = new Date();
         submission.reviewStatus = "pending";
-        
+
         // 处理作业内容 - 转换为ExamPaper期望的格式
-        submission.examContent = homeworkData.map((item, index) => {
-          // 转换题目类型为ExamPaper期望的格式
-          let questionType = 'question';
-          if (item.questionType) {
-            switch (item.questionType.toLowerCase()) {
-              case 'single':
-              case 'single_choice':
-              case 'single-choice':
-                questionType = 'single-choice';
-                break;
-              case 'multiple':
-              case 'multiple_choice':
-              case 'multiple-choice':
-                questionType = 'multiple-choice';
-                break;
-              case 'fill':
-              case 'fill_blank':
-              case 'fill-in-blank':
-                questionType = 'fill-in-blank';
-                break;
-              case 'judge':
-              case 'true_false':
-              case 'true-false':
-                questionType = 'true-false';
-                break;
-              case 'short':
-              case 'short_answer':
-              case 'short-answer':
-                questionType = 'short-answer';
-                break;
-              default:
-                questionType = 'question';
+        submission.examContent = homeworkData
+          .map((item, index) => {
+            // 转换题目类型为ExamPaper期望的格式
+            let questionType = "question";
+            if (item.questionType) {
+              switch (item.questionType.toLowerCase()) {
+                case "single":
+                case "single_choice":
+                case "single-choice":
+                  questionType = "single-choice";
+                  break;
+                case "multiple":
+                case "multiple_choice":
+                case "multiple-choice":
+                  questionType = "multiple-choice";
+                  break;
+                case "fill":
+                case "fill_blank":
+                case "fill-in-blank":
+                  questionType = "fill-in-blank";
+                  break;
+                case "judge":
+                case "true_false":
+                case "true-false":
+                  questionType = "true-false";
+                  break;
+                case "short":
+                case "short_answer":
+                case "short-answer":
+                  questionType = "short-answer";
+                  break;
+                default:
+                  questionType = "question";
+              }
             }
-          }
-          
-          const questionText = `${index + 1}. [${questionType}] ${item.questionContent || ''}`;
-          
-                  // 处理选项 - 修复[object Object]问题
-        let optionsText = '';
-        if (item.questionOptions) {
-          try {
-            const options = JSON.parse(item.questionOptions);
-            
-            if (Array.isArray(options) && options.length > 0) {
-              // 过滤掉无效的选项内容
-              const validOptions = options.filter(opt => {
-                if (typeof opt === 'string') return opt && opt.trim() !== '';
-                if (typeof opt === 'object' && opt !== null) {
-                  // 如果是对象，尝试提取有用的字段
-                  return opt.content || opt.text || opt.label || opt.value;
-                }
-                return false;
-              });
-              
-              if (validOptions.length > 0) {
-                optionsText = validOptions.map((opt, i) => {
-                  let optionText = '';
-                  if (typeof opt === 'string') {
-                    optionText = opt;
-                  } else if (typeof opt === 'object' && opt !== null) {
-                    // 尝试从对象中提取选项文本
-                    optionText = opt.content || opt.text || opt.label || opt.value || JSON.stringify(opt);
+
+            const questionText = `${index + 1}. [${questionType}] ${
+              item.questionContent || ""
+            }`;
+
+            // 处理选项 - 修复[object Object]问题
+            let optionsText = "";
+            if (item.questionOptions) {
+              try {
+                const options = JSON.parse(item.questionOptions);
+
+                if (Array.isArray(options) && options.length > 0) {
+                  // 过滤掉无效的选项内容
+                  const validOptions = options.filter((opt) => {
+                    if (typeof opt === "string")
+                      return opt && opt.trim() !== "";
+                    if (typeof opt === "object" && opt !== null) {
+                      // 如果是对象，尝试提取有用的字段
+                      return opt.content || opt.text || opt.label || opt.value;
+                    }
+                    return false;
+                  });
+
+                  if (validOptions.length > 0) {
+                    optionsText = validOptions
+                      .map((opt, i) => {
+                        let optionText = "";
+                        if (typeof opt === "string") {
+                          optionText = opt;
+                        } else if (typeof opt === "object" && opt !== null) {
+                          // 尝试从对象中提取选项文本
+                          optionText =
+                            opt.content ||
+                            opt.text ||
+                            opt.label ||
+                            opt.value ||
+                            JSON.stringify(opt);
+                        }
+                        return `${String.fromCharCode(65 + i)}. ${optionText}`;
+                      })
+                      .join("\n");
                   }
-                  return `${String.fromCharCode(65 + i)}. ${optionText}`;
-                }).join('\n');
+                }
+              } catch (e) {
+                console.warn("选项解析失败:", item.questionOptions, e);
+                // 如果JSON解析失败，尝试直接使用字符串
+                if (typeof item.questionOptions === "string") {
+                  const lines = item.questionOptions
+                    .split("\n")
+                    .filter((line) => line.trim() !== "");
+                  if (lines.length > 0) {
+                    optionsText = lines
+                      .map(
+                        (line, i) =>
+                          `${String.fromCharCode(65 + i)}. ${line.trim()}`
+                      )
+                      .join("\n");
+                  }
+                }
               }
             }
-          } catch (e) {
-            console.warn('选项解析失败:', item.questionOptions, e);
-            // 如果JSON解析失败，尝试直接使用字符串
-            if (typeof item.questionOptions === 'string') {
-              const lines = item.questionOptions.split('\n').filter(line => line.trim() !== '');
-              if (lines.length > 0) {
-                optionsText = lines.map((line, i) => `${String.fromCharCode(65 + i)}. ${line.trim()}`).join('\n');
-              }
-            }
-          }
-        }
-          
-          // 处理答案 - 使用ExamPaper期望的格式
-          const answer = `答案: ${item.studentAnswer || ''}`;
-          
-          // 处理解析
-          const explanation = item.explanation ? `\n解析: ${item.explanation}` : '';
-          
-          return `${questionText}\n${optionsText}\n${answer}${explanation}`;
-        }).join('\n\n');
-        
+
+            // 处理答案 - 使用ExamPaper期望的格式
+            const answer = `答案: ${item.studentAnswer || ""}`;
+
+            // 处理解析
+            const explanation = item.explanation
+              ? `\n解析: ${item.explanation}`
+              : "";
+
+            return `${questionText}\n${optionsText}\n${answer}${explanation}`;
+          })
+          .join("\n\n");
+
         // 处理学生答案 - 确保空答案被正确识别
-        submission.studentAnswers = homeworkData.map(item => {
+        submission.studentAnswers = homeworkData.map((item) => {
           const answer = item.studentAnswer;
           // 如果答案为空、null、undefined或只包含空白字符，则视为未作答
-          if (!answer || (typeof answer === 'string' && answer.trim() === '')) {
-            return '';
+          if (!answer || (typeof answer === "string" && answer.trim() === "")) {
+            return "";
           }
           return answer;
         });
       }
-      
+
       submissionsData.push(submission);
     }
-    
+
     submissions.value = submissionsData;
-    console.log('学生提交情况:', submissionsData);
-    
+    console.log("学生提交情况:", submissionsData);
   } catch (error) {
-    console.error('获取学生提交情况失败:', error);
-    ElMessage.error('获取学生提交情况失败');
+    console.error("获取学生提交情况失败:", error);
+    ElMessage.error("获取学生提交情况失败");
   } finally {
     tableLoading.value = false;
   }
@@ -807,8 +998,6 @@ onMounted(async () => {
   await fetchCourseStudents();
   await fetchAllWork();
 });
-
-
 
 // 计算属性
 const filteredHomework = computed(() => {
@@ -829,10 +1018,14 @@ const formatDate = (date) => {
   return new Date(date).toLocaleString("zh-CN");
 };
 
-
-
 const createHomework = async () => {
-  if (!newHomework.value.chapterId || !newHomework.value.title || !newHomework.value.description || !newHomework.value.questionCount || !newHomework.value.difficultyLevel) {
+  if (
+    !newHomework.value.chapterId ||
+    !newHomework.value.title ||
+    !newHomework.value.description ||
+    !newHomework.value.questionCount ||
+    !newHomework.value.difficultyLevel
+  ) {
     ElMessage.warning("请填写所有必填项");
     return;
   }
@@ -841,21 +1034,24 @@ const createHomework = async () => {
   try {
     // 构建AI创建作业的内容描述
     const content = `请为${newHomework.value.title}创建${newHomework.value.questionCount}道题目，难度等级为${newHomework.value.difficultyLevel}。作业要求：${newHomework.value.description}`;
-    
+
     const response = await teacherService.teacherCreateTest(
       content,
       props.courseId,
       newHomework.value.chapterId
     );
-    
-    console.log('智能创建作业成功:', response);
+
+    console.log("智能创建作业成功:", response);
     if (response.data && response.data.success && response.data.data) {
       // 创建新的作业对象
       const newHomeworkData = {
         id: `${props.courseId}-${newHomework.value.chapterId}-${Date.now()}`,
         title: newHomework.value.title,
         chapterId: newHomework.value.chapterId,
-        chapterName: chapters.value.find(c => c.chapterId === newHomework.value.chapterId)?.chapterName || '',
+        chapterName:
+          chapters.value.find(
+            (c) => c.chapterId === newHomework.value.chapterId
+          )?.chapterName || "",
         description: newHomework.value.description,
         questions: response.data.data || [],
         status: "published",
@@ -863,13 +1059,13 @@ const createHomework = async () => {
         submittedCount: 0,
         totalStudents: courseStudents.value.length || 0,
         questionCount: newHomework.value.questionCount,
-        difficultyLevel: newHomework.value.difficultyLevel
+        difficultyLevel: newHomework.value.difficultyLevel,
       };
-      
+
       homeworkList.value.unshift(newHomeworkData);
       ElMessage.success("作业创建并发布成功！");
       showCreateDialog.value = false;
-      
+
       // 重置表单
       newHomework.value = {
         chapterId: "",
@@ -882,7 +1078,7 @@ const createHomework = async () => {
       ElMessage.error("作业创建失败");
     }
   } catch (error) {
-    console.error('智能创建作业失败:', error);
+    console.error("智能创建作业失败:", error);
     ElMessage.error("作业创建失败，请重试");
   } finally {
     createLoading.value = false;
@@ -900,7 +1096,6 @@ const viewSubmissions = (homework) => {
   showSubmissionsDialog.value = true;
 };
 
-
 // 计算属性
 const submittedCount = computed(() => {
   return submissions.value.filter((s) => s.status === "submitted").length;
@@ -909,8 +1104,6 @@ const submittedCount = computed(() => {
 const totalStudents = computed(() => {
   return courseStudents.value.length;
 });
-
-
 
 // 获取评阅状态类型
 const getReviewStatusType = (status) => {
@@ -937,16 +1130,16 @@ const getReviewStatusText = (status) => {
 // 查看作业详情
 const viewSubmission = (submission) => {
   selectedSubmission.value = submission;
-  
+
   // 初始化手动评阅表单
   manualReview.value = {
     comments: submission.comments || "",
     grade: submission.manualGrade || "",
   };
-  
+
   // 直接传递studentAnswers
   selectedSubmission.value.studentAnswers = submission.studentAnswers || [];
-  
+
   showSubmissionDetailDialog.value = true;
 };
 
@@ -962,13 +1155,13 @@ const startAIGrading = async (submission) => {
     }
 
     // 构建请求参数
-    const studentAnswerDTOList = submission.homeworkData.map(item => ({
+    const studentAnswerDTOList = submission.homeworkData.map((item) => ({
       questionId: item.questionId || 0,
       studentAnswer: item.studentAnswer || "",
     }));
-      // answerEmpty: !item.studentAnswer || item.studentAnswer.trim() === "",
-      // valid: true,
-      // formattedAnswer: item.studentAnswer || ""
+    // answerEmpty: !item.studentAnswer || item.studentAnswer.trim() === "",
+    // valid: true,
+    // formattedAnswer: item.studentAnswer || ""
 
     // 验证请求数据完整性
     if (!selectedHomework.value?.chapterId) {
@@ -985,28 +1178,31 @@ const startAIGrading = async (submission) => {
       chapterId: selectedHomework.value.chapterId,
       type: "test", // 作业类型
       courseId: props.courseId,
-      studentAnswerDTOList: studentAnswerDTOList
+      studentAnswerDTOList: studentAnswerDTOList,
     };
 
-    console.log('AI评阅请求数据:', requestData);
-    console.log('请求数据详情:', {
+    console.log("AI评阅请求数据:", requestData);
+    console.log("请求数据详情:", {
       chapterId: requestData.chapterId,
       type: requestData.type,
       courseId: requestData.courseId,
       studentAnswerCount: requestData.studentAnswerDTOList.length,
-      firstAnswer: requestData.studentAnswerDTOList[0]
+      firstAnswer: requestData.studentAnswerDTOList[0],
     });
 
     // 调用AI评阅接口
     const response = await teacherService.judgeChapterTest(requestData);
-    console.log('AI评阅接口响应:', response);
-    
+    console.log("AI评阅接口响应:", response);
+
     if (response.data && response.data.success) {
       const result = response.data.data;
-      
+
       // 处理AI评阅结果
       const aiReview = {
-        feedback: result.overallComment || result.feedback || generateAIFeedback(submission),
+        feedback:
+          result.overallComment ||
+          result.feedback ||
+          generateAIFeedback(submission),
         criteria: result.criteria || generateAICriteria(submission),
         questionResults: result.questionResults || [],
         // 新增：从接口响应中提取更多评阅信息
@@ -1016,8 +1212,8 @@ const startAIGrading = async (submission) => {
         wrongQuestions: result.wrongQuestions || 0,
         answeredQuestions: result.answeredQuestions || 0,
         unansweredQuestions: result.unansweredQuestions || 0,
-        testLevel: result.testLevel || '未知',
-        suggestion: result.suggestion || '',
+        testLevel: result.testLevel || "未知",
+        suggestion: result.suggestion || "",
         durationMinutes: result.durationMinutes || null,
         testStartTime: result.testStartTime || null,
         testEndTime: result.testEndTime || null,
@@ -1027,8 +1223,8 @@ const startAIGrading = async (submission) => {
           multipleChoice: result.multipleChoiceStats || {},
           trueFalse: result.trueFalseStats || {},
           fillBlank: result.fillBlankStats || {},
-          shortAnswer: result.shortAnswerStats || {}
-        }
+          shortAnswer: result.shortAnswerStats || {},
+        },
       };
 
       submission.aiReview = aiReview;
@@ -1036,19 +1232,21 @@ const startAIGrading = async (submission) => {
 
       ElMessage.success(`${submission.studentName} 的作业AI评阅完成！`);
     } else {
-      console.error('AI评阅接口返回失败:', response);
-      throw new Error(response.data?.message || `AI评阅失败: ${response.status || '未知错误'}`);
+      console.error("AI评阅接口返回失败:", response);
+      throw new Error(
+        response.data?.message || `AI评阅失败: ${response.status || "未知错误"}`
+      );
     }
   } catch (error) {
-    console.error('AI评阅失败:', error);
-    console.error('错误详情:', {
+    console.error("AI评阅失败:", error);
+    console.error("错误详情:", {
       message: error.message,
       stack: error.stack,
-      response: error.response
+      response: error.response,
     });
-    
-    ElMessage.error(`AI评阅失败：${error.message || '请重试'}`);
-    
+
+    ElMessage.error(`AI评阅失败：${error.message || "请重试"}`);
+
     // 如果AI评阅失败，不设置AI评阅状态，保持原状态
     // 只提供基本的评阅信息，不标记为AI已评阅
     const aiReview = {
@@ -1067,11 +1265,16 @@ const generateAIFeedback = (submission) => {
   if (!submission.homeworkData || submission.homeworkData.length === 0) {
     return "作业数据不完整，无法进行AI评阅。";
   }
-  
+
   const totalQuestions = submission.homeworkData.length;
-  const correctAnswers = submission.homeworkData.filter(item => item.isCorrect).length;
-  const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions * 100).toFixed(1) : 0;
-  
+  const correctAnswers = submission.homeworkData.filter(
+    (item) => item.isCorrect
+  ).length;
+  const accuracy =
+    totalQuestions > 0
+      ? ((correctAnswers / totalQuestions) * 100).toFixed(1)
+      : 0;
+
   if (accuracy >= 90) {
     return `作业完成度很高，正确率${accuracy}%。答案准确，理解深入，表现优秀。`;
   } else if (accuracy >= 80) {
@@ -1092,22 +1295,39 @@ const generateAICriteria = (submission) => {
       { name: "理解深度", description: "对知识点的理解程度" },
     ];
   }
-  
+
   const totalQuestions = submission.homeworkData.length;
-  const correctAnswers = submission.homeworkData.filter(item => item.isCorrect).length;
-  const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) : 0;
-  
+  const correctAnswers = submission.homeworkData.filter(
+    (item) => item.isCorrect
+  ).length;
+  const accuracy = totalQuestions > 0 ? correctAnswers / totalQuestions : 0;
+
   return [
-    { name: "作业完整性", description: submission.status === "submitted" ? "作业已完整提交" : "作业未完整提交" },
-    { name: "答案正确性", description: `正确率${(accuracy * 100).toFixed(1)}%` },
-    { name: "理解深度", description: accuracy >= 0.8 ? "理解深入" : accuracy >= 0.6 ? "理解一般" : "需要加强学习" },
+    {
+      name: "作业完整性",
+      description:
+        submission.status === "submitted" ? "作业已完整提交" : "作业未完整提交",
+    },
+    {
+      name: "答案正确性",
+      description: `正确率${(accuracy * 100).toFixed(1)}%`,
+    },
+    {
+      name: "理解深度",
+      description:
+        accuracy >= 0.8
+          ? "理解深入"
+          : accuracy >= 0.6
+          ? "理解一般"
+          : "需要加强学习",
+    },
   ];
 };
 
 // 批量智能评阅
 const startBatchReview = async () => {
   const pendingSubmissions = submissions.value.filter(
-      (s) => s.status === "submitted" && s.reviewStatus === "pending"
+    (s) => s.status === "submitted" && s.reviewStatus === "pending"
   );
 
   if (pendingSubmissions.length === 0) {
@@ -1131,11 +1351,13 @@ const startBatchReview = async () => {
         failCount++;
       }
     }
-    
+
     if (failCount === 0) {
       ElMessage.success(`批量评阅完成，共成功评阅 ${successCount} 份作业`);
     } else {
-      ElMessage.warning(`批量评阅完成，成功 ${successCount} 份，失败 ${failCount} 份`);
+      ElMessage.warning(
+        `批量评阅完成，成功 ${successCount} 份，失败 ${failCount} 份`
+      );
     }
   } catch (error) {
     console.error("批量评阅过程中出现错误:", error);
@@ -1157,8 +1379,6 @@ const saveManualReview = () => {
   showSubmissionDetailDialog.value = false;
 };
 
-// 删除exportSubmissions方法，因为不再需要
-
 const handleClose = () => {
   showCreateDialog.value = false;
 };
@@ -1177,28 +1397,44 @@ const getDifficultyText = (difficulty) => {
   const texts = {
     easy: "简单",
     medium: "中等",
-    hard: "困难"
+    hard: "困难",
   };
   return texts[difficulty] || "未知";
 };
 
 // 获取测试等级对应的标签类型
 const getTestLevelType = (testLevel) => {
-  if (!testLevel) return 'info';
-  
+  if (!testLevel) return "info";
+
   const level = testLevel.toLowerCase();
-  if (level.includes('优秀') || level.includes('a') || level.includes('90')) {
-    return 'success';
-  } else if (level.includes('良好') || level.includes('b') || level.includes('80')) {
-    return 'primary';
-  } else if (level.includes('中等') || level.includes('c') || level.includes('70')) {
-    return 'warning';
-  } else if (level.includes('及格') || level.includes('d') || level.includes('60')) {
-    return 'warning';
-  } else if (level.includes('不及格') || level.includes('f') || level.includes('0')) {
-    return 'danger';
+  if (level.includes("优秀") || level.includes("a") || level.includes("90")) {
+    return "success";
+  } else if (
+    level.includes("良好") ||
+    level.includes("b") ||
+    level.includes("80")
+  ) {
+    return "primary";
+  } else if (
+    level.includes("中等") ||
+    level.includes("c") ||
+    level.includes("70")
+  ) {
+    return "warning";
+  } else if (
+    level.includes("及格") ||
+    level.includes("d") ||
+    level.includes("60")
+  ) {
+    return "warning";
+  } else if (
+    level.includes("不及格") ||
+    level.includes("f") ||
+    level.includes("0")
+  ) {
+    return "danger";
   } else {
-    return 'info';
+    return "info";
   }
 };
 </script>
@@ -1324,8 +1560,6 @@ const getTestLevelType = (testLevel) => {
   transition: background-color 0.2s ease;
 }
 
-
-
 /* 班级信息样式 */
 .class-info {
   background: #e0f2fe;
@@ -1394,8 +1628,6 @@ const getTestLevelType = (testLevel) => {
   max-height: 500px;
   overflow-y: auto;
 }
-
-
 
 /* 作业详情样式 */
 .submission-detail {
@@ -1612,8 +1844,6 @@ const getTestLevelType = (testLevel) => {
   font-weight: 600;
 }
 
-
-
 .feedback-section {
   display: flex;
   flex-direction: column;
@@ -1654,8 +1884,6 @@ const getTestLevelType = (testLevel) => {
 .criteria-list li {
   margin-bottom: 4px;
 }
-
-
 
 /* 学习建议样式 */
 .suggestion-section {
@@ -1733,8 +1961,6 @@ const getTestLevelType = (testLevel) => {
   color: #9ca3af;
   font-style: italic;
 }
-
-
 
 /* 智能创建作业表单样式 */
 .create-tips {
