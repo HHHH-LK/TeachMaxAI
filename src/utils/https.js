@@ -36,57 +36,38 @@ apiClient.interceptors.request.use(config => {
 });
 
 // 响应拦截器
-// apiClient.interceptors.response.use(
-//     response => {
-//       // 成功响应处理
-//       if (response.data.code === 200) {
-//         return response.data;
-//       }
-//       // 业务逻辑错误处理
-//       return Promise.reject({
-//         isBizError: true,
-//         message: response.data.message || '业务逻辑错误',
-//         code: response.data.code,
-//         response
-//       });
-//     },
-//     error => {
-//       // 统一错误处理
-//       const errorInfo = {
-//         isNetworkError: !error.response,
-//         isTimeout: error.code === 'ECONNABORTED',
-//         status: error.response?.status,
-//         message: ''
-//       };
-//
-//       if (error.response) {
-//         switch (error.response.status) {
-//           case 401:
-//             errorInfo.message = '身份验证失败，请重新登录';
-//             router.push('/login');
-//             break;
-//           case 403:
-//             errorInfo.message = '没有操作权限';
-//             break;
-//           case 500:
-//             errorInfo.message = '服务器内部错误';
-//             break;
-//           default:
-//             errorInfo.message = `请求失败 [${error.response.status}]`;
-//         }
-//       } else if (error.isTimeout) {
-//         errorInfo.message = '请求超时，请检查网络连接';
-//       } else {
-//         errorInfo.message = '网络连接异常，请检查网络';
-//       }
-//
-//       // 返回统一错误格式
-//       return Promise.reject({
-//         ...errorInfo,
-//         rawError: error,
-//         timestamp: new Date().toISOString()
-//       });
-//     }
-//   );
+apiClient.interceptors.response.use(
+    // 成功响应直接返回数据
+    response => response,
+
+    // 错误响应处理（聚焦401、403等状态码）
+    error => {
+      const authStore = useAuthStore();
+      const status = error.response?.status;
+
+      switch (status) {
+        case 401:
+          ElMessage.error('身份验证失败，请重新登录');
+          authStore.clearToken();
+          router.push('/login');
+          break;
+        case 403:
+          // ElMessage.error('没有操作权限');
+          console.error('没有操作权限')
+          break;
+        case 500:
+          // ElMessage.error('服务器内部错误，请稍后重试');
+          console.error('服务器内部错误，请稍后重试')
+          break;
+        default:
+          // 其他状态码统一提示
+          // ElMessage.error(`请求失败 [${status || '未知错误'}]`);
+          console.error(`请求失败 [${status || '未知错误'}]`)
+      }
+
+      // 抛出错误供业务层处理
+      return Promise.reject(error);
+    }
+);
 
 export default apiClient;

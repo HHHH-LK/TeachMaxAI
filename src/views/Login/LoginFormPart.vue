@@ -43,25 +43,25 @@
           <h1>REGISTER</h1>
           <div class="role-selection">
             <div class="role-option">
-              <input 
-                type="radio"  
-                id="student" 
-                v-model="registerForm.userType" 
-                value="student" 
+              <input
+                type="radio"
+                id="student"
+                v-model="registerForm.userType"
+                value="student"
                 required
               />
               <label for="student">学生</label>
             </div>
             <div class="role-option">
-              <input 
-                type="radio"  
-                id="teacher" 
-                v-model="registerForm.userType" 
+              <input
+                type="radio"
+                id="teacher"
+                v-model="registerForm.userType"
                 value="teacher"
               />
               <label for="teacher">教师</label>
             </div>
-          </div>  
+          </div>
           <div class="form-input CusernameInput">
             <input
               type="text" v-model="registerForm.username"
@@ -96,7 +96,7 @@
           <h2>忘记密码</h2>
           <button class="close-btn" @click="closeForgotPassword">&times;</button>
         </div>
-        
+
         <div class="forgot-step">
           <p>请输入您的用户名和新密码</p>
           <div class="form-input">
@@ -205,7 +205,7 @@ export default {
             role: userRole,
             // 可以根据需要添加更多用户信息
           };
-          
+
           useAuthStore().setToken(token);
           useAuthStore().setUser(userInfo);
 
@@ -226,7 +226,7 @@ export default {
           ElMessage.error("需要选择角色！");
           return;
         }
-        
+
         const response = await authService.register({
           userType: registerForm.value.userType,
           username: registerForm.value.username,
