@@ -148,7 +148,7 @@
       <AILearningAnalysis
         :student-data="analysisData"
         @close="showAIAnalysis = false"
-        :courseId="selectedCourse" 
+        :courseId="aiCourseId"
       />
     </el-dialog>
   </div>
@@ -163,6 +163,9 @@ import { getCurrentUserId } from "@/utils/userUtils";
 import AILearningAnalysis from "@/components/teacher/AILearningAnalysis.vue";
 import { teacherService, adminService } from "@/services/api.js";
 import { ElMessage } from "element-plus";
+
+
+const aiCourseId = ref("");
 
 // 历史考试下拉相关
 const examList = ref([]);
@@ -455,8 +458,11 @@ const masteryChartOption = computed(() => {
 const showAIAnalysis = ref(false);
 
 const onAIClick = () => {
+  // 设置当前选中的课程ID
+  aiCourseId.value = selectedCourse.value;
   showAIAnalysis.value = true;
 };
+
 
 // 获取知识点掌握情况数据
 const fetchKnowledgePoints = async (courseId) => {
