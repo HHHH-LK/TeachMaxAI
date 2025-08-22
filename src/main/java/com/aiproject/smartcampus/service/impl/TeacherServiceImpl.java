@@ -1303,14 +1303,33 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     @Override
     public Result<Boolean> updateExamQuestion(QuestionBank questionBank) {
+        // 确保questionBank的questionId不为空
+        if (questionBank.getQuestionId() == null) {
+            return Result.error("题目ID不能为空");
+        }
 
-        LambdaUpdateWrapper<QuestionBank> questionBankWrapper = new LambdaUpdateWrapper<>();
-        questionBankWrapper.set(QuestionBank::getQuestionId, questionBank.getQuestionId());
+        // 创建更新条件
+        LambdaUpdateWrapper<QuestionBank> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(QuestionBank::getQuestionId, questionBank.getQuestionId());
 
-        int update = questionBankMapper.update(questionBankWrapper);
+        // 设置需要更新的字段（排除主键）
+        updateWrapper
+                .set(questionBank.getCourseId() != null, QuestionBank::getCourseId, questionBank.getCourseId())
+                .set(questionBank.getPointId() != null, QuestionBank::getPointId, questionBank.getPointId())
+                .set(questionBank.getQuestionType() != null, QuestionBank::getQuestionType, questionBank.getQuestionType())
+                .set(questionBank.getQuestionContent() != null, QuestionBank::getQuestionContent, questionBank.getQuestionContent())
+                .set(questionBank.getQuestionOptions() != null, QuestionBank::getQuestionOptions, questionBank.getQuestionOptions())
+                .set(questionBank.getCorrectAnswer() != null, QuestionBank::getCorrectAnswer, questionBank.getCorrectAnswer())
+                .set(questionBank.getExplanation() != null, QuestionBank::getExplanation, questionBank.getExplanation())
+                .set(questionBank.getDifficultyLevel() != null, QuestionBank::getDifficultyLevel, questionBank.getDifficultyLevel())
+                .set(questionBank.getScorePoints() != null, QuestionBank::getScorePoints, questionBank.getScorePoints())
+                .set(questionBank.getCreatedBy() != null, QuestionBank::getCreatedBy, questionBank.getCreatedBy());
+
+        // 执行更新
+        int update = questionBankMapper.update(null, updateWrapper);
         if (update == 0) {
-            log.error("修改试卷失败");
-            throw new RuntimeException("修改试卷失败");
+            log.error("更新题目失败");
+            return Result.error("更新题目失败");
         }
 
         return Result.success(true);
@@ -1357,22 +1376,21 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Boolean> deletePaperQuestion(String questionId, String examId) {
-
-        //删除试卷题目列表中的数据
+        // 删除试卷题目关联表中的记录
         LambdaUpdateWrapper<PaperQuestion> paperQuestionWrapper = new LambdaUpdateWrapper<>();
         paperQuestionWrapper.eq(PaperQuestion::getPaperId, examId);
         paperQuestionWrapper.eq(PaperQuestion::getQuestionId, questionId);
-        int update = paperQuestionMapper.update(null, paperQuestionWrapper);
-        if (update == 0) {
+        int paperQuestionDeleteCount = paperQuestionMapper.delete(paperQuestionWrapper);
+        if (paperQuestionDeleteCount == 0) {
             log.error("删除试卷题目列表失败");
             throw new RuntimeException("删除试卷题目列表失败");
         }
 
-        //删除题目
-        LambdaUpdateWrapper<QuestionBank> questionBankLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        questionBankLambdaUpdateWrapper.eq(QuestionBank::getQuestionId, questionId);
-        int update1 = questionBankMapper.update(null, questionBankLambdaUpdateWrapper);
-        if (update1 == 0) {
+        // 删除题目表中的记录
+        LambdaUpdateWrapper<QuestionBank> questionBankWrapper = new LambdaUpdateWrapper<>();
+        questionBankWrapper.eq(QuestionBank::getQuestionId, questionId);
+        int questionBankDeleteCount = questionBankMapper.delete(questionBankWrapper);
+        if (questionBankDeleteCount == 0) {
             log.error("删除题目信息失败");
             throw new RuntimeException("删除题目信息失败");
         }
