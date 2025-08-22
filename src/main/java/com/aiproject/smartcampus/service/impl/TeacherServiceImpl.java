@@ -1428,23 +1428,25 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Boolean> deleteChapterQuestion(String chapterId, String questionId) {
+        // 删除章节题目关联记录
+        LambdaQueryWrapper<ChapterQuestion> chapterQuestionWrapper = new LambdaQueryWrapper<>();
+        chapterQuestionWrapper.eq(ChapterQuestion::getQuestionId, questionId)
+                .eq(ChapterQuestion::getChapterId, chapterId);
+        int deleteCount = chapterQuestionMapper.delete(chapterQuestionWrapper);
 
-        LambdaUpdateWrapper<ChapterQuestion> chapterQuestionWrapper = new LambdaUpdateWrapper<>();
-        chapterQuestionWrapper.eq(ChapterQuestion::getQuestionId, questionId);
-        chapterQuestionWrapper.eq(ChapterQuestion::getChapterId, chapterId);
-        int update = chapterQuestionMapper.update(null, chapterQuestionWrapper);
-        if (update == 0) {
+        if (deleteCount == 0) {
             log.error("删除章节题目失败");
             throw new RuntimeException("删除章节题目失败");
         }
 
-        //删除题目信息
-        LambdaUpdateWrapper<QuestionBank> questionBankLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        questionBankLambdaUpdateWrapper.eq(QuestionBank::getQuestionId, questionId);
-        int update1 = questionBankMapper.update(null, questionBankLambdaUpdateWrapper);
-        if (update1 == 0) {
-            log.error("删除题目信息");
-            throw new RuntimeException("删除题目信息");
+        // 删除题目信息
+        LambdaQueryWrapper<QuestionBank> questionBankWrapper = new LambdaQueryWrapper<>();
+        questionBankWrapper.eq(QuestionBank::getQuestionId, questionId);
+        int deleteQuestionCount = questionBankMapper.delete(questionBankWrapper);
+
+        if (deleteQuestionCount == 0) {
+            log.error("删除题目信息失败");
+            throw new RuntimeException("删除题目信息失败");
         }
 
         return Result.success(true);
