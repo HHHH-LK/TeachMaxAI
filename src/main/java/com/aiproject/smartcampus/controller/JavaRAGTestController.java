@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import com.aiproject.smartcampus.model.handler.impl.SeptIntentRagHandler;
 
 import java.io.File;
-import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @Slf4j
@@ -101,23 +104,38 @@ public class JavaRAGTestController {
     /**
      * 导入知识库资料
      */
+    private final ExecutorService executorService = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors() * 2
+    );
 
     @GetMapping("/knowledge/database")
     public void loadKnowledgeDatabase(String url) {
-
-        if (url == null||url.isEmpty()) {
+        if (url == null || url.isEmpty()) {
             return;
         }
 
         // 搜索所有文件
         List<File> allFiles = searchAllFiles(url);
+        log.info("开始知识库文件导入，一共【{}】个数据文件", allFiles.size());
 
-        log.info("开始知识库文件，一共【{}】个数据文件", allFiles.size());
-
+        AtomicInteger i = new AtomicInteger();
+        // 提交并发任务
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (File file : allFiles) {
-            fileloadFunction.processDocumentDynamically(file);
-            log.info("文件{}导入完毕", file.getName());
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    i.getAndIncrement();
+                    fileloadFunction.processDocumentDynamically(file);
+                    log.info("第【{}】文件 {} 导入完毕", i, file.getName());
+                } catch (Exception e) {
+                    log.error("文件 {} 导入失败: {}", file.getName(), e.getMessage(), e);
+                }
+            }, executorService);
+            futures.add(future);
         }
+
+        // 等待所有任务完成
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
         log.info("导入知识库文件成功，一共处理了【{}】条数据", allFiles.size());
     }

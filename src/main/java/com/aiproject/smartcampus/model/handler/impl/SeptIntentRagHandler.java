@@ -59,18 +59,18 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
     // 检索与融合参数
     private static final int TOP_K_CANDIDATES = 50;     // 每个 query 的候选池
     private static final int TOP_K_PER_STRATEGY = 10;   // 每个策略取前k
-    private static final int TOP_K_RESULTS = 10;        // 融合后保留前k
+    private static final int TOP_K_RESULTS = 3;        // 融合后保留前k
     private static final int TOP_N_FINAL = 5;           // 最终对用户展示的数量
     private static final double MIN_RELEVANCE_SCORE = 0.35;
     private static final double HYBRID_SEM_WEIGHT = 0.65;
     private static final double HYBRID_KEY_WEIGHT = 0.35;
-    private static final int RETRIEVAL_TIMEOUT_SECONDS = 10;
+    private static final int RETRIEVAL_TIMEOUT_SECONDS = 30;
     private static final int RRF_K = 60;                // RRF 稳定常数
 
     // 评估与展示参数
     private static final double ESTIMATE_GOOD_HYBRID_THRESHOLD = 0.60; // 估计“相关”阈值（用于 Precision@K）
     private static final double CONF_WEIGHT_RRF_THEO = 0.5; // 匹配度中 RRF 理论归一化权重
-    private static final double CONF_WEIGHT_HYBRID   = 0.5; // 匹配度中 hybrid 分权重
+    private static final double CONF_WEIGHT_HYBRID = 0.5; // 匹配度中 hybrid 分权重
 
     // Embedding 缓存（简单 LRU）
     private final Map<String, double[]> embeddingCache = Collections.synchronizedMap(
