@@ -43,10 +43,13 @@ import {teacherService} from "@/services/api";
 
 const props = defineProps({
   studentData: {type: Object, default: () => ({})},
+  courseId: {type: String, default: "1"}
 });
 
 
-const courseId = "1"
+console.log(props.courseId, "fjasdklf;")
+
+const courseId = props.courseId
 const isGenerating = ref(true);
 const progress = ref(0);
 const generatingText = ref("正在收集学习数据...");

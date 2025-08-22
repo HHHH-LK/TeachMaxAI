@@ -148,6 +148,7 @@
       <AILearningAnalysis
         :student-data="analysisData"
         @close="showAIAnalysis = false"
+        :courseId="selectedCourse" 
       />
     </el-dialog>
   </div>
