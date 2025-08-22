@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted, computed} from "vue";
+import {ref, onMounted, computed, watch} from "vue";
 import {Refresh} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 import {marked} from 'marked';
@@ -47,7 +47,7 @@ const props = defineProps({
 });
 
 
-console.log(props.courseId, "fjasdklf;")
+console.log(props.courseId, "fjasdklf;");
 
 const courseId = props.courseId
 const isGenerating = ref(true);
@@ -208,6 +208,16 @@ onMounted(() => {
   startGenerating();
   fetchAnalysis();
   updateReportDate();
+});
+
+watch(() => props.courseId, (newCourseId, oldCourseId) => {
+  if (newCourseId && newCourseId !== oldCourseId) {
+    console.log("courseId 发生变化，重新生成分析数据", newCourseId);
+    ElMessage.info("课程已切换，正在重新生成分析...");
+    startGenerating();
+    fetchAnalysis();
+    updateReportDate();
+  }
 });
 </script>
 
