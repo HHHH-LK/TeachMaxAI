@@ -1226,9 +1226,13 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         }
 
         // 2. 查询该课程下所有考试
+        AtomicInteger i= new AtomicInteger();
         List<Exam> exams = examMapper.selectList(
                 new LambdaQueryWrapper<Exam>().eq(Exam::getCourseId, courseId)
-        );
+        ).stream().peek(a->{
+            String s = a.getTitle() + String.valueOf(i.getAndIncrement());
+            a.setTitle(s);
+        }).toList();
 
         // 3. 组装统计信息
         String finalCourseName = courseName;
