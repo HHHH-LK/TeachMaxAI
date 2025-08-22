@@ -26,9 +26,10 @@
         </span>
         <!-- 修改分数功能 -->
         <span class="q-score">
+          <!-- 修复：使用v-model.number确保数字类型 -->
           <el-input-number
             v-if="editingQuestionId === q.id"
-            v-model="editingQuestion.score"
+            v-model.number="editingQuestion.score"
             :min="1"
             :max="100"
             size="small"
@@ -84,6 +85,7 @@
               :key="optIdx"
               class="option-item"
             >
+              <!-- 修复：使用v-model绑定到选项对象的属性 -->
               <el-input
                 v-model="opt.label"
                 placeholder="选项标签 (如 A、B)"
@@ -144,6 +146,7 @@
               :key="optIdx"
               class="option-item"
             >
+              <!-- 修复：使用v-model绑定到选项对象的属性 -->
               <el-input
                 v-model="opt.label"
                 placeholder="选项标签 (如 A、B)"
@@ -517,7 +520,7 @@ watch(
   [() => props.paper, () => props.userAnswers, () => props.readonly],
   ([paper, extUserAnswers, readonly]) => {
     if (readonly && extUserAnswers && Object.keys(extUserAnswers).length > 0) {
-      userAnswers.value = { ...ext极狐UserAnswers };
+      userAnswers.value = { ...extUserAnswers };
     } else if (readonly && paper && paper.userAnswers) {
       userAnswers.value = { ...paper.userAnswers };
     } else {
@@ -613,19 +616,18 @@ function startEditQuestion(question) {
     }
   }
   
-  // 确保使用原题目的分数作为默认值
+  // 修复：确保使用深拷贝，避免引用问题
   editingQuestion.value = {
     id: question.id,
     title: question.title,
     type: question.type,
     score: question.score, // 使用原题目的分数作为默认值
-    options: question.options ? [...question.options] : [],
+    options: question.options ? JSON.parse(JSON.stringify(question.options)) : [],
     correctAnswer: question.correctAnswer,
     correctAnswerLabel: correctAnswerLabel, // 设置正确答案标签
     explanation: question.explanation || "" // 初始化解析
   };
 }
-
 
 // 映射前端题目类型到后端类型
 const questionTypeMap = {
@@ -645,7 +647,7 @@ function convertToBackendQuestion(frontendQuestion) {
     courseId: props.courseId,
     pointId: frontendQuestion.pointId || 0,
     questionType: questionTypeMap[frontendQuestion.type] || frontendQuestion.type,
-    questionContent: frontendQuestion.questionContent,
+    questionContent: frontendQuestion.title,
     scorePoints: frontendQuestion.scorePoints,
     explanation: frontendQuestion.explanation,
     difficultyLevel: "medium",
@@ -697,9 +699,9 @@ function saveQuestionEdit(question) {
   // 转换正确答案标签为实际值
   let correctAnswer = null;
   
-  if (["single", "multiple"].includes(question.type)) {
+  if (["single", "multiple"].includes(editingQuestion.value.type)) {
     if (editingQuestion.value.correctAnswerLabel) {
-      if (question.type === "single") {
+      if (editingQuestion.value.type === "single") {
         // 单选题：直接存储标签（如"A"）
         correctAnswer = editingQuestion.value.correctAnswerLabel;
       } else {
@@ -707,7 +709,7 @@ function saveQuestionEdit(question) {
         correctAnswer = editingQuestion.value.correctAnswerLabel.split(",").map(l => l.trim());
       }
     }
-  } else if (question.type === "judge") {
+  } else if (editingQuestion.value.type === "judge") {
     // 判断题
     correctAnswer = editingQuestion.value.correctAnswer;
   } else {
@@ -718,28 +720,25 @@ function saveQuestionEdit(question) {
   // 更新题目数据
   const updatedQuestion = {
     ...question,
-    questionContent: editingQuestion.value.title,
-    score: editingQuestion.value.score,
+    title: editingQuestion.value.title,
+    type: editingQuestion.value.type,
+    scorePoints: editingQuestion.value.score, // 修复：使用编辑后的分数
+    options: JSON.parse(JSON.stringify(editingQuestion.value.options)), // 深拷贝选项
     correctAnswer: correctAnswer,
     explanation: editingQuestion.value.explanation
   };
-  
-  // 如果是选择题，更新选项
-  if (["single", "multiple"].includes(question.type)) {
-    updatedQuestion.options = [...editingQuestion.value.options];
-  }
   
   // 转换为后端实体
   const backendQuestion = convertToBackendQuestion(updatedQuestion);
   backendQuestion.questionId = question.id; // 设置题目ID
   
+  console.log("准备更新题目:", backendQuestion);
   // 调用API更新题目
   updateExamQuestion(backendQuestion);
   
   // 退出编辑状态
   editingQuestionId.value = null;
 }
-
 
 // 更新题目API调用
 async function updateExamQuestion(question) {
@@ -751,7 +750,7 @@ async function updateExamQuestion(question) {
       pointId: question.pointId,
       questionType: question.questionType,
       questionContent: question.questionContent,
-      question_options: question.question_options, // 修改字段名
+      questionOptions: question.questionOptions, // 修改字段名
       correctAnswer: question.correctAnswer,
       explanation: question.explanation,
       difficultyLevel: question.difficultyLevel,
@@ -883,8 +882,19 @@ function addQuestionToPaper() {
     return;
   }
   
-  // 验证选择题答案
+  // 验证选择题选项
   if (['single', 'multiple'].includes(newQuestion.value.type)) {
+    // 检查是否有选项内容为空
+    const emptyOption = newQuestion.value.options.find(
+      opt => !opt.content.trim()
+    );
+    
+    if (emptyOption) {
+      ElMessage.warning('请填写所有选项内容');
+      return;
+    }
+    
+    // 验证答案是否为空
     if (!newQuestion.value.correctAnswerLabel.trim()) {
       ElMessage.warning('请输入正确答案');
       return;
@@ -923,10 +933,10 @@ function addQuestionToPaper() {
   const question = {
     questionId: `q${Date.now()}`, // 生成唯一ID
     courseId: props.courseId,
-    questionContent: newQuestion.value.title,
+    title: newQuestion.value.title,
     questionType: newQuestion.value.type,
     scorePoints: newQuestion.value.score,
-    options: [...newQuestion.value.options], // 确保传递选项
+    options: JSON.parse(JSON.stringify(newQuestion.value.options)), // 深拷贝选项
     correctAnswer: null, // 初始化为null
     explanation: newQuestion.value.explanation
   };
@@ -966,6 +976,7 @@ function addQuestionToPaper() {
 // 添加题目API调用
 async function addExamQuestion(question) {
   try {
+    console.log(props.paper.examId);
     const response = await teacherService.addQuestion({
       examId: props.paper.examId, // 试卷ID
       questionBank: question

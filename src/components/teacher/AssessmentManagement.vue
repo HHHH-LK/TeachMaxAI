@@ -288,6 +288,7 @@ const viewExamContent = async (assessment) => {
       });
 
       selectedExamPaper.value = {
+        examId: assessment.id,
         title: assessment.title,
         questions: questions
       };
