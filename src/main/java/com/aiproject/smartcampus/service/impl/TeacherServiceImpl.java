@@ -14,6 +14,7 @@ import com.aiproject.smartcampus.pojo.vo.*;
 import com.aiproject.smartcampus.service.TeacherService;
 import com.aliyun.core.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     private final StudentMapper studentMapper;
     private final UserMapper userMapper;
     private final QuestionBankMapper questionBankMapper;
+    private final ChapterQuestionMapper chapterQuestionMapper;
 
 
     @Override
@@ -200,8 +202,8 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             return studentWrongKnowledgeBOMap.get(a.getKey());
         }).toList();
 
-        LambdaQueryWrapper<Course> courseLambdaQueryWrapper=new LambdaQueryWrapper<>();
-        courseLambdaQueryWrapper.eq(Course::getCourseId,couresId);
+        LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        courseLambdaQueryWrapper.eq(Course::getCourseId, couresId);
         Course course = courseMapper.selectOne(courseLambdaQueryWrapper);
         String courseName = course.getCourseName();
 
@@ -1226,10 +1228,10 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         }
 
         // 2. 查询该课程下所有考试
-        AtomicInteger i= new AtomicInteger();
+        AtomicInteger i = new AtomicInteger();
         List<Exam> exams = examMapper.selectList(
                 new LambdaQueryWrapper<Exam>().eq(Exam::getCourseId, courseId)
-        ).stream().peek(a->{
+        ).stream().peek(a -> {
             String s = a.getTitle() + String.valueOf(i.getAndIncrement());
             a.setTitle(s);
         }).toList();
@@ -1297,6 +1299,137 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                     return situationDTO;
                 }
         ));
+    }
+
+    @Override
+    public Result<Boolean> updateExamQuestion(QuestionBank questionBank) {
+
+        LambdaUpdateWrapper<QuestionBank> questionBankWrapper = new LambdaUpdateWrapper<>();
+        questionBankWrapper.set(QuestionBank::getQuestionId, questionBank.getQuestionId());
+
+        int update = questionBankMapper.update(questionBankWrapper);
+        if (update == 0) {
+            log.error("修改试卷失败");
+            throw new RuntimeException("修改试卷失败");
+        }
+
+        return Result.success(true);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Boolean> addExamQuestion(String examId, QuestionBank questionBank) {
+
+        PaperQuestion paperQuestion = new PaperQuestion();
+        LambdaQueryWrapper<PaperQuestion> paperQuestionWrapper = new LambdaQueryWrapper<>();
+        paperQuestionWrapper.eq(PaperQuestion::getPaperId, examId);
+        paperQuestionWrapper.orderByDesc(PaperQuestion::getQuestionOrder);
+        paperQuestionWrapper.last("limit 1");
+        PaperQuestion lastQuestion = paperQuestionMapper.selectOne(paperQuestionWrapper);
+
+        //获取出最后的题目顺序
+        Integer questionOrder = lastQuestion.getQuestionOrder();
+
+        //插入题库表
+        int insert1 = questionBankMapper.insert(questionBank);
+        if (insert1 == 0) {
+            log.error("新增题目失败");
+            throw new RuntimeException("新增题目失败");
+        }
+
+        //构建实体类
+        paperQuestion.setQuestionId(questionBank.getQuestionId());
+        paperQuestion.setQuestionOrder(questionOrder + 1);
+        paperQuestion.setPaperId(Integer.valueOf(examId));
+        paperQuestion.setCustomScore(questionBank.getScorePoints());
+
+        //进行插入数据
+        int insert = paperQuestionMapper.insert(paperQuestion);
+
+        if (insert == 0) {
+            log.error("新增试卷题目列表失败");
+            throw new RuntimeException("新增试卷题目列表失败");
+        }
+
+        return Result.success(true);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Boolean> deletePaperQuestion(String questionId, String examId) {
+
+        //删除试卷题目列表中的数据
+        LambdaUpdateWrapper<PaperQuestion> paperQuestionWrapper = new LambdaUpdateWrapper<>();
+        paperQuestionWrapper.eq(PaperQuestion::getPaperId, examId);
+        paperQuestionWrapper.eq(PaperQuestion::getQuestionId, questionId);
+        int update = paperQuestionMapper.update(null, paperQuestionWrapper);
+        if (update == 0) {
+            log.error("删除试卷题目列表失败");
+            throw new RuntimeException("删除试卷题目列表失败");
+        }
+
+        //删除题目
+        LambdaUpdateWrapper<QuestionBank> questionBankLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        questionBankLambdaUpdateWrapper.eq(QuestionBank::getQuestionId, questionId);
+        int update1 = questionBankMapper.update(null, questionBankLambdaUpdateWrapper);
+        if (update1 == 0) {
+            log.error("删除题目信息失败");
+            throw new RuntimeException("删除题目信息失败");
+        }
+
+        return Result.success(true);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Boolean> addChapterQuestion(String chapterId, QuestionBank questionBank) {
+
+        //新增数据
+        int insert = questionBankMapper.insert(questionBank);
+        if (insert == 0) {
+            log.error("插入课堂作业到题库中失效");
+            throw new RuntimeException("插入课堂作业到题库中失效");
+        }
+
+        ChapterQuestion chapterQuestion = new ChapterQuestion();
+        chapterQuestion.setChapterId(Integer.valueOf(chapterId));
+        chapterQuestion.setQuestionId(questionBank.getQuestionId());
+        chapterQuestion.setQuestionType(ChapterQuestion.QuestionType.TEST);
+        chapterQuestion.setCreatedAt(LocalDateTime.now());
+
+        int insert1 = chapterQuestionMapper.insert(chapterQuestion);
+        if (insert1 == 0) {
+            log.error("插入题目失败");
+            throw new RuntimeException("插入题目失败");
+
+        }
+
+        return Result.success(true);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Boolean> deleteChapterQuestion(String chapterId, String questionId) {
+
+        LambdaUpdateWrapper<ChapterQuestion> chapterQuestionWrapper = new LambdaUpdateWrapper<>();
+        chapterQuestionWrapper.eq(ChapterQuestion::getQuestionId, questionId);
+        chapterQuestionWrapper.eq(ChapterQuestion::getChapterId, chapterId);
+        int update = chapterQuestionMapper.update(null, chapterQuestionWrapper);
+        if (update == 0) {
+            log.error("删除章节题目失败");
+            throw new RuntimeException("删除章节题目失败");
+        }
+
+        //删除题目信息
+        LambdaUpdateWrapper<QuestionBank> questionBankLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        questionBankLambdaUpdateWrapper.eq(QuestionBank::getQuestionId, questionId);
+        int update1 = questionBankMapper.update(null, questionBankLambdaUpdateWrapper);
+        if (update1 == 0) {
+            log.error("删除题目信息");
+            throw new RuntimeException("删除题目信息");
+        }
+
+        return Result.success(true);
     }
 
 

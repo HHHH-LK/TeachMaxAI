@@ -64,7 +64,7 @@ public class EvaluateRAG {
 
             // 2) 用例级分析（增强型系统）
             JsonNode cases = root.path("testCaseResults");
-            if (!cases.isArray() || cases.size() == 0) {
+            if (!cases.isArray() || cases.isEmpty()) {
                 System.out.println("未找到 testCaseResults，用例级分析跳过。");
                 return;
             }
@@ -217,8 +217,8 @@ public class EvaluateRAG {
     // 最近排名法（Nearest Rank）
     private static double percentile(List<Integer> values, double p) {
         if (values == null || values.isEmpty()) return 0;
-        if (p <= 0) return values.get(0);
-        if (p >= 100) return values.get(values.size() - 1);
+        if (p <= 0) return values.getFirst();
+        if (p >= 100) return values.getLast();
         int n = values.size();
         int rank = (int) Math.ceil((p / 100.0) * n);
         rank = Math.max(1, Math.min(rank, n));

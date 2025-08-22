@@ -336,6 +336,7 @@ public class SeptIntentRagHandler extends BaseEnhancedHandler {
                                     .map(c -> {
                                         double ss = calculateSemanticScore(q, c);
                                         double ks = calculateKeywordScore(keywords, c);
+                                        //进行混合检索
                                         double hs = HYBRID_SEM_WEIGHT * ss + HYBRID_KEY_WEIGHT * ks;
                                         ScoredContent sc = new ScoredContent(c, hs, RetrievalStrategy.HYBRID);
                                         sc.getDimensionScores().put("semantic", ss);

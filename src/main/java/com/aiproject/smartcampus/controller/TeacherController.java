@@ -8,8 +8,12 @@ import com.aiproject.smartcampus.pojo.dto.TeacherQueryDTO;
 
 //import com.aiproject.smartcampus.pojo.dto.TeacherUpdateDTO;
 import com.aiproject.smartcampus.pojo.po.Course;
+import com.aiproject.smartcampus.pojo.po.Exam;
+import com.aiproject.smartcampus.pojo.po.ExamQuestion;
+import com.aiproject.smartcampus.pojo.po.QuestionBank;
 import com.aiproject.smartcampus.pojo.vo.*;
 import com.aiproject.smartcampus.service.TeacherService;
+import dev.langchain4j.agent.tool.P;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -178,4 +182,54 @@ public class TeacherController {
     public Result<Map<String, KnowledgePointMasteryVO>> getKnowledgePointMastery(@RequestParam("courseId") String courseId) {
         return teacherService.getKnowledgePointMastery(courseId);
     }
+
+    /**
+     * 修改试卷/章节练习题内容
+     * */
+    @PostMapping("/updateExam/question")
+    public Result<Boolean> updateExamQuestion( @RequestBody QuestionBank questionBank) {
+
+        return teacherService.updateExamQuestion(questionBank);
+    }
+
+    /**
+     * 新增试卷内容
+     * */
+    @PostMapping("/add/examQuestion")
+    public Result<Boolean> addExamQuestion(@RequestParam String examId,@RequestBody QuestionBank questionBank) {
+
+        return teacherService.addExamQuestion(examId,questionBank);
+    }
+
+    /**
+     * 删除试卷内容
+     * */
+    @PostMapping("/delete/paperQuestion")
+    public Result<Boolean> deletePaperQuestion(@RequestParam String questionId,@RequestParam String examId) {
+
+        return teacherService.deletePaperQuestion(questionId,examId);
+
+    }
+
+    /**
+     * 新增章节作业题目
+     * */
+    @PostMapping("/add/chapterQuestion")
+    public Result<Boolean> addChapterQuestion(@RequestParam String chapterId,@RequestBody QuestionBank questionBank) {
+
+        return teacherService.addChapterQuestion(chapterId,questionBank);
+
+    }
+
+    /**
+     * 删除章节作业题目
+     * */
+    @PostMapping("/delete/chapterQuestion")
+    public Result<Boolean> deleteChapterQuestion(@RequestParam String chapterId,@RequestParam String questionId) {
+
+        return teacherService.deleteChapterQuestion(chapterId,questionId);
+    }
+
+
+
 }
