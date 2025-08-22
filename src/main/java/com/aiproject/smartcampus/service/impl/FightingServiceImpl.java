@@ -573,35 +573,38 @@ public class FightingServiceImpl implements FightingService {
 
     // 本地判题（能判就返回true/false；无法判题返回null）
     private Boolean judgeAnswerLocal(QuestionBank question, String studentAnswer) {
+
+        Boolean IS_TRUE_TAG = false;
+
         try {
-            if (question.getQuestionType() == null) return null;
+            if (question.getQuestionType() == null) return IS_TRUE_TAG;
             String type = question.getQuestionType().getValue();
             String correct = question.getCorrectAnswer();
-            if (!StringUtils.hasText(correct)) return null;
+            if (!StringUtils.hasText(correct)) return IS_TRUE_TAG;
 
             switch (type.toLowerCase()) {
                 case "single_choice": {
                     String std = normalizeLabel(extractFirstLabel(correct));
                     String stu = normalizeLabel(extractFirstLabel(studentAnswer));
-                    if (!StringUtils.hasText(std) || !StringUtils.hasText(stu)) return null;
+                    if (!StringUtils.hasText(std) || !StringUtils.hasText(stu)) return IS_TRUE_TAG;
                     return std.equals(stu);
                 }
                 case "multiple_choice": {
                     Set<String> std = parseLabelSet(correct);
                     Set<String> stu = parseLabelSet(studentAnswer);
-                    if (std.isEmpty() || stu.isEmpty()) return null;
+                    if (std.isEmpty() || stu.isEmpty()) return IS_TRUE_TAG;
                     return std.equals(stu);
                 }
                 case "true_false": {
                     Boolean std = parseBooleanAnswer(correct);
                     Boolean stu = parseBooleanAnswer(studentAnswer);
-                    if (std == null || stu == null) return null;
+                    if (std == null || stu == null) return IS_TRUE_TAG;
                     return Objects.equals(std, stu);
                 }
                 case "fill_blank": {
                     List<String> std = parseTextList(correct);
                     List<String> stu = parseTextList(studentAnswer);
-                    if (std.isEmpty() || stu.isEmpty()) return null;
+                    if (std.isEmpty() || stu.isEmpty()) return IS_TRUE_TAG;
                     // 长度不同直接错误；长度相同则逐项宽松匹配（忽略大小写与空白）
                     if (std.size() != stu.size()) return false;
                     for (int i = 0; i < std.size(); i++) {
