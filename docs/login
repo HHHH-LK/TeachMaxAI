@@ -1,0 +1,26 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import TeacherView from '../views/TeacherView.vue'
+import StudentView from '../views/StudentView.vue'
+import ErrorAnalysisView from '../views/student/ErrorAnalysisView.vue';
+import ChatView from "@/views/chatView.vue";
+import AdminView from '../views/AdminView.vue';
+import UserManagement from '../views/admin/UserManagement.vue';
+import ResourceManagement from '../views/admin/ResourceManagement.vue';
+import Dashboard from '../views/admin/Dashboard.vue';
+import KnowledgePointManagementView from '../views/student/KnowledgePointManagementView.vue';
+import CourseSelectionView from '../views/student/CourseSelectionView.vue'
+import LoginDynamicView from '@/views/Login/LoginDynamicView.vue'
+import CommunityStudent from '../views/student/CommunityStudent.vue'
+import CommunityTeacher from '../views/teacher/CommunityTeacher.vue'
+import StudentChat from '../views/teacher/StudentChat.vue'
+import ChatBackground from '@/components/student/chat/ChatBackground.vue';
+import TabChat from '@/components/student/chat/TabChat.vue';
+import CenterBackground from '@/components/student/center/CenterBackground.vue';
+import Center from '@/views/Center.vue';
+import TeacherChat from "@/views/student/TeacherChat.vue";
+import ExamReview from "@/views/admin/ExamReview.vue";
+import CourseAssignment from "@/views/admin/CourseAssignment.vue";
+import Test from "@/views/tower/Fight.vue"
+import Game from "@/views/student/game/Game.vue"
+import TowerTransition from "@/views/student/game/animation/tower.vue"
+// import { useAuthStore } from '@/store/authStore'

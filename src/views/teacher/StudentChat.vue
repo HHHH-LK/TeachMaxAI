@@ -148,13 +148,14 @@ import {
 import teacherAvatar from '@/assets/teacher-avatar.png';
 import {teacherService, isOnline, studentService} from "@/services/api.js";
 import chatSSEService from '@/services/chatSSEService.js';
-import { getCurrentUser } from '@/utils/userUtils.js';
+import {getCurrentUser, getCurrentUserId} from '@/utils/userUtils.js';
 import { ElMessage } from 'element-plus';
 import { useAuthStore } from '@/store/authStore.js';
 
 // 学生数据状态
 const students = ref([]);
 const loading = ref(false);
+const course = ref(null);
 
 // 全局（当前老师自己）的SSE连接状态
 const sseUserId = ref(null);
@@ -305,15 +306,26 @@ const refreshAllStudents = async () => {
   try {
     loading.value = true;
 
-    // 同时获取两个课程的学生数据和未读消息数据
-    const [course1Students, course2Students] = await Promise.all([
-      fetchClassStudents(1),
-      fetchClassStudents(2),
-      fetchUnreadMessages() // 获取未读消息数据
-    ]);
+    const userId = getCurrentUserId()
+    const res = await teacherService.getTeacherInfo(userId)
+    const teacherId = res.data.data.teacherId;
+    const response = await teacherService.getAllCourse(teacherId);
+    if(response.data && response.data.data) {
+      course.value = response.data.data.map(item => ({
+        id: item.courseId,
+        name: item.courseName,
+        semester: item.semester
+      }))
+    }
 
-    // 合并两个课程的学生数据
-    const allStudents = [...course1Students, ...course2Students];
+    // 生成每个课程的学生数据请求（返回Promise数组）
+    const studentPromises = course.value.map(courseItem =>
+        fetchClassStudents(courseItem.id)
+    );
+
+    // 等待所有请求完成，获取实际数据
+    const allCourseStudents = await Promise.all(studentPromises);
+    const allStudents = allCourseStudents.flat();
 
     if (allStudents.length > 0) {
       students.value = allStudents;

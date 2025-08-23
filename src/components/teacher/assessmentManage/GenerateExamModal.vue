@@ -310,10 +310,13 @@ const generateAssessment = async () => {
 
     ElMessage.info("正在根据选择的章节和知识点生成试卷内容...");
 
+    console.log("生成描述:", generateDescription.value, generateForm.courseId)
     const response = await teacherService.assessment.createIntelligentExam(
         generateDescription.value,
-        generateForm.courseId
+        props.courseId
     );
+
+    console.log("生成结果:", response)
 
     if (response.data && response.data.success) {
       const examPaperJson = JSON.parse(response.data.data.examPaperJson);
