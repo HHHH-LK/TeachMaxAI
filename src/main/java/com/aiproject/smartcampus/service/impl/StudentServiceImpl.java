@@ -8,15 +8,13 @@ import com.aiproject.smartcampus.mapper.*;
 import com.aiproject.smartcampus.pojo.bo.SimpleKnowledgeAnalysisBO;
 import com.aiproject.smartcampus.pojo.dto.StudentAnswerDTO;
 import com.aiproject.smartcampus.pojo.dto.StudentExamAnswerDTO;
-import com.aiproject.smartcampus.pojo.po.QuestionBank;
-import com.aiproject.smartcampus.pojo.po.Student;
-import com.aiproject.smartcampus.pojo.po.StudentAnswer;
-import com.aiproject.smartcampus.pojo.po.User;
+import com.aiproject.smartcampus.pojo.po.*;
 import com.aiproject.smartcampus.pojo.vo.StudentKnowledgePointVO;
 import com.aiproject.smartcampus.pojo.vo.StudentSelectAllVO;
 import com.aiproject.smartcampus.pojo.vo.StudentWrongQuestionVO;
 import com.aiproject.smartcampus.service.StudentService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,6 +42,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -76,6 +75,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             },
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
+    private final ExamScoreMapper examScoreMapper;
 
     @PreDestroy
     public void shutdown() {
@@ -119,7 +119,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Override
     public String academicAnalysis(String courseId) {
         try {
-          String studentId = userToTypeUtils.change();
+            String studentId = userToTypeUtils.change();
             // 错题
             log.info("开始检索学生{}错误题目信息", studentId);
             List<StudentWrongQuestionVO> wrongList = studentMapper.selectWrongQuestion(studentId, courseId);
@@ -154,7 +154,13 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Transactional(rollbackFor = Exception.class)
     public void finshExam(StudentExamAnswerDTO studentExamAnswerDTO) {
         List<StudentAnswerDTO> list = studentExamAnswerDTO.getStudentExamAnswerDTOList();
+
+        LambdaQueryWrapper<StudentAnswer> studentAnswerLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        studentAnswerLambdaQueryWrapper.eq(StudentAnswer::getExamId, studentExamAnswerDTO.getExamId());
+        Long l = studentAnswerMapper.selectCount(studentAnswerLambdaQueryWrapper);
+
         int i = 0;
+        String studentId = userToTypeUtils.change();
         for (StudentAnswerDTO dto : list) {
             Integer qid = dto.getQuestionId();
             QuestionBank qb = questionBankMapper.selectById(qid);
@@ -164,14 +170,39 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             }
             log.info("提取出学生的第{}题目信息", i++);
 
-            String studentId = userToTypeUtils.change();
-            StudentAnswer sa = new StudentAnswer();
-            sa.setStudentId(Integer.valueOf(studentId));
-            sa.setExamId(Integer.valueOf(studentExamAnswerDTO.getExamId()));
-            sa.setQuestionId(qid);
-            sa.setStudentAnswer(dto.getFormattedAnswer());
-            studentAnswerMapper.insert(sa);
+            if (l > 0) {
+                //执行update操作
+                LambdaUpdateWrapper<StudentAnswer> studentAnswerLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+                studentAnswerLambdaUpdateWrapper.eq(StudentAnswer::getStudentId, studentId);
+                studentAnswerLambdaUpdateWrapper.eq(StudentAnswer::getExamId, studentExamAnswerDTO.getExamId());
+                studentAnswerLambdaUpdateWrapper.set(StudentAnswer::getStudentAnswer, dto.getFormattedAnswer());
+                int update = studentAnswerMapper.update(studentAnswerLambdaUpdateWrapper);
+
+                if (update <= 0) {
+                    throw new RuntimeException("试卷提交失败");
+                }
+
+            } else {
+                StudentAnswer sa = new StudentAnswer();
+                sa.setStudentId(Integer.valueOf(studentId));
+                sa.setExamId(Integer.valueOf(studentExamAnswerDTO.getExamId()));
+                sa.setQuestionId(qid);
+                sa.setStudentAnswer(dto.getFormattedAnswer());
+                studentAnswerMapper.insert(sa);
+            }
+
         }
+
+        //插入考试提交表记录
+        ExamScore examScore = new ExamScore();
+        examScore.setStudentId(Integer.valueOf(studentId));
+        examScore.setExamId(Integer.valueOf(studentExamAnswerDTO.getExamId()));
+        examScore.setSubmittedAt(LocalDateTime.now());
+        int insert = examScoreMapper.insert(examScore);
+        if (insert == 0) {
+            throw new RuntimeException("提交失败");
+        }
+
         log.info("题目入库完毕,学生一共提交了[{}]道题目", list.size());
     }
 
@@ -842,7 +873,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private String createSystemPrompts() {
         String p = """
                 你是一名“学习资源链接生成器”，负责为给定的知识点与关键词生成可直接访问、与内容高度相关的学习资料链接。
-                
+                                
                 你的目标（必须全部满足）：
                 - 链接可直接访问：无需登录、无需付费、非被屏蔽或需跳过中间跳转页（Landing/短链/广告页/404/搜索结果页等一律禁止）。
                 - 内容高度相关：落地页正文应围绕用户消息中给出的知识点与关键词展开（用户消息会提供关键词、禁用域以及上一轮错误反馈）。
@@ -850,7 +881,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 - 域名约束：严禁使用用户消息中列出的禁用域名；避免内容农场、聚合复制站、明显广告/营销页面。
                 - 语言偏好：优先中文；若中文质量不足可给英文权威资源。
                 - 去重与规范：链接去重（按 URL）；移除跟踪参数（如 utm_* 等）；避免短链与重定向中间页；不要返回搜索结果页。
-                
+                                
                 输出格式（只允许输出以下 JSON，严禁输出任何解释、代码块标记或额外文本）：
                 {
                   "links": [
@@ -865,7 +896,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 - 不得返回搜索结果页、站点主页、登录页、收费墙页、PDF 聚合页、跳转中间页、短链或明显广告页。
                 - 不得返回用户消息中“禁用域名”列表内的任何链接。
                 - 链接之间需主题互补、来源多样，避免同一站点的重复栏目页。
-                
+                                
                 质量自检清单（请在生成前自检并仅输出最终 JSON）：
                 1) 每个 URL 为直达内容页（非列表/搜索/中间页），HTTPS 优先，去除无关跟踪参数。
                 2) title 能准确概括落地页主题，非“首页/列表/下载-xx”等泛化词。
@@ -873,7 +904,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 4) links 数量与用户要求一致；URL 不重复；不包含被禁用域；来源尽量多样化。
                 5) 优先官档/学术/权威教程；若为英文高质量资源，可保留，但不要全部英文。
                 6) 与用户提供的关键词尽可能紧密（至少围绕 2 个关键词展开），避免泛化页面。
-                
+                                
                 只输出满足以上约束的 JSON，且仅输出一次，不要添加任何额外文本。
                 """;
         return p;
@@ -933,76 +964,76 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private String buildAnalysisPrompt(String knowledgePointData, String questionData) {
         return String.format("""
                 你是一位专业的教育数据分析师和学习顾问。请基于以下学生的学习数据，生成一份专业、全面的学情分析报告。
-                
+                                
                 ### 🎯 分析任务
                 请深入分析学生的学习状况，生成个性化的学情报告和学习建议。
-                
+                                
                 ### 📊 数据源
                 **学生知识点掌握情况：**
                 %s
-                
+                                
                 **学生错题记录：**
                 %s
-                
+                                
                 ### 📋 分析要求
                 请按以下结构生成分析报告（使用markdown格式）：
-                
+                                
                 #### 1. 📈 学习现状总览 (200-250字)
                 - 基于知识点掌握数据，评估整体学习水平
                 - 分析各课程学习进度和掌握程度分布
                 - 概括主要学习特征和表现
-                
+                                
                 #### 2. 🧠 知识掌握深度分析 (300-350字)
                 - **课程掌握对比**：各课程间的掌握水平差异
                 - **核心知识点分析**：重点关注isCorePoint=true的知识点掌握情况
                 - **难度分布**：easy/medium/hard各难度级别的掌握状况
                 - **学习投入效果**：practiceCount与practiceScore的关系分析
                 - **章节进度评估**：chapterProgressRate反映的学习进度
-                
+                                
                 #### 3. ❌ 错题深度剖析 (300-350字)
                 - **错题类型分析**：single_choice/multiple_choice/true_false/fill_blank/short_answer的错误分布
                 - **难度集中度**：错题在easy/medium/hard的分布特征
                 - **课程薄弱点**：各courseName中的错题集中情况
                 - **答题准确性**：scoreEarned与scorePoints的得分率分析
                 - **错误模式**：高频错误类型和潜在原因
-                
+                                
                 #### 4. 🔍 学习行为洞察 (200-250字)
                 - **练习频次**：practiceCount反映的学习勤奋度
                 - **学习时长**：chapterStudyTime体现的时间投入
                 - **学习路径**：基于chapterOrder和pointOrderInChapter的学习轨迹
                 - **学习专注度**：各知识点投入时间与掌握效果的匹配度
-                
+                                
                 #### 5. ⚖️ 优势与挑战识别 (250-300字)
                 **💪 学习优势：**
                 - 至少3个具体优势（基于掌握程度高的知识点和错题少的领域）
                 - 学习习惯中的积极表现
-                
+                                
                 **🔧 学习挑战：**
                 - 至少3个需要改进的方面（基于未掌握的核心知识点和高频错题）
                 - 学习效率和方法上的问题
-                
+                                
                 #### 6. 💡 个性化学习建议 (400-450字)
                 **🎯 即刻行动（本周内）：**
                 - 3-4个基于当前数据的紧急改进建议
                 - 重点关注masteryLevel='not_learned'的核心知识点
-                
+                                
                 **📈 短期计划（2-4周）：**
                 - 针对错题集中的questionType制定专项练习计划
                 - 对practiceScore<60分的知识点进行重点突破
-                
+                                
                 **🚀 中期目标（1-2个月）：**
                 - 基于课程整体掌握情况制定系统学习计划
                 - 提升章节学习效率和知识点掌握深度
-                
+                                
                 **📚 学习方法建议：**
                 - 根据错题类型提供针对性的解题策略
                 - 基于学习时长和效果提供时间管理建议
-                
+                                
                 #### 7. ⚠️ 重点关注预警 (150-200字)
                 - 需要优先解决的学习问题（基于核心知识点掌握不足）
                 - 潜在的学习风险（基于错题趋势和学习投入度）
                 - 家长和教师需要重点关注的方面
-                
+                                
                 ### 📝 输出要求
                 1. 每个分析结论都要有具体的数据支撑
                 2. 使用专业但易懂的教育语言
@@ -1011,7 +1042,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 5. 关键数据和建议用**加粗**突出
                 6. 使用emoji增加可读性
                 7. 确保分析客观准确，建议切实可行
-                
+                                
                 请开始分析并生成完整的学情报告。
                 """, knowledgePointData, questionData);
     }

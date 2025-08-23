@@ -63,4 +63,6 @@ public interface TeacherService extends IService<Teacher> {
     Result<Boolean> addChapterQuestion(String chapterId, QuestionBank questionBank);
 
     Result<Boolean> deleteChapterQuestion(String chapterId, String questionId);
+
+    Result<Integer> getExamTotalScore(String examId);
 }

@@ -1,9 +1,12 @@
 package com.aiproject.smartcampus.model.functioncalling.toolutils;
 
 import com.aiproject.smartcampus.mapper.ExamMapper;
+import com.aiproject.smartcampus.mapper.ExamScoreMapper;
 import com.aiproject.smartcampus.mapper.KnowledgePointMapper;
+import com.aiproject.smartcampus.pojo.po.ExamScore;
 import com.aiproject.smartcampus.pojo.vo.ExamQuestionVO;
 import com.aiproject.smartcampus.pojo.vo.StudentExamAnswerVO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
@@ -33,6 +36,7 @@ public class ExamMarkingToolUtils {
     private final KnowledgePointMapper knowledgePointMapper;
     private final ChatLanguageModel chatLanguageModel;
     private final ObjectMapper objectMapper;
+    private final ExamScoreMapper examScoreMapper;
 
     /**
      * AI自动评卷主方法 - 增加最终成绩更新
@@ -324,16 +328,16 @@ public class ExamMarkingToolUtils {
 
             boolean isCorrect = false;
 
-            // 处理不同格式的答案
+          /*  // 处理不同格式的答案
             if (isJsonFormat(correctAnswer) && isJsonFormat(studentAnswerText)) {
                 // JSON格式比较
                 JsonNode correctNode = objectMapper.readTree(correctAnswer);
                 JsonNode studentNode = objectMapper.readTree(studentAnswerText);
                 isCorrect = compareAnswers(correctNode, studentNode, question.getQuestionType());
-            } else {
-                // 字符串格式比较
-                isCorrect = compareStringAnswers(correctAnswer, studentAnswerText, question.getQuestionType());
-            }
+            } else {*/
+            // 字符串格式比较
+            isCorrect = compareStringAnswers(correctAnswer, studentAnswerText, question.getQuestionType());
+            //}
 
             result.setIsCorrect(isCorrect);
             // 使用传入的maxScore计算得分
@@ -452,17 +456,25 @@ public class ExamMarkingToolUtils {
         String normalizedStudent = normalizeAnswer(student);
 
         if ("multiple_choice".equals(questionType)) {
-            // 多选题可能有多个答案，用逗号分隔
-            Set<String> correctSet = Arrays.stream(normalizedCorrect.split(","))
+            // 定义需要去除的特殊字符正则（双引号、方括号）
+            String specialCharsRegex = "[\"\\[\\]]";
+
+            Set<String> correctSet = Arrays.stream(normalizedCorrect.replaceAll(specialCharsRegex, "").split(","))
                     .map(String::trim)
+                    .filter(s -> !s.isEmpty()) // 过滤空字符串
                     .collect(Collectors.toSet());
-            Set<String> studentSet = Arrays.stream(normalizedStudent.split(","))
+
+            Set<String> studentSet = Arrays.stream(normalizedStudent.replaceAll(specialCharsRegex, "").split(","))
                     .map(String::trim)
+                    .filter(s -> !s.isEmpty()) // 过滤空字符串
                     .collect(Collectors.toSet());
             return correctSet.equals(studentSet);
         } else {
+            String specialCharsRegex = "[\"\\[\\]]";
+            String correctAswer = normalizedCorrect.replaceAll(specialCharsRegex, "");
+            String studentAswer = normalizedStudent.replaceAll(specialCharsRegex, "");
             // 单选题和判断题直接比较
-            return normalizedCorrect.equals(normalizedStudent);
+            return correctAswer.equals(studentAswer);
         }
     }
 
@@ -482,24 +494,24 @@ public class ExamMarkingToolUtils {
     private String buildFillBlankPrompt(ExamQuestionVO question, String studentAnswer, String correctAnswer, BigDecimal maxScore) {
         return String.format("""
                         请作为一位严格的老师，对以下填空题进行评分：
-                        
+                                                
                         题目内容：%s
                         标准答案：%s
                         学生答案：%s
                         知识点：%s
                         题目满分：%.1f分
-                        
+                                                
                         评分要求：
                         1. 完全正确得1分，部分正确得0.5分，完全错误得0分
                         2. 考虑答案的语义相似性，不仅仅是字面匹配
                         3. 忽略标点符号和空格的差异
                         4. 数字答案要求精确匹配
                         5. 专业术语需要准确
-                        
+                                                
                         评分说明：
                         - 返回的score是0-1之间的比例，最终得分将乘以题目满分%.1f分
                         - 例如：score=0.8表示得分为%.1f分
-                        
+                                                
                         请以JSON格式返回评分结果：
                         {
                             "score": 评分(0-1之间的小数),
@@ -517,31 +529,31 @@ public class ExamMarkingToolUtils {
     private String buildSubjectivePrompt(ExamQuestionVO question, String studentAnswer, String correctAnswer, BigDecimal maxScore) {
         return String.format("""
                         请作为一位资深的老师，对以下简答题进行评分：
-                        
+                                                
                         题目内容：%s
                         参考答案：%s
                         学生答案：%s
                         知识点：%s
                         难度等级：%s
                         题目满分：%.1f分
-                        
+                                                
                         评分标准：
                         1. 答案要点完整性（40%%）
                         2. 逻辑表达清晰性（30%%）
                         3. 专业术语准确性（20%%）
                         4. 举例或论证合理性（10%%）
-                        
+                                                
                         评分要求：
                         - 满分为1.0，最低分为0.0
                         - 考虑答案的深度和广度
                         - 即使表达方式不同，但意思正确的给予相应分数
                         - 鼓励创新思维，合理的扩展给予加分
                         - 字数过少或答非所问要扣分
-                        
+                                                
                         评分说明：
                         - 返回的score是0-1之间的比例，最终得分将乘以题目满分%.1f分
                         - score>=0.6认为及格，score>=0.8认为优秀
-                        
+                                                
                         请以JSON格式返回评分结果：
                         {
                             "score": 评分(0-1之间的小数),
@@ -609,12 +621,16 @@ public class ExamMarkingToolUtils {
      * 比较客观题答案
      */
     private boolean compareAnswers(JsonNode correct, JsonNode student, String questionType) {
+        String specialCharsRegex = "[\"\\[\\]]";
+        String scorrectTest = correct.asText().replaceAll(specialCharsRegex, "");
+        String studentTest = student.asText().replaceAll(specialCharsRegex, "");
+
         if ("multiple_choice".equals(questionType)) {
             // 多选题需要完全匹配所有选项
-            return correct.equals(student);
+            return scorrectTest.equals(scorrectTest);
         } else {
             // 单选题和判断题直接比较
-            return correct.equals(student);
+            return scorrectTest.equals(scorrectTest);
         }
     }
 
@@ -792,19 +808,42 @@ public class ExamMarkingToolUtils {
      */
     private void updateExamScore(String examId, String studentId, BigDecimal totalScore) {
         try {
-            int updateCount = examMapper.updateExamScore(
-                    Integer.parseInt(examId),
-                    Integer.parseInt(studentId),
-                    totalScore,
-                    LocalDateTime.now()
-            );
 
-            if (updateCount > 0) {
-                log.info("更新考试成绩成功: examId={}, studentId={}, score={}",
-                        examId, studentId, totalScore);
+            LambdaQueryWrapper<ExamScore> examScoreLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            examScoreLambdaQueryWrapper.eq(ExamScore::getExamId, examId);
+            examScoreLambdaQueryWrapper.eq(ExamScore::getStudentId, studentId);
+
+            ExamScore examScore = examScoreMapper.selectOne(examScoreLambdaQueryWrapper);
+            if (examScore == null) {
+
+                ExamScore examScore1 = new ExamScore();
+                examScore1.setExamId(Integer.valueOf(examId));
+                examScore1.setStudentId(Integer.valueOf(studentId));
+                examScore1.setScore(totalScore);
+
+                int insert = examScoreMapper.insert(examScore1);
+
+                if (insert <= 0) {
+                    throw new RuntimeException("批卷失败");
+                }
+
+
             } else {
-                log.warn("更新考试成绩失败，未找到记录: examId={}, studentId={}", examId, studentId);
+
+                int updateCount = examMapper.updateExamScore(
+                        Integer.parseInt(examId),
+                        Integer.parseInt(studentId),
+                        totalScore
+                );
+
+                if (updateCount > 0) {
+                    log.info("更新考试成绩成功: examId={}, studentId={}, score={}",
+                            examId, studentId, totalScore);
+                } else {
+                    log.warn("更新考试成绩失败，未找到记录: examId={}, studentId={}", examId, studentId);
+                }
             }
+
         } catch (Exception e) {
             log.error("更新考试成绩失败: examId={}, studentId={}", examId, studentId, e);
         }

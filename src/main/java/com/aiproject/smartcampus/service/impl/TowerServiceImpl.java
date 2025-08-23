@@ -795,7 +795,8 @@ public class TowerServiceImpl implements TowerService {
                 .append("    \"difficulty_level\": \"easy\",\n")
                 .append("    \"score_points\": 1.0\n")
                 .append("  }\n")
-                .append("]\n");
+                .append("]\n")
+                .append("请严格保证题目内容和题目类型一致");
 
         return prompt.toString();
     }

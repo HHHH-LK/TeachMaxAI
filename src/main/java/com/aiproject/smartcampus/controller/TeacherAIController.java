@@ -38,7 +38,6 @@ public class TeacherAIController {
     @PostMapping("/createExamByai")
     public Result<ExamCreationResult> createIntelligentExam(@RequestParam String content, @RequestParam String courseId) {
 
-
         ExamCreationResult result = teacherAIservice.createIntelligentExam(content, courseId);
 
         if (result.getSuccess()) {
@@ -52,9 +51,9 @@ public class TeacherAIController {
 
     /**
      * 班级智能学情分析报告
-     * */
+     */
     @PostMapping("/aiclassAiayaisc")
-    public Result<String> aiclassAiayaisc(String courseId){
+    public Result<String> aiclassAiayaisc(String courseId) {
         return teacherAIservice.aiclassAiayaisc(courseId);
 
     }
@@ -62,22 +61,21 @@ public class TeacherAIController {
 
     /**
      * 智能教案的生成
-     * */
+     */
     @GetMapping("TeacherTextCreate")
     public Result<String> teacherTextCreate(@RequestParam String content, @RequestParam String courseId, @RequestParam String chapterId) {
 
-        return teacherAIservice.TeacherTextCreate(content,courseId,chapterId);
+        return teacherAIservice.TeacherTextCreate(content, courseId, chapterId);
     }
 
     /**
      * 智能生成章节测试题
-     * */
+     */
     @PostMapping("teacher/createPractice")
-    public Result<String> teacherCreateTest(@RequestParam String content, @RequestParam String courseId,@RequestParam String chapterId) {
+    public Result<String> teacherCreateTest(@RequestParam String content, @RequestParam String courseId, @RequestParam String chapterId) {
 
-        return teacherAIservice.teacherCreateTest(content,courseId,chapterId);
+        return teacherAIservice.teacherCreateTest(content, courseId, chapterId);
     }
-
 
 
 }

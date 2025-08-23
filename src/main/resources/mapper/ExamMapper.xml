@@ -16,7 +16,6 @@
     <update id="updateExamScore">
         UPDATE exam_scores
         SET score = #{score},
-        submitted_at = #{submittedAt}
         WHERE exam_id = #{examId}
         AND student_id = #{studentId}
     </update>

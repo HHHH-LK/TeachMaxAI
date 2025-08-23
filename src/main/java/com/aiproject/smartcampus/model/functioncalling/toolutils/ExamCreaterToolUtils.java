@@ -288,10 +288,10 @@ public class ExamCreaterToolUtils {
     private String buildRequirementParsePrompt(String content, String courseId) {
         return String.format("""
                 请作为一位经验丰富的教师，分析以下试卷创建要求，并提取关键信息：
-                
+                                
                 课程ID: %s
                 试卷要求: %s
-                
+                                
                 请分析并提取以下信息：
                 1. 考试标题（如果未明确指定，请根据内容生成合适的标题）
                 2. 考试描述
@@ -300,7 +300,7 @@ public class ExamCreaterToolUtils {
                 5. 难度分布（简单、中等、困难的题目比例）
                 6. 题型分布（单选、多选、判断、填空、简答题的数量或比例）
                 7. 重点知识点（需要重点考察的知识领域）
-                
+                                
                 请以JSON格式返回分析结果：
                 {
                     "examTitle": "考试标题",
@@ -367,7 +367,7 @@ public class ExamCreaterToolUtils {
                                                               ExamCreationRequestVO request,
                                                               List<KnowledgePointVO> knowledgePoints) {
         try {
-            String prompt = buildQuestionGenerationPrompt(questionType, count, request, knowledgePoints);
+            String prompt = buildQuestionGenerationPrompt(questionType, count, request, knowledgePoints) + "请严格按照题目类型来生成，确保题目类型和题目内容相匹配";
             String aiResponse = chatLanguageModel.chat(prompt);
             log.info("生成{}类型题目AI响应长度: {}", questionType, aiResponse != null ? aiResponse.length() : 0);
 
@@ -397,26 +397,26 @@ public class ExamCreaterToolUtils {
 
         return String.format("""
                         请作为一位专业的教师，为以下课程生成%s：
-                        
+                                                
                         考试信息：
                         - 考试标题: %s
                         - 考试描述: %s
                         - 题目类型: %s
                         - 需要生成: %d题
                         - 重点知识点: %s
-                        
+                                                
                         课程知识点信息：
                         %s
-                        
+                                                
                         生成要求：
                         1. 题目内容要准确、专业，符合课程要求
                         2. 难度要合理分布，覆盖不同知识点
                         3. 选项要有迷惑性但不能误导学生
                         4. 答案要准确无误
                         5. 提供详细的答案解析
-                        
+                                                
                         %s
-                        
+                                                
                         请生成%d道题目，以JSON数组格式返回：
                         [
                             %s
@@ -712,9 +712,12 @@ public class ExamCreaterToolUtils {
             for (int i = 0; i < questionIds.size(); i++) {
                 PaperQuestion paperQuestion = new PaperQuestion();
                 paperQuestion.setPaperId(paperId);
-                paperQuestion.setQuestionId(questionIds.get(i));
+                Integer id = questionIds.get(i);
+                paperQuestion.setQuestionId(id);
                 paperQuestion.setQuestionOrder(i + 1);
-                // customScore可以后续设置
+                //查询出题目分值
+                BigDecimal scorePoints = questionBankMapper.selectById(id).getScorePoints();
+                paperQuestion.setCustomScore(scorePoints);
 
                 examMapper.insertPaperQuestion(paperQuestion);
             }

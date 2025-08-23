@@ -154,13 +154,12 @@ public interface ExamMapper extends BaseMapper<Exam> {
      * @param examId      考试ID
      * @param studentId   学生ID
      * @param score       总得分
-     * @param submittedAt 提交/评卷完成时间
      * @return 更新的记录数
      */
     int updateExamScore(@Param("examId") Integer examId,
                         @Param("studentId") Integer studentId,
-                        @Param("score") BigDecimal score,
-                        @Param("submittedAt") LocalDateTime submittedAt);
+                        @Param("score") BigDecimal score);
+
 
     /**
      * 获取考试的所有学生ID（用于批量评卷）
@@ -224,8 +223,9 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     /**
      * 更新学生课程最终成绩到course_enrollments表
-     * @param courseId 课程ID
-     * @param studentId 学生ID
+     *
+     * @param courseId   课程ID
+     * @param studentId  学生ID
      * @param finalGrade 最终成绩
      * @return 更新的记录数
      */
@@ -235,6 +235,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     /**
      * 根据考试ID获取课程ID
+     *
      * @param examId 考试ID
      * @return 课程ID
      */
@@ -242,7 +243,8 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     /**
      * 计算学生在某课程的平均考试成绩
-     * @param courseId 课程ID
+     *
+     * @param courseId  课程ID
      * @param studentId 学生ID
      * @return 平均成绩
      */
@@ -251,7 +253,8 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     /**
      * 获取学生在某课程的所有考试成绩
-     * @param courseId 课程ID
+     *
+     * @param courseId  课程ID
      * @param studentId 学生ID
      * @return 考试成绩列表
      */
@@ -289,7 +292,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     @Select("SELECT " +
             "e.exam_id AS examId, " +
-            "e.title AS examName, " +  
+            "e.title AS examName, " +
             "c.course_id AS courseId, " +
             "c.course_name AS courseName, " +
             "s.student_id AS studentId, " +

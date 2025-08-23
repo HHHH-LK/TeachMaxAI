@@ -110,15 +110,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     @Override
     public Result<Map<Integer, Double>> getAllClassInfo(String courseId) {
-        int pointSize = 124000;
 
-        // 初始化准确率累加 Map 和计数 List
-        Map<Integer, Double> pointMap = new ConcurrentHashMap<>(pointSize);
-        List<Long> pointNumList = new ArrayList<>(Collections.nCopies(pointSize, 0L));
-
-        for (int i = 0; i < pointSize; i++) {
-            pointMap.put(i, 0.0);
-        }
+        //知识点对应掌握率
+        Map<Integer, Double> POINT_MAP = new HashMap<>();
 
         // 查询当前老师 ID
         String teacherId = userToTypeUtils.change();
@@ -130,38 +124,53 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             return Result.success(Collections.emptyMap());
         }
 
-        // 统计学生错误知识点
-        for (Integer studentId : studentIdList) {
-            List<StudentWrongKnowledgeBO> wrongList = knowledgePointMapper.getStudentWrongKnowledgeByStudentId(String.valueOf(studentId));
-            if (wrongList == null) {
-                continue;
-            }
-            List<StudentWrongKnowledgeBO> list = wrongList.stream().filter(a -> a.getCourseName().equals(courseMapper.findCourseNameByid(courseId))).toList();
+        //查询所有知识点id
+        LambdaQueryWrapper<KnowledgePoint> knowledgePointLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        knowledgePointLambdaQueryWrapper.eq(KnowledgePoint::getCourseId, courseId);
+        List<Integer> pointIdList = knowledgePointMapper.selectList(knowledgePointLambdaQueryWrapper).stream()
+                .map(KnowledgePoint::getPointId).toList();
 
-            for (StudentWrongKnowledgeBO bo : list) {
-                Integer pointId = bo.getPointId();
-                Double accuracyRate = bo.getAccuracyRate();
+        //获取每一个知识点的掌握情况
+        for (Integer pointId : pointIdList) {
 
-                if (pointId == null || pointId < 0 || pointId >= pointSize || accuracyRate == null) {
-                    continue;
-                }
+            //查询回答总次数
+            LambdaQueryWrapper<QuestionBank> questionBankLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            questionBankLambdaQueryWrapper.eq(QuestionBank::getPointId, pointId);
+            questionBankLambdaQueryWrapper.eq(QuestionBank::getCourseId, courseId);
+            List<Integer> questionIdListForPointId = questionBankMapper.selectList(questionBankLambdaQueryWrapper).stream()
+                    .map(QuestionBank::getQuestionId).toList();
+            Long count = questionBankMapper.selectCount(questionBankLambdaQueryWrapper);
 
-                // 累加准确率与统计数量
-                pointMap.merge(pointId, accuracyRate, Double::sum);
-                pointNumList.set(pointId, pointNumList.get(pointId) + 1);
-            }
+            //查询回答正确总次数
+            LambdaQueryWrapper<StudentAnswer> studentAnswerLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            studentAnswerLambdaQueryWrapper.eq(StudentAnswer::getIsCorrect, 1);
+            studentAnswerLambdaQueryWrapper.in(!studentIdList.isEmpty(), StudentAnswer::getStudentId, studentIdList);
+            studentAnswerLambdaQueryWrapper.in(!questionIdListForPointId.isEmpty(), StudentAnswer::getQuestionId, questionIdListForPointId);
+            Long count1 = studentAnswerMapper.selectCount(studentAnswerLambdaQueryWrapper);
+
+
+            // 先计算原始比例
+            double ratio = count1 == 0 ? 0 : count == 0 ? 0 : count1 * 1.00 / count;
+            // 保留两位小数（四舍五入）
+            double correct = Math.round(ratio * 100) / 100.0;
+
+            POINT_MAP.put(pointId, correct * 100);
         }
 
-        // 计算平均准确率（过滤无数据的项）
-        Map<Integer, Double> avgMap = new HashMap<>();
-        for (int i = 0; i < pointSize; i++) {
-            long count = pointNumList.get(i);
-            if (count > 0) {
-                avgMap.put(i, pointMap.get(i) / count);
-            }
-        }
 
-        return Result.success(avgMap);
+        LinkedHashMap<Integer, Double> collect = POINT_MAP.entrySet().stream()
+                // 按值降序排序（使用Double.compare确保正确比较double值）
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                // 收集到LinkedHashMap中保持排序后的顺序
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldVal, newVal) -> newVal,
+                        LinkedHashMap::new
+                ));
+
+        return Result.success(collect);
+
     }
 
     @Override
@@ -186,15 +195,18 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 continue;
             }
 
-            //统计每个知识点的错误次数
             for (StudentWrongKnowledgeBO bo : studentWrongKnowledgeByStudentId) {
                 Integer pointId = bo.getPointId();
-                Integer wrongAnswerCount = bo.getWrongAnswerCount();
-                pointMap.put(pointId, pointMap.get(pointId) + wrongAnswerCount);
+                // 处理wrongAnswerCount可能为null的情况，默认0
+                Integer wrongAnswerCount = bo.getWrongAnswerCount() == null ? 0 : bo.getWrongAnswerCount();
+
+                // 用getOrDefault判断当前pointId是否存在，不存在则用0作为初始值
+                long currentTotal = pointMap.getOrDefault(pointId, 0L);
+                // 累加后存入map
+                pointMap.put(pointId, currentTotal + wrongAnswerCount);
+
                 studentWrongKnowledgeBOMap.put(pointId, bo);
-
             }
-
         }
 
         List<StudentWrongKnowledgeBO> list = pointMap.entrySet().stream().sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())).limit(6).map(a -> {
@@ -288,10 +300,13 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             double passRate = totalStudents > 0 ? (100.0 * (totalStudents - failCount) / totalStudents) : 0.0;
             double excellentRate = totalStudents > 0 ? (100.0 * excellentCount / totalStudents) : 0.0;
 
+            //补充后端
+            String courseById = courseMapper.getCourseByid(courseId);
+
             // 填充DTO对象
             TeacherGetSituationDTO situationDTO = new TeacherGetSituationDTO();
             situationDTO.setCourseId(courseId);
-            situationDTO.setCourseName(""); // 需要补充课程名称查询逻辑
+            situationDTO.setCourseName(courseById);
             situationDTO.setAverageScore(RoundingUtils.round(averageScore));
             situationDTO.setPassRate(RoundingUtils.round(passRate));
             situationDTO.setExcellentRate(RoundingUtils.round(excellentRate));
@@ -475,8 +490,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     @Override
     public Result<List<ExamStudentVO>> getExamStudentInfo(String examId) {
-//        String teacherId = userToTypeUtils.change();
-        String teacherId = "1";
+        String teacherId = userToTypeUtils.change();
         try {
             // 1. 参数校验
             if (examId == null || examId.isBlank()) {
@@ -1254,7 +1268,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         // 设置需要更新的字段（排除主键）
         updateWrapper.set(ObjectUtil.isNotNull(questionBank.getCourseId()), QuestionBank::getCourseId, questionBank.getCourseId()).set(ObjectUtil.isNotNull(questionBank.getPointId()), QuestionBank::getPointId, questionBank.getPointId()).set(ObjectUtil.isNotNull(questionBank.getQuestionType()), QuestionBank::getQuestionType, questionBank.getQuestionType())
                 // 字符串类型使用isNotBlank（排除null、空字符串、纯空白字符）
-                .set(StrUtil.isNotBlank(questionBank.getQuestionContent()), QuestionBank::getQuestionContent, questionBank.getQuestionContent()).set(StrUtil.isNotBlank(questionBank.getQuestionOptions()), QuestionBank::getQuestionOptions, questionBank.getQuestionOptions()).set(StrUtil.isNotBlank(questionBank.getCorrectAnswer()), QuestionBank::getCorrectAnswer, questionBank.getCorrectAnswer()).set(StrUtil.isNotBlank(questionBank.getExplanation()), QuestionBank::getExplanation, questionBank.getExplanation()).set(ObjectUtil.isNotNull(questionBank.getDifficultyLevel()), QuestionBank::getDifficultyLevel, questionBank.getDifficultyLevel()).set(ObjectUtil.isNotNull(questionBank.getScorePoints()), QuestionBank::getScorePoints, questionBank.getScorePoints()).set(StrUtil.isNotBlank(String.valueOf(questionBank.getCreatedBy())), QuestionBank::getCreatedBy, questionBank.getCreatedBy());
+                .set(StrUtil.isNotBlank(questionBank.getQuestionContent()), QuestionBank::getQuestionContent, questionBank.getQuestionContent()).set(StrUtil.isNotBlank(questionBank.getQuestionOptions()), QuestionBank::getQuestionOptions, questionBank.getQuestionOptions()).set(StrUtil.isNotBlank(questionBank.getCorrectAnswer()), QuestionBank::getCorrectAnswer, questionBank.getCorrectAnswer()).set(StrUtil.isNotBlank(questionBank.getExplanation()), QuestionBank::getExplanation, questionBank.getExplanation()).set(ObjectUtil.isNotNull(questionBank.getDifficultyLevel()), QuestionBank::getDifficultyLevel, questionBank.getDifficultyLevel()).set(ObjectUtil.isNotNull(questionBank.getScorePoints()), QuestionBank::getScorePoints, questionBank.getScorePoints()).set(StrUtil.isNotBlank(String.valueOf(questionBank.getCreatedBy())), QuestionBank::getCreatedBy, questionBank.getCreatedBy())
+                .set(QuestionBank::getUpdatedAt, LocalDateTime.now());
+
 
         // 执行更新
         int update = questionBankMapper.update(null, updateWrapper);
@@ -1279,6 +1295,8 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
         //获取出最后的题目顺序
         Integer questionOrder = lastQuestion.getQuestionOrder();
+        questionBank.setCreatedAt(LocalDateTime.now());
+        questionBank.setUpdatedAt(LocalDateTime.now());
 
         //插入题库表
         int insert1 = questionBankMapper.insert(questionBank);
@@ -1338,6 +1356,8 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             //解析json
             String jsonCorrectAnswer = objectMapper.writeValueAsString(correctAnswers);
             questionBank.setCorrectAnswer(jsonCorrectAnswer);
+            questionBank.setCreatedAt(LocalDateTime.now());
+            questionBank.setUpdatedAt(LocalDateTime.now());
 
         } catch (Exception e) {
             log.error("JSON 解析失败");
@@ -1390,6 +1410,13 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         }
 
         return Result.success(true);
+    }
+
+    @Override
+    public Result<Integer> getExamTotalScore(String examId) {
+
+
+        return null;
     }
 
 

@@ -230,6 +230,16 @@ public class TeacherController {
         return teacherService.deleteChapterQuestion(chapterId,questionId);
     }
 
+    /**
+     * 获取考试总分数
+     * */
+    @GetMapping("/getExamTotalScore")
+    public Result<Integer> getExamTotalScore(@RequestParam String examId){
+
+        return teacherService.getExamTotalScore(examId);
+    }
+
+
 
 
 }

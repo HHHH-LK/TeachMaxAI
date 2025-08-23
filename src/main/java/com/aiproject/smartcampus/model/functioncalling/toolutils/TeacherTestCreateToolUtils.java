@@ -118,6 +118,8 @@ public class TeacherTestCreateToolUtils {
         // 系统角色设定
         prompt.append("你是一名专业的教育测试专家。请根据以下信息生成高质量的章节测试题。\n");
         prompt.append("⚠️ 重要：请直接返回JSON对象，不要使用```json```代码块包装！\n\n");
+        prompt.append("- question_type与数据库枚举值完全匹配\n");
+        prompt.append("- 所有题目分数总和为100分\n");
 
         // 任务描述
         appendTestTaskDescription(prompt);
@@ -195,11 +197,11 @@ public class TeacherTestCreateToolUtils {
     private void appendTestRequirements(StringBuilder prompt) {
         prompt.append("## 📝 测试题生成要求\n")
                 .append("### 题型分布建议：\n")
-                .append("- **单选题（40%）**：基础概念理解，每题2分\n")
-                .append("- **多选题（20%）**：综合知识运用，每题3分\n")
-                .append("- **判断题（20%）**：概念辨析，每题1分\n")
-                .append("- **填空题（10%）**：关键术语记忆，每题2分\n")
-                .append("- **简答题（10%）**：原理解释应用，每题5分\n\n")
+                .append("- **单选题（40%）**（single_choice）：基础概念理解，每题5分\n")
+                .append("- **多选题（20%）**（multiple_choice）：综合知识运用，每题5分\n")
+                .append("- **判断题（20%）**（true_false）：概念辨析，每题5分\n")
+                .append("- **填空题（10%）**（fill_blank）：关键术语记忆，每题5分\n")
+                .append("- **简答题（10%）**（short_answer）：原理解释应用，每题5分\n\n")
                 .append("### 难度分布：\n")
                 .append("- **简单题（30%）**：基础知识点直接考查\n")
                 .append("- **中等题（50%）**：知识点综合运用\n")
@@ -240,6 +242,13 @@ public class TeacherTestCreateToolUtils {
                 .append("    }\n")
                 .append("  ]\n")
                 .append("}\n\n");
+
+        // 在appendTestJsonFormat方法中补充
+        prompt.append("### 不同题型的字段说明：\n")
+                .append("- single_choice/multiple_choice：必须包含question_options\n")
+                .append("- true_false：question_options可选，correct_answer应为\"true\"或\"false\"\n")
+                .append("- fill_blank：可增加\"blanks_count\"字段，correct_answer为填充内容数组\n")
+                .append("- short_answer：无需question_options，correct_answer为详细答案文本\n\n");
     }
 
     /**

@@ -40,7 +40,6 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final ChapterMapper chapterMapper;
 
 
-
     /**
      * 查询所有课程信息
      *
@@ -195,8 +194,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public Result<List<ExamQuestionDetailVO>> getCourseExamInfo(String examId) {
 
-//        String studentId = userToTypeUtils.change();
-        String studentId = "1";
+        String studentId = userToTypeUtils.change();
+
 
         List<ExamPaper> papers = examPaperMapper.findByExamId(Integer.parseInt(examId));
         ExamPaper examPaper = papers.get(0);
@@ -245,7 +244,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public Result<List<ExamQuestionDetailVO>> getCourseExamStudent(String examId, String studentId) {
         List<ExamPaper> papers = examPaperMapper.findByExamId(Integer.parseInt(examId));
-        ExamPaper examPaper = papers.get(0);
+        ExamPaper examPaper = papers.getFirst();
         int paperId = examPaper.getPaperId();
 
 
@@ -261,7 +260,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             log.info("查询到 {} 道考试题目", questionList != null ? questionList.size() : 0);
 
             if (questionList != null && !questionList.isEmpty()) {
-                ExamQuestionDetailVO firstQuestion = questionList.get(0);
+                ExamQuestionDetailVO firstQuestion = questionList.getFirst();
                 log.info("第一道题目内容: {}",
                         firstQuestion.getQuestionContent() != null ?
                                 firstQuestion.getQuestionContent().substring(0, Math.min(50, firstQuestion.getQuestionContent().length())) + "..." :
@@ -276,6 +275,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
             // 按试卷设置的题目顺序排序
             List<ExamQuestionDetailVO> sortedList = questionList.stream()
+                    .distinct()
                     .sorted(Comparator.comparingInt(ExamQuestionDetailVO::getQuestionOrder))
                     .collect(Collectors.toList());
 
