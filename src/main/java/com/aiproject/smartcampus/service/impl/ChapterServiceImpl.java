@@ -15,6 +15,7 @@ import com.aiproject.smartcampus.pojo.po.StudentChapterProgress;
 import com.aiproject.smartcampus.pojo.vo.*;
 import com.aiproject.smartcampus.service.ChapterService;
 import com.aliyun.core.utils.StringUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -289,24 +290,69 @@ public class ChapterServiceImpl implements ChapterService {
     @Override
     public Result finsh(StudentStudyDTO studentStudyDTO) {
 
-        String nowmaterialId = studentStudyDTO.getNowmaterialId();
-        String chapterId = studentStudyDTO.getChapterId();
-        String studentId = userToTypeUtils.change();
+        String nowmaterialIdStr = studentStudyDTO.getNowmaterialId();
+        String chapterIdStr = studentStudyDTO.getChapterId();
+        String studentIdStr = userToTypeUtils.change();
 
-        LambdaUpdateWrapper<StudentChapterProgress> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(!StringUtils.isBlank(chapterId), StudentChapterProgress::getChapterId, chapterId);
-        updateWrapper.eq(!StringUtils.isBlank(studentId), StudentChapterProgress::getStudentId, studentId);
-        updateWrapper.eq(!StringUtils.isBlank(nowmaterialId), StudentChapterProgress::getCurrentMaterialId, nowmaterialId);
-        updateWrapper.set(StudentChapterProgress::getMasteryLevel, "completed");
-        updateWrapper.setSql("completed_materials = CONCAT('[" + nowmaterialId + ",', SUBSTRING(completed_materials, 2))");
-        int update = studentChapterProgressMapper.update(updateWrapper);
+// 类型转换（字符串转Integer）
+        Integer nowmaterialId = StringUtils.isBlank(nowmaterialIdStr) ? null : Integer.valueOf(nowmaterialIdStr);
+        Integer chapterId = StringUtils.isBlank(chapterIdStr) ? null : Integer.valueOf(chapterIdStr);
+        Integer studentId = StringUtils.isBlank(studentIdStr) ? null : Integer.valueOf(studentIdStr);
 
-        if (update <= 0) {
-            log.error("用户完成课程资源学习错误");
-            return Result.error("系统异常");
+// 1. 构建查询条件（基于唯一约束：student_id + chapter_id）
+        LambdaQueryWrapper<StudentChapterProgress> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(studentId != null, StudentChapterProgress::getStudentId, studentId);
+        queryWrapper.eq(chapterId != null, StudentChapterProgress::getChapterId, chapterId);
+
+// 2. 查询是否存在对应记录
+        StudentChapterProgress existingRecord = studentChapterProgressMapper.selectOne(queryWrapper);
+
+        if (existingRecord != null) {
+            // 3. 存在则执行更新操作
+            LambdaUpdateWrapper<StudentChapterProgress> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(StudentChapterProgress::getStudentId, studentId)
+                    .eq(StudentChapterProgress::getChapterId, chapterId);
+
+            // 更新当前学习的资料ID
+            updateWrapper.set(nowmaterialId != null, StudentChapterProgress::getCurrentMaterialId, nowmaterialId);
+            // 更新掌握程度为已完成
+            updateWrapper.set(StudentChapterProgress::getMasteryLevel, StudentChapterProgress.MasteryLevel.COMPLETED);
+            // 更新最后学习时间为当前时间
+            updateWrapper.set(StudentChapterProgress::getLastStudyAt, LocalDateTime.now());
+            // 更新已完成资料列表（JSON格式）
+            if (nowmaterialId != null) {
+                updateWrapper.setSql("completed_materials = CONCAT('[" + nowmaterialId + ",', SUBSTRING(completed_materials, 2))");
+            }
+
+            int update = studentChapterProgressMapper.update(null, updateWrapper);
+            if (update <= 0) {
+                log.error("用户完成课程资源学习更新失败，学生ID:{}，章节ID:{}", studentId, chapterId);
+                return Result.error("系统异常");
+            }
+        } else {
+            // 4. 不存在则执行新建操作
+            StudentChapterProgress newRecord = new StudentChapterProgress();
+            newRecord.setStudentId(studentId);
+            newRecord.setChapterId(chapterId);
+            newRecord.setCurrentMaterialId(nowmaterialId);
+            newRecord.setMasteryLevel(StudentChapterProgress.MasteryLevel.COMPLETED);
+            newRecord.setLastStudyAt(LocalDateTime.now());
+            // 初始化已完成材料列表（JSON格式）
+            newRecord.setCompletedMaterials(nowmaterialId != null ? "[" + nowmaterialId + "]" : "[]");
+            // 初始进度设为0
+            newRecord.setProgressRate(0.00);
+            // 初始学习时长设为0
+            newRecord.setStudyTime(0);
+
+            int insert = studentChapterProgressMapper.insert(newRecord);
+            if (insert <= 0) {
+                log.error("用户完成课程资源学习新建失败，学生ID:{}，章节ID:{}", studentId, chapterId);
+                return Result.error("系统异常");
+            }
         }
 
         return Result.success();
+
     }
 
 

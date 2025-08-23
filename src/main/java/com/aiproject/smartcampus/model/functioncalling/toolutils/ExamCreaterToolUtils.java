@@ -520,7 +520,7 @@ public class ExamCreaterToolUtils {
                             "correctAnswer": ["B"],
                             "explanation": "答案解析",
                             "difficultyLevel": "medium",
-                            "scorePoints": 2.0,
+                            "scorePoints": 5.0,
                             "knowledgePointName": "相关知识点名称"
                         }
                         """;
@@ -535,7 +535,7 @@ public class ExamCreaterToolUtils {
                             "correctAnswer": ["A"],
                             "explanation": "答案解析",
                             "difficultyLevel": "easy",
-                            "scorePoints": 1.0,
+                            "scorePoints": 5.0,
                             "knowledgePointName": "相关知识点名称"
                         }
                         """;
@@ -546,7 +546,7 @@ public class ExamCreaterToolUtils {
                             "correctAnswer": ["标准答案"],
                             "explanation": "答案解析",
                             "difficultyLevel": "medium",
-                            "scorePoints": 2.0,
+                            "scorePoints": 5.0,
                             "knowledgePointName": "相关知识点名称"
                         }
                         """;

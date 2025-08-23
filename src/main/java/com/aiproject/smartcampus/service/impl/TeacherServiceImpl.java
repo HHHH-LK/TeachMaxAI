@@ -1,5 +1,6 @@
 package com.aiproject.smartcampus.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.aiproject.smartcampus.commons.client.Result;
 import com.aiproject.smartcampus.commons.utils.UserToTypeUtils;
 import com.aiproject.smartcampus.commons.utils.math.RoundingUtils;
@@ -16,6 +17,8 @@ import com.aliyun.core.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -133,8 +136,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             if (wrongList == null) {
                 continue;
             }
-            List<StudentWrongKnowledgeBO> list = wrongList.stream()
-                    .filter(a -> a.getCourseName().equals(courseMapper.findCourseNameByid(courseId))).toList();
+            List<StudentWrongKnowledgeBO> list = wrongList.stream().filter(a -> a.getCourseName().equals(courseMapper.findCourseNameByid(courseId))).toList();
 
             for (StudentWrongKnowledgeBO bo : list) {
                 Integer pointId = bo.getPointId();
@@ -165,12 +167,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     @Override
     public Result<List<StudentWrongKnowledgeBO>> getTheMaxUncorrectPoint(String couresId) {
 
-        int pointSize = 124000;
-        Map<Integer, Long> pointMap = new ConcurrentHashMap<>(pointSize);
+        Map<Integer, Long> pointMap = new ConcurrentHashMap<>();
         Map<Integer, StudentWrongKnowledgeBO> studentWrongKnowledgeBOMap = new ConcurrentHashMap<>();
-        for (int i = 0; i < pointSize; i++) {
-            pointMap.put(i, 0L);
-        }
+
 
         String teacherId = userToTypeUtils.change();
         // 查询该课程下所有学生 ID
@@ -202,14 +201,16 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             return studentWrongKnowledgeBOMap.get(a.getKey());
         }).toList();
 
+        if (list.isEmpty()) {
+            return Result.success(list);
+        }
+
         LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();
         courseLambdaQueryWrapper.eq(Course::getCourseId, couresId);
         Course course = courseMapper.selectOne(courseLambdaQueryWrapper);
         String courseName = course.getCourseName();
 
-        List<StudentWrongKnowledgeBO> list1 = list.stream().filter(a ->
-                a.getCourseName().equals(courseName)
-        ).toList();
+        List<StudentWrongKnowledgeBO> list1 = list.stream().filter(a -> a.getCourseName().equals(courseName)).toList();
 
         return Result.success(list1);
     }
@@ -352,16 +353,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 // 查询该考试的已批改数量（score不为null的记录）
                 Integer gradedCount = examScoreMapper.countGradedByExamId(exam.getExamId());
 
-                return ExamInfoVO.builder()
-                        .examId(exam.getExamId())
-                        .courseId(exam.getCourseId())
-                        .title(exam.getTitle())
-                        .examDate(exam.getExamDate())
-                        .duration(exam.getDurationMinutes())
-                        .max_score(exam.getMaxScore())
-                        .status(exam.getStatus())
-                        .createdAt(exam.getCreatedAt())
-                        .questionCount(submittedCount) // 试题数量
+                return ExamInfoVO.builder().examId(exam.getExamId()).courseId(exam.getCourseId()).title(exam.getTitle()).examDate(exam.getExamDate()).duration(exam.getDurationMinutes()).max_score(exam.getMaxScore()).status(exam.getStatus()).createdAt(exam.getCreatedAt()).questionCount(submittedCount) // 试题数量
                         .markingCount(gradedCount) // 已批改数量
                         .build();
             }).collect(Collectors.toList());
@@ -685,11 +677,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 // 8. 通过一个学生获取章节问题列表（用于构建唯一问题列表）
                 if (!studentIds.isEmpty()) {
                     String firstStudentId = studentIds.get(0);
-                    List<ChapterQuestionDetailVO> firstStudentQuestions = chapterMapper.getChapterTestQuestions(
-                            chapter.getChapterId(),
-                            Integer.valueOf(firstStudentId),
-                            Integer.valueOf(courseId)
-                    );
+                    List<ChapterQuestionDetailVO> firstStudentQuestions = chapterMapper.getChapterTestQuestions(chapter.getChapterId(), Integer.valueOf(firstStudentId), Integer.valueOf(courseId));
 
                     if (firstStudentQuestions != null) {
                         for (ChapterQuestionDetailVO question : firstStudentQuestions) {
@@ -711,26 +699,20 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                 HomeworkVO homeworkVO = new HomeworkVO();
 
                 // 10. 计算章节满分（所有唯一问题分值总和）
-                BigDecimal chapterMaxScore = questionScores.values().stream()
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal chapterMaxScore = questionScores.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
                 homeworkVO.setMaxScore(chapterMaxScore);
 
                 // 11. 获取所有学生的答题记录
                 List<ChapterQuestionDetailVO> allStudentAnswers = new ArrayList<>();
                 for (String studentId : studentIds) {
-                    List<ChapterQuestionDetailVO> studentAnswers = chapterMapper.getChapterTestQuestions(
-                            chapter.getChapterId(),
-                            Integer.valueOf(studentId),
-                            Integer.valueOf(courseId)
-                    );
+                    List<ChapterQuestionDetailVO> studentAnswers = chapterMapper.getChapterTestQuestions(chapter.getChapterId(), Integer.valueOf(studentId), Integer.valueOf(courseId));
                     if (studentAnswers != null) {
                         allStudentAnswers.addAll(studentAnswers);
                     }
                 }
 
                 // 12. 按答题记录分组（使用answerId作为分组依据）
-                Map<Integer, List<ChapterQuestionDetailVO>> answerGroups = allStudentAnswers.stream()
-                        .filter(a -> a.getAnswerId() != null) // 有答题记录
+                Map<Integer, List<ChapterQuestionDetailVO>> answerGroups = allStudentAnswers.stream().filter(a -> a.getAnswerId() != null) // 有答题记录
                         .collect(Collectors.groupingBy(ChapterQuestionDetailVO::getAnswerId));
 
                 // 13. 计算章节作业统计数据
@@ -740,8 +722,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
                 for (List<ChapterQuestionDetailVO> answers : answerGroups.values()) {
                     // 检查是否提交（判断是否有得分）
-                    boolean submitted = answers.stream()
-                            .anyMatch(a -> a.getScoreEarned() != null && a.getScoreEarned().compareTo(BigDecimal.ZERO) >= 0);
+                    boolean submitted = answers.stream().anyMatch(a -> a.getScoreEarned() != null && a.getScoreEarned().compareTo(BigDecimal.ZERO) >= 0);
 
                     if (!submitted) continue;
 
@@ -749,9 +730,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                     totalSubmissions++;
 
                     // 计算学生在本章节总得分
-                    BigDecimal studentScore = answers.stream()
-                            .map(q -> q.getScoreEarned() != null ? q.getScoreEarned() : BigDecimal.ZERO)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    BigDecimal studentScore = answers.stream().map(q -> q.getScoreEarned() != null ? q.getScoreEarned() : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
 
                     chapterScoreSum = chapterScoreSum.add(studentScore);
 
@@ -775,19 +754,14 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
                 // 平均分计算
                 if (chapterSubmissionCount > 0) {
-                    homeworkVO.setAverageScore(
-                            chapterScoreSum.divide(BigDecimal.valueOf(chapterSubmissionCount), 2, RoundingMode.HALF_UP)
-                    );
+                    homeworkVO.setAverageScore(chapterScoreSum.divide(BigDecimal.valueOf(chapterSubmissionCount), 2, RoundingMode.HALF_UP));
                 } else {
                     homeworkVO.setAverageScore(BigDecimal.ZERO);
                 }
 
                 // 提交率计算
                 if (totalStudents > 0) {
-                    BigDecimal submissionRate = new BigDecimal(chapterSubmissionCount)
-                            .divide(new BigDecimal(totalStudents), 4, RoundingMode.HALF_UP)
-                            .multiply(BigDecimal.valueOf(100))
-                            .setScale(2, RoundingMode.HALF_UP);
+                    BigDecimal submissionRate = new BigDecimal(chapterSubmissionCount).divide(new BigDecimal(totalStudents), 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
                     homeworkVO.setSubmissionRate(submissionRate);
                 } else {
                     homeworkVO.setSubmissionRate(BigDecimal.ZERO);
@@ -809,9 +783,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
             // 16. 课程整体平均分
             if (totalSubmissions > 0) {
-                summary.setOverallAverageScore(
-                        totalScoreSum.divide(new BigDecimal(totalSubmissions), 2, RoundingMode.HALF_UP)
-                );
+                summary.setOverallAverageScore(totalScoreSum.divide(new BigDecimal(totalSubmissions), 2, RoundingMode.HALF_UP));
             } else {
                 summary.setOverallAverageScore(BigDecimal.ZERO);
             }
@@ -819,10 +791,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             // 17. 课程整体提交率
             int totalPossibleSubmissions = totalAssignments * totalStudents;
             if (totalPossibleSubmissions > 0) {
-                BigDecimal rate = new BigDecimal(totalSubmissions)
-                        .divide(new BigDecimal(totalPossibleSubmissions), 4, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100))
-                        .setScale(2, RoundingMode.HALF_UP);
+                BigDecimal rate = new BigDecimal(totalSubmissions).divide(new BigDecimal(totalPossibleSubmissions), 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
                 summary.setOverallSubmissionRate(rate);
             } else {
                 summary.setOverallSubmissionRate(BigDecimal.ZERO);
@@ -860,8 +829,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
             // 5. 获取课程所有学生
             List<Student> allStudents = enrollmentMapper.findStudentsByCourseId(courseId);
-            Map<Integer, Student> studentMap = allStudents.stream()
-                    .collect(Collectors.toMap(Student::getStudentId, Function.identity()));
+            Map<Integer, Student> studentMap = allStudents.stream().collect(Collectors.toMap(Student::getStudentId, Function.identity()));
 
             // 6. 准备统计数据
             BigDecimal totalScoreSum = BigDecimal.ZERO;
@@ -881,8 +849,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
                 // 获取该考试的所有成绩记录
                 List<ExamScore> scores = examScoreMapper.findByExamId(exam.getExamId());
-                Map<Integer, ExamScore> scoreMap = scores.stream()
-                        .collect(Collectors.toMap(ExamScore::getStudentId, Function.identity()));
+                Map<Integer, ExamScore> scoreMap = scores.stream().collect(Collectors.toMap(ExamScore::getStudentId, Function.identity()));
 
                 // 创建完整的学生成绩列表（包括未作答学生）
                 List<StudentExamScoreVO> studentScores = new ArrayList<>();
@@ -938,9 +905,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
                 // 计算该考试的平均分（只计算有成绩的学生）
                 if (examScoreCount > 0) {
-                    examDetail.setAverageScore(
-                            examScoreSum.divide(new BigDecimal(examScoreCount), 2, RoundingMode.HALF_UP)
-                    );
+                    examDetail.setAverageScore(examScoreSum.divide(new BigDecimal(examScoreCount), 2, RoundingMode.HALF_UP));
                 } else {
                     examDetail.setAverageScore(BigDecimal.ZERO);
                 }
@@ -983,19 +948,14 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
             // 8. 计算总平均分（只计算有成绩的学生）
             if (totalScoreCount > 0) {
-                summary.setOverallAverageScore(
-                        totalScoreSum.divide(new BigDecimal(totalScoreCount), 2, RoundingMode.HALF_UP)
-                );
+                summary.setOverallAverageScore(totalScoreSum.divide(new BigDecimal(totalScoreCount), 2, RoundingMode.HALF_UP));
             } else {
                 summary.setOverallAverageScore(BigDecimal.ZERO);
             }
 
             // 9. 计算及格率
             if (totalScoreCount > 0) {
-                BigDecimal rate = new BigDecimal(passCount)
-                        .divide(new BigDecimal(totalScoreCount), 4, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100))
-                        .setScale(2, RoundingMode.HALF_UP);
+                BigDecimal rate = new BigDecimal(passCount).divide(new BigDecimal(totalScoreCount), 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
                 summary.setPassRate(rate);
             } else {
                 summary.setPassRate(BigDecimal.ZERO);
@@ -1052,13 +1012,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                     return;
                 }
 
-                KnowledgePointStats stats = statsMap.computeIfAbsent(answer.getPointId(), k ->
-                        new KnowledgePointStats(
-                                answer.getPointId(),
-                                answer.getPointName(),
-                                answer.getCourseName()
-                        )
-                );
+                KnowledgePointStats stats = statsMap.computeIfAbsent(answer.getPointId(), k -> new KnowledgePointStats(answer.getPointId(), answer.getPointName(), answer.getCourseName()));
 
                 // 更新统计信息
                 stats.incrementTotalAnswerCount();
@@ -1101,9 +1055,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
      * @param stats     知识点统计数据（可能为null）
      * @param resultMap 结果Map
      */
-    private void handleCompositeKnowledgePoint(String pointName,
-                                               KnowledgePointStats stats,
-                                               Map<String, KnowledgePointMasteryVO> resultMap) {
+    private void handleCompositeKnowledgePoint(String pointName, KnowledgePointStats stats, Map<String, KnowledgePointMasteryVO> resultMap) {
         // 如果名称为空直接返回
         if (StringUtils.isBlank(pointName)) {
             return;
@@ -1128,16 +1080,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             return new KnowledgePointMasteryVO(pointName, 0.0, 0, 0, 0);
         }
 
-        double masteryRate = stats.getTotalAnswerCount() > 0 ?
-                (double) stats.getCorrectCount() / stats.getTotalAnswerCount() : 0.0;
+        double masteryRate = stats.getTotalAnswerCount() > 0 ? (double) stats.getCorrectCount() / stats.getTotalAnswerCount() : 0.0;
 
-        return new KnowledgePointMasteryVO(
-                pointName,
-                masteryRate,
-                stats.getErrorCount(),
-                stats.getCorrectCount(),
-                stats.getTotalAnswerCount()
-        );
+        return new KnowledgePointMasteryVO(pointName, masteryRate, stats.getErrorCount(), stats.getCorrectCount(), stats.getTotalAnswerCount());
     }
 
     // 知识点统计信息
@@ -1229,17 +1174,14 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
         // 2. 查询该课程下所有考试
         AtomicInteger i = new AtomicInteger();
-        List<Exam> exams = examMapper.selectList(
-                new LambdaQueryWrapper<Exam>().eq(Exam::getCourseId, courseId)
-        ).stream().peek(a -> {
+        List<Exam> exams = examMapper.selectList(new LambdaQueryWrapper<Exam>().eq(Exam::getCourseId, courseId)).stream().peek(a -> {
             String s = a.getTitle() + String.valueOf(i.getAndIncrement());
             a.setTitle(s);
         }).toList();
 
         // 3. 组装统计信息
         String finalCourseName = courseName;
-        return exams.stream().collect(Collectors.toMap(
-                Exam::getTitle, // key: 考试标题
+        return exams.stream().collect(Collectors.toMap(Exam::getTitle, // key: 考试标题
                 exam -> {
                     // 查询成绩
                     List<Double> scoreList = courseEnrollmentMapper.getStudentScores(exam.getExamId());
@@ -1256,9 +1198,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                     }
 
                     // 转换空分数为 0
-                    List<Double> validScores = scoreList.stream()
-                            .map(score -> score == null ? 0.0 : score)
-                            .toList();
+                    List<Double> validScores = scoreList.stream().map(score -> score == null ? 0.0 : score).toList();
 
                     int totalStudents = validScores.size();
                     double averageScore = validScores.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
@@ -1297,8 +1237,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
                     situationDTO.setExcellentNumber(excellentCount);
 
                     return situationDTO;
-                }
-        ));
+                }));
     }
 
     @Override
@@ -1313,17 +1252,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         updateWrapper.eq(QuestionBank::getQuestionId, questionBank.getQuestionId());
 
         // 设置需要更新的字段（排除主键）
-        updateWrapper
-                .set(questionBank.getCourseId() != null, QuestionBank::getCourseId, questionBank.getCourseId())
-                .set(questionBank.getPointId() != null, QuestionBank::getPointId, questionBank.getPointId())
-                .set(questionBank.getQuestionType() != null, QuestionBank::getQuestionType, questionBank.getQuestionType())
-                .set(questionBank.getQuestionContent() != null, QuestionBank::getQuestionContent, questionBank.getQuestionContent())
-                .set(questionBank.getQuestionOptions() != null, QuestionBank::getQuestionOptions, questionBank.getQuestionOptions())
-                .set(questionBank.getCorrectAnswer() != null, QuestionBank::getCorrectAnswer, questionBank.getCorrectAnswer())
-                .set(questionBank.getExplanation() != null, QuestionBank::getExplanation, questionBank.getExplanation())
-                .set(questionBank.getDifficultyLevel() != null, QuestionBank::getDifficultyLevel, questionBank.getDifficultyLevel())
-                .set(questionBank.getScorePoints() != null, QuestionBank::getScorePoints, questionBank.getScorePoints())
-                .set(questionBank.getCreatedBy() != null, QuestionBank::getCreatedBy, questionBank.getCreatedBy());
+        updateWrapper.set(ObjectUtil.isNotNull(questionBank.getCourseId()), QuestionBank::getCourseId, questionBank.getCourseId()).set(ObjectUtil.isNotNull(questionBank.getPointId()), QuestionBank::getPointId, questionBank.getPointId()).set(ObjectUtil.isNotNull(questionBank.getQuestionType()), QuestionBank::getQuestionType, questionBank.getQuestionType())
+                // 字符串类型使用isNotBlank（排除null、空字符串、纯空白字符）
+                .set(StrUtil.isNotBlank(questionBank.getQuestionContent()), QuestionBank::getQuestionContent, questionBank.getQuestionContent()).set(StrUtil.isNotBlank(questionBank.getQuestionOptions()), QuestionBank::getQuestionOptions, questionBank.getQuestionOptions()).set(StrUtil.isNotBlank(questionBank.getCorrectAnswer()), QuestionBank::getCorrectAnswer, questionBank.getCorrectAnswer()).set(StrUtil.isNotBlank(questionBank.getExplanation()), QuestionBank::getExplanation, questionBank.getExplanation()).set(ObjectUtil.isNotNull(questionBank.getDifficultyLevel()), QuestionBank::getDifficultyLevel, questionBank.getDifficultyLevel()).set(ObjectUtil.isNotNull(questionBank.getScorePoints()), QuestionBank::getScorePoints, questionBank.getScorePoints()).set(StrUtil.isNotBlank(String.valueOf(questionBank.getCreatedBy())), QuestionBank::getCreatedBy, questionBank.getCreatedBy());
 
         // 执行更新
         int update = questionBankMapper.update(null, updateWrapper);
@@ -1401,6 +1332,16 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Boolean> addChapterQuestion(String chapterId, QuestionBank questionBank) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            List<String> correctAnswers = Arrays.asList(questionBank.getCorrectAnswer()); // 用List存储正确答案
+            //解析json
+            String jsonCorrectAnswer = objectMapper.writeValueAsString(correctAnswers);
+            questionBank.setCorrectAnswer(jsonCorrectAnswer);
+
+        } catch (Exception e) {
+            log.error("JSON 解析失败");
+        }
 
         //新增数据
         int insert = questionBankMapper.insert(questionBank);
@@ -1430,8 +1371,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     public Result<Boolean> deleteChapterQuestion(String chapterId, String questionId) {
         // 删除章节题目关联记录
         LambdaQueryWrapper<ChapterQuestion> chapterQuestionWrapper = new LambdaQueryWrapper<>();
-        chapterQuestionWrapper.eq(ChapterQuestion::getQuestionId, questionId)
-                .eq(ChapterQuestion::getChapterId, chapterId);
+        chapterQuestionWrapper.eq(ChapterQuestion::getQuestionId, questionId).eq(ChapterQuestion::getChapterId, chapterId);
         int deleteCount = chapterQuestionMapper.delete(chapterQuestionWrapper);
 
         if (deleteCount == 0) {

@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -35,7 +36,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class TeacherTestCreateToolUtils {
 
-    private static final ChapterQuestion.QuestionType TEST_QUESTION_TYPE = ChapterQuestion.QuestionType.TEST ;
+    private static final ChapterQuestion.QuestionType TEST_QUESTION_TYPE = ChapterQuestion.QuestionType.TEST;
     private final ChatLanguageModel chatLanguageModel;
     private final QuestionBankMapper questionBankMapper;
     private final ChapterQuestionMapper chapterQuestionMapper;
@@ -50,9 +51,9 @@ public class TeacherTestCreateToolUtils {
     /**
      * 生成章节测试题
      *
-     * @param content 教师需求内容
+     * @param content             教师需求内容
      * @param classAndChapterInfo 课程章节知识点信息
-     * @param wrongKnowledgeInfo 班级错误知识点信息
+     * @param wrongKnowledgeInfo  班级错误知识点信息
      * @return 生成的测试题JSON格式
      */
     public String createChapterTest(String content, String classAndChapterInfo, String wrongKnowledgeInfo) {
@@ -77,12 +78,12 @@ public class TeacherTestCreateToolUtils {
     /**
      * 生成章节测试题并保存到数据库
      *
-     * @param content 教师需求内容
+     * @param content             教师需求内容
      * @param classAndChapterInfo 课程章节知识点信息
-     * @param wrongKnowledgeInfo 班级错误知识点信息
-     * @param courseId 课程ID
-     * @param chapterId 章节ID
-     * @param teacherId 教师ID
+     * @param wrongKnowledgeInfo  班级错误知识点信息
+     * @param courseId            课程ID
+     * @param chapterId           章节ID
+     * @param teacherId           教师ID
      * @return 生成的测试题和保存结果
      */
     public String createChapterTestWithSave(String content, String classAndChapterInfo,
@@ -423,12 +424,21 @@ public class TeacherTestCreateToolUtils {
             questionBank.setQuestionOptions(objectMapper.writeValueAsString(optionsNode));
         }
 
-        // 处理答案
+// 处理答案：确保最终格式为JSON数组
         JsonNode answerNode = questionNode.get("correct_answer");
         if (answerNode != null && !answerNode.isNull()) {
-            String answerJson = answerNode.isTextual() ?
-                    objectMapper.writeValueAsString(answerNode.asText()) :
-                    objectMapper.writeValueAsString(answerNode);
+            String answerJson;
+            if (answerNode.isArray()) {
+                // 如果是数组节点，直接序列化
+                answerJson = objectMapper.writeValueAsString(answerNode);
+            } else if (answerNode.isTextual()) {
+                // 如果是文本节点，将其包装为数组（如"A" → ["A"]）
+                String singleAnswer = answerNode.asText();
+                answerJson = objectMapper.writeValueAsString(Arrays.asList(singleAnswer));
+            } else {
+                // 其他类型（如对象），根据业务需求处理
+                throw new RuntimeException("不支持的correct_answer格式");
+            }
             questionBank.setCorrectAnswer(answerJson);
         }
 
