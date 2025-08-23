@@ -45,6 +45,7 @@
     <ExamContentModal
       v-model="showExamModal"
       :examPaper="selectedExamPaper"
+      :courseId="currentCourseId"
     />
   </div>
 </template>
@@ -287,6 +288,7 @@ const viewExamContent = async (assessment) => {
       });
 
       selectedExamPaper.value = {
+        examId: assessment.id,
         title: assessment.title,
         questions: questions
       };

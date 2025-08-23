@@ -439,6 +439,53 @@ export const teacherService = {
       params: { examId }
     });
   },
+
+
+  deleteQuestion: async (params) => {
+    return await apiClient.post('/teacher/delete/paperQuestion', null, {
+      params: {
+        questionId: params.questionId,
+        examId: params.examId
+      }
+    });
+  },
+
+  addQuestion: async (params) => {
+    return await apiClient.post('/teacher/add/examQuestion', params.questionBank, {
+      params: {
+        examId: params.examId
+      }
+    });
+  },
+
+  updateQuestion: async (questionData) => {
+    return await apiClient.post('/teacher/updateExam/question', questionData);
+  },
+
+  uploadKnowledge: async (filePath) => {
+    return await apiClient.get('/test/knowledge/database', {
+      params: {
+        url: filePath
+      }
+    })
+  },
+
+  deleteChapter: async (params) => {
+    return await apiClient.post(`/teacher/delete/chapterQuestion`, null, {
+      params: {
+        chapterId: params.chapterId,
+        questionId: params.questionId
+      }
+    });
+  },
+
+  addChapterQuestion: async(params) =>{
+    return await apiClient.post('/teacher/add/chapterQuestion', params.questionBank, {
+      params: {
+        chapterId: params.chapterId
+      }
+    });
+  }
 };
 
 //管理员服务

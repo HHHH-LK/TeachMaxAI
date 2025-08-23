@@ -6,12 +6,13 @@
     :before-close="handleClose"
   >
     <div v-if="examPaper" class="exam-content">
-      <ExamAttempt 
+      <ExamAdit 
         :paper="examPaper" 
         :readonly="true" 
         :wrong-analysis="correctAnswers"
         :user-answers="{}"
         :show-user-answers="false"
+        :courseId="props.courseId" 
       />
     </div>
   </el-dialog>
@@ -19,7 +20,8 @@
 
 <script setup>
 import { computed } from 'vue';
-import ExamAttempt from '@/components/ExamAttempt.vue';
+// import ExamAttempt from '@/components/ExamAttempt.vue';
+import ExamAdit from '@/components/ExamAdit.vue';
 
 const props = defineProps({
   modelValue: {
@@ -29,6 +31,10 @@ const props = defineProps({
   examPaper: {
     type: Object,
     default: null
+  },
+  courseId: {
+    type: [String, Number],
+    default: 1
   }
 });
 
@@ -52,6 +58,9 @@ const correctAnswers = computed(() => {
         answer: question.correctAnswer,
         explanation: question.explanation
       };
+      console.log(question.id, question.correctAnswer);
+      // console.log("question", props.examPaper);
+      // console.log("course", props.courseId)
     }
   });
   
