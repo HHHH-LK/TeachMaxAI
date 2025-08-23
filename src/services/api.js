@@ -480,9 +480,9 @@ export const teacherService = {
   },
 
   addChapterQuestion: async(params) =>{
-    return await apiClient.post('/teacher/add/examQuestion', params.questionBank, {
+    return await apiClient.post('/teacher/add/chapterQuestion', params.questionBank, {
       params: {
-        examId: params.chapterId
+        chapterId: params.chapterId
       }
     });
   }

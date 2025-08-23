@@ -983,11 +983,12 @@ const addNewQuestion = async () => {
       createdBy: 1 // 创建者ID，
     };
     
+
     const params = {
+      chapterId: props.chapterId ? parseInt(props.chapterId) : 0,
       questionBank: questionBank,
-      chapterId: props.chapterId ? parseInt(props.chapterId) : 0
     };
-    
+        console.log("添加题目参数:", params);
     // 调用API添加题目
     const response = await teacherService.addChapterQuestion(params);
     
