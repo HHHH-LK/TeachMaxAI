@@ -195,8 +195,7 @@ const generateDescription = computed(() => {
       `试卷标题：${generateForm.title} \n` +
       `考试类型：${generateForm.type} \n` +
       `包含章节：${formattedChapters || "无"} \n` +
-      `题目数量：${generateForm.totalQuestions}题` +
-      `总分值为100分`
+      `题目数量：${generateForm.totalQuestions}题`
   );
 });
 

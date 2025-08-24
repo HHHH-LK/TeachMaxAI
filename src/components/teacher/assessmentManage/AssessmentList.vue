@@ -51,8 +51,7 @@ const activeTab = ref('all');
 const pendingAssessments = computed(() => {
   return props.assessments.filter((assessment) => {
     // 只有状态为进行中且还有未阅卷学生的考核才显示在待阅卷区域
-    return assessment.status === 'scheduled' && 
-           assessment.gradedCount < assessment.submittedCount;
+    return assessment.status === 'scheduled';
   });
 });
 </script>

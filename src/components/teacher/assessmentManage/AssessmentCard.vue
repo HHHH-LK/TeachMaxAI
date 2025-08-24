@@ -51,7 +51,7 @@
           size="small"
           type="success"
           @click="$emit('grade', assessment)"
-          v-if="assessment.status === 'scheduled' && assessment.gradedCount < assessment.submittedCount"
+          v-if="assessment.status === 'scheduled'"
         >
           智能阅卷
         </el-button>

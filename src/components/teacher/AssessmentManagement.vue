@@ -237,6 +237,18 @@ const viewExamContent = async (assessment) => {
     const response = await teacherService.assessment.getCourseExamInfo(assessment.id);
     console.log("考试内容响应:", response);
 
+    let totalScore = 0;
+
+    const questionList = response.data.data;
+    console.log("questionList实际值:", questionList);
+
+    const safeQuestionList = Array.isArray(questionList) ? questionList : [];
+
+    safeQuestionList.forEach(question => {
+      const point = question.scorePoints ?? 0;
+      totalScore += point;
+    });
+
     if (response.data && response.data.success) {
       // 将API返回的题目数据转换为组件需要的格式
       const questions = response.data.data.map(question => {
@@ -334,6 +346,7 @@ const deleteAssessment = async (id) => {
 };
 
 // 初始化加载考核列表
+// 初始化加载考核列表
 const loadAssessments = async () => {
   try {
     const response = await teacherService.assessment.generateExam(currentCourseId.value);
@@ -342,80 +355,101 @@ const loadAssessments = async () => {
     if (response.data && response.data.success) {
       // 将API返回的数据转换为组件需要的格式
       const examList = response.data.data;
-      
-      // 获取每个考试的学生信息
+
+      // 获取每个考试的学生信息 + 调用接口计算总分
       const examWithStudents = await Promise.all(
-        examList.map(async (exam) => {
-          try {
-            const studentResponse = await teacherService.getExamStudentInfo(exam.examId);
-            console.log("获取学生信息响应:", studentResponse);
-            let submittedCount = 0;
-            let gradedCount = 0;
-            
-            if (studentResponse.data && studentResponse.data.success) {
-              const students = studentResponse.data.data;
-              // 所有学生都默认已提交
-              submittedCount = students.length;
-              // 计算已阅卷数量（分数不为null且大于等于0的学生）
-              gradedCount = students.filter(student => student.score !== null && student.score >= 0).length;
-            }
-            
-            // 根据考试状态和阅卷情况确定显示状态
-            let displayStatus = exam.status;
-            if (exam.status === 'scheduled' && gradedCount >= submittedCount && submittedCount > 0) {
-              displayStatus = 'completed'; // 如果所有提交的学生都已阅卷，则标记为已完成
-            }
-            
-            return {
-              id: exam.examId.toString(),
-              title: exam.title,
-              type: "期末考试",
-              status: displayStatus,
-              totalQuestions: exam.questionCount || 0,
-              totalScore: exam.max_score || 0,
-              totalStudents: 6, // 根据API返回的学生数量
-              submittedCount: submittedCount,
-              gradedCount: gradedCount,
-              createdAt: exam.createdAt,
-              lastSubmissionTime: exam.lastSubmissionTime || null,
-              chapters: [exam.courseId],
-              knowledgePoints: ["综合项目实践"],
-              examPaper: {
-                title: exam.title,
-                questions: [] // 试卷题目数据需要另外获取
+          examList.map(async (exam) => {
+            let totalScore = 0; // 初始化总分
+            try {
+              // 调用获取考试内容的接口（传入当前考试ID）
+              const examDetailRes = await teacherService.assessment.getCourseExamInfo(exam.examId);
+              console.log(`考试${exam.examId}的题目详情响应:`, examDetailRes);
+
+              if (examDetailRes.data && examDetailRes.data.success) {
+                const questionList = examDetailRes.data.data;
+                // 确保题目列表是数组，避免异常
+                const safeQuestionList = Array.isArray(questionList) ? questionList : [];
+                // 遍历题目累加分数
+                safeQuestionList.forEach(question => {
+                  const point = question.scorePoints ?? 0;
+                  totalScore += point;
+                });
+              } else {
+                console.warn(`获取考试${exam.examId}题目失败，使用默认总分0`);
+                totalScore = 0;
               }
-            };
-          } catch (error) {
-            console.error(`获取考试${exam.examId}的学生信息失败:`, error);
-            // 如果获取学生信息失败，使用默认值
-            return {
-              id: exam.examId.toString(),
-              title: exam.title,
-              type: "期末考试",
-              status: exam.status,
-              totalQuestions: exam.questionCount || 0,
-              totalScore: exam.max_score || 0,
-              totalStudents: 6,
-              submittedCount: 6, // 默认所有学生都已提交
-              gradedCount: 0,
-              createdAt: exam.createdAt,
-              lastSubmissionTime: null,
-              chapters: [exam.courseId],
-              knowledgePoints: ["综合项目实践"],
-              examPaper: {
-                title: exam.title,
-                questions: []
+            } catch (error) {
+              console.error(`调用考试${exam.examId}题目接口失败:`, error);
+              totalScore = 0; // 接口调用失败时默认总分0
+            }
+            console.log(`考试${exam.examId}的题目总分:`, totalScore)
+
+            // 原有：获取学生信息逻辑
+            try {
+              const studentResponse = await teacherService.getExamStudentInfo(exam.examId);
+              console.log("获取学生信息响应:", studentResponse);
+              let submittedCount = 0;
+              let gradedCount = 0;
+
+              if (studentResponse.data && studentResponse.data.success) {
+                const students = studentResponse.data.data;
+                submittedCount = students.length; // 所有学生默认已提交
+                gradedCount = students.filter(student => student.score !== null && student.score >= 0).length;
               }
-            };
-          }
-        })
+
+              // 根据考试状态和阅卷情况确定显示状态
+              let displayStatus = exam.status;
+
+              return {
+                id: exam.examId.toString(),
+                title: exam.title,
+                type: "期末考试",
+                status: displayStatus,
+                totalQuestions: exam.questionCount || 0,
+                // 关键修改：替换为接口计算的totalScore，不再依赖exam.max_score
+                totalScore: totalScore,
+                totalStudents: studentResponse.data?.data?.length || 0, // 加空判断避免报错
+                submittedCount: submittedCount,
+                gradedCount: gradedCount,
+                createdAt: exam.createdAt,
+                lastSubmissionTime: exam.lastSubmissionTime || null,
+                chapters: [exam.courseId],
+                knowledgePoints: ["综合项目实践"],
+                examPaper: {
+                  title: exam.title,
+                  questions: [] // 试卷题目数据需要另外获取
+                }
+              };
+            } catch (error) {
+              console.error(`获取考试${exam.examId}的学生信息失败:`, error);
+              // 学生信息获取失败时，仍返回基础结构（总分用接口计算的结果）
+              return {
+                id: exam.examId.toString(),
+                title: exam.title,
+                type: "期末考试",
+                status: exam.status,
+                totalQuestions: exam.questionCount || 0,
+                totalScore: totalScore, // 同样使用接口计算的总分
+                totalStudents: 0,
+                submittedCount: 0,
+                gradedCount: 0,
+                createdAt: exam.createdAt,
+                lastSubmissionTime: null,
+                chapters: [exam.courseId],
+                knowledgePoints: ["综合项目实践"],
+                examPaper: {
+                  title: exam.title,
+                  questions: []
+                }
+              };
+            }
+          })
       );
-      
+
       assessments.value = examWithStudents;
     }
   } catch (error) {
     console.error("加载考核列表失败:", error);
-    // 如果API调用失败，保持使用模拟数据
   }
 };
 

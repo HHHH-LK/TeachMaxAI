@@ -474,20 +474,16 @@ const fetchKnowledgePoints = async (courseId) => {
       const knowledgeData = response.data.data;
       const knowledgePointsData = [];
 
-      // 遍历知识点ID和掌握情况
+      // 遍历知识点ID和掌握情况，收集数据
       for (const [pointId, masteryRate] of Object.entries(knowledgeData)) {
         try {
           // 获取知识点名称
-          const nameResponse = await teacherService.getKnowledgeNameById(
-            pointId
-          );
-          // console.log(`知识点${pointId}名称响应:`, nameResponse);
-
+          const nameResponse = await teacherService.getKnowledgeNameById(pointId);
           if (nameResponse.data && nameResponse.data.success) {
             knowledgePointsData.push({
               id: pointId,
               name: nameResponse.data.data,
-              masteryRate: masteryRate,
+              masteryRate: masteryRate, // 假设是数值类型（如80.5表示80.5%）
             });
           }
         } catch (error) {
@@ -495,8 +491,12 @@ const fetchKnowledgePoints = async (courseId) => {
         }
       }
 
+      // 排序：按掌握率从低到高（若需要从高到低，反转比较顺序即可）
+      knowledgePointsData.sort((a, b) => b.masteryRate - a.masteryRate);
+
+      // 赋值给响应式变量
       knowledgePoints.value = knowledgePointsData;
-      console.log("处理后的知识点数据:", knowledgePoints.value);
+      console.log("排序后的知识点数据:", knowledgePoints.value);
     }
   } catch (error) {
     console.log("获取知识点掌握情况失败:", error);

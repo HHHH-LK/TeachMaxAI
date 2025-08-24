@@ -18,8 +18,26 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="授课班级" prop="className">
-              <el-input v-model="form.className" placeholder="如：2023级计算机1班" />
+            <el-form-item label="选择章节" prop="chapterId">
+              <el-select
+                  v-model="form.chapterId"
+                  placeholder="请选择章节"
+                  filterable
+                  clearable
+                  style="width: 100%"
+              >
+                <el-option
+                    v-for="chapter in chapters"
+                    :key="chapter.chapterId"
+                    :label="chapter.chapterName"
+                    :value="chapter.chapterId"
+                >
+                  <span style="float: left">{{ chapter.chapterName }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">
+                    第{{ chapter.chapterOrder }}章
+                  </span>
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -164,7 +182,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import {
   MagicStick, Download, Check, Refresh
@@ -175,6 +193,13 @@ import DOMPurify from 'dompurify';
 import { teacherService } from '@/services/api';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+
+const props = defineProps({
+  courseId: {
+    type: [String, Number],
+    required: true
+  }
+})
 
 const lessonPlanForm = ref(null);
 const generating = ref(false);
@@ -189,9 +214,12 @@ const loadingTexts = ref([
 ]);
 const currentLoadingText = ref(0);
 
+// 章节列表数据
+const chapters = ref([]);
+
 const form = reactive({
   courseName: '',
-  className: '',
+  chapterId: '',
   duration: '90分钟',
   courseType: 'theory',
   studentLevel: 'intermediate',
@@ -202,7 +230,7 @@ const form = reactive({
 
 const rules = {
   courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
-  className: [{ required: true, message: '请输入授课班级', trigger: 'blur' }],
+  chapterId: [{ required: true, message: '请选择章节', trigger: 'change' }],
   duration: [{ required: true, message: '请选择授课时长', trigger: 'change' }],
   courseType: [{ required: true, message: '请选择课程类型', trigger: 'change' }],
   studentLevel: [{ required: true, message: '请选择学生水平', trigger: 'change' }],
@@ -211,6 +239,46 @@ const rules = {
 };
 
 const generatedPlan = ref({});
+
+// 获取选中章节的信息
+const selectedChapter = computed(() => {
+  if (!form.chapterId) return null;
+  return chapters.value.find(chapter => chapter.chapterId === form.chapterId);
+});
+
+// 获取章节列表
+const fetchChapters = async () => {
+  try {
+    const response = await teacherService.getChapterByCourseId(props.courseId);
+    if (response.data?.success) {
+      chapters.value = response.data.data;
+    }
+    console.log('获取章节列表成功:', response);
+    console.log('章节列表:', chapters.value)
+
+    // 模拟数据
+    // chapters.value = [
+    //   { id: 1, title: '数据结构基础', order: 1 },
+    //   { id: 2, title: '线性表', order: 2 },
+    //   { id: 3, title: '栈与队列', order: 3 },
+    //   { id: 4, title: '串', order: 4 },
+    //   { id: 5, title: '数组和广义表', order: 5 },
+    //   { id: 6, title: '树和二叉树', order: 6 },
+    //   { id: 7, title: '图', order: 7 },
+    //   { id: 8, title: '查找', order: 8 },
+    //   { id: 9, title: '排序', order: 9 },
+    //   { id: 10, title: '文件', order: 10 }
+    // ];
+  } catch (error) {
+    console.error('获取章节列表失败:', error);
+    ElMessage.warning('获取章节列表失败，使用默认数据');
+  }
+};
+
+// 组件挂载时获取章节列表
+onMounted(() => {
+  fetchChapters();
+});
 
 // 从不同可能的字段提取 Markdown 字符串
 const extractMarkdownText = (raw) => {
@@ -284,23 +352,25 @@ const buildLessonPlanData = (form) => {
   const courseTypeText = courseTypeMap[form.courseType] || form.courseType;
   const studentLevelText = studentLevelMap[form.studentLevel] || form.studentLevel;
   const focusText = focusMap[form.focus] || form.focus;
+  const chapterTitle = selectedChapter.value ? selectedChapter.value.chapterName : '未选择章节';
 
-  return `课程名称：${form.courseName}。授课班级：${form.className}。授课时长：${form.duration}。课程类型：${courseTypeText}。学生水平：${studentLevelText}。教学重点：${focusText}。教学内容：${form.content}。特殊要求：${form.requirements || '无特殊要求'}。`;
+  return `课程名称：${form.courseName}。选择章节：${chapterTitle}。授课时长：${form.duration}。课程类型：${courseTypeText}。学生水平：${studentLevelText}。教学重点：${focusText}。教学内容：${form.content}。特殊要求：${form.requirements || '无特殊要求'}。`;
 };
 
 const generateMockLessonPlan = () => {
+  const chapterTitle = selectedChapter.value ? selectedChapter.value.chapterName : '未选择章节';
   generatedPlan.value = `
 # 模拟教案示例
 
 课程名称：${form.courseName}
-授课班级：${form.className}
+选择章节：${chapterTitle}
 授课时长：${form.duration}
 课程类型：理论课
 学生水平：中级
 教学重点：概念理解
 
 ## 教学内容
-本节课主要讲解数据结构中链表的概念、基本操作（插入、删除、查找）以及实际应用场景。
+本节课主要讲解${chapterTitle}的概念、基本操作以及实际应用场景。
 
 ## 特殊要求
 无特殊要求。
@@ -319,14 +389,14 @@ const generateLessonPlan = async () => {
     generating.value = true;
     loadingProgress.value = 0;
     currentLoadingText.value = 0;
-    
+
     // 启动进度条动画
     const progressInterval = setInterval(() => {
       if (loadingProgress.value < 90) {
         loadingProgress.value += Math.random() * 15;
       }
     }, 500);
-    
+
     // 启动文本轮换动画
     const textInterval = setInterval(() => {
       currentLoadingText.value = (currentLoadingText.value + 1) % loadingTexts.value.length;
@@ -337,7 +407,7 @@ const generateLessonPlan = async () => {
       generatedPlan.value = '';
       ElMessage.info('正在根据备课资料生成教案...');
 
-      const response = await teacherService.generateLessonPlan(lessonPlanData, 1, 1);
+      const response = await teacherService.generateLessonPlan(lessonPlanData, props.courseId, form.chapterId);
 
       if (response.data?.success) {
         // 这里做兼容处理，防止返回结构不一致
@@ -378,7 +448,7 @@ const exportPlan = async () => {
 
   try {
     ElMessage.info('正在生成PDF文件...');
-    
+
     // 创建临时容器用于PDF生成
     const tempContainer = document.createElement('div');
     tempContainer.style.cssText = `
@@ -392,7 +462,7 @@ const exportPlan = async () => {
       line-height: 1.6;
       color: #333;
     `;
-    
+
     // 生成PDF内容
     const pdfContent = generatePDFContent();
     tempContainer.innerHTML = pdfContent;
@@ -434,7 +504,8 @@ const exportPlan = async () => {
     }
 
     // 下载PDF文件
-    const fileName = `${form.courseName}_教案_${new Date().toISOString().slice(0, 10)}.pdf`;
+    const chapterTitle = selectedChapter.value ? selectedChapter.value.title : '章节';
+    const fileName = `${form.courseName}_${chapterTitle}_教案_${new Date().toISOString().slice(0, 10)}.pdf`;
     pdf.save(fileName);
 
     ElMessage.success('PDF教案导出成功！');
@@ -466,13 +537,14 @@ const generatePDFContent = () => {
   const courseTypeText = courseTypeMap[form.courseType] || form.courseType;
   const studentLevelText = studentLevelMap[form.studentLevel] || form.studentLevel;
   const focusText = focusMap[form.focus] || form.focus;
+  const chapterTitle = selectedChapter.value ? selectedChapter.value.chapterName : '未选择章节';
 
   let content = `
     <div style="text-align: center; margin-bottom: 30px;">
       <h1 style="color: #3b82f6; font-size: 28px; margin-bottom: 10px;">智能教案</h1>
       <p style="color: #666; font-size: 14px;">AI智能生成 · ${new Date().toLocaleString('zh-CN')}</p>
     </div>
-    
+
     <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
       <h2 style="color: #3b82f6; font-size: 20px; margin-bottom: 15px;">基本信息</h2>
       <table style="width: 100%; border-collapse: collapse;">
@@ -481,8 +553,8 @@ const generatePDFContent = () => {
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${form.courseName}</td>
         </tr>
         <tr>
-          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">授课班级</td>
-          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${form.className}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">选择章节</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${chapterTitle}</td>
         </tr>
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">授课时长</td>
@@ -532,16 +604,16 @@ const generatePDFContent = () => {
   if (typeof generatedPlan.value === 'string') {
     // 处理Markdown内容
     const processedContent = generatedPlan.value
-      .replace(/^#\s+(.+)$/gm, '<h2 style="color: #3b82f6; font-size: 18px; margin: 20px 0 10px 0;">$1</h2>')
-      .replace(/^##\s+(.+)$/gm, '<h3 style="color: #1f2937; font-size: 16px; margin: 15px 0 8px 0;">$1</h3>')
-      .replace(/^###\s+(.+)$/gm, '<h4 style="color: #374151; font-size: 14px; margin: 12px 0 6px 0;">$1</h4>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/`(.+?)`/g, '<code style="background: #f3f4f6; padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>')
-      .replace(/^\s*[-*+]\s+(.+)$/gm, '<li style="margin: 5px 0;">$1</li>')
-      .replace(/^\s*\d+\.\s+(.+)$/gm, '<li style="margin: 5px 0;">$1</li>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/^(.+)$/gm, '<p style="margin: 8px 0; line-height: 1.6;">$1</p>');
+        .replace(/^#\s+(.+)$/gm, '<h2 style="color: #3b82f6; font-size: 18px; margin: 20px 0 10px 0;">$1</h2>')
+        .replace(/^##\s+(.+)$/gm, '<h3 style="color: #1f2937; font-size: 16px; margin: 15px 0 8px 0;">$1</h3>')
+        .replace(/^###\s+(.+)$/gm, '<h4 style="color: #374151; font-size: 14px; margin: 12px 0 6px 0;">$1</h4>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`(.+?)`/g, '<code style="background: #f3f4f6; padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>')
+        .replace(/^\s*[-*+]\s+(.+)$/gm, '<li style="margin: 5px 0;">$1</li>')
+        .replace(/^\s*\d+\.\s+(.+)$/gm, '<li style="margin: 5px 0;">$1</li>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/^(.+)$/gm, '<p style="margin: 8px 0; line-height: 1.6;">$1</p>');
 
     content += `
       <div style="margin-bottom: 25px;">
@@ -598,16 +670,16 @@ const generatePDFContent = () => {
         <div style="margin-bottom: 20px;">
           <h3 style="color: #1f2937; font-size: 16px; margin-bottom: 10px;">教学内容</h3>
           <div style="padding: 15px; background: #f8fafc; border-radius: 6px;">
-            ${Array.isArray(generatedPlan.value.content) 
-              ? generatedPlan.value.content.map(section => `
+            ${Array.isArray(generatedPlan.value.content)
+          ? generatedPlan.value.content.map(section => `
                   <div style="margin-bottom: 15px;">
                     <h4 style="color: #374151; margin-bottom: 8px;">${section.sectionTitle}</h4>
                     <p style="margin: 5px 0;">${section.details}</p>
                     ${section.keyPoints ? `<p style="margin: 5px 0; color: #059669;"><strong>重点：</strong>${section.keyPoints}</p>` : ''}
                   </div>
                 `).join('')
-              : `<p style="margin: 0;">${generatedPlan.value.content}</p>`
-            }
+          : `<p style="margin: 0;">${generatedPlan.value.content}</p>`
+      }
           </div>
         </div>
       `;
@@ -674,9 +746,8 @@ const savePlan = () => {
 
 const regeneratePlan = () => {
   generateLessonPlan();
-};
+}
 </script>
-
 
 <style scoped>
 .markdown-styles {
