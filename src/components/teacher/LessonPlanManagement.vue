@@ -112,10 +112,10 @@
             <div class="lesson-plan-content">
               <div class="lesson-plan-info">
                 <div class="meta-info">
-                  <div class="meta-item">
-                    <el-icon><User /></el-icon>
-                    <span>{{ lessonPlan.teacherName }}</span>
-                  </div>
+<!--                  <div class="meta-item">-->
+<!--                    <el-icon><User /></el-icon>-->
+<!--                    <span>{{ lessonPlan.teacherName }}</span>-->
+<!--                  </div>-->
                 </div>
                 <div class="creation-info">
                   <span class="created-time">创建时间：{{ formatDate(lessonPlan.createdAt) }}</span>
@@ -246,8 +246,6 @@ import {
   Upload,
   Delete,
   User,
-  Check,
-  Close
 } from '@element-plus/icons-vue'
 
 // 定义 props

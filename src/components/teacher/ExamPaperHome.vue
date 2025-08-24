@@ -149,32 +149,32 @@
 
         <!-- 答案与解析区域 -->
         <div v-if="isReadonly || submitted" class="answer-section">
-          <p
-            class="your-answer"
-            :class="
-              isCorrect(question, displayUserAnswers[index])
-                ? 'correct'
-                : 'wrong'
-            "
-          >
-            你选择的答案：{{
-              formatUserAnswer(displayUserAnswers[index], question.type)
-            }}
-            <span v-if="isCorrect(question, displayUserAnswers[index])"
-              >（正确）</span
-            >
-            <span
-              v-else-if="
-                (displayUserAnswers[index] &&
-                  typeof displayUserAnswers[index] === 'string' &&
-                  displayUserAnswers[index].trim() !== '') ||
-                (Array.isArray(displayUserAnswers[index]) &&
-                  displayUserAnswers[index].length > 0)
-              "
-              >（错误）</span
-            >
-            <span v-else>（未作答）</span>
-          </p>
+<!--          <p-->
+<!--            class="your-answer"-->
+<!--            :class="-->
+<!--              isCorrect(question, displayUserAnswers[index])-->
+<!--                ? 'correct'-->
+<!--                : 'wrong'-->
+<!--            "-->
+<!--          >-->
+<!--            你选择的答案：{{-->
+<!--              formatUserAnswer(displayUserAnswers[index], question.type)-->
+<!--            }}-->
+<!--            <span v-if="isCorrect(question, displayUserAnswers[index])"-->
+<!--              >（正确）</span-->
+<!--            >-->
+<!--            <span-->
+<!--              v-else-if="-->
+<!--                (displayUserAnswers[index] &&-->
+<!--                  typeof displayUserAnswers[index] === 'string' &&-->
+<!--                  displayUserAnswers[index].trim() !== '') ||-->
+<!--                (Array.isArray(displayUserAnswers[index]) &&-->
+<!--                  displayUserAnswers[index].length > 0)-->
+<!--              "-->
+<!--              >（错误）</span-->
+<!--            >-->
+<!--            <span v-else>（未作答）</span>-->
+<!--          </p>-->
           <p class="correct-answer">
             正确答案: {{ formatAnswer(question.answer, question.type) }}
           </p>

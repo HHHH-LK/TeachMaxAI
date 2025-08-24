@@ -34,6 +34,13 @@
               @click="viewSubmissions(homework)"
               >提交情况</el-button
             >
+            <el-button
+              size="small"
+              type="warning"
+              @click="refreshSubmissionCount(homework)"
+              :loading="homework.refreshing"
+              >刷新数量</el-button
+            >
           </div>
         </div>
 
@@ -740,6 +747,38 @@ const getStudentHomework = async (studentId, courseId, chapterId) => {
   }
 };
 
+// 获取作业的提交数量
+const getHomeworkSubmissionCount = async (courseId, chapterId) => {
+  if (!courseStudents.value || courseStudents.value.length === 0) {
+    return 0;
+  }
+
+  let submittedCount = 0;
+  
+  for (const student of courseStudents.value) {
+    try {
+      const studentDetail = await getStudentDetail(student.studentNumber);
+      const homeworkData = await getStudentHomework(
+        studentDetail?.studentId || student.studentNumber,
+        courseId,
+        chapterId
+      );
+      
+      // 检查是否有已作答的题目
+      if (homeworkData && homeworkData.length > 0) {
+        const answeredCount = homeworkData.filter(item => item.answered === true).length;
+        if (answeredCount > 0) {
+          submittedCount++;
+        }
+      }
+    } catch (error) {
+      console.warn(`获取学生 ${student.realName} 的作业提交状态失败:`, error);
+    }
+  }
+  
+  return submittedCount;
+};
+
 // 获取作业列表
 const fetchAllWork = async () => {
   try {
@@ -804,9 +843,19 @@ const fetchAllWork = async () => {
                 totalStudents: courseStudents.value.length || 0,
                 questionCount: response.data.data.length,
                 difficultyLevel: "medium",
+                refreshing: false, // 刷新状态
               };
 
               homeworkList.value.push(homework);
+              
+              // 获取该作业的实际提交数量
+              try {
+                const actualSubmittedCount = await getHomeworkSubmissionCount(props.courseId, chapter.chapterId);
+                homework.submittedCount = actualSubmittedCount;
+                console.log(`作业 ${homework.title} 的实际提交数量: ${actualSubmittedCount}`);
+              } catch (error) {
+                console.warn(`获取作业 ${homework.title} 的提交数量失败:`, error);
+              }
             }
           }
         } catch (error) {
@@ -827,24 +876,22 @@ const fetchStudentSubmissions = async (homework) => {
   tableLoading.value = true;
   try {
     const submissionsData = [];
+    let submittedCount = 0; // 统计已提交的学生数量
 
     for (const student of courseStudents.value) {
-      // 获取学生详细信息
       const studentDetail = await getStudentDetail(student.studentNumber);
-
-      // 获取学生作业信息
       const homeworkData = await getStudentHomework(
-        studentDetail?.studentId || student.studentNumber,
-        props.courseId,
-        homework.chapterId
+          studentDetail?.studentId || student.studentNumber,
+          props.courseId,
+          homework.chapterId
       );
 
       const submission = {
         studentName: student.realName,
         studentId: student.studentNumber,
         studentDetail: studentDetail,
-        submitTime: null,
-        status: "not_submitted",
+        submitTime: null, // 待基于 homeworkData.createdAt 赋值
+        status: "not_submitted", // 默认未提交
         content: "",
         examContent: "",
         studentAnswers: [],
@@ -853,130 +900,101 @@ const fetchStudentSubmissions = async (homework) => {
         homeworkData: homeworkData,
       };
 
-      // 如果有作业数据，说明学生已提交
+      // -------------------------- 修改点1：基于 answered 判断整体提交状态 --------------------------
       if (homeworkData && homeworkData.length > 0) {
-        submission.status = "submitted";
-        submission.submitTime = new Date();
-        submission.reviewStatus = "pending";
+        // 统计已作答的题目数量（answered: true）
+        const answeredCount = homeworkData.filter(item => item.answered === true).length;
+        // 若至少有1题已作答，则视为“已提交”
+        if (answeredCount > 0) {
+          submission.status = "submitted";
+          submission.reviewStatus = "pending";
+          submittedCount++; // 增加已提交计数
+          // 修正提交时间：取第一个题目的创建时间（通常所有题目提交时间一致）
+          submission.submitTime = homeworkData[0].createdAt
+              ? new Date(homeworkData[0].createdAt)
+              : new Date();
+        }
+      }
 
-        // 处理作业内容 - 转换为ExamPaper期望的格式
+      // -------------------------- 修改点2：生成 examContent 时关联 answered 状态 --------------------------
+      if (homeworkData && homeworkData.length > 0) {
         submission.examContent = homeworkData
-          .map((item, index) => {
-            // 转换题目类型为ExamPaper期望的格式
-            let questionType = "question";
-            if (item.questionType) {
-              switch (item.questionType.toLowerCase()) {
-                case "single":
-                case "single_choice":
-                case "single-choice":
-                  questionType = "single-choice";
-                  break;
-                case "multiple":
-                case "multiple_choice":
-                case "multiple-choice":
-                  questionType = "multiple-choice";
-                  break;
-                case "fill":
-                case "fill_blank":
-                case "fill-in-blank":
-                  questionType = "fill-in-blank";
-                  break;
-                case "judge":
-                case "true_false":
-                case "true-false":
-                  questionType = "true-false";
-                  break;
-                case "short":
-                case "short_answer":
-                case "short-answer":
-                  questionType = "short-answer";
-                  break;
-                default:
-                  questionType = "question";
+            .map((item, index) => {
+              // 1. 处理题目类型（原逻辑保留，优化可读性）
+              let questionType = "question";
+              if (item.questionType) {
+                const typeMap = {
+                  "single": "single-choice",
+                  "single_choice": "single-choice",
+                  "single-choice": "single-choice",
+                  "multiple": "multiple-choice",
+                  "multiple_choice": "multiple-choice",
+                  "multiple-choice": "multiple-choice",
+                  "fill": "fill-in-blank",
+                  "fill_blank": "fill-in-blank",
+                  "fill-in-blank": "fill-in-blank",
+                  "judge": "true-false",
+                  "true_false": "true-false",
+                  "true-false": "true-false",
+                  "short": "short-answer",
+                  "short_answer": "short-answer",
+                  "short-answer": "short-answer"
+                };
+                questionType = typeMap[item.questionType.toLowerCase()] || "question";
               }
-            }
+              const questionText = `${index + 1}. [${questionType}] ${item.questionContent || ""}`;
 
-            const questionText = `${index + 1}. [${questionType}] ${
-              item.questionContent || ""
-            }`;
-
-            // 处理选项 - 修复[object Object]问题
-            let optionsText = "";
-            if (item.questionOptions) {
-              try {
-                const options = JSON.parse(item.questionOptions);
-
-                if (Array.isArray(options) && options.length > 0) {
-                  // 过滤掉无效的选项内容
-                  const validOptions = options.filter((opt) => {
-                    if (typeof opt === "string")
-                      return opt && opt.trim() !== "";
-                    if (typeof opt === "object" && opt !== null) {
-                      // 如果是对象，尝试提取有用的字段
-                      return opt.content || opt.text || opt.label || opt.value;
+              // 2. 处理选项（原逻辑保留，修复解析异常）
+              let optionsText = "";
+              if (item.questionOptions) {
+                try {
+                  const options = JSON.parse(item.questionOptions);
+                  if (Array.isArray(options) && options.length > 0) {
+                    const validOptions = options.filter(opt => {
+                      if (typeof opt === "string") return opt.trim() !== "";
+                      if (typeof opt === "object" && opt !== null) {
+                        return opt.content || opt.text || opt.label || opt.value;
+                      }
+                      return false;
+                    });
+                    if (validOptions.length > 0) {
+                      optionsText = validOptions
+                          .map((opt, i) => {
+                            let optionText = typeof opt === "string"
+                                ? opt
+                                : (opt.content || opt.text || opt.label || opt.value || JSON.stringify(opt));
+                            return `${String.fromCharCode(65 + i)}. ${optionText}`;
+                          })
+                          .join("\n");
                     }
-                    return false;
-                  });
-
-                  if (validOptions.length > 0) {
-                    optionsText = validOptions
-                      .map((opt, i) => {
-                        let optionText = "";
-                        if (typeof opt === "string") {
-                          optionText = opt;
-                        } else if (typeof opt === "object" && opt !== null) {
-                          // 尝试从对象中提取选项文本
-                          optionText =
-                            opt.content ||
-                            opt.text ||
-                            opt.label ||
-                            opt.value ||
-                            JSON.stringify(opt);
-                        }
-                        return `${String.fromCharCode(65 + i)}. ${optionText}`;
-                      })
-                      .join("\n");
                   }
-                }
-              } catch (e) {
-                console.warn("选项解析失败:", item.questionOptions, e);
-                // 如果JSON解析失败，尝试直接使用字符串
-                if (typeof item.questionOptions === "string") {
-                  const lines = item.questionOptions
-                    .split("\n")
-                    .filter((line) => line.trim() !== "");
-                  if (lines.length > 0) {
-                    optionsText = lines
-                      .map(
-                        (line, i) =>
-                          `${String.fromCharCode(65 + i)}. ${line.trim()}`
-                      )
-                      .join("\n");
+                } catch (e) {
+                  console.warn("选项解析失败:", item.questionOptions, e);
+                  if (typeof item.questionOptions === "string") {
+                    const lines = item.questionOptions.split("\n").filter(line => line.trim() !== "");
+                    optionsText = lines.map((line, i) => `${String.fromCharCode(65 + i)}. ${line.trim()}`).join("\n");
                   }
                 }
               }
-            }
 
-            // 处理答案 - 使用ExamPaper期望的格式
-            const answer = `答案: ${item.studentAnswer || ""}`;
+              // 3. 处理答案：基于 answered 字段显示“未作答”或学生答案
+              let answerText = "答案: 未作答"; // 默认未作答
+              if (item.answered === true) {
+                answerText = `答案: ${item.studentAnswer || "（空答案）"}`;
+              }
 
-            // 处理解析
-            const explanation = item.explanation
-              ? `\n解析: ${item.explanation}`
-              : "";
+              // 4. 处理解析（原逻辑保留）
+              const explanation = item.explanation ? `\n解析: ${item.explanation}` : "";
 
-            return `${questionText}\n${optionsText}\n${answer}${explanation}`;
-          })
-          .join("\n\n");
+              return `${questionText}\n${optionsText}\n${answerText}${explanation}`;
+            })
+            .join("\n\n");
 
-        // 处理学生答案 - 确保空答案被正确识别
-        submission.studentAnswers = homeworkData.map((item) => {
-          const answer = item.studentAnswer;
-          // 如果答案为空、null、undefined或只包含空白字符，则视为未作答
-          if (!answer || (typeof answer === "string" && answer.trim() === "")) {
-            return "";
-          }
-          return answer;
+        // -------------------------- 修改点3：生成 studentAnswers 时关联 answered 状态 --------------------------
+        submission.studentAnswers = homeworkData.map(item => {
+          // 若未作答（answered: false），强制设为空字符串；若已作答，保留答案（空答案需标注）
+          if (item.answered !== true) return "";
+          return item.studentAnswer || "（空答案）";
         });
       }
 
@@ -984,7 +1002,17 @@ const fetchStudentSubmissions = async (homework) => {
     }
 
     submissions.value = submissionsData;
-    console.log("学生提交情况:", submissionsData);
+    
+    // 更新作业的提交数量
+    if (homework) {
+      const homeworkIndex = homeworkList.value.findIndex(h => h.id === homework.id);
+      if (homeworkIndex !== -1) {
+        homeworkList.value[homeworkIndex].submittedCount = submittedCount;
+        console.log(`更新作业 ${homework.title} 的提交数量: ${submittedCount}`);
+      }
+    }
+    
+    console.log("学生提交情况（基于answered判断）:", submissionsData);
   } catch (error) {
     console.error("获取学生提交情况失败:", error);
     ElMessage.error("获取学生提交情况失败");
@@ -1060,9 +1088,20 @@ const createHomework = async () => {
         totalStudents: courseStudents.value.length || 0,
         questionCount: newHomework.value.questionCount,
         difficultyLevel: newHomework.value.difficultyLevel,
+        refreshing: false, // 刷新状态
       };
 
       homeworkList.value.unshift(newHomeworkData);
+      
+      // 获取新创建作业的实际提交数量
+      try {
+        const actualSubmittedCount = await getHomeworkSubmissionCount(props.courseId, newHomework.value.chapterId);
+        newHomeworkData.submittedCount = actualSubmittedCount;
+        console.log(`新创建作业 ${newHomeworkData.title} 的实际提交数量: ${actualSubmittedCount}`);
+      } catch (error) {
+        console.warn(`获取新创建作业的提交数量失败:`, error);
+      }
+      
       ElMessage.success("作业创建并发布成功！");
       showCreateDialog.value = false;
 
@@ -1400,6 +1439,26 @@ const getDifficultyText = (difficulty) => {
     hard: "困难",
   };
   return texts[difficulty] || "未知";
+};
+
+// 刷新作业提交数量
+const refreshSubmissionCount = async (homework) => {
+  if (!homework) return;
+  
+  // 设置刷新状态
+  homework.refreshing = true;
+  
+  try {
+    const actualSubmittedCount = await getHomeworkSubmissionCount(props.courseId, homework.chapterId);
+    homework.submittedCount = actualSubmittedCount;
+    console.log(`刷新作业 ${homework.title} 的提交数量: ${actualSubmittedCount}`);
+    ElMessage.success(`提交数量已刷新：${actualSubmittedCount}/${homework.totalStudents}`);
+  } catch (error) {
+    console.error(`刷新作业 ${homework.title} 的提交数量失败:`, error);
+    ElMessage.error("刷新提交数量失败，请重试");
+  } finally {
+    homework.refreshing = false;
+  }
 };
 
 // 获取测试等级对应的标签类型
