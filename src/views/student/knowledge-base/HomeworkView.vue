@@ -16,6 +16,7 @@
         :userInfo="userInfo"
         :chapterId="chapterIdNumber"
         :homeworks="homeworks"
+        :readonly="homeworks.allAnswered"
       />
     </div>
     <div v-else>
@@ -75,7 +76,7 @@ const fetchAllWork = async () => {
         chapter.value[i].id,
         props.courseId
       );
-      console.log("response", response.data);
+      // console.log("response", response.data);
       if (response.data.data) {
         const homework = {
           id: `${props.courseId}-${chapter.value[i].id}-${number}`,
@@ -84,7 +85,7 @@ const fetchAllWork = async () => {
           questions: [],
           allAnswered: false,
         };
-        console.log("homework", response.data);
+        // console.log("homework", response.data);
         homework.questions = response.data.data.map((item) => {
           let parsedOptions = [];
           try {

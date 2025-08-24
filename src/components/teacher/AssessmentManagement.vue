@@ -46,6 +46,7 @@
       v-model="showExamModal"
       :examPaper="selectedExamPaper"
       :courseId="currentCourseId"
+      :isView="currentAssessment?.status === 'scheduled'"
     />
   </div>
 </template>
@@ -70,6 +71,7 @@ const showViewModal = ref(false);
 const showExamModal = ref(false);
 const selectedAssessment = ref(null);
 const selectedExamPaper = ref(null);
+const currentAssessment = ref(null)
 
 // 定义props接收courseId
 const props = defineProps({
@@ -233,6 +235,8 @@ const viewAssessment = (assessment) => {
 
 // 查看考试内容
 const viewExamContent = async (assessment) => {
+  currentAssessment.value = assessment;
+  console.log("查看考试内容:", assessment);
   try {
     const response = await teacherService.assessment.getCourseExamInfo(assessment.id);
     console.log("考试内容响应:", response);
@@ -447,6 +451,7 @@ const loadAssessments = async () => {
       );
 
       assessments.value = examWithStudents;
+      console.log(assessments.value, "assessments")
     }
   } catch (error) {
     console.error("加载考核列表失败:", error);

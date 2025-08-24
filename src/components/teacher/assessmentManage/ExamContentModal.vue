@@ -6,7 +6,7 @@
     :before-close="handleClose"
   >
     <div v-if="examPaper" class="exam-content">
-      <ExamAdit 
+      <ExamAdit v-if="!props.isView"
         :paper="examPaper" 
         :readonly="true" 
         :wrong-analysis="correctAnswers"
@@ -14,13 +14,22 @@
         :show-user-answers="false"
         :courseId="props.courseId" 
       />
+
+      <ExamAttempt v-if="props.isView"
+                :paper="examPaper"
+                :readonly="true"
+                :wrong-analysis="correctAnswers"
+                :user-answers="{}"
+                :show-user-answers="false"
+                :courseId="props.courseId"
+      />
     </div>
   </el-dialog>
 </template>
 
 <script setup>
 import { computed } from 'vue';
-// import ExamAttempt from '@/components/ExamAttempt.vue';
+import ExamAttempt from '@/components/ExamAttempt.vue';
 import ExamAdit from '@/components/ExamAdit.vue';
 
 const props = defineProps({
@@ -35,9 +44,15 @@ const props = defineProps({
   courseId: {
     type: [String, Number],
     default: 1
+  },
+  isView: {
+    type: Boolean,
+    default: true
   }
 });
 
+
+console.log("aksjdflkj", props.isView)
 const emit = defineEmits(['update:modelValue']);
 
 const visible = computed({

@@ -407,7 +407,7 @@ const generateRealExamContent = (examData) => {
             questionType = "true-false";
             break;
           case "fill_blank":
-            questionType = "fill-blank";
+            questionType = "fill-in-blank";
             break;
           case "short_answer":
             questionType = "short-answer";

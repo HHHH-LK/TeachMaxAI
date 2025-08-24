@@ -9,9 +9,9 @@
       <el-container class="right-container">
         <head-bar/>
         <el-main class="main-content">
-          <!-- 根据 activeMenu 显示不同的内容 -->
           <router-view></router-view>
-          <aiAssistant v-if="!isGamePage" />
+          <!-- 关键修改：用 !shouldHideAiAssistant 控制，同时排除两种页面 -->
+          <aiAssistant v-if="!shouldHideAiAssistant" />
         </el-main>
       </el-container>
     </el-container>
@@ -21,12 +21,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import studentAvatar from '@/assets/student-avatar.png';
-// import Sidebar from '../components/common/Sidebar.vue';
 import CommonHeader from '../components/common/CommonHeader.vue';
 import aiAssistant from '../components/aIAssistant.vue';
 import Sider from '@/components/common/Sider.vue'
-import CommunityStudent from './student/CommunityStudent.vue';
-import {useRoute, useRouter} from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import HeadBar from '@/components/common/HeadBar.vue';
 
 const router = useRouter();
@@ -73,15 +71,11 @@ const navbarItems = [
 
 const handleNavbarItemClick = async (item) => {
   if (item.route) {
-    // 如果是神秘之塔，先检查角色信息
     if (item.id === 'game-entry') {
       try {
-        // 这里可以添加角色检查逻辑，如果需要的话
-        // 目前直接跳转，角色检查在Entry.vue中进行
         router.push(item.route);
       } catch (error) {
         console.error('进入神秘之塔失败:', error);
-        // 如果失败，仍然跳转，让Entry.vue处理错误
         router.push(item.route);
       }
     } else {
@@ -102,13 +96,19 @@ const currentPageTitle = computed(() => {
   return findTitle(navbarItems, route.path);
 });
 
-// 判断当前是否在游戏页面
-const isGamePage = computed(() => {
-  return route.path === '/student/game-entry';
+// 关键修改：新增判断逻辑，覆盖「游戏页面」和「带参数的课程中心页面」
+const shouldHideAiAssistant = computed(() => {
+  // 1. 游戏页面（精确匹配固定路径）
+  const isGamePage = route.path === '/student/game-entry';
+  // 2. 带参数的课程中心页面（模糊匹配：路径以 /student/course-center/ 开头，如 /student/course-center/20）
+  const isCourseCenterDynamicPage = route.path.startsWith('/student/course-center/');
+
+  // 满足任一条件，就需要禁用 aiAssistant
+  return isGamePage || isCourseCenterDynamicPage;
 });
 
 onMounted(() => {
-  // 可以在这里进行一些初始化操作，例如根据路由设置初始 activeMenu
+  // 初始化操作（不变）
 });
 </script>
 
@@ -123,17 +123,17 @@ onMounted(() => {
 
 .right-container {
   flex-direction: column;
-  width: calc(100% - 5em); /* Assuming sidebar width is 250px */
-  border-radius: 8px; /* Slightly rounded corners */
+  width: calc(100% - 5em);
+  border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-  overflow: hidden;  
+  overflow: hidden;
   margin-left: 5em;
 }
 
 .main-content {
   flex-grow: 1;
-  background-color: #ffffff;  
+  background-color: #ffffff;
   overflow-y: auto;
-  border-radius: 0 0 8px 8px;  
+  border-radius: 0 0 8px 8px;
 }
 </style>

@@ -94,10 +94,35 @@
         <template #header>
           <div class="card-header">
             <span>成绩详情</span>
+            <div class="header-actions">
+              <!-- 考试选择下拉框 -->
+              <el-select
+                  v-model="selectedExamId"
+                  placeholder="请选择考试"
+                  style="width: 220px; margin-right: 15px"
+                  clearable
+                  :disabled="examList.length === 0"
+              >
+                <el-option
+                    v-for="exam in examList"
+                    :key="exam.id"
+                    :label="exam.label"
+                    :value="exam.value"
+                ></el-option>
+              </el-select>
+              <!-- 导出按钮 -->
+              <el-button
+                  type="primary"
+                  :icon="Download"
+                  @click="handleExport"
+                  :disabled="!selectedExamId || examList.length === 0"
+              >
+                导出成绩
+              </el-button>
+            </div>
           </div>
         </template>
-
-                 <el-table :data="paginatedGradeList" style="width: 100%" v-loading="loading">
+        <el-table :data="paginatedGradeList" style="width: 100%" v-loading="loading">
           <el-table-column prop="studentName" label="学生姓名" width="120" />
           <el-table-column prop="studentId" label="学号" width="120" />
           <el-table-column prop="examName" label="考试名称" width="150" />
@@ -140,6 +165,7 @@ import { User, Document, TrendCharts, Trophy, Download } from '@element-plus/ico
 import { ElMessage } from 'element-plus';
 import * as echarts from 'echarts';
 import {teacherService} from "@/services/api.js";
+import * as XLSX from "xlsx";
 
 const route = useRoute();
 const courseId = ref(route.params.courseId);
@@ -149,6 +175,9 @@ const loading = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
+
+const examList = ref([]); // 考试列表（格式：[{id, label, value}]）
+const selectedExamId = ref(''); // 选中的考试ID
 
 // 统计数据
 const totalStudents = ref(0);
@@ -184,17 +213,50 @@ const gradeList = ref([]);
 const paginatedGradeList = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   const end = start + pageSize.value;
-  const result = gradeList.value.slice(start, end);
+  const result = filteredGradeList.value.slice(start, end);
   console.log('分页信息:', {
     currentPage: currentPage.value,
     pageSize: pageSize.value,
-    total: gradeList.value.length,
+    total: filteredGradeList.value.length,
     start,
     end,
     resultLength: result.length
   });
   return result;
 });
+
+const handleExport = () => {
+  if (!selectedExamId.value) {
+    ElMessage.warning('请先选择需要导出的考试');
+    return;
+  }
+
+  // 获取选中考试信息
+  const selectedExam = examList.value.find(item => item.value === selectedExamId.value);
+  const examName = selectedExam ? selectedExam.label : '未知考试';
+
+  console.log('导出信息:', examName)
+
+  // 整理导出数据（匹配Excel表头）
+  const exportData = filteredGradeList.value.map(item => ({
+    '学生姓名': item.studentName,
+    '学号': item.studentId,
+    '考试名称': item.examName,
+    '成绩': item.score,
+    '排名': item.rank,
+    '考试日期': item.examDate,
+    '状态': item.status
+  }));
+
+  // 生成Excel工作簿
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(exportData); // JSON转工作表
+  XLSX.utils.book_append_sheet(workbook, worksheet, '成绩列表'); // 添加工作表
+
+  // 下载Excel文件
+  XLSX.writeFile(workbook, `${examName}_成绩导出.xlsx`);
+  ElMessage.success(`《${examName}》成绩导出成功`);
+};
 
 // 获取成绩样式类
 const getScoreClass = (score) => {
@@ -232,50 +294,54 @@ const loadGradeData = async () => {
     loading.value = true;
     const response = await teacherService.getStudentExam(courseId.value);
     console.log("loadGradeData:", response);
-    
+
     if (response.data && response.data.success) {
       const data = response.data.data;
-      
-             // 更新统计数据
-       totalStudents.value = data.studentCount || 0;
-       totalExams.value = data.examCount || 0;
-       averageScore.value = data.overallAverageScore || 0;
-       passRate.value = data.passRate || 0;
-      
-             // 更新成绩分布数据
-       scoreDistribution.value = {
-         scoreA: data.scoreA || 0,
-         scoreB: data.scoreB || 0,
-         scoreC: data.scoreC || 0,
-         scoreD: data.scoreD || 0,
-         scoreF: data.scoreF || 0
-       };
-      
-             // 更新成绩趋势数据
-       scoreTrend.value.examTitles = data.examDetails.map(exam => exam.title);
-       scoreTrend.value.averageScores = data.examDetails.map(exam => exam.averageScore || 0);
-      
-      // 更新成绩列表数据
+      console.log("获取到成绩信息", data)
+
+      // 原有逻辑：更新统计数据、成绩分布、成绩趋势...
+      totalStudents.value = data.studentCount || 0;
+      totalExams.value = data.examCount || 0;
+      averageScore.value = data.overallAverageScore || 0;
+      passRate.value = data.passRate || 0;
+      scoreDistribution.value = {
+        scoreA: data.scoreA || 0,
+        scoreB: data.scoreB || 0,
+        scoreC: data.scoreC || 0,
+        scoreD: data.scoreD || 0,
+        scoreF: data.scoreF || 0
+      };
+      scoreTrend.value.examTitles = data.examDetails.map(exam => exam.title);
+      scoreTrend.value.averageScores = data.examDetails.map(exam => exam.averageScore || 0);
+
+      examList.value = data.examDetails.map(exam => ({
+        id: exam.examId, // 唯一标识
+        label: exam.title, // 下拉框显示文本
+        value: exam.examId // 下拉框选中值（与selectedExamId绑定）
+      }));
+
+      // 修改：构建成绩列表时，新增examId字段（用于过滤）
       gradeList.value = [];
       data.examDetails.forEach(exam => {
         if (exam.studentScores && exam.studentScores.length > 0) {
           exam.studentScores.forEach((student, index) => {
-                         gradeList.value.push({
-               studentName: student.studentName || `学生${index + 1}`,
-               studentId: student.studentId || `ID${index + 1}`,
-               examName: exam.title,
-               score: student.score || 0,
-               rank: student.rank || index + 1,
-               examDate: new Date(exam.examDate).toLocaleDateString(),
-               status: '已批改'
-             });
+            gradeList.value.push({
+              studentName: student.studentName || `学生${index + 1}`,
+              studentId: student.studentId || `ID${index + 1}`,
+              examName: exam.title,
+              examId: exam.examId,
+              score: student.score || 0,
+              rank: student.rank || index + 1,
+              examDate: new Date(exam.examDate).toLocaleDateString(),
+              status: '已批改'
+            });
           });
         }
       });
-      
-             // 设置总数为原始数据长度，用于分页
-       total.value = gradeList.value.length;
-      
+
+      // 修改：分页总数基于过滤后的数据
+      total.value = filteredGradeList.value.length;
+
       // 重新初始化图表
       nextTick(() => {
         initScoreDistributionChart();
@@ -290,15 +356,21 @@ const loadGradeData = async () => {
   }
 };
 
+const filteredGradeList = computed(() => {
+  if (!selectedExamId.value) return gradeList.value; // 未选考试时显示全部
+  // 按考试ID过滤（需确保gradeList中包含examId字段）
+  return gradeList.value.filter(item => item.examId === selectedExamId.value);
+});
+
 // 初始化成绩分布图表
 const initScoreDistributionChart = () => {
   if (!scoreDistributionChart.value) return;
-  
+
   // 销毁旧实例
   if (scoreDistributionChartInstance) {
     scoreDistributionChartInstance.dispose();
   }
-  
+
   scoreDistributionChartInstance = echarts.init(scoreDistributionChart.value);
   const option = {
     tooltip: {
@@ -337,12 +409,12 @@ const initScoreDistributionChart = () => {
 // 初始化成绩趋势图表
 const initScoreTrendChart = () => {
   if (!scoreTrendChart.value) return;
-  
+
   // 销毁旧实例
   if (scoreTrendChartInstance) {
     scoreTrendChartInstance.dispose();
   }
-  
+
   scoreTrendChartInstance = echarts.init(scoreTrendChart.value);
   const option = {
     tooltip: {
@@ -415,6 +487,11 @@ watch(
     currentPage.value = 1;
   }
 );
+
+watch(selectedExamId, () => {
+  currentPage.value = 1;
+  total.value = filteredGradeList.value.length;
+});
 
 onMounted(() => {
   loadGradeData();
@@ -516,6 +593,12 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 .chart-container {
@@ -561,4 +644,4 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: center;
 }
-</style> 
+</style>
