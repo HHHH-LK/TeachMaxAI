@@ -57,6 +57,7 @@ const fetchResource = async() =>{
     error.value = null;
     const chapters = ref([]);
     const responseChapter = await studentService.getChapterInfo(props.courseId);
+    console.log("responseChapter", responseChapter)
   
     if(responseChapter.data){
       chapters.value = responseChapter.data.data.map(item => ({
@@ -65,13 +66,13 @@ const fetchResource = async() =>{
     }
     for(var i = 0; i < chapters.value.length; i++){
       const response = await studentService.getAllResources(chapters.value[i].id, props.courseId)
-      // console.log("data", response.data.data.courseList)
-      const resourcesTemp = response.data.data.courseList.map(item => ({
+      console.log("data", response)
+      const resourcesTemp = response.data.data.externalList.map(item => ({
         id: item.materialId,
         title: item.materialTitle,
         description: item. materialDescription,
         icon: 'icon-file-pdf',
-        link: "https://www.w3cschool.cn/java/java-book.html",
+        link: item.externalResourceUrl,
         type: "pdf"
       }));
       resources.value.push(...resourcesTemp)
