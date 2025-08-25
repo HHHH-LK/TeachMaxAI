@@ -128,7 +128,7 @@ const loadStudentData = async () => {
     }
   } catch (error) {
     console.error('获取学生数据失败:', error)
-    ElMessage.error('获取学生数据失败')
+    // ElMessage.error('获取学生数据失败')
     // 降级到模拟数据
     studentList.value = mockStudentData[selectedClass.value] || []
   } finally {
