@@ -86,12 +86,12 @@
                 @click="aiGradeSingleStudent(scope.row)"
                 :loading="scope.row.aiLoading"
               >智能阅卷</el-button>
-              <el-button 
-                size="small" 
-                type="success" 
-                @click="generateReport(scope.row)"
-                :loading="scope.row.reportLoading"
-              >生成报告</el-button>
+<!--              <el-button -->
+<!--                size="small" -->
+<!--                type="success" -->
+<!--                @click="generateReport(scope.row)"-->
+<!--                :loading="scope.row.reportLoading"-->
+<!--              >生成报告</el-button>-->
             </template>
           </el-table-column>
         </el-table>
