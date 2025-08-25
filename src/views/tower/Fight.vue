@@ -259,7 +259,7 @@ const fetchBossInfo = async () => {
       console.log("Boss信息加载成功:", enemyMaxHealth);
     } else {
       console.error("获取Boss信息失败:", response.data.message);
-      enemyMaxHealth = 100;
+      enemyMaxHealth.value = 100;
     }
   } catch (error) {
     console.error("获取Boss信息异常:", error);
