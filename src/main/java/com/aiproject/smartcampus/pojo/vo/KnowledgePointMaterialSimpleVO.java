@@ -10,6 +10,7 @@ public class KnowledgePointMaterialSimpleVO {
     private String materialDescription;
     private String materialType;
     private String materialTypeCn;
+    private String externalResourceUrl;
 
 
 }

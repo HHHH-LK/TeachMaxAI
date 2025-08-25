@@ -85,6 +85,14 @@ public class ChapterServiceImpl implements ChapterService {
             List<KnowledgePointMaterialSimpleVO> knowledgePointMaterialVOS =
                     chapterMapper.selectMaterialsByChapterStudentCourse(chapterId, studentId, courseId);
 
+            knowledgePointMaterialVOS.stream().forEach(a -> {
+
+                String URL = chapterMapper.selectMaterialURLById(a.getMaterialId());
+                a.setExternalResourceUrl(URL);
+
+            });
+
+
             if (knowledgePointMaterialVOS.isEmpty()) {
                 // 返回空的分类结果
                 KnowledgePointMaterialSimpleSpliderVO emptyResult = new KnowledgePointMaterialSimpleSpliderVO();

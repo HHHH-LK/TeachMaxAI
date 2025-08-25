@@ -518,5 +518,9 @@ public interface ChapterMapper extends BaseMapper<Chapter> {
 
     @Select("SELECT * FROM chapters WHERE course_id = #{courseId}")
     List<Chapter> selectByCourseId(String courseId);
+
+
+    @Select("select external_resource_url from education_system.course_materials where material_id=#{materialId}")
+    String selectMaterialURLById(Integer materialId);
 }
 
