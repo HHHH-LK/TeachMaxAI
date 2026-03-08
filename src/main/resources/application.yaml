@@ -104,8 +104,8 @@ mybatis-plus:
 mail:
   host: smtp.qq.com    # SMTP服务器地址
   port: 587                 # 端口
-  username: 3963077470@qq.com  # 邮箱用户名
-  password: xbtalymioxrzcgfg   # 邮箱密码或授权码
+  username:   # 邮箱用户名
+  password:    # 邮箱密码或授权码
   display-name: 教学实训
   protocol: smtp
   properties:
@@ -181,8 +181,8 @@ aliyun:
     endpoint: https://oss-cn-beijing.aliyuncs.com
     bucketName: smart-campus-resources-${random.int(1000,9999)}  # 使用唯一的bucket名称
     region: cn-beijing
-    accessKeyId: LTAI5tHAaGZDfWRA5jTmiHsn
-    accessKeySecret: COEDRVsbvau1b0WdQHyU8kwsS9J9kl
+    accessKeyId: 
+    accessKeySecret: 
 
 smart-campus:
   memory:
